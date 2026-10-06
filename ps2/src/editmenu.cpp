@@ -3997,7 +3997,6 @@ int CRemovalMenu::KeyStep() {
     }
     return closed;
 }
-#ifdef STATEMATCHING
 void MenuRemovalInit(mgCMemory *stack, int *arg) {
     int size;
 
@@ -4061,10 +4060,6 @@ void MenuRemovalInit(mgCMemory *stack, int *arg) {
     }
     MenuArg.result[0] = 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editmenu", MenuRemovalInit__FP9mgCMemoryPi);
-#endif
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editmenu", Initialize__19CCharaFrameMatchingFv);
 int MenuRemovalKey() {
     return RemovalMenuPtr->KeyStep();
 }
