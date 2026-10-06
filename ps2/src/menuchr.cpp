@@ -5939,6 +5939,7 @@ void CMenuCostumeSel::Draw() {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuchr", Draw__15CMenuCostumeSelFv);
 #endif
+extern u_long CostumeOptionEnv;
 extern "C" void *__ct__15mgCCameraFollowFffff(void *camera, float distance, float height, float angle,
                                                float speed);
 #ifdef STATEMATCHING

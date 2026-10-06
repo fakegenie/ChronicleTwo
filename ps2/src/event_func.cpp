@@ -13077,17 +13077,6 @@ int _IS_CLEAR_PRACTICE(RS_STACKDATA *stack, int argc) {
         return 0;
     }
     int bonus = info->practice_type;
-<<<<<<< ours
-    if (bonus == 2) {
-        int param = info->practice_param;
-        switch (param) {
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-                bonus = param + 5;
-                break;
-=======
     switch (bonus) {
         case 2: {
             int param = info->practice_param;
@@ -13099,7 +13088,6 @@ int _IS_CLEAR_PRACTICE(RS_STACKDATA *stack, int argc) {
                     bonus = param + 5;
                     break;
             }
->>>>>>> theirs
         }
     }
     SetStack(stack++, cleared);
