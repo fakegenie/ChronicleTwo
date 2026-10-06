@@ -9727,9 +9727,7 @@ void CItemSelect::Draw(void) {
     mgRect<int> frame_rect;
     frame_rect.Set(1, 0, 0x110, 0xFE);
     mgRect<float> *list = &list_rect;
-    mgRect<int> scissor;
-    scissor.Set(0, (int)(37.0f + list_rect.top), mgScreenWidth - 1, (int)(147.0f + list_rect.top));
-    SetMenuScissor(scissor);
+    SetMenuScissor(mgRect<int>(0, (int)(37.0f + list_rect.top), mgScreenWidth - 1, (int)(147.0f + list_rect.top)));
     SetSpriteEnv(prim, 0);
     prim->Begin(6);
     float scroll_top = 37.0f + list->top - 55.0f * top_line;
@@ -9767,7 +9765,7 @@ void CItemSelect::Draw(void) {
     mgRect<int> number_rect;
     number_rect.Set(0, 0xF4, 0xA, 0xD);
     int index = 0;
-    for (int line = 0; line < item_num && item_list[line * 5] != NULL; line++) {
+    for (int line = 0; line < item_num && item_list[line] != NULL; line++) {
         icon_rect.left = 4.0f + item_rect.left;
         for (int column = 0; column < 5; column++, index++) {
             if (icon_rect.top <= 0.0f) {
@@ -9776,10 +9774,9 @@ void CItemSelect::Draw(void) {
             if (index >= item_num) {
                 break;
             }
-            CGameDataUsed *item = item_list[index];
-            DrawOneItem(prim, icon_rect, item->item_no, 0, NULL, color.rgba, 0);
-            int num = item->GetNum();
-            s16 item_no = item->item_no;
+            DrawOneItem(prim, icon_rect, item_list[index]->item_no, 0, NULL, color.rgba, 0);
+            int num = item_list[index]->GetNum();
+            s16 item_no = item_list[index]->item_no;
             if (item_no == 0x137) {
                 num = GetUserDataMan()->yarikomi_medal;
             }
@@ -9830,23 +9827,11 @@ void CItemSelect::Draw(void) {
     float bar_x = 250.0f + list->left;
     prim->Bilinear(1);
     prim->Begin(6);
-    mgRect<int> tex_rect;
-    mgRect<int> put_rect;
-    tex_rect.Set(0x13E, 0, 6, 4);
-    int x = (int)bar_x;
-    put_rect.Set(x, (int)scroll_y, 6, 4);
-    PrimQuad(prim, put_rect, tex_rect);
-    mgRect<int> body_tex;
-    mgRect<int> body_put;
-    body_tex.Set(0x13E, 4, 6, 0x12);
-    float body_y = 4.0f + scroll_y;
-    body_put.Set(x, (int)body_y, 6, (int)(bar_h - 8.0f));
-    PrimQuad(prim, body_put, body_tex);
-    mgRect<int> end_tex;
-    mgRect<int> end_put;
-    end_tex.Set(0x13E, 0x18, 6, 4);
-    end_put.Set(x, (int)(body_y + bar_h - 8.0f), 6, 4);
-    PrimQuad(prim, end_put, end_tex);
+    int x;
+    PrimQuad(prim, mgRect<int>(x = (int)bar_x, (int)scroll_y, 6, 4), mgRect<int>(0x13E, 0, 6, 4));
+    float body_y;
+    PrimQuad(prim, mgRect<int>(x, (int)(body_y = 4.0f + scroll_y), 6, (int)(bar_h - 8.0f)), mgRect<int>(0x13E, 4, 6, 0x12));
+    PrimQuad(prim, mgRect<int>(x, (int)(body_y + bar_h - 8.0f), 6, 4), mgRect<int>(0x13E, 0x18, 6, 4));
     prim->End();
     mgRect<float> cursor_rect;
     cursor_rect.Set(item_rect.left, 40.0f + list->top, item_rect.right, item_rect.bottom);
@@ -9859,14 +9844,10 @@ void CItemSelect::Draw(void) {
         cursor_x += (cursor_rect.left - cursor_x) / 4.0f;
         cursor_y += (cursor_rect.top - cursor_y) / 4.0f;
     }
-    mgRect<int> waku_tex;
-    waku_tex.Set(0x10, 0x20, 0x12, 0xC);
-    mgRect<float> waku_rect(cursor_x - 2.0f, cursor_y - 4.0f, cursor_rect.right, 40.0f);
-    DrawMenuWakuRect(MenuPosData->icon_effect_tex, waku_rect, waku_tex, alpha, 0x80, 0x80, 0x80);
+    DrawMenuWakuRect(MenuPosData->icon_effect_tex, mgRect<float>(cursor_x - 2.0f, cursor_y - 4.0f, cursor_rect.right, 40.0f),
+                     mgRect<int>(0x10, 0x20, 0x12, 0xC), alpha, 0x80, 0x80, 0x80);
     if (mode == MENU_ASK_MODE_NONE) {
-        int mes_pos[2];
-        mes_pos[0] = (int)(16.0f + list->left);
-        mes_pos[1] = (int)(164.0f + list->top);
+        int mes_pos[2] = {(int)(16.0f + list->left), (int)(164.0f + list->top)};
         tex_manager->ReloadTexture(MenuArg.mes_tex_block, (sceVif1Packet *)NULL);
         MenuDCMsg[0]->SetPutPos(mes_pos);
         MenuDCMsg[0]->StepMsg();
