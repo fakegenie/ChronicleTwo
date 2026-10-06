@@ -292,25 +292,26 @@ CColFrame *LoadCollisionFile(MDS_HEADER *header, mgCMemory *memory) {
     sceVu0FVECTOR  max;
     sceVu0FVECTOR  min;
     u_int          i;
-    int offset;
-    MDTOBJ_HEADER *object;
-    CColFrame     *frame;
-    MDS_HEADER *base = header;
+    int            column;
+    u_char        *cursor;
     CColFrame     *frames;
     int            row;
-    int            column;
+    MDTOBJ_HEADER *object;
+    CColFrame     *frame;
+    int            offset;
 
-    header = (MDS_HEADER *)((u_char *)header + sizeof(MDS_HEADER));
-    if (base->object_num == 0) {
+    cursor = (u_char *)header;
+    cursor += sizeof(MDS_HEADER);
+    if (header->object_num == 0) {
         return 0;
     }
 
-    frames = new ((u_long128 *)memory->Alloc(Align16Blocks(base->object_num * sizeof(CColFrame)) + 2)) CColFrame[base->object_num];
+    frames = new ((u_long128 *)memory->Alloc(Align16Blocks(header->object_num * sizeof(CColFrame)) + 2)) CColFrame[header->object_num];
 
-    offset = 0;
-    for (i = 0; i < base->object_num; offset += sizeof(CColFrame), i++) {
-        object = (MDTOBJ_HEADER *)header;
-        header = (MDS_HEADER *)((u_char *)header + sizeof(MDTOBJ_HEADER));
+    i = 0;
+    for (offset = 0; i < header->object_num; offset += sizeof(CColFrame), i++) {
+        object = (MDTOBJ_HEADER *)cursor;
+        cursor += sizeof(MDTOBJ_HEADER);
         frame = (CColFrame *)((u_char *)frames + offset);
         frame->Initialize();
 
@@ -330,7 +331,7 @@ CColFrame *LoadCollisionFile(MDS_HEADER *header, mgCMemory *memory) {
         }
 
         if (object->mdt_ofs != 0) {
-            u_int *model = (u_int *)((u_char *)base + object->mdt_ofs);
+            u_int *model = (u_int *)((u_char *)header + object->mdt_ofs);
             mgZeroVector(max);
             mgZeroVector(min);
 
