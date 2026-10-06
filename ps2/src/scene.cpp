@@ -412,8 +412,8 @@ void CRain::Stop(void) {
 }
 void CRain::Start() {
     int i;
-    float position[4];
     float view_angle = 0.7853982f;
+    float position[4];
 
     active = 1;
     for (i = 0; i < RAIN_DROP_NUM; i++) {

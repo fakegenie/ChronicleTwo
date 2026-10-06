@@ -37,6 +37,7 @@ extern "C" void *__construct_new_array(void *, void *(*)(void *), void *, u_int,
 extern "C" void *__ct__10mgCTextureFv(void *);
 extern "C" void *__ct__15mgCTextureBlockFv(void *);
 extern "C" void *Alloc__9mgCMemoryFi(mgCMemory *, int);
+extern "C" sceGsTex0 *__as__9sceGsTex0FRC9sceGsTex0(sceGsTex0 *dst, const sceGsTex0 *src);
 static inline u_int align16_blocks(u_int bytes) {
     if (bytes & 0xF)
         return (bytes >> 4) + 1;
@@ -1216,7 +1217,7 @@ int mgCTextureManager::ReloadTexture(int block, u_int *packet) {
                     texture->tex0.PSM = SCE_GS_PSMT8;
                 }
             }
-            tex0 = texture->tex0;
+            __as__9sceGsTex0FRC9sceGsTex0(&tex0, &texture->tex0);
             if (texture->bpp <= 8) {
                 fix -= MG_TEXTURE_CLUT_BLOCKS;
                 texture->tex0.CBP = fix;
@@ -1260,9 +1261,9 @@ int mgCTextureManager::ReloadTexture(int block, u_int *packet) {
 #pragma schedule reset
 
 #pragma schedule off
-sceGsTex0 &sceGsTex0::operator=(const sceGsTex0 &src) {
-    value = src.value;
-    return *this;
+extern "C" sceGsTex0 *__as__9sceGsTex0FRC9sceGsTex0(sceGsTex0 *dst, const sceGsTex0 *src) {
+    dst->value = src->value;
+    return dst;
 }
 #pragma schedule reset
 #pragma schedule off

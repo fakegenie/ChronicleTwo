@@ -102,11 +102,12 @@ struct BASE_MONSTER_TBL {
     s8    user_mons_id;
     u16   reward_exp;
     u16   reward_money;
-    s16   unk_5a;
+    u16   unk_5a;
     float whp;
-    s16   gekirin_num;
+    u16   gekirin_num;
     s8    guard_rate;
-    s8    escape_rate[2];
+    s8    escape_rate0;
+    s8    escape_rate1;
     u16   attack;
     u8    defense;
     s8    stagger;

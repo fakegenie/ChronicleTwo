@@ -742,13 +742,13 @@ int _SET_ESCAPE_RATE(RS_STACKDATA *stack, int argc) {
         monster = nowMonster;
     }
     float scale = GetStackFloat(stack);
-    monster->tbl->escape_rate[0] = fptosi((float)monster->base_tbl->escape_rate[0] * scale);
-    monster->tbl->escape_rate[1] = fptosi((float)monster->base_tbl->escape_rate[1] * scale);
-    if ((u8)monster->tbl->escape_rate[0] > 100) {
-        monster->tbl->escape_rate[0] = 100;
+    monster->tbl->escape_rate0 = fptosi((float)monster->base_tbl->escape_rate0 * scale);
+    monster->tbl->escape_rate1 = fptosi((float)monster->base_tbl->escape_rate1 * scale);
+    if ((u8)monster->tbl->escape_rate0 > 100) {
+        monster->tbl->escape_rate0 = 100;
     }
-    if ((u8)monster->tbl->escape_rate[1] > 100) {
-        monster->tbl->escape_rate[1] = 100;
+    if ((u8)monster->tbl->escape_rate1 > 100) {
+        monster->tbl->escape_rate1 = 100;
     }
     return 1;
 }

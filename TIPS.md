@@ -248,8 +248,12 @@ only functions present in both objects can be replaced, the plain build keeps th
 - Aggregate spelling changes copy instructions. A bitfield struct returned
   through a hidden pointer gives `ld/sd`. A `struct { u_long128 value; }` copies
   with `lq/sq`. `RECT t = F();` and `RECT t; t = F();` differ.
-- `sceGsTex0` has an out-of-line `operator=`. Initialise in the declaration or
-  copy through a plain mirror struct.
+- A struct-typed member (bitfield struct, union, `struct { u_long v; }`) is
+  copied through an address register in an implicit copy. An anonymous union
+  whose first member is a `u_long` copies with a direct `ld/sd`, which is how
+  `mgCTexture` holds `tex0`, `tex1` and `clamp`.
+- `sceGsTex0` has no `operator=`. `ReloadTexture` calls retail's
+  `__as__9sceGsTex0FRC9sceGsTex0` helper through an `extern "C"` declaration.
 - Qword rounding is `if (bytes & 0xF) q = (bytes >> 4) + 1; else q = bytes >> 4;`.
   Signed `x * 16 / 16 + 1` matches `Alloc` sizes where `sizeof` does not.
 - Reading an extern rodata quadword as `*(u_long128 *)&sym` gives retail's early
@@ -288,3 +292,12 @@ only functions present in both objects can be replaced, the plain build keeps th
 - Retail's brace-initialised local arrays (an `at_NNNN` template followed by element stores) are written as brace initialisers with non-constant elements, such as `int next[2] = {waku_pos[0], waku_pos[1]};`. Template copy plus assignments makes MWCC hold the array addresses in registers where retail does not.
 - A function containing an if/else whose two branches store the same value the variable already holds, so the compiler deletes both stores, switches on retail's "no fall-through delay-slot fill" style in menusys switches.
 - Writing a call argument as a named local before the call, and reordering locals with a permutation search, are the usual last steps once the structure is right.
+- Unrelated header edits can change a matched function's scheduling. Adding a single member declaration to `mgCTexture` broke `CRain::Start` in the `scene` state compile. Declaring `view_angle` before `position` made it match with every header variant tried.
+- MWCC keeps a value in a caller-saved register (a1 to a3) across a call only when the callee is a static function defined earlier in the same file. `GetScreenSize` in mglib, `GetFishParam` in fishing and `FishDist` in gyoracesim had to be `static` for that reason.
+- Retail leaving a0 and a1 unused for temporaries is the sign of the `primer=u64div` state option. `gyoracesim` needed it added to `state_units.txt`.
+- Member-wise copies of struct-typed members (bitfield structs, unions, `struct { u_long v; }`) go through an address register. An anonymous union whose first member is a `u_long` copies directly with `ld`/`sd`, as retail does. `mgCTexture` `tex0`, `tex1` and `clamp` are declared that way.
+- Hand-written `operator new` plus manual vtable stores, with all allocations before the `Initialize()` calls, matched `StepDataLoading`. The same pattern is in `fishing.cpp`, `dynCOLLISION` and `LoadEditCursor`.
+- Early returns on each failure path matched where nested ifs did not (`StepDataLoading`).
+- Retail copies two `s8` fields with `lb`/`sb`, while a two-byte array copies with `lbu`. `BASE_MONSTER_TBL::escape_rate` is two `s8` fields for that reason.
+- `perm.py` must score drafts with the unit's primer and `drafts` options as `state.py` does. The copy in `ps2/re/a71/perm.py` with `PERM_EXPAND=1` agrees with the real build. Put a space after a bracket before a `[[[` choice.
+- Renaming a member in a header can break a matched function in a state-compiled unit that includes it (`scene`, `CRain::Start`). Build and check every unit after a header rename.

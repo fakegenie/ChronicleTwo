@@ -273,7 +273,6 @@ typedef struct sceGsTex0 {
             u_long cld : 3;
         } bits;
     };
-    sceGsTex0 &operator=(const sceGsTex0 &source);
 } sceGsTex0;
 
 #define SCE_GS_SET_TEX0(tbp0, tbw, psm, tw, th, tcc, tfx, cbp, cpsm, csm, csa, cld) \
@@ -527,8 +526,7 @@ typedef struct {
 } sceGsClear;
 
 typedef struct {
-    sceGsDispEnv disp0;
-    sceGsDispEnv disp1;
+    sceGsDispEnv disp[2];
     sceGifTag giftag0;
     sceGsDrawEnv1 draw0;
     sceGsClear clear0;

@@ -573,34 +573,39 @@ int CMonsterMan::LoadReferMonsterFile(int id, BASE_MONSTER_TBL *tbl, mgCMemory *
     return 1;
 }
 #ifdef NONMATCHING
-CActiveMonster *CMonsterMan::SetActiveMonster(int refer_no, float *pos, float *rot, int param) {
+CActiveMonster *CMonsterMan::SetActiveMonster(int refer_no, float pos[], float rot[], int param) {
+    int slot;
+    CActiveMonster *monster;
+    int npc;
+    BASE_MONSTER_TBL *tbl;
+    int i;
+    DNG_BATTLE_AREA *area;
     if (refer_no < 0 || refer_no >= MONSTER_REFER_MAX) {
         return NULL;
     }
     if (refer[refer_no].chara.GetFrame() == NULL) {
         return NULL;
     }
-    int slot = SearchActiveMonsterBlock();
+    slot = SearchActiveMonsterBlock();
     if (slot < 0) {
         return NULL;
     }
-    DNG_BATTLE_AREA *area = &scene->battle_area;
-    int npc = GetBattleCharaInfo()->GetNowNPC();
+    area = &scene->battle_area;
+    npc = GetBattleCharaInfo()->GetNowNPC();
     active[slot] = (CActiveMonster *)scene->GetCharacter(slot + MONSTER_ACTIVE_MAX);
     if (active[slot] == NULL) {
         return NULL;
     }
     memory[slot].stReset();
     locate.SetPutFlag(slot, 1);
-    CActiveMonster *monster = active[slot];
-    MONSTER_REFER *source = &refer[refer_no];
-    BASE_MONSTER_TBL *tbl = GetReferPtr2(source->id);
+    monster = active[slot];
+    tbl = GetReferPtr2(refer[refer_no].id);
     if (tbl->unk_b4 == 0) {
-        source->chara.SetPosition(0.0f, 0.0f, 0.0f);
-        source->chara.SetRotation(0.0f, 0.0f, 0.0f);
-        source->chara.Copy(*monster, &memory[slot]);
+        refer[refer_no].chara.SetPosition(0.0f, 0.0f, 0.0f);
+        refer[refer_no].chara.SetRotation(0.0f, 0.0f, 0.0f);
+        refer[refer_no].chara.Copy(*monster, &memory[slot]);
     } else {
-        *monster = source->chara;
+        *monster = refer[refer_no].chara;
         monster->main_frame_info = (s32)monster->motion[0].frame_info;
         monster->shadow_frame_info = monster->shadow_motion[0].frame_info;
         monster->now_key = 0;
@@ -616,7 +621,7 @@ CActiveMonster *CMonsterMan::SetActiveMonster(int refer_no, float *pos, float *r
     monster->param = *tbl;
     monster->base_tbl = tbl;
     monster->tbl = &monster->param;
-    monster->monster_id = source->id;
+    monster->monster_id = refer[refer_no].id;
     monster->chara_type = slot + MONSTER_ACTIVE_MAX;
     monster->chara_kind = ACTION_KIND_SCRIPT;
     monster->Show(1, 1);
@@ -669,13 +674,13 @@ CActiveMonster *CMonsterMan::SetActiveMonster(int refer_no, float *pos, float *r
     monster->stagger_time = 0;
     monster->target_dist = 0.0f;
     monster->priority = -1;
-    for (int i = 0; i < MONSTER_VAR_MAX; i++) {
+    for (i = 0; i < MONSTER_VAR_MAX; i++) {
         monster->var[i].i = 0;
     }
-    for (int i = 0; i < MONSTER_VAR2_MAX; i++) {
+    for (i = 0; i < MONSTER_VAR2_MAX; i++) {
         monster->var2[i].i = 0;
     }
-    SetMonsterScript(&monster->mons_script, source->script, &memory[slot]);
+    SetMonsterScript(&monster->mons_script, refer[refer_no].script, &memory[slot]);
     monster->req_prog = MONSTER_PROG_INIT;
     RunScript(slot);
     monster->req_prog = MONSTER_PROG_MAIN;
@@ -1872,10 +1877,10 @@ void CMonsterMan::ThinkHost() {
             if (monster->mask_flag & 2) {
                 chance = 100;
             }
-            if (target->murderous == 0 && chance < tbl->escape_rate[0]) {
+            if (target->murderous == 0 && chance < tbl->escape_rate0) {
                 monster->req_prog = MONSTER_PROG_ESCAPE_0;
             }
-            if (target->murderous == 1 && chance < tbl->escape_rate[1]) {
+            if (target->murderous == 1 && chance < tbl->escape_rate1) {
                 monster->req_prog = MONSTER_PROG_ESCAPE_1;
             }
             target->murderous_time = 0;
