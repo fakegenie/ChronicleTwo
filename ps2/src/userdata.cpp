@@ -3420,14 +3420,19 @@ int CUserDataManager::GetOverItem(int item_no, int count) {
 int CUserDataManager::CheckItemLimmitOver() {
     u16 item_count[0x200];
     u16 item_count2[0x200];
+    int bag_size;
+    int i;
+    CGameDataUsed *inventory;
 
     memset(item_count, 0, sizeof(item_count));
     memset(item_count2, 0, sizeof(item_count2));
-    CGameDataUsed *inventory = GetUsedDataPtr(0);
-    int bag_size = GetNowBagMax(1);
-    for (int i = 0; i < bag_size; i++) {
-        CGameDataUsed *used = &inventory[i];
-        int owned_no = used->item_no;
+    inventory = GetUsedDataPtr(0);
+    bag_size = GetNowBagMax(1);
+    for (i = 0; i < bag_size; i++) {
+        int owned_no;
+        CGameDataUsed *used;
+        used = &inventory[i];
+        owned_no = used->item_no;
         if (0 < owned_no) {
             item_count[owned_no] += used->GetNum();
             if (0 < used->GetGiftBoxItemNum()) {
@@ -3442,10 +3447,11 @@ int CUserDataManager::CheckItemLimmitOver() {
     }
     CHARA_DATA *charas = GetCharaDataPtr(0);
     for (int chara = 0; chara < 2; chara++) {
+        charas += chara;
         for (int slot = 0; slot < 3; slot++) {
-            CGameDataUsed *active = &charas[chara].active_item[slot];
+            CGameDataUsed *active = &charas->active_item[slot];
             int active_no = active->item_no;
-            if (0 < active_no) {
+            if (active_no > 0) {
                 item_count[active_no] += active->GetNum();
                 if (0 < active->GetGiftBoxItemNum()) {
                     for (int k = 0; k < 3; k++) {
@@ -3458,10 +3464,10 @@ int CUserDataManager::CheckItemLimmitOver() {
             }
         }
     }
-    for (unsigned int item_no = 1; item_no < 0x200; item_no++) {
-        CDataCommon *common = GetCommonItemData(item_no);
-        if (common != NULL && common->max_num < item_count[item_no]) {
-            return item_no;
+    for (i = 1; i < 0x200; i++) {
+        CDataCommon *common = GetCommonItemData(i);
+        if (common != NULL && common->max_num < item_count[i]) {
+            return i;
         }
     }
     return 0;
