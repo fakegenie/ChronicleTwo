@@ -816,11 +816,9 @@ void InitSpectolRasterTable(mgCMemory *memory) {
         offset += 0x20;
     }
 }
-#ifdef NONMATCHING
 void DrawOneItem(mgCDrawPrim *prim, mgRect<float> rect, int item, int mode, MENU_PARTS_EFFECT_STRUCT1 *effect, u8 *rgba,
                  int item_flag) {
-    float bottom = rect.top + rect.bottom;
-    if (bottom >= 0.0f && mgScreenWidth - 1 >= rect.left) {
+    if (rect.top + rect.bottom >= 0.0f && mgScreenWidth - 1 >= rect.left) {
         mgRect<int> icon_uv(0, 0, 0, 0);
         mgCTextureManager *textures = &mgTexManager;
         GetMenuItemIconTexGetXY(item, icon_uv);
@@ -834,13 +832,12 @@ void DrawOneItem(mgCDrawPrim *prim, mgRect<float> rect, int item, int mode, MENU
                 if (effect->param[0] > 150.0f) {
                     effect->param[0] = 0.0f;
                 }
-                effect[1].param[0] += 1.0f;
+                effect[1].param[0]++;
             }
             mgRect<int> uv(item_transtbl[use_trans_rect].left, item_transtbl[use_trans_rect].top,
                            item_transtbl[use_trans_rect].right, item_transtbl[use_trans_rect].bottom);
-            u_long tex0 = tex->tex0.value;
-            u_int tbp = tex0 & 0x3FFF;
-            u_int tbw = (tex0 >> 14) & 0x3F;
+            u_int tbp = tex->tex0_value & 0x3FFF;
+            u_int tbw = (tex->tex0_value >> 14) & 0x3F;
             prim->Begin(0);
             prim->Direct(SCE_GS_BITBLTBUF, SCE_GS_SET_BITBLTBUF(tbp, tbw, SCE_GS_PSMT8, tbp, tbw, SCE_GS_PSMT8));
             prim->Direct(SCE_GS_TRXPOS, SCE_GS_SET_TRXPOS(icon_uv.left, icon_uv.top, uv.left, uv.top, 0));
@@ -848,6 +845,7 @@ void DrawOneItem(mgCDrawPrim *prim, mgRect<float> rect, int item, int mode, MENU
             prim->Direct(SCE_GS_TRXDIR, SCE_GS_SET_TRXDIR(2));
             prim->End();
             float right = rect.left + rect.right;
+            float bottom = rect.top + rect.bottom;
             int uv_right = uv.left + uv.right;
             int uv_bottom = uv.top + uv.bottom;
             if (mode != 1) {
@@ -916,8 +914,10 @@ void DrawOneItem(mgCDrawPrim *prim, mgRect<float> rect, int item, int mode, MENU
                     int mark_u = mark % 2 * 16 + 0xC0;
                     int mark_v = mark / 2 * 16 + 0x1A0;
                     prim->TextureCrd(mark_u, mark_v);
-                    float mark_y = 20.0f + rect.top;
-                    float mark_x = 16.0f + rect.left;
+                    float mark_y;
+                    float mark_x;
+                    mark_x = rect.left + 16.0f;
+                    mark_y = rect.top + 20.0f;
                     prim->Vertex(mark_x, mark_y, 0.0f);
                     prim->TextureCrd(mark_u + 16, mark_v + 16);
                     prim->Vertex(16.0f + mark_x, 16.0f + mark_y, 0.0f);
@@ -934,16 +934,19 @@ void DrawOneItem(mgCDrawPrim *prim, mgRect<float> rect, int item, int mode, MENU
                 prim->Vertex(right, bottom, 0.0f);
                 prim->Flush();
                 if (effect != NULL) {
+                    u8 blue;
                     int raster = (int)effect->param[0] * 32;
+                    u8 red;
                     float hue = mgAngleLimit(0.017453292f * effect[1].param[0]);
                     int line_v = uv.top;
                     float line_y = rect.top;
+                    u8 green;
                     for (int line = 0; line < 32; line++, line_v++) {
                         float line_x = rect.left + (int)spectol_raster_xtbl[raster + line];
                         float line_h = spectol_y_addtbl_1245[line];
-                        u8 red = 255.0f * sinf(hue);
-                        u8 green = 255.0f * sinf(2.0943952f + hue);
-                        u8 blue = 255.0f * sinf(4.1887903f + hue);
+                        red = 255.0f * sinf(hue);
+                        green = 255.0f * sinf(2.0943952f + hue);
+                        blue = 255.0f * sinf(4.1887903f + hue);
                         prim->Color(red, green, blue, rgba[3] / 3);
                         prim->TextureCrd(uv.left, line_v);
                         prim->Vertex(line_x, line_y, 0.0f);
@@ -956,10 +959,14 @@ void DrawOneItem(mgCDrawPrim *prim, mgRect<float> rect, int item, int mode, MENU
             }
             prim->End();
             if (item_flag & 2) {
-                float mark_x = 23.0f + rect.left;
-                float mark_y = 16.0f + rect.top - DrawItemCounter;
-                float mark_right = 16.0f + mark_x;
-                float mark_bottom = 16.0f + mark_y;
+                float mark_x;
+                float mark_right;
+                float mark_y;
+                float mark_bottom;
+                mark_x = 23.0f + rect.left;
+                mark_y = 16.0f + rect.top - DrawItemCounter;
+                mark_right = 16.0f + mark_x;
+                mark_bottom = 16.0f + mark_y;
                 prim->Bilinear(1);
                 prim->Begin(6);
                 prim->Color(0x80, 0x80, 0x80, 0x80);
@@ -990,9 +997,6 @@ void DrawOneItem(mgCDrawPrim *prim, mgRect<float> rect, int item, int mode, MENU
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", DrawOneItem__FP11mgCDrawPrim9mgRect_f_iiP25MENU_PARTS_EFFECT_STRUCT1PUci);
-#endif
 void MenuWindowHelp(mgCDrawPrim *prim, mgCTexture *texture, float x, float y, float width, float height,
                     short *table) {
     if (texture != 0) {
