@@ -3898,8 +3898,8 @@ void ClsMes::DrawMesWin() {
             break;
         case MES_WIN_DQ_FUKIDASHI:
         case MES_WIN_DQ_FUKIDASHI_2:
-            text_x = (int)CalcAutoPosSet(0.0f, 512.0f, text_w, 0.5f);
-            text_y = (int)CalcAutoPosSet(0.0f, 480.0f, text_h, 0.95f);
+            text_x = (int)CalcAutoPosSet(0.0f, float(512.0), text_w, 0.5f);
+            text_y = (int)CalcAutoPosSet(0.0f, 480.0f, text_h, float(0.95));
             outer.x = text_x - (font_w + 8);
             outer.y = text_y - 13;
             outer.width = font_w + (font_w + 16 + text_w);
@@ -3939,8 +3939,8 @@ void ClsMes::DrawMesWin() {
     }
     if (window_mode == MES_WIN_BOTTOM || window_mode == MES_WIN_DQ_FUKIDASHI ||
         window_mode == MES_WIN_DQ_FUKIDASHI_2) {
-        text_x = (int)CalcAutoPosSet(0.0f, 512.0f, text_w, 0.5f);
-        text_y = (int)CalcAutoPosSet(0.0f, 480.0f, text_h, 0.95f);
+        text_x = (int)CalcAutoPosSet(0.0f, float(512.0), text_w, float(0.5));
+        text_y = (int)CalcAutoPosSet(float(0.0), float(480.0), text_h, 0.95f);
     }
     if (window_mode == MES_WIN_CENTRE) {
         text_x = (int)CalcAutoPosSet(0.0f, 512.0f, text_w, 0.5f);
