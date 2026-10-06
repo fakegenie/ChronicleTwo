@@ -3227,31 +3227,33 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuaqua", Thinking__9CAquariumFi);
 #ifdef NONMATCHING
 int CAquarium::ColCheck(int no) {
     aqua_col_point *point;
-    float radius;
-    int calm;
     int i;
+    CAquaFishActionParam *action;
+    int calm;
+    int result;
     int num;
     int aqua_no;
+    float dist;
+    CAquaFish *me;
+    float radius;
     float pos[4];
     float move[4];
     float other_pos[4];
     float away[4];
     float point_away[4];
     float food_pos[4];
-    CAquaFish *me = fish[no];
     float rot[4];
-    float dist;
-    int result;
+    me = fish[no];
 
     if (me == NULL) {
         return 0;
     }
     result = 0;
-    radius = 0.29f * me->radius;
+    radius = me->radius;
+    radius = 0.29f * radius;
     me->GetPosition(pos);
     sceVu0AddVector(pos, pos, me->move);
     me->col_flags = 0;
-    CAquaFishActionParam *action;
     action = NULL;
     if (me->think_mode == AQUA_FISH_THINK_BATTLE) {
         action = &me->action;
@@ -3281,8 +3283,8 @@ int CAquarium::ColCheck(int no) {
                 reach -= dist;
                 move[0] = 0.5f * (me->move[0] + away[0] * reach);
                 move[1] = 0.5f * (me->move[1] + away[1] * reach);
-                move[3] = 1.0f;
                 move[2] = 0.5f * (me->move[2] + away[2] * reach);
+                move[3] = 1.0f;
                 sceVu0ScaleVector(me->move, move, 1.5f);
                 if (calm == 0) {
                     if (me->think_mode == AQUA_FISH_THINK_BATTLE || me->think_mode == AQUA_FISH_THINK_LOVE_CHASE) {
@@ -3331,8 +3333,8 @@ int CAquarium::ColCheck(int no) {
             reach -= dist;
             move[0] = 0.5f * (me->move[0] + point_away[0] * reach);
             move[1] = 0.5f * (me->move[1] + point_away[1] * reach);
-            move[3] = 1.0f;
             move[2] = 0.5f * (me->move[2] + point_away[2] * reach);
+            move[3] = 1.0f;
             sceVu0ScaleVector(me->move, move, 1.5f);
             me->move[1] *= 1.05f;
             me->col_flags |= AQUA_FISH_COL_OBJECT;
