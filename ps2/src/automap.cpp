@@ -732,7 +732,6 @@ void CAutoMapGen::RoomLink(int from, int to) {
         }
     } while (joined == 0);
 }
-#ifdef NONMATCHING
 void CAutoMapGen::CreatDummyRoot(int room_no) {
     int tries = 0;
     int x;
@@ -853,10 +852,7 @@ void CAutoMapGen::CreatDummyRoot(int room_no) {
                 side = kStepLeft;
             }
             float d = (float)dx;
-            if (d < 0.0f) {
-                d = -d;
-            }
-            steps = iRand((int)d) + 1;
+            steps = iRand((int)(d < 0.0f ? -d : d)) + 1;
         } else {
             if (dy < 0) {
                 side = kStepDown;
@@ -864,19 +860,13 @@ void CAutoMapGen::CreatDummyRoot(int room_no) {
                 side = kStepUp;
             }
             float d = dy;
-            if (d < 0.0f) {
-                d = -d;
-            }
-            steps = iRand((int)d) + 1;
+            steps = iRand((int)(d < 0.0f ? -d : d)) + 1;
         }
         if (steps >= 2) {
             steps = 2;
         }
     } while (joined == 0);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/automap", CreatDummyRoot__11CAutoMapGenFi);
-#endif
 void CAutoMapGen::CreatTermParts() {
     CAutoMapParts *grid;
     int openDirs;
