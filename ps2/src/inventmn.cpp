@@ -2244,7 +2244,6 @@ extern short sndtimetbl_2868[2];
 extern signed char D_003532DF[];
 extern float eff_light_2927[4];
 
-#ifdef NONMATCHING
 
 #pragma inline_depth(5)
 int CMenuInvent::IsCreateObject(int mode, int keys) {
@@ -2645,6 +2644,7 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
             this->create_effect->Initialize(0);
             frame = mgLoadMDSFile(pack_file, load_stack, NULL, NULL);
             this->create_effect->CObjectFrame::frame = frame;
+            float effect_y = -20.0f;
             if (frame != NULL) {
                 mgCFrameAttr *attr = (mgCFrameAttr *)frame->attr;
                 attr->no_light = 1;
@@ -2652,7 +2652,10 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
                 attr->color[1] = eff_light_2927[1];
                 attr->color[2] = eff_light_2927[2];
                 attr->color[3] = eff_light_2927[3];
-                this->create_effect->SetPosition(18.0f, -20.0f, 20.0f);
+                float x = 18.0f;
+                float y = -20.0f;
+                float z = 20.0f;
+                this->create_effect->SetPosition(18.0f, y, z);
                 this->create_effect->SetRotation(0.0f, 0.15707964f, 0.0f);
                 frame->SetAttrParam(*attr, 1, kSceneAttrFlags);
             }
@@ -2756,9 +2759,6 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
 }
 
 #pragma inline_depth reset
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/inventmn", IsCreateObject__11CMenuInventFii);
-#endif
 void CMenuInvent::CalcMakeBrd(int message_index) {
     if (makebrd_form != NULL && makebrd_form->draw_flag) {
         make_board.unk_1c = make_num;
