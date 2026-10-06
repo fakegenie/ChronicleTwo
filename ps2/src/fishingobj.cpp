@@ -804,10 +804,10 @@ void RodStep(CScene *scene, u_long128 *poly_buffer) {
         (*joint)->parent->GetLWMatrix(parent_world);
         mgInversMatrix(parent_inverse, parent_world);
         sceVu0CopyMatrix(parent_world, (*joint)->parent->trans_matrix);
-        float fraction = SaoDist[i] / SaoDist[7];
+        float fraction = 0.99f * (SaoDist[i] / SaoDist[7]);
         ParaBlend(before, 0.99f * (SaoDist[i - 1] / SaoDist[7]), curve, 5);
         before[3] = 1.0f;
-        ParaBlend(after, 0.99f * fraction, curve, 5);
+        ParaBlend(after, fraction, curve, 5);
         sceVu0SubVector(forward, after, before);
         forward[3] = 0.0f;
         sceVu0ApplyMatrix(joint_matrix[0], parent_inverse, forward);
@@ -1187,8 +1187,8 @@ void InitUkiObj(int no, mgCFrame *uki, mgCFrame *hari) {
     uki_obj->point[3].pos[2] = -1.5f;
     uki_obj->point[3].pos[3] = 1.0f;
     SaoFrame[7]->GetWorldPosition0(rod_tip);
-    for (i = 0; i < uki_obj->point_num; i++) {
-        mgAddVector(uki_obj->point[i].pos, rod_tip);
+    for (int k = 0; k < uki_obj->point_num; k++) {
+        mgAddVector(uki_obj->point[k].pos, rod_tip);
     }
     float *pt2;
     float *pt1 = uki_obj->point[1].pos;
@@ -1258,8 +1258,8 @@ void InitUkiObj(int no, mgCFrame *uki, mgCFrame *hari) {
     hari_obj->point[2].pos[1] = -4.0f;
     hari_obj->point[2].pos[2] = 0.0f;
     hari_obj->point[2].pos[3] = 1.0f;
-    for (i = 0; i < hari_obj->point_num; i++) {
-        mgAddVector(hari_obj->point[i].pos, rod_tip);
+    for (int k = 0; k < hari_obj->point_num; k++) {
+        mgAddVector(hari_obj->point[k].pos, rod_tip);
     }
     hari_obj->bind_num = 3;
     pt1 = hari_obj->point[1].pos;

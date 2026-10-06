@@ -118,18 +118,18 @@ static int old_cam_no = -1;
 int sgInitGyoRace(SubGameInfo *info) {
     extern short *GetSystemMesBuffer();
     extern mgCTexture *TEX_SystemEffect1;
-    extern const unsigned char at_1373__3__DATA[];
-    extern const unsigned char at_1374__2__DATA[];
-    extern const unsigned char at_1375__2__DATA[];
-    extern const unsigned char at_1376__2__DATA[];
-    extern const unsigned char at_1377__4__DATA[];
-    extern const unsigned char at_1378__3__DATA[];
-    extern const unsigned char at_1379__3__DATA[];
-    extern const unsigned char at_1380__2__DATA[];
-    extern const unsigned char at_1381__DATA[];
-    extern const unsigned char at_1382__2__DATA[];
-    extern const unsigned char at_1383__3__DATA[];
-    extern const unsigned char at_1384__2__DATA[];
+    extern char at_1373__3__DATA[];
+    extern char at_1374__2__DATA[];
+    extern char at_1375__2__DATA[];
+    extern char at_1376__2__DATA[];
+    extern char at_1377__4__DATA[];
+    extern char at_1378__3__DATA[];
+    extern char at_1379__3__DATA[];
+    extern char at_1380__2__DATA[];
+    extern char at_1381__DATA[];
+    extern char at_1382__2__DATA[];
+    extern char at_1383__3__DATA[];
+    extern char at_1384__2__DATA[];
     extern RaceVector at_1027__4;
     extern RaceVector at_1028__9;
     mgCTextureManager *textures;
@@ -143,14 +143,14 @@ int sgInitGyoRace(SubGameInfo *info) {
     u_long128 *buffer = scene->read_buff;
     int size;
     sndInitPort(5);
-    LoadFile2((char *)at_1373__3__DATA, buffer, &size, 0);
+    LoadFile2(at_1373__3__DATA, buffer, &size, 0);
     gyore_snd_id = sndLoadSound(5, (unsigned int *)buffer, memory);
-    ChangeDir((char *)at_1374__2__DATA);
+    ChangeDir(at_1374__2__DATA);
     CGyoraceFishData fish_data;
     fish_data.LoadData(memory, buffer);
     u_long128 *texture_buffer = BuffTextureData.stack;
     char path[0x100];
-    sprintf(path, (char *)at_1375__2__DATA, LanguageCode);
+    sprintf(path, at_1375__2__DATA, LanguageCode);
     LoadFile2(path, texture_buffer, &size, 0);
     gyo_mes = new(memory->Alloc(0x298)) ClsMes;
     gyo_mes->SetBuff((short *)texture_buffer);
@@ -193,9 +193,8 @@ int sgInitGyoRace(SubGameInfo *info) {
     int state_offset = 0;
     int item_offset = 0;
     do {
-        GYORACE_FISH_INF *state = (GYORACE_FISH_INF *)((unsigned char *)fish_inf + state_offset);
-        state->fish_no = -1;
-        int &number_slot = state->fish_no;
+        ((GYORACE_FISH_INF *)((unsigned char *)fish_inf + state_offset))->fish_no = -1;
+        int &number_slot = ((GYORACE_FISH_INF *)((unsigned char *)fish_inf + state_offset))->fish_no;
         if (OmakeFlag != 0) {
             CGameDataUsed *race_fish = GetOmakeGyoracer2(fish);
             CGameDataUsed **item = (CGameDataUsed **)((unsigned char *)game_data + item_offset);
@@ -207,7 +206,7 @@ int sgInitGyoRace(SubGameInfo *info) {
                     for (old = 0; old < chosen_num; old++) {
                         if (chosen[old] == chosen[chosen_num]) break;
                     }
-                    if (old == chosen_num) break;
+                    if (chosen_num == old) break;
                     chosen[chosen_num] = race_rank[1] * 18 + (int)(17.0f * mgRnd());
                 } while (1);
                 *item = fish_data.GetRaceFish(race_rank[0], chosen[chosen_num]);
@@ -222,7 +221,7 @@ int sgInitGyoRace(SubGameInfo *info) {
                 for (old = 0; old < chosen_num; old++) {
                     if (chosen[old] == chosen[chosen_num]) break;
                 }
-                if (old == chosen_num) break;
+                if (chosen_num == old) break;
                 chosen[chosen_num] = race_rank[1] * 18 + (int)(17.0f * mgRnd());
             } while (1);
             int number = chosen[chosen_num];
@@ -255,11 +254,11 @@ int sgInitGyoRace(SubGameInfo *info) {
     int lane = 0;
     if (OmakeFlag == 0) {
         lane = (int)(6.0f * mgRnd());
-        if (lane >= 6) lane = 5;
+        if (lane > 5) lane = 5;
     }
     memset(&RaceInfo, 0, sizeof(RaceInfo));
     RaceInfo.seed = 0;
-    printf((char *)at_1376__2__DATA, RaceInfo.seed);
+    printf(at_1376__2__DATA, RaceInfo.seed);
     RaceInfo.fish_num = 6;
     RaceInfo.step_max = 1000;
     RaceInfo.after_goal_step = 20;
@@ -275,7 +274,7 @@ int sgInitGyoRace(SubGameInfo *info) {
             ((grRACE_INFO *)((unsigned char *)&RaceInfo + param_offset))->fish[0].tactics = GetOmakeGyoracerTactics(racer);
         } else {
             ((grRACE_INFO *)((unsigned char *)&RaceInfo + param_offset))->fish[0].tactics = (int)(6.0f * mgRnd());
-            if (((grRACE_INFO *)((unsigned char *)&RaceInfo + param_offset))->fish[0].tactics >= 6) ((grRACE_INFO *)((unsigned char *)&RaceInfo + param_offset))->fish[0].tactics = 5;
+            if (((grRACE_INFO *)((unsigned char *)&RaceInfo + param_offset))->fish[0].tactics > 5) ((grRACE_INFO *)((unsigned char *)&RaceInfo + param_offset))->fish[0].tactics = 5;
         }
         int fatigue;
         CGameDataUsed **item = (CGameDataUsed **)((unsigned char *)game_data + progress_offset);
@@ -293,7 +292,7 @@ int sgInitGyoRace(SubGameInfo *info) {
             BREEDFISH_USED *const &stamina_data = stamina_pointer;
             fatigue = (unsigned short)fish_item->data.fish.fatigue;
             entry->fish[0].stamina = (int)((float)stamina_data->param[3] - (0.1f * (float)(fatigue - 1) * (float)fish_item->data.fish.param[3]));
-            printf((char *)at_1377__4__DATA, fatigue);
+            printf(at_1377__4__DATA, fatigue);
         } else {
             entry->fish[0].stamina = data->param[3];
         }
@@ -307,7 +306,7 @@ int sgInitGyoRace(SubGameInfo *info) {
         ((GYORACE_FISH_INF *)((unsigned char *)fish_inf + info_offset))->lane = lane;
         lane++;
         if (lane >= 6) lane = 0;
-        printf((char *)at_1378__3__DATA, name, entry->fish[0].tactics);
+        printf(at_1378__3__DATA, name, entry->fish[0].tactics);
         racer++;
         progress_offset += sizeof(grRACE_PROGRESS *);
         param_offset += sizeof(grFISH_PARAM);
@@ -340,7 +339,7 @@ int sgInitGyoRace(SubGameInfo *info) {
         state->time = 0.0f;
         state->rank = 1;
         int *character_no = &state->chara_no;
-        scene->LoadChara(state->chara_no, (unsigned int *)buffer, (char *)at_1379__3__DATA, memory, memory, memory, CharaTexb, 0);
+        scene->LoadChara(state->chara_no, (unsigned int *)buffer, at_1379__3__DATA, memory, memory, memory, CharaTexb, 0);
         scene->SetActive(1, *character_no);
         scene->SetCharaTexb(*character_no, CharaTexb);
         CCharacter2 *character = scene->GetCharacter(*character_no);
@@ -357,7 +356,7 @@ int sgInitGyoRace(SubGameInfo *info) {
         character->SetScale(scale, scale, scale);
         character->SetRotation(rotation.f);
         character->SetPosition(position.f);
-        character->SetMotion((char *)at_1380__2__DATA, 0);
+        character->SetMotion(at_1380__2__DATA, 0);
         character->SetStep(0.3f);
         FishIMGReplace(buffer, character, (*item)->item_no, &(*item)->data.fish);
         fish++;
@@ -369,21 +368,22 @@ int sgInitGyoRace(SubGameInfo *info) {
     if (texture_buffer != NULL) {
             WindowTexb = CharaTexb;
             char image_path[0x20];
-            if (LanguageCode > 0) sprintf(image_path, (char *)at_1381__DATA, LanguageCode);
-            else sprintf(image_path, (char *)at_1382__2__DATA, LanguageCode);
+            if (LanguageCode > 0) sprintf(image_path, at_1381__DATA, LanguageCode);
+            else sprintf(image_path, at_1382__2__DATA, LanguageCode);
             textures->DeleteBlock(WindowTexb);
             LoadFile(image_path, texture_buffer, &size);
             textures->EnterIMGFile((unsigned char *)texture_buffer, WindowTexb, &BuffTextureData, NULL);
-            EffectTex2 = textures->GetTexture((char *)at_1383__3__DATA, -1);
+            EffectTex2 = textures->GetTexture(at_1383__3__DATA, -1);
             EffectTexb = WindowTexb + 1;
             textures->DeleteBlock(EffectTexb);
             textures->EnterIMGFile((unsigned char *)texture_buffer, EffectTexb, &BuffTextureData, NULL);
-            TEX_SystemEffect1 = EffectTex = textures->GetTexture((char *)at_1384__2__DATA, -1);
+            TEX_SystemEffect1 = EffectTex = textures->GetTexture(at_1384__2__DATA, -1);
             ChangeDir(NULL);
     }
     camera_id = scene->AssignCamera(-1, &camera0, NULL);
+    int id = camera_id;
     scene->before_camera = scene->active_camera;
-    scene->active_camera = camera_id;
+    scene->active_camera = id;
     camera0.SetPos(225.0f, 38.0f, 168.0f);
     camera0.SetNextPos(225.0f, 38.0f, 168.0f);
     camera0.SetSpeed(0.0f, 0.0f);
