@@ -594,7 +594,15 @@ asm void mgUnitMatrix(float (*matrix)[4]) {
     jr ra
     sqc2 vf3, 0x0(a0)
 }
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgZeroMatrix__FPA4_f);
+asm void mgZeroMatrix(float (*matrix)[4]) {
+    .set noreorder
+    vsub.xyzw vf1, vf1, vf1
+    sqc2 vf1, 0x30(a0)
+    sqc2 vf1, 0x20(a0)
+    sqc2 vf1, 0x10(a0)
+    jr ra
+    sqc2 vf1, 0x0(a0)
+}
 
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", MulMatrix3__FPA4_fPA4_fPA4_f);
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgMulMatrix__FPA4_fPA4_fPA4_f);
