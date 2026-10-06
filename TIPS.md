@@ -387,3 +387,12 @@ only functions present in both objects can be replaced, the plain build keeps th
 - Wrapping a call in a one-line `static inline` accessor can add one spill slot. When retail's frame is exactly 16 bytes bigger and the extra slot is never referenced, try wrapping the call whose result gets spilled (`SearchMapFlatPosition`: the frame matched, the test scheduling did not).
 - An assignment inside the condition, `if ((arm = F()) != NULL)`, changes where later float constants are materialised. It can move a `0.0f` ahead of an intervening call into a callee-saved register.
 - Once an instruction is inserted, word-diff and immediate-masked counts saturate. Aligning the masked instruction words with difflib before counting gives a usable gradient on big drafts. objdiff percent can fall even when differing rows drop, so check the percent before keeping an edit.
+- A switch that the optimiser reduces to an `if` or to nothing (`switch (x) { case 0: break; default: ... }` or `case 1: default:`) turns off filling branch delay slots from the fall-through block for the whole function. A real two-case switch does not. If retail shows `beqz; nop; jal; addiu a1` where we fill the beqz slot, look for such a switch.
+- `if (p == NULL && p == NULL) return;` produces retail's `bnez p,L; ...; beqz p,epilogue` pair.
+- Wrapping an expression in a file-local static inline function (`WindRand`, `MoveCheckRadius`) changes the order float constants are loaded, where rewording the expression itself never did.
+- Stack layout follows declaration order, including inner blocks. Map retail's `sp` offsets, then declare locals in that order, moving declarations into blocks where needed. A brace-initialised vector's template copy happens where it is declared.
+- `int a[2][2]` loads `a[1][0]` through an address register. Two arrays `int a0[2], a1[2]` give retail's direct `[0]` loads.
+- To find which block causes a register-number swap, cut the function short with an early `return` at several points and watch which `sN` the parameters are moved into at entry. Split a variable that is reused across blocks or loops.
+- The operand order of `addu` follows source order, and `red += pulse` allocates registers differently from `x = c + pulse`.
+- In this compiler `(int)f` also emits a call to `fptosi`. The optimiser can move a cast but not an explicit `fptosi()` call, so choose per site.
+- A `goto` can give retail's `beq 1 -> body; bne 2 -> other` dispatch where a switch or if chain does not (`FramePose`).
