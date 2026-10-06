@@ -2885,14 +2885,13 @@ int SubGameSaveKey(void) {
             }
             break;
         case SUB_SAVE_WRITE_DONE:
-            unsigned int was_pushed = pushed != 0;
-            if (was_pushed) {
+            if (pushed != 0) {
                 MenuSePlay(SYSTEM_SE_DECIDE);
                 SubGameSaveLoadStatus = 1;
             }
             break;
-        case SUB_SAVE_WRITE_FAILED_FULL:
         case SUB_SAVE_WRITE_FAILED:
+        case SUB_SAVE_WRITE_FAILED_FULL:
             if (pushed != 0) {
                 next = SUB_SAVE_SLOT_SELECT;
                 MenuSePlay(SYSTEM_SE_DECIDE);
@@ -2908,8 +2907,10 @@ int SubGameSaveKey(void) {
                     MenuSePlay(SYSTEM_SE_DECIDE);
                     if (card->formatted == 0) {
                         next = SUB_SAVE_FORMAT_ASK;
+                        break;
                     } else if (card->free_size < SubCheckTotalSaveFileSize) {
                         next = SUB_SAVE_CARD_ERROR;
+                        break;
                     } else {
                         next = SUB_SAVE_DIR_MAKING;
                     }
@@ -2950,8 +2951,7 @@ int SubGameSaveKey(void) {
             break;
         case SUB_SAVE_FORMATTING:
             card = GetSubGameCard(MemoryCardPtr);
-            int format_done = stepResult != 0;
-            if (format_done) {
+            if (stepResult != 0) {
                 if (McCheckMCPs2(card) != 0) {
                     next = SUB_SAVE_DIR_MAKING;
                     if (card != NULL && card->formatted == 0) {
