@@ -1266,7 +1266,6 @@ CGameDataUsed *CShopMenu::SearchNowPosItemExist() {
     }
     return NULL;
 }
-#ifdef NONMATCHING
 extern u8 rgba_1897[4];
 void ShopSellListDraw(int &tex_block, float *pos) {
     mgCTexture *icon_tex = MenuPosData->item_icon_tex[0][0];
@@ -1303,21 +1302,25 @@ void ShopSellListDraw(int &tex_block, float *pos) {
     mgRect<int> line_rect(0, 0x8E, 0xB0, 6);
     mgCDrawPrim *prim = GetMenuPrim();
     SetSpriteEnv(prim, 0);
-    float x = pos[0] + 18.0f;
+    float price_x;
+    int price;
     float mark_x;
-    float y = pos[1] + 44.0f;
+    float x;
+    int count;
+    float y;
+    x = pos[0] + 18.0f;
+    y = pos[1] + 44.0f;
     CGameDataUsed item;
-    float price_x = x + 92.0f;
+    price_x = x + 92.0f;
     if (LanguageCode > 0 && NowSellMode == SHOP_SELL_MODE_MEDAL) {
-        mark_x = price_x;
         price_x -= 12.0f;
-    } else {
-        mark_x = price_x;
     }
+    mark_x = price_x;
     if (LanguageCode > 0 && NowSellMode == SHOP_SELL_MODE_ROBO_ABS) {
-        mark_x = price_x + 6.0f;
+        mark_x += 6.0f;
     }
-    for (line = 0; (unsigned int)line < CShopPtr->item_num; line++, y += 44.0f) {
+    count = CShopPtr->item_num;
+    for (line = 0; line < count; line++, y += 44.0f) {
         if (y + 44.0f < 0.0f) {
             continue;
         }
@@ -1331,13 +1334,15 @@ void ShopSellListDraw(int &tex_block, float *pos) {
         prim->Color(0x80, 0x80, 0x80, 0x80);
         PrimQuad(prim, x - 4.0f, y + 40.0f, line_rect);
         PrimQuad(prim, x + 128.0f, y + 1.0f, have_board);
-        int price = CShopPtr->GetHaveNum(line);
-        PrimDrawNumber(prim, price, 1, fptosi(x + 134.0f + 23.0f), fptosi(y + 12.0f), have_digits, 0, 0);
+        int have = CShopPtr->GetHaveNum(line);
+        price = have;
+        PrimDrawNumber(prim, have, 1, fptosi(x + 134.0f + 23.0f), fptosi(y + 12.0f), have_digits, 0, 0);
         item.item_no = item_no;
         CShopPtr->GetPrice(&item, &price, NULL);
         PrimDrawNumber(prim, price, 0, fptosi(price_x), fptosi(y + 16.0f), price_digits, 0, 0);
-        mgRect<int> mark_rect(fptosi(mark_x), fptosi(y + 22.0f), price_mark->right, price_mark->bottom);
-        PrimQuad(prim, mark_rect, *price_mark);
+        int mark_y = fptosi(y + 22.0f);
+        int mark_left = fptosi(mark_x);
+        PrimQuad(prim, mgRect<int>(mark_left, mark_y, price_mark->right, price_mark->bottom), *price_mark);
         prim->End();
         mgRect<float> icon_rect(x, y, 32.0f, 40.0f);
         if (item_no == 0x1A8 || item_no == 0x1AB || item_no == 0x1AC || item_no == 0x1A6) {
@@ -1364,9 +1369,6 @@ void ShopSellListDraw(int &tex_block, float *pos) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menushop", ShopSellListDraw__FRiPf);
-#endif
 extern char at_2114__2[];
 extern char at_2115__2[];
 extern char at_2116__2[];
