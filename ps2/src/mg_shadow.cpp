@@ -47,6 +47,7 @@ static int SetShadowData(u_int *packet, float (*matrix)[4]) {
 }
 #pragma schedule reset
 
+#pragma optimization_level 2
 #ifdef NONMATCHING
 int mgCShadowMDT::CreateFacePacket(u_int *packet, mgCFace *face) {
     // VIF MSCAL that starts the shadow microprogram on each batch.
@@ -136,6 +137,8 @@ int mgCShadowMDT::CreateFacePacket(u_int *packet, mgCFace *face) {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_shadow", CreateFacePacket__12mgCShadowMDTFPUiP7mgCFace);
 #endif
+#pragma optimization_level reset
+
 
 #pragma schedule off
 #pragma global_optimizer off
@@ -259,6 +262,7 @@ int mgCShadowMDT::DataAssignMDT(MDT_HEADER *header, mgCMemory *memory,
 #pragma global_optimizer reset
 #pragma schedule reset
 
+#pragma schedule off
 #ifdef NONMATCHING
 int mgCShadowMDT::CreateRenderInfoPacket(u_int *packet, float (*matrix)[4], mgRENDER_INFO *info) {
     u_int zero[4] = {0, 0, 0, 0};
@@ -368,6 +372,8 @@ int mgCShadowMDT::CreateRenderInfoPacket(u_int *packet, float (*matrix)[4], mgRE
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_shadow", CreateRenderInfoPacket__12mgCShadowMDTFPUiPA4_fP13mgRENDER_INFO);
 #endif
+#pragma schedule reset
+
 
 // Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_shadow", prog_vif_208__DATA);

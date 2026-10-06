@@ -292,7 +292,7 @@ extern CDC2Mes *GeoramaMes[5];
 extern signed char msgtbl_2587[5];
 extern signed char GeoramaMesForceMakeFlag;
 extern u8 GeoramaMesPosForceSetFlag;
-extern signed char GeoramaMesForceMakeFlag_PaintVer;
+extern unsigned char GeoramaMesForceMakeFlag_PaintVer;
 extern u8 MenuGeoramaCursorForceSetFlag;
 extern signed char MenuGeoStoneDonwLoadFlag;
 extern mgCMemory MenuGeoramaStack;
@@ -831,36 +831,30 @@ void MenuGeoramaListDraw(int &tex_block, float *pos, int page, int alpha) {
             int shadow_y = (int)(3.0f + pos[1]);
             int body_y = shadow_y + head_tex.bottom;
             PrimQuad(prim, shadow_x, shadow_y, head_tex);
-            PrimQuad(prim, mgRect<int>(shadow_x, body_y, body_tex.right, 0x88), body_tex);
-            PrimQuad(prim, mgRect<int>(shadow_x, (int)(136.0f + body_y), foot_tex.right, foot_tex.bottom), foot_tex);
+            PrimQuad(prim, mgRect < int > (shadow_x, body_y, body_tex.right, 0x88), body_tex);
+            PrimQuad(prim, mgRect < int > (shadow_x, (int)(136.0f + body_y), foot_tex.right, foot_tex.bottom), foot_tex);
             prim->Color(0x80, 0x80, 0x80, alpha);
             float top = pos[1];
             body_y = (int)(top + head_tex.bottom);
             PrimQuad(prim, pos[0], top, head_tex);
-            PrimQuad(prim, mgRect<int>((int)pos[0], body_y, body_tex.right, 0x88), body_tex);
-            PrimQuad(prim, mgRect<int>((int)pos[0], (int)(136.0f + body_y), foot_tex.right, foot_tex.bottom), foot_tex);
+            PrimQuad(prim, mgRect < int > ((int)pos[0], body_y, body_tex.right, 0x88), body_tex);
+            PrimQuad(prim, mgRect < int > ((int)pos[0], (int)(136.0f + body_y), foot_tex.right, foot_tex.bottom), foot_tex);
             u8 active = page >= 0 && CMenuGeoPt->key_arg_no == viewmode_to_mode_convtable_1310[page];
             short *board = brdtbl_active_1314;
             if (!active) {
                 board = brdtbl_noneactive_1315;
             }
             prim->Color(0x80, 0x80, 0x80, alpha);
-            Menu3DivideTextureDraw(prim, mgRect<int>((int)(54.0f + pos[0]), (int)(11.0f + pos[1]), 0x89, 0x15), board, 1);
+            Menu3DivideTextureDraw(prim, mgRect < int > ((int)(54.0f + pos[0]), (int)(11.0f + pos[1]), 0x89, 0x15), board, 1);
             if (active) {
                 prim->Color(0xB6, 0xB6, 0xB6, alpha);
             }
             float *title = GeoBoardListTitleTexRect[data_no];
-            PrimQuad(prim,
-                     mgRect<int>((int)(pos[0] + GeoBoardListTitlePutOffset[data_no][0]), (int)(12.0f + pos[1]), (int)title[2],
-                                 (int)title[3]),
-                     mgRect<int>((int)title[0], (int)title[1], (int)title[2], (int)title[3]));
+            PrimQuad(prim, mgRect < int > ((int)(pos[0] + GeoBoardListTitlePutOffset[data_no][0]), (int)(12.0f + pos[1]), (int)title[2], (int)title[3]), mgRect < int > ((int)title[0], (int)title[1], (int)title[2], (int)title[3]));
             int bar_x = (int)(228.0f + pos[0]);
             int bar_y = (int)(46.0f + pos[1]);
             prim->Color(0x80, 0x80, 0x80, alpha);
-            Menu3DivideTextureDraw(prim,
-                                   mgRect<int>(bar_x, (int)(bar_y + CMenuGeoPt->scroll_bar_y[page]), 8,
-                                               (int)CMenuGeoPt->scroll_bar_h[page]),
-                                   ScrlBarTable_1320, 0);
+            Menu3DivideTextureDraw(prim, mgRect < int > (bar_x, (int)(bar_y + CMenuGeoPt->scroll_bar_y[page]), 8, (int)CMenuGeoPt->scroll_bar_h[page]), ScrlBarTable_1320, 0);
             prim->End();
             float left = pos[0];
             top = pos[1];
@@ -889,7 +883,7 @@ void MenuGeoramaListDraw(int &tex_block, float *pos, int page, int alpha) {
                 prim->Begin(6);
                 prim->Texture(Tex_Georama);
                 prim->Color(0x80, 0x80, 0x80, alpha);
-                for (int i = 0; i < 99; i++, check_y += 24.0f, line_y += 24.0f) {
+                for (int i = 0; i < 99; i++, check_y = check_y + 24.0f, line_y += 24.0f) {
                     if (line_y < 133.0f) {
                         continue;
                     }
@@ -901,9 +895,8 @@ void MenuGeoramaListDraw(int &tex_block, float *pos, int page, int alpha) {
                         continue;
                     }
                     PrimQuad(prim, line_x, check_y, potti1);
-                    int number_y = (int)(line_y - 16.0f);
-                    PrimQuad(prim, 150.0f + line_x, number_y, times_tex);
-                    PrimDrawNumber(prim, CMenuGeoPt->stock_list[i].num, 1, (int)(180.0f + line_x), number_y, number_tex, -2, 0);
+                    PrimQuad(prim, 150.0f + line_x, (int)(line_y - 16.0f), times_tex);
+                    PrimDrawNumber(prim, CMenuGeoPt->stock_list[i].num, 1, (int)(180.0f + line_x), (int)(line_y - 16.0f), number_tex, -2, 0);
                     if (mgScreenHeight <= check_y) {
                         break;
                     }
@@ -1102,9 +1095,9 @@ void MenuGeoramaAnalyzeDraw(int &tex_block, float *pos, int alpha) {
                     PrimQuad(prim, list_pos[0] - 19.0f, 17.0f + y, mgRect<int>(0x160, 0x132, 0x26, 0x1A));
                     short *button = maintopicbtn_1568[GeoRequestFlag->met[no]];
                     PrimQuad(prim, list_pos[0] - 30.0f, y - 9.0f, mgRect<int>(button[0], button[1], 0x1C, 0x26));
+                    y += 30.0f;
                     req_h += GeoramaReqMsgTexH[font_no];
                     font_no++;
-                    y += 30.0f;
                     for (int con = 0; 0 <= MenuEditAnalyzeDataSrc[no]->con_no[con]; con++) {
                         if (mgScreenWidth < y) {
                             break;
@@ -1141,7 +1134,7 @@ void MenuGeoramaAnalyzeDraw(int &tex_block, float *pos, int alpha) {
             if (CMenuGeoPt->list_pos[GEORAMA_VIEW_ANALYZE][0] < mgScreenWidth) {
                 MenuReloadTexture(tex_block, MenuArg.mes_tex_block);
                 for (int i = 0; GeoramaReqMsgFont[i] != NULL && i < 48; i++) {
-                    if (first_hidden >= 0 && first_hidden < i) {
+                    if (0 <= first_hidden && first_hidden < i) {
                         break;
                     }
                     if (GeoramaReqMsgFontDrawFlag[i] != 0) {
@@ -1353,7 +1346,7 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
     int size;
     int no;
 
-    if (town_no < 0 || town_no >= 5) {
+    if (town_no < 0 || town_no > 4) {
         map_no = 0;
         valid = 0;
     }
@@ -1369,9 +1362,9 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
             MenuEditAnalyzeDataSrc[no] = edit->GetAnalyzeData(map_no, no);
         }
     }
-    for (no = 0; MenuEditAnalyzeDataSrc[no] != NULL && no < 32; no++) {
-        GeoRequestFlag->met[no] =
-            edit->GetAnalyzeFlag(map_no, no, GeoRequestFlag->con_no[no], GeoRequestFlag->con_flag[no]);
+    for (int n = 0; MenuEditAnalyzeDataSrc[n] != NULL && n < 32; n++) {
+        GeoRequestFlag->met[n] =
+            edit->GetAnalyzeFlag(map_no, n, GeoRequestFlag->con_no[n], GeoRequestFlag->con_flag[n]);
     }
     analyze_percent = edit->GetAnalyzePercent(map_no);
     MenuAnalyzeData = &edit->analyze;
@@ -1381,6 +1374,7 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
     CSaveDataDungeon *dungeon = &save->save_dungeon;
     memset(floors, 0, sizeof(floors));
     PartsMakeOkTableNum = 0;
+    int *ok_table = PartsMakeOkTable;
     char *hatena = GetHatena();
     CScene *scene = GetMainScene();
     CEditMap *map = (CEditMap *)scene->GetMap(scene->active_map);
@@ -1415,7 +1409,7 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
             if (floor != NULL) {
                 if (!(floor->flag & DNG_FLOOR_FLAG_GEOSTONE_FOUND)) {
                     PartsMakeOkTableNum++;
-                    PartsMakeOkTable[PartsMakeOkTableNum] = parts->id;
+                    ok_table[PartsMakeOkTableNum] = parts->id;
                     PartsMakeOkTableNum++;
                 } else if (!(floor->flag & DNG_FLOOR_FLAG_GEOSTONE_READ)) {
                     floor_num++;
@@ -1459,7 +1453,7 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
                 int dungeon_no = geo_floor / 100;
                 int floor_no = geo_floor % 100;
                 DNG_FLOOR_SAVE *floor = dungeon->GetFloorInfoPtr(dungeon_no, floor_no);
-                signed char was_open = MenuAnalyzeData->data_open[no];
+                int was_open = MenuAnalyzeData->data_open[no];
                 if (floor != NULL && (floor->flag & DNG_FLOOR_FLAG_GEOSTONE_FOUND)) {
                     known = 1;
                     MenuAnalyzeData->data_open[no] = 1;
@@ -1887,14 +1881,15 @@ void MenuMapPartsDraw(int &draw_wait) {
 #ifdef NONMATCHING
 void MenuGeoramaMessageMake(int mode) {
     int force_pos = GeoramaMesPosForceSetFlag;
+    char *name;
     GeoramaMesPosForceSetFlag = 0;
     for (int list_no = 0; list_no < GEORAMA_VIEW_MODE_NUM; list_no++) {
         int data_no = ConvGeoramaDataNo(list_no);
-        if (data_no < 0) {
+        if (0 > data_no) {
             continue;
         }
         signed char *manner = &GeoramaMesMakeManner[data_no];
-        int top_line[2] = {CMenuGeoPt->list_info[list_no].top, CMenuGeoPt->list_info[list_no].top - 1};
+        int top_line[2] = { CMenuGeoPt->list_info[list_no].top, CMenuGeoPt->list_info[list_no].top - 1 };
         GeoramaMesMakeLine[data_no] = top_line[*manner];
         int first_line = GeoramaMesMakeLine[data_no];
         CMenuPosDataForm *form = CMenuGeoPt->list_form[list_no];
@@ -1909,39 +1904,41 @@ void MenuGeoramaMessageMake(int mode) {
         } else if (list_pos[0] < -180.0f) {
             continue;
         }
-        int item_mes[13] = {0};
-        char *names[13] = {NULL};
-        int line_pos[12][2];
+        int item_mes[13] = { 0 };
+        char *names[13] = { NULL };
         sceVu0FVECTOR line_color[10];
+        int line_pos[12][2];
         CEditPartsInfo *info[10];
         int i = 0;
         int line = first_line;
         float x = list_pos[0];
-        float y = list_pos[1] + 24.0f * first_line;
-        for (; line < 0; line++) {
+        float y = list_pos[1] + 24.0f * (int)first_line;
+        while (line < 0) {
             item_mes[i] = 0;
             names[i] = NULL;
             line_pos[i][0] = (int)x;
             line_pos[i][1] = (int)y;
             y += 24.0f;
             i++;
+            ++line;
         }
         for (; i < 10; i++) {
             item_mes[i] = 0;
             names[i] = NULL;
             int no = first_line + i;
             line_pos[i][0] = (int)x;
-            line_pos[i][1] = (int)y;
-            if (list_no == GEORAMA_VIEW_PAINT) {
+            line_pos[i][1] = y;
+            int temp = list_no == GEORAMA_VIEW_PAINT;
+            if (temp) {
                 item_mes[i] = i + 0x145A + CMenuGeoPt->list_info[GEORAMA_VIEW_PAINT].top;
-                if (no == 8 && LanguageCode > 0) {
+                if (first_line + i == 8 && LanguageCode > 0) {
                     line_pos[i][0] = (int)(x - 40.0f);
                 }
             } else {
                 line_color[i][0] = 107.0f;
                 line_color[i][1] = 106.0f;
                 line_color[i][2] = 104.0f;
-                info[i] = CMenuGeoPt->GetNowSelectEditPartsInfo(data_no, no);
+                info[i] = CMenuGeoPt->GetNowSelectEditPartsInfo(data_no, first_line + i);
                 if (info[i] != NULL) {
                     names[i] = info[i]->edit_name;
                 } else {
@@ -1955,14 +1952,14 @@ void MenuGeoramaMessageMake(int mode) {
             if (list_no == GEORAMA_VIEW_PAINT) {
                 line_pos[i][0] += 40;
                 if (mes->item_mes[i] != item_mes[i]) {
-                    mes->ClsMes::mes_no = -1;
+                    mes->ClsMes::mes_no = - 1;
                 }
                 mes->SetItemMes(i, item_mes[i]);
             }
             if (list_no != GEORAMA_VIEW_PAINT) {
-                char *name = names[i];
+                name = names[i];
                 if (name != NULL && strcmp(mes->name[i], name) != 0) {
-                    mes->ClsMes::mes_no = -1;
+                    mes->ClsMes::mes_no = - 1;
                 }
                 if (name != NULL) {
                     strcpy(mes->name[i], name);
@@ -1974,10 +1971,9 @@ void MenuGeoramaMessageMake(int mode) {
             mes->SetMovePosGyou(i, line_pos[i][0], line_pos[i][1]);
         }
         if (GeoramaMesForceMakeFlag != 0) {
-            mes->ClsMes::mes_no = -1;
+            mes->ClsMes::mes_no = - 1;
         }
-        if ((*manner == 1 && 238.0f + form->y - 9.0f <= line_pos[8][1]) ||
-            (*manner == 0 && 238.0f + form->y - 9.0f <= line_pos[8][1])) {
+        if ((*manner == 1 && 238.0f + form->y - 9.0f <= line_pos[8][1]) || (*manner == 0 && 238.0f + form->y - 9.0f <= line_pos[8][1])) {
             mes->line_pos[8][0] = mgScreenWidth - 20;
             mes->line_pos_on[8] = 1;
         }
@@ -2677,52 +2673,52 @@ int CMenuGeorama::IsMakeObject(int buttons_held, int buttons_pressed) {
 }
 #ifdef NONMATCHING
 void CMenuGeorama::CalcCursorPosition() {
-    if (MenuPosData == NULL) return;
-    CMenuPosDataForm *forms[9] = {title_form, list_form[0], list_form[1], list_form[2],
-                                   NULL, list_form[4], NULL, list_form[6], free_color_form};
-    int x = 0;
-    int y = 0;
-    CMenuPosDataForm *form = forms[key_arg_no];
-    if (form != NULL) {
-        switch (key_arg_no) {
-        case 0:
-            MenuCommonInfo->SetWakuType(0);
-            MenuCommonInfo->SetWakuWH(0, 84, 38);
-            x = fptosi(menu_georama_title_pos[0]);
-            y = fptosi(menu_georama_title_pos[1]);
-            break;
-        case 1:
-        case 2:
-        case 5:
-        case 7:
-            form->GetPutPosXY(NULL, x, y);
-            x -= 6;
-            y = fptosi((float)y + (43.0f + 24.0f * (list_info[view_mode].select - list_info[view_mode].top)));
-            break;
-        case 3:
-            form->GetPutPosXY(NULL, x, y);
-            x -= 6;
-            y = fptosi((float)y + (40.0f + 24.0f * (paint_select - paint_top)));
-            break;
-        case 8: {
-            char part_name[32];
-            sprintf(part_name, at_3329, free_color_select);
-            form->GetPutPosXY(part_name, x, y);
-            x -= 26;
-            y -= 12;
-            break;
+    char name[32];
+
+    if (MenuPosData != NULL) {
+        CMenuPosDataForm *forms[9] = {title_form,   list_form[0], list_form[1], list_form[2],   NULL,
+                                      list_form[4], list_form[6], list_form[6], free_color_form};
+        CMenuPosDataForm *form = forms[key_arg_no];
+        int pos[4] = {0, 0, 0, 0};
+        if (form != NULL) {
+            switch (key_arg_no) {
+            case 0:
+                MenuCommonInfo->SetWakuType(0);
+                MenuCommonInfo->SetWakuWH(0, 0x54, 0x26);
+                pos[0] = (int)menu_georama_title_pos[0];
+                pos[1] = (int)menu_georama_title_pos[1];
+                break;
+            case 1:
+            case 2:
+            case 5:
+            case 7:
+                form->GetPutPosXY(NULL, pos[0], pos[1]);
+                pos[0] -= 6;
+                pos[1] = (int)(pos[1] + (43.0f + 24.0f * (list_info[view_mode].select - list_info[view_mode].top)));
+                break;
+            case 3:
+                form->GetPutPosXY(NULL, pos[0], pos[1]);
+                pos[0] -= 6;
+                pos[1] = (int)(pos[1] + (40.0f + 24.0f * (paint_select - paint_top)));
+                break;
+            case 8:
+                sprintf(name, at_3329, free_color_select);
+                form->GetPutPosXY(name, pos[0], pos[1]);
+                pos[0] -= 0x1A;
+                pos[1] -= 0xC;
+                break;
+            }
         }
+        if (mode == 6) {
+            pos[0] = (int)(-50.0f + MakeBoardDrawInfo[make_cursor * 2]);
+            pos[1] = (int)MakeBoardDrawInfo[make_cursor * 2 + 1];
         }
+        if (MenuGeoramaCursorForceSetFlag != 0) {
+            MenuCommonInfo->MenuSetPos(pos[0], pos[1]);
+            MenuGeoramaCursorForceSetFlag = 0;
+        }
+        MenuCommonInfo->MenuPosStep(pos, NULL);
     }
-    if (mode == 6) {
-        x = fptosi(-50.0f + MakeBoardDrawInfo[make_cursor * 2]);
-        y = fptosi(MakeBoardDrawInfo[make_cursor * 2 + 1]);
-    }
-    if (MenuGeoramaCursorForceSetFlag) {
-        MenuCommonInfo->MenuSetPos(x, y);
-        MenuGeoramaCursorForceSetFlag = 0;
-    }
-    MenuCommonInfo->MenuPosStep(&x, NULL);
 }
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/editmenu", CalcCursorPosition__12CMenuGeoramaFv);
@@ -3462,30 +3458,41 @@ int MenuGeoramaAnalyzeSelect(CMenuGeorama *menu, int keys, int pushed) {
     int old_top = menu->top;
     int max = menu->GetNowViewModeMax(GEORAMA_VIEW_ANALYZE);
     int step = 0;
-    if ((keys & 1) || (keys & 0x10)) step--;
-    if ((keys & 2) || (keys & 0x20)) step++;
-    menu->select += step;
-    if (menu->select < 0) menu->select = 0;
-    if (menu->select > max) menu->select = max;
+    float *list_pos;
 
+    if ((keys & 1) || (keys & 0x10)) {
+        step--;
+    }
+    if ((keys & 2) || (keys & 0x20)) {
+        step++;
+    }
+    menu->select += step;
+    if (menu->select < 0) {
+        menu->select = 0;
+    }
+    if (max < menu->select) {
+        menu->select = max;
+    }
     MenuEditAnalyzeDataSrcListH_Move = MenuEditAnalyzeDataSrcListHTable[menu->select];
-    if (MenuEditAnalyzeDataSrcListH_Move > MenuEditAnalyzeDataSrcListH) {
+    if (MenuEditAnalyzeDataSrcListH < MenuEditAnalyzeDataSrcListH_Move) {
         MenuEditAnalyzeDataSrcListH_Move = MenuEditAnalyzeDataSrcListH;
     }
     menu->list_target_y[GEORAMA_VIEW_ANALYZE] = 50.0f + menu->analyze_form->y - MenuEditAnalyzeDataSrcListH_Move;
-    float &y = menu->list_pos[GEORAMA_VIEW_ANALYZE][1];
-    y += (menu->list_target_y[GEORAMA_VIEW_ANALYZE] - y) / 4.0f;
-    if (abs(fptosi(y - menu->list_target_y[GEORAMA_VIEW_ANALYZE])) <= 0) {
-        y = menu->list_target_y[GEORAMA_VIEW_ANALYZE];
+    list_pos = CMenuGeoPt->list_pos[GEORAMA_VIEW_ANALYZE];
+    list_pos[1] += (menu->list_target_y[GEORAMA_VIEW_ANALYZE] - list_pos[1]) / 4.0f;
+    if (abs((int)(list_pos[1] - menu->list_target_y[GEORAMA_VIEW_ANALYZE])) <= 0) {
+        list_pos[1] = menu->list_target_y[GEORAMA_VIEW_ANALYZE];
     }
     menu->top = menu->select;
     menu->SetGeoListInfo(menu->view_mode, menu->select, menu->top);
     if (old_top != menu->top) {
-        GeoramaReqMakeManner = old_top < menu->top;
+        GeoramaReqMakeManner = old_top < menu->top ? 1 : 0;
         GeoramaReqMakeFlag = 1;
         MenuSePlay(0);
     }
-    if (pushed & 2) menu->ReturnSelectMode(0);
+    if (pushed & 2) {
+        menu->ReturnSelectMode(0);
+    }
     return 0;
 }
 #else
@@ -3593,7 +3600,6 @@ int CRemovalMenu::KeyStep() {
     int push;
     CDC2Mes *ask_mes;
     CDC2Mes *yes_mes;
-    CDC2Mes *info_mes;
     CDC2Mes *list_mes;
     CDC2Mes *npc_mes;
     int remake;
@@ -3601,6 +3607,9 @@ int CRemovalMenu::KeyStep() {
     int action;
     int size;
     char part_name[32];
+    int old_top;
+    u8 *pack;
+    int first;
 
     if (MenuMainMapInfo == NULL) {
         return 1;
@@ -3610,335 +3619,338 @@ int CRemovalMenu::KeyStep() {
     ask_mes = MenuDCMsg[1];
     remake = 0;
     yes_mes = MenuDCMsg[2];
+    CDC2Mes *info_mes;
     info_mes = MenuDCMsg[3];
     list_mes = MenuDCMsg[4];
     npc_mes = MenuDCMsg[5];
+    __typeof__(MenuUserDataManPtr) menuUserDataManPtr2 = MenuUserDataManPtr;
     reload = 0;
     switch (mode) {
-    case 1:
-        if (HouseDrawInfo == NULL) {
-            return 1;
-        }
-        if (ReadBGSync() == 0) {
-            MakeNPCList();
-            BG_READ_INFO *read_b_g = GetReadBGFile(0);
-            if (read_b_g != NULL) {
-                MenuDataAnalyze((char *)GetPackFile((unsigned int *)read_b_g->buffer, at_4248, &size), size, &data_stack);
-                script = (char *)GetPackFile((unsigned int *)read_b_g->buffer, at_4249, &script_size);
-                AttachMessageForm();
-                MenuMesForm[0]->rgba_bit = 8;
-                house_form = MenuPosData->GetFormInfo(at_3167);
-                HouseInfoFormGrobal = house_form;
-                list_form = MenuPosData->GetFormInfo(at_4250);
-                clip_form = MenuPosData->GetFormInfo(at_4251);
-                npc_win_form = MenuPosData->GetFormInfo(at_4252);
-                npc_chr_form = MenuPosData->GetFormInfo(at_4253);
-                if (list_form != NULL) {
-                    scroll_parts[0] = list_form->GetPartInfo(at_3420);
-                    scroll_parts[1] = list_form->GetPartInfo(at_3421);
-                    scroll_parts[2] = list_form->GetPartInfo(at_4254);
-                    for (int i = 0; i < 9; i++) {
-                        sprintf(part_name, at_4255, i);
-                        line_parts[i] = list_form->GetPartInfo(part_name);
+        case 1:
+            if (HouseDrawInfo == NULL) {
+                return 1;
+            }
+            if (ReadBGSync() == 0) {
+                MakeNPCList();
+                BG_READ_INFO *read_b_g = GetReadBGFile(0);
+                if (read_b_g != NULL) {
+                    MenuDataAnalyze((char *)GetPackFile((unsigned int *)read_b_g->buffer, at_4248, &size), size, &data_stack);
+                    script = (char *)GetPackFile((unsigned int *)read_b_g->buffer, at_4249, &script_size);
+                    AttachMessageForm();
+                    MenuMesForm[0]->rgba_bit = 8;
+                    house_form = MenuPosData->GetFormInfo(at_3167);
+                    HouseInfoFormGrobal = house_form;
+                    list_form = MenuPosData->GetFormInfo(at_4250);
+                    clip_form = MenuPosData->GetFormInfo(at_4251);
+                    npc_win_form = MenuPosData->GetFormInfo(at_4252);
+                    npc_chr_form = MenuPosData->GetFormInfo(at_4253);
+                    if (list_form != NULL) {
+                        scroll_parts[0] = list_form->GetPartInfo(at_3420);
+                        scroll_parts[1] = list_form->GetPartInfo(at_3421);
+                        scroll_parts[2] = list_form->GetPartInfo(at_4254);
+                        for (int i = 0; i < 9; i++) {
+                            sprintf(part_name, at_4255, i);
+                            line_parts[i] = list_form->GetPartInfo(part_name);
+                        }
                     }
-                }
-                list_jump = 1;
-                list_scroll_dir = 0;
-                int tex_block = MenuCommonInfo->tex_block[3];
-                mgTexManager.EnterIMGFile((u8 *)GetPackFile((unsigned int *)read_b_g->buffer, at_2654, NULL), tex_block,
-                                          NULL, NULL);
-                mgTexManager.EnterIMGFile((u8 *)GetPackFile((unsigned int *)read_b_g->buffer, at_4256, NULL), tex_block,
-                                          NULL, NULL);
-                Tex_Georama = mgTexManager.GetTexture(at_2656, tex_block);
-                MenuPosData->ResetTextureInfoAll();
-                ExeScript(at_2659);
-                short *message_pack = (short *)GetPackFile((unsigned int *)read_b_g->buffer, at_2657, &size);
-                MenuCommandAnalyzeInfo.system_mes_buff[0] = GetSystemMesBuffer();
-                MenuCommandAnalyzeInfo.system_mes_buff[1] = message_pack;
-                MenuCommandAnalyzeInfo.mes_buff[0] = GetMenuMainMessageBuffer();
-                MenuCommandAnalyzeInfo.mes_buff[1] = message_pack;
-                if (LanguageCode == 0) {
-                    ExeScript(at_4257);
-                } else {
-                    ExeScript(at_4258);
-                }
-                remake = 1;
-                if (special_house == 1) {
-                    MenuMesForm[1]->x = 76.0f;
-                    MenuMesForm[1]->y = 160.0f;
-                    if (LanguageCode > 0) {
-                        MenuMesForm[1]->x = 54.0f;
-                        MenuMesForm[1]->y = 160.0f;
+                    list_jump = 1;
+                    list_scroll_dir = 0;
+                    u8 *pack = (u8 *)GetPackFile((unsigned int *)read_b_g->buffer, at_2654, NULL);
+                    int tex_block = MenuCommonInfo->tex_block[3];
+                    mgTexManager.EnterIMGFile(pack, tex_block, NULL, NULL);
+                    mgTexManager.EnterIMGFile((u8 *)GetPackFile((unsigned int *)read_b_g->buffer, at_4256, NULL), tex_block, NULL, NULL);
+                    Tex_Georama = mgTexManager.GetTexture(at_2656, tex_block);
+                    MenuPosData->ResetTextureInfoAll();
+                    ExeScript(at_2659);
+                    short *message_pack = (short *)GetPackFile((unsigned int *)read_b_g->buffer, at_2657, &size);
+                    MenuCommandAnalyzeInfo.system_mes_buff[0] = GetSystemMesBuffer();
+                    MenuCommandAnalyzeInfo.system_mes_buff[1] = message_pack;
+                    MenuCommandAnalyzeInfo.mes_buff[0] = GetMenuMainMessageBuffer();
+                    MenuCommandAnalyzeInfo.mes_buff[1] = message_pack;
+                    if (LanguageCode == 0) {
+                        ExeScript(at_4257);
+                    } else {
+                        ExeScript(at_4258);
                     }
                     remake = 1;
-                }
-            }
-            MenuGeoramaStack.Align64();
-            chara_stack.stSetBuffer(MenuGeoramaStack.stGetTop(), 0xFA00);
-            MenuGeoramaStack.Alloc(0xFA00);
-            MenuGeoramaStack.Align64();
-            int rest = MenuGeoramaStack.stGetRest();
-            MenuChangeNpcMemory.stSetBuffer(MenuGeoramaStack.stGetTop(), rest);
-            MenuCommonInfo->key_enable = 1;
-            key_arg_no = 0;
-            mode = 0;
-            step = 0;
-        }
-        break;
-    case 2:
-        exit_wait++;
-        if (exit_wait >= 10) {
-            closed = 1;
-        }
-        break;
-    default:
-        action = REMOVAL_ACTION_NONE;
-        switch (key_arg_no) {
-        case 0:
-            switch (step) {
-            case 0: {
-                int last = 1;
-                if (special_house == 1) {
-                    last = 0;
-                }
-                ask_mes->AddMsgCursor2(0, last, 1);
-                switch (push) {
-                case 1:
-                case 4: {
-                    int cursor = ask_mes->GetMsgCursor();
-                    if (special_house == 1) {
-                        cursor = 1;
+                    int temp = special_house == 1;
+                    if (temp) {
+                        CMenuPosDataForm *form = MenuMesForm[1];
+                        form->x = 76.0f;
+                        form->y = 160.0f;
+                        if (LanguageCode > 0) {
+                            form = MenuMesForm[1];
+                            form->x = 54.0f;
+                            form->y = 160.0f;
+                        }
                     }
-                    switch (cursor) {
-                    case 0:
-                        MenuSePlay(1);
-                        action = REMOVAL_ACTION_CLOSE;
-                        MenuArg.end_code = 9;
-                        break;
-                    case 1:
-                        MenuSePlay(1);
-                        if (house->npc_no[0] <= 0) {
-                            if (npc_num <= 0) {
-                                MenuSePlay(5);
-                            } else {
-                                key_arg_no = 1;
+                }
+                MenuGeoramaStack.Align64();
+                chara_stack.stSetBuffer(MenuGeoramaStack.stGetTop(), 0xFA00);
+                MenuGeoramaStack.Alloc(0xFA00);
+                MenuGeoramaStack.Align64();
+                int rest = MenuGeoramaStack.stGetRest();
+                MenuChangeNpcMemory.stSetBuffer(MenuGeoramaStack.stGetTop(), rest);
+                MenuCommonInfo->key_enable = 1;
+                key_arg_no = 0;
+                mode = 0;
+                step = 0;
+            }
+            break;
+        case 2:
+            exit_wait++;
+            if (exit_wait >= 10) {
+                closed = 1;
+            }
+            break;
+        default:
+            action = REMOVAL_ACTION_NONE;
+            switch (key_arg_no) {
+                case 0:
+                    switch (step) {
+                        case 0: {
+                            int last = 1;
+                            if (special_house == 1) {
+                                last = 0;
+                            }
+                            ask_mes->AddMsgCursor2(0, last, 1);
+                            switch (push) {
+                                case 1:
+                                case 4: {
+                                    int cursor = ask_mes->GetMsgCursor();
+                                    if (special_house == 1) {
+                                        cursor = 1;
+                                    }
+                                    switch (cursor) {
+                                        case 0:
+                                            MenuSePlay(1);
+                                            action = REMOVAL_ACTION_CLOSE;
+                                            MenuArg.end_code = 9;
+                                            break;
+                                        case 1:
+                                            MenuSePlay(1);
+                                            if (house->npc_no[0] <= 0) {
+                                                if (npc_num <= 0) {
+                                                    MenuSePlay(5);
+                                                } else {
+                                                    key_arg_no = 1;
+                                                    step = 0;
+                                                    ExeScript(at_4259);
+                                                    model_wait = 0;
+                                                    reload = 1;
+                                                    model_state = 1;
+                                                    if (select >= npc_num) {
+                                                        select = npc_num - 1;
+                                                    }
+                                                    if (npc_num <= top + 8) {
+                                                        top = npc_num - 8;
+                                                    }
+                                                    if (top < 0) {
+                                                        top = 0;
+                                                    }
+                                                }
+                                            } else {
+                                                ExeScript(at_4260);
+                                                char *name[1] = { GetNPCName(house->npc_no[0]) };
+                                                yes_mes->SetMsgItemNo(name, 1);
+                                                ask_mes->cursor_on = 0;
+                                                step = 1;
+                                            }
+                                            break;
+                                    }
+                                    break;
+                                }
+                                case 2:
+                                    MenuSePlay(5);
+                                    action = REMOVAL_ACTION_CLOSE;
+                                    break;
+                            }
+                            break;
+                        }
+                        case 1: {
+                            int answer = yes_mes->YesNoCursor2(1);
+                            if (answer == 1) {
+                                MenuUserDataManPtr->LeaveHouse(house->npc_no[0]);
+                                house->npc_no[0] = 0;
+                                ExeScript(at_4261);
+                                ask_mes->cursor_on = 1;
+                                if (special_house == 1) {
+                                    ask_mes->MakeMsg(0x11F8);
+                                }
+                                MakeNPCList();
                                 step = 0;
-                                ExeScript(at_4259);
-                                model_wait = 0;
+                                remake = 1;
+                            }
+                            if (answer == 2) {
+                                ask_mes->cursor_on = 1;
+                                ExeScript(at_4262);
+                                step = 0;
+                                MenuSePlay(5);
+                            }
+                            break;
+                        }
+                    }
+                    break;
+                case 1:
+                    switch (step) {
+                        case 0: {
+                            int move = georama_menu_local_key(select_key);
+                            old_top = top;
+                            if (MenuKeySelectCheck(move, &select, &top, 0, npc_num, GEORAMA_LIST_LINE_NUM, 0) != 0) {
+                                model_wait = 0x10;
                                 reload = 1;
-                                model_state = 1;
-                                if (select >= npc_num) {
-                                    select = npc_num - 1;
-                                }
-                                if (top + 8 >= npc_num) {
-                                    top = npc_num - 8;
-                                }
-                                if (top < 0) {
-                                    top = 0;
+                                MenuSePlay(0);
+                            }
+                            if (old_top != top) {
+                                if (old_top < top) {
+                                    list_scroll_dir = 1;
+                                } else {
+                                    list_scroll_dir = 0;
                                 }
                             }
-                        } else {
-                            ExeScript(at_4260);
-                            char *name[1] = {GetNPCName(house->npc_no[0])};
-                            yes_mes->SetMsgItemNo(name, 1);
-                            ask_mes->cursor_on = 0;
-                            step = 1;
+                            switch (push) {
+                                case 1:
+                                case 4:
+                                    action = REMOVAL_ACTION_PICK;
+                                    break;
+                                case 2:
+                                    MenuSePlay(5);
+                                    action = REMOVAL_ACTION_BACK;
+                                    break;
+                            }
+                            break;
                         }
-                        break;
+                        case 1: {
+                            int answer = yes_mes->YesNoCursor2(1);
+                            if (answer == 1) {
+                                action = REMOVAL_ACTION_MOVE_IN;
+                            }
+                            if (answer == 2) {
+                                action = REMOVAL_ACTION_CANCEL;
+                            }
+                            break;
+                        }
+                        case 2:
+                            if (push != 0) {
+                                ExeScript(at_4263);
+                                step = 0;
+                            }
+                            break;
                     }
                     break;
-                }
-                case 2:
-                    MenuSePlay(5);
-                    action = REMOVAL_ACTION_CLOSE;
-                    break;
-                }
-                break;
             }
-            case 1: {
-                int answer = yes_mes->YesNoCursor2(1);
-                if (answer == 1) {
-                    MenuUserDataManPtr->LeaveHouse(house->npc_no[0]);
-                    house->npc_no[0] = 0;
-                    ExeScript(at_4261);
-                    ask_mes->cursor_on = 1;
-                    if (special_house == 1) {
-                        ask_mes->MakeMsg(0x11F8);
+            switch (action) {
+                case REMOVAL_ACTION_PICK: {
+                    int npc = npc_list[select];
+                    int live = CheckLiveChara(MenuMainScene->now_map_no, MenuMainMapInfo, place_no, npc);
+                    if (npc == 6 && CheckBitFlagMenu(0x132) == 0) {
+                        live = 0;
                     }
-                    MakeNPCList();
-                    step = 0;
-                    remake = 1;
+                    if (DebugFlag != 0 && (GamePad__2.On(2) | GamePad__2.On(8)) != 0) {
+                        live = 1;
+                    }
+                    if (live == 0) {
+                        ExeScript(at_4264);
+                        MenuDCMsg[6]->MakeMsg(GetPartyCharaMessage(npc, 10, 0));
+                        MenuDCMsg[6]->StepMsg();
+                        AdjustNPCTalk(MenuDCMsg[6], &chara);
+                        MenuDCMsg[6]->StepMsg();
+                        MenuDCMsg[6]->DrawMsg();
+                        step = 2;
+                    } else {
+                        select_npc = npc_list[select];
+                        char *names[2] = { GetNPCName(select_npc), parts_info->edit_name };
+                        step = 1;
+                        ExeScript(at_4265);
+                        yes_mes->SetMsgItemNo(names, 2);
+                    }
+                    break;
                 }
-                if (answer == 2) {
-                    ask_mes->cursor_on = 1;
+                case REMOVAL_ACTION_MOVE_IN:
+                    menuUserDataManPtr2->SetPartyCharaStatus(select_npc, 4);
+                    house->npc_no[0] = select_npc;
+                    MakeNPCList();
+                    remake = 1;
+                    ExeScript(at_4262);
+                    ExeScript(at_4266);
+                    step = 0;
+                    key_arg_no = 0;
+                    model_state = 0;
+                    MenuSePlay(1);
+                    break;
+                case REMOVAL_ACTION_CANCEL:
                     ExeScript(at_4262);
                     step = 0;
                     MenuSePlay(5);
-                }
-                break;
-            }
-            }
-            break;
-        case 1:
-            switch (step) {
-            case 0: {
-                int move = georama_menu_local_key(select_key);
-                int old_top = top;
-                if (MenuKeySelectCheck(move, &select, &top, 0, npc_num, GEORAMA_LIST_LINE_NUM, 0) != 0) {
-                    model_wait = 0x10;
-                    MenuSePlay(0);
-                    reload = 1;
-                }
-                if (old_top != top) {
-                    if (old_top < top) {
-                        list_scroll_dir = 1;
-                    } else {
-                        list_scroll_dir = 0;
+                    break;
+                case REMOVAL_ACTION_BACK:
+                    key_arg_no = 0;
+                    ExeScript(at_4266);
+                    model_state = 0;
+                    break;
+                case REMOVAL_ACTION_WAIT:
+                    break;
+                case REMOVAL_ACTION_CLOSE:
+                    mode = 2;
+                    ExeScript(at_3952);
+                    exit_wait = 0;
+                    if (MenuArg.end_code != 9 && house != NULL && first_npc != house->npc_no[0]) {
+                        MenuArg.end_code = 0xD;
+                        MenuArg.result[0] = 1;
+                        MenuArg.result[1] = house->npc_no[0];
                     }
-                }
-                switch (push) {
-                case 1:
-                case 4:
-                    action = REMOVAL_ACTION_PICK;
                     break;
-                case 2:
-                    MenuSePlay(5);
-                    action = REMOVAL_ACTION_BACK;
-                    break;
-                }
-                break;
-            }
-            case 1: {
-                int answer = yes_mes->YesNoCursor2(1);
-                if (answer == 1) {
-                    action = REMOVAL_ACTION_MOVE_IN;
-                }
-                if (answer == 2) {
-                    action = REMOVAL_ACTION_CANCEL;
-                }
-                break;
-            }
-            case 2:
-                if (push != 0) {
-                    ExeScript(at_4263);
-                    step = 0;
-                }
-                break;
             }
             break;
-        }
-        switch (action) {
-        case REMOVAL_ACTION_PICK: {
-            int npc = npc_list[select];
-            int live = CheckLiveChara(MenuMainScene->now_map_no, MenuMainMapInfo, place_no, npc);
-            if (npc == 6 && CheckBitFlagMenu(0x132) == 0) {
-                live = 0;
-            }
-            if (DebugFlag != 0 && (GamePad__2.On(2) | GamePad__2.On(8)) != 0) {
-                live = 1;
-            }
-            if (live == 0) {
-                ExeScript(at_4264);
-                MenuDCMsg[6]->MakeMsg(GetPartyCharaMessage(npc, 10, 0));
-                MenuDCMsg[6]->StepMsg();
-                AdjustNPCTalk(MenuDCMsg[6], &chara);
-                MenuDCMsg[6]->StepMsg();
-                MenuDCMsg[6]->DrawMsg();
-                step = 2;
-            } else {
-                select_npc = npc_list[select];
-                char *names[2] = {GetNPCName(select_npc), parts_info->edit_name};
-                step = 1;
-                ExeScript(at_4265);
-                yes_mes->SetMsgItemNo(names, 2);
-            }
-            break;
-        }
-        case REMOVAL_ACTION_MOVE_IN:
-            MenuUserDataManPtr->SetPartyCharaStatus(select_npc, 4);
-            house->npc_no[0] = select_npc;
-            MakeNPCList();
-            remake = 1;
-            ExeScript(at_4262);
-            ExeScript(at_4266);
-            step = 0;
-            key_arg_no = 0;
-            model_state = 0;
-            MenuSePlay(1);
-            break;
-        case REMOVAL_ACTION_CANCEL:
-            ExeScript(at_4262);
-            step = 0;
-            MenuSePlay(5);
-            break;
-        case REMOVAL_ACTION_BACK:
-            key_arg_no = 0;
-            ExeScript(at_4266);
-            model_state = 0;
-            break;
-        case REMOVAL_ACTION_WAIT:
-            break;
-        case REMOVAL_ACTION_CLOSE:
-            mode = 2;
-            ExeScript(at_3952);
-            exit_wait = 0;
-            if (MenuArg.end_code != 9 && house != NULL && first_npc != house->npc_no[0]) {
-                MenuArg.end_code = 0xD;
-                MenuArg.result[0] = 1;
-                MenuArg.result[1] = house->npc_no[0];
-            }
-            break;
-        }
-        break;
     }
     int npc = npc_list[select];
-    if (model_wait > 0) {
+    if (0 < model_wait) {
         model_wait--;
         if (model_wait == 0) {
             model_state = 1;
         }
     }
-    float model_pos[4] = {14.0f, -3.0f, 0.0f, 1.0f};
+    float model_pos[4] = { 14.0f, - 3.0f, 0.0f, 1.0f };
     switch (model_state) {
-    case 0:
-        if (npc_chr_form != NULL) {
-            npc_chr_form->SetActionCharaPtr(NULL, -1, -1);
-        }
-        break;
-    case 1:
-        MenuChangeNpcMemory.stReset();
-        StartReadBG();
-        MenuNPCModelLoad(&MenuChangeNpcMemory, npc, 1);
-        npc_chr_form->SetActionCharaPtr(NULL, -1, -1);
-        ExeScript(at_4267);
-        model_state = 2;
-        break;
-    case 2:
-        if (ReadBGSync() != 0) {
+        case 0:
+            if (npc_chr_form != NULL) {
+                npc_chr_form->SetActionCharaPtr(NULL, -1, -1);
+            }
             break;
-        }
-        chara_stack.stReset();
-        chara.Initialize(NULL);
-        MenuNPCLoadCheck(&chara, &chara_stack, MenuCommonInfo->tex_block[4]);
-        chara.SetScale(1.0f, 1.0f, 1.0f);
-        chara.SetPosition(model_pos);
-        if (npc == 9) {
-            MenuAdjustPolygonScale(&chara, 5.655f);
-        } else {
-            MenuAdjustPolygonScale(&chara, 6.96f);
-        }
-        chara.SetRotation(0.0f, -0.0785398f, 0.0f);
-        chara.SetMotion(at_4268, 0, 1);
-        npc_chr_form->SetActionCharaPtr(&chara, MenuCommonInfo->tex_block[4], -1);
-        npc_chr_form->counter = -14;
-        model_state = 3;
-        mgTexManager.TexAnimeAllOff(MenuCommonInfo->tex_block[4]);
-    case 3:
-        chara.Step();
-        if (npc_chr_form->counter == 14) {
-            ExeScript(at_4269);
-        }
-        break;
+        case 1:
+            MenuChangeNpcMemory.stReset();
+            StartReadBG();
+            MenuNPCModelLoad(&MenuChangeNpcMemory, npc, 1);
+            npc_chr_form->SetActionCharaPtr(NULL, -1, -1);
+            ExeScript(at_4267);
+            model_state = 2;
+            break;
+        case 2:
+            if (ReadBGSync() != 0) {
+                break;
+            }
+            chara_stack.stReset();
+            chara.Initialize(NULL);
+            MenuNPCLoadCheck(&chara, &chara_stack, MenuCommonInfo->tex_block[4]);
+            chara.SetScale(1.0f, 1.0f, 1.0f);
+            chara.SetPosition(model_pos);
+            if (npc == 9) {
+                MenuAdjustPolygonScale(&chara, 5.655f);
+            } else {
+                MenuAdjustPolygonScale(&chara, 6.96f);
+            }
+            chara.SetRotation(0.0f, -0.0785398f, 0.0f);
+            chara.SetMotion(at_4268, 0, 1);
+            npc_chr_form->SetActionCharaPtr(&chara, MenuCommonInfo->tex_block[4], -1);
+            npc_chr_form->counter = -14;
+            model_state = 3;
+            mgTexManager.TexAnimeAllOff(MenuCommonInfo->tex_block[4]);
+        case 3:
+            chara.Step();
+            if (npc_chr_form->counter == 14) {
+                ExeScript(at_4269);
+            }
+            break;
     }
     MenuPosData->FormStep();
     MenuPlacedHouseMessMake(parts_info, house, remake);
@@ -3951,7 +3963,7 @@ int CRemovalMenu::KeyStep() {
     }
     MenuPlacedHousePosLinkMes();
     if (reload != 0 && npc_mes != NULL) {
-        int talk[2] = {GetPartyCharaMessage(npc, 0, 0), GetPartyCharaMessage(npc, 3, 0)};
+        int talk[2] = { GetPartyCharaMessage(npc, 0, 0), GetPartyCharaMessage(npc, 3, 0) };
         npc_mes->SetMsgItemNo(talk, 2);
         npc_mes->MakeMsg(0xB);
         npc_mes->StepMsg();
@@ -3975,8 +3987,8 @@ int CRemovalMenu::KeyStep() {
             list_form->GetPutPosXY(at_4271, put_pos[0], put_pos[1]);
             info_mes->SetMovePosGyou(0, put_pos[0], put_pos[1]);
         }
-        int top_line[2] = {top, top - 1};
-        int first = top_line[list_scroll_dir];
+        int top_line[2] = { top, top - 1 };
+        first = top_line[list_scroll_dir];
         float list_pos[2];
         list_form->GetPutPosXY(at_4272, list_pos[0], list_pos[1]);
         int line_h = list_mes->font_h;
@@ -3984,8 +3996,8 @@ int CRemovalMenu::KeyStep() {
         list_x = list_pos[0];
         CalcMenu1(list_pos[1], &list_y, 4.0f, 0.0f, list_jump);
         list_jump = 0;
-        int no = first;
         list_pos[1] = list_y + first * line_h;
+        int no = first;
         char *names[9];
         int line_pos[9][2];
         int i = 0;
@@ -3996,7 +4008,7 @@ int CRemovalMenu::KeyStep() {
             line_parts[i]->y = 20.0f + list_pos[1] - list_form->y;
             list_pos[1] += line_h;
         }
-        for (; i < 9; i++) {
+        for (; i < 9;) {
             names[i] = GetNPCName(npc_list[first + i]);
             line_pos[i][0] = (int)list_pos[0];
             line_pos[i][1] = (int)list_pos[1];
@@ -4005,13 +4017,14 @@ int CRemovalMenu::KeyStep() {
                 line_parts[i]->y = -130.0f;
             }
             list_pos[1] += line_h;
+            i += 1;
         }
         list_mes->SetMsgItemNo(names, 9);
         list_mes->SetMsgItemPos(&line_pos[0][0], 9);
         list_mes->MakeMsg(0x3A);
-        int bar_pos[2] = {(int)(216.0f + list_form->x), (int)(list_form->y - 44.0f)};
-        int bar_size[2] = {8, 200};
-        float bar_lines[2] = {(float)npc_num, 8.0f};
+        int bar_pos[2] = { (int)(216.0f + list_form->x), (int)(list_form->y - 44.0f) };
+        int bar_size[2] = { 8, 200 };
+        float bar_lines[2] = { (float) npc_num, 8.0f };
         if (bar_lines[0] < 8.0f) {
             bar_lines[0] = 8.0f;
         }
@@ -4033,13 +4046,14 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/editmenu", KeyStep__12CRemovalMenuFv);
 #ifdef NONMATCHING
 void MenuRemovalInit(mgCMemory *stack, int *arg) {
     int size;
-    MenuGeoramaStack.stSetBuffer(stack->stGetTop(), stack->stGetRest());
+
+    int rest = stack->stGetRest();
+    MenuGeoramaStack.stSetBuffer(stack->stGetTop(), rest);
     MenuCapture(MenuCommonInfo->tex_block[0], &MenuGeoramaStack, 1);
     MenuMainImageDataEnter(MenuCommonInfo->tex_block[1]);
     MenuDrawEnv->camera.SetRef(0.0f, 0.0f, 0.0f);
     MenuDrawEnv->camera.SetPos(0.0f, 0.0f, 500.0f);
     MenuMainMapInfo = (CEditMap *)MenuMainScene->GetMap(MenuMainScene->active_map);
-
     RemovalMenuPtr = new (MenuGeoramaStack.Alloc(0x152)) CRemovalMenu;
     HouseInfoSelectMoveInit = 1;
     Tex_Georama = NULL;
@@ -4049,7 +4063,8 @@ void MenuRemovalInit(mgCMemory *stack, int *arg) {
     HouseInfoSelectSelect = 0;
     HouseInfoFormGrobal = NULL;
     MenuDataAnalyze((char *)GetMenuMainPosCfgBuffer(&size), size, &MenuGeoramaStack);
-    RemovalMenuPtr->data_stack.stSetBuffer(MenuGeoramaStack.stGetTop(), 0x1180);
+    u_long128 *top = MenuGeoramaStack.stGetTop();
+    RemovalMenuPtr->data_stack.stSetBuffer(top, 0x1180);
     MenuGeoramaStack.Alloc(0x1180);
     MenuCommonInfo->AttachFuncData();
     RemovalMenuPtr->place_no = MenuArg.param[0];
@@ -4085,7 +4100,7 @@ void MenuRemovalInit(mgCMemory *stack, int *arg) {
     AttachMessageForm();
     MenuMesForm[0]->draw_flag = 0;
     MenuMesForm[1]->draw_flag = 0;
-    MenuCommonReadData(&MenuGeoramaStack, fname_1013, 0);
+    MenuCommonReadData(&MenuGeoramaStack, fname_4292, 0);
     MenuGeoramaStack.Align64();
     if (MenuCommonInfo->cursor_form != NULL) {
         MenuCommonInfo->cursor_form->draw_flag = 0;

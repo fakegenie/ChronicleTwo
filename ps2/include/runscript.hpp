@@ -138,8 +138,8 @@ struct RS_STACKDATA {
     int type; /**< Kind of value held. @see RS_STACK_TYPE. */
 
     union {
-        int           i; /**< Value of an integer. */
         float         f; /**< Value of a float. */
+        int           i; /**< Value of an integer. */
         char         *s; /**< Value of a string. */
         RS_STACKDATA *p; /**< Stack slot a reference points at. */
     };

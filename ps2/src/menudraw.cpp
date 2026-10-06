@@ -1313,20 +1313,22 @@ void PrimDrawNumber2(mgCDrawPrim *prim, int number, int digit_count, int x, int 
     DrawMenuNumber(prim, number, 0, rect, texture_rect, texture_rect.right + spacing, mode);
 }
 #ifdef NONMATCHING
-void PrimFillRect4(mgCDrawPrim *prim, mgRect<float> rect, float *rgba0, float *rgba1,
-                   float *rgba2, float *rgba3) {
+void PrimFillRect4(mgCDrawPrim *prim, mgRect<float> rect, float *rgba0, float *rgba1, float *rgba2, float *rgba3) {
+    float right;
+    float bottom;
+
     if (rgba0 == NULL || rgba1 == NULL || rgba2 == NULL || rgba3 == NULL) {
         return;
     }
-    float right = rect.left + rect.right;
-    float bottom = rect.top + rect.bottom;
-    prim->Color(fptosi(rgba0[0]), fptosi(rgba0[1]), fptosi(rgba0[2]), fptosi(rgba0[3]));
+    right = rect.left + rect.right;
+    bottom = rect.top + rect.bottom;
+    prim->Color((int)rgba0[0], (int)rgba0[1], (int)rgba0[2], (int)rgba0[3]);
     prim->Vertex(rect.left, rect.top, 0.0f);
-    prim->Color(fptosi(rgba1[0]), fptosi(rgba1[1]), fptosi(rgba1[2]), fptosi(rgba1[3]));
+    prim->Color((int)rgba1[0], (int)rgba1[1], (int)rgba1[2], (int)rgba1[3]);
     prim->Vertex(right, rect.top, 0.0f);
-    prim->Color(fptosi(rgba2[0]), fptosi(rgba2[1]), fptosi(rgba2[2]), fptosi(rgba2[3]));
+    prim->Color((int)rgba2[0], (int)rgba2[1], (int)rgba2[2], (int)rgba2[3]);
     prim->Vertex(rect.left, bottom, 0.0f);
-    prim->Color(fptosi(rgba3[0]), fptosi(rgba3[1]), fptosi(rgba3[2]), fptosi(rgba3[3]));
+    prim->Color((int)rgba3[0], (int)rgba3[1], (int)rgba3[2], (int)rgba3[3]);
     prim->Vertex(right, bottom, 0.0f);
 }
 #else
@@ -1374,11 +1376,10 @@ void DrawMenuFillBox(mgCDrawPrim *prim, float x, float y, float width, float hei
     prim->Vertex(x + width, y + height, 0.0f);
     prim->End();
 }
-#ifdef NONMATCHING
 void GenarateRandamLine(int *origin, int width, int height, int *points, int count, int unused) {
     int rising = 1;
-    float progress;
     float sway;
+    float progress;
     int offset = 0;
     int i;
     for (i = 0; i < count; i++) {
@@ -1402,16 +1403,15 @@ void GenarateRandamLine(int *origin, int width, int height, int *points, int cou
             }
         }
     }
+    int y;
     int stride = GetRandI(7) + 4;
     for (i = 0; i < count && i + stride < count; i += stride) {
-        int y = points[i * 2 + 1];
-        points[i * 2 + 1] = points[((i + stride) << 1) + 1];
-        points[((i + stride) << 1) + 1] = y;
+        int j = ((i + stride) << 1) + 1;
+        y = points[i * 2 + 1];
+        points[i * 2 + 1] = points[j];
+        points[j] = y;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", GenarateRandamLine__FPiiiPiii);
-#endif
 void DrawRandamLine(mgCDrawPrim *prim, int *points, int smoothing, int count, u8 *color) {
     float source[1000][4];
     float smoothed[2000][4];
@@ -1546,48 +1546,52 @@ void DrawMenuDl(int alpha) {
 }
 #ifdef NONMATCHING
 void CalcCommonBrdDrawInfo(float *pos, MENUFORM_MAKEBRD_INFO *info, ClsMes *mes) {
+    float board_w;
+    int i;
+    int center_x;
+    int quarter_w;
+    int left_x;
+    int right_x;
+
     if (info == NULL || mes == NULL) {
         Tex_CommonBoard = NULL;
         return;
     }
     Tex_CommonBoard = mgTexManager.GetTexture(at_1780, -1);
-    float width = LanguageCode > 0 ? 208.0f : 188.0f;
-    board_line_width line_width = at_1720;
-    for (int i = 0; i < 4; ++i) {
+    board_w = 188.0f;
+    if (LanguageCode > 0) {
+        board_w = 208.0f;
+    }
+    board_line_width line_w = at_1720;
+    for (i = 0; i < 4; i++) {
         if (mes->name[i + 1][0] != 0) {
-            line_width.width[i] = mes->GetStrWidth(mes->name[i + 1]);
+            line_w.width[i] = mes->GetStrWidth(mes->name[i + 1]);
         }
-        if (width < (float)line_width.width[i]) {
-            width = (float)line_width.width[i];
+        if (line_w.width[i] > board_w) {
+            board_w = line_w.width[i];
         }
     }
-    MakeBoardDrawInfo[4] = width + 40.0f;
+    MakeBoardDrawInfo[4] = 40.0f + board_w;
     pos[0] = ((float)mgScreenWidth - MakeBoardDrawInfo[4]) / 2.0f - 18.0f;
-    int centre = mgScreenWidth >> 1;
-    int quarter = fptosi(MakeBoardDrawInfo[4]) >> 2;
-    int left = centre - quarter - (mes->cross_on[6] >> 1);
-    if ((float)left < pos[0] + 22.0f) {
-        left = fptosi(pos[0] + 22.0f);
+    center_x = mgScreenWidth >> 1;
+    board_w = MakeBoardDrawInfo[4];
+    quarter_w = (int)board_w >> 2;
+    left_x = center_x - quarter_w - (mes->line_w[0] >> 1);
+    if (left_x < 22.0f + pos[0]) {
+        left_x = 22.0f + pos[0];
     }
-    int right = centre + quarter - (mes->cross_on[7] >> 1);
-    if (MakeBoardDrawInfo[4] / 2.0f < (float)mes->cross_on[7]) {
-        right = fptosi((float)centre + MakeBoardDrawInfo[4] / 2.0f - (float)mes->cross_on[7] - 4.0f);
+    right_x = center_x + quarter_w - (mes->line_w[1] >> 1);
+    if (board_w / 2.0f < mes->line_w[1]) {
+        right_x = (float)center_x + board_w / 2.0f - mes->line_w[1] - 4.0f;
     }
-    mes->line_pos[6][0] = left;
-    mes->line_pos[6][1] = fptosi(pos[1] + 16.0f);
-    mes->line_pos_on[6] = 1;
-    mes->line_pos[7][0] = right;
-    mes->line_pos[7][1] = fptosi(pos[1] + 42.0f);
-    mes->line_pos_on[7] = 1;
-    for (int i = 0; i < 4; ++i) {
+    mes->SetMovePosGyou(0, left_x, (int)(16.0f + pos[1]));
+    mes->SetMovePosGyou(1, right_x, (int)(42.0f + pos[1]));
+    for (i = 0; i < 4; i++) {
         if (mes->name[i + 1][0] != 0) {
-            mes->line_pos[i + 8][0] = fptosi(pos[0] + 38.0f);
-            mes->line_pos[i + 8][1] = fptosi(pos[1] + 93.0f + (float)(i * 34));
+            mes->SetMovePosGyou(i + 2, (int)(18.0f + (20.0f + pos[0])), (int)(1.0f + (92.0f + pos[1] + (float)(i * 34))));
         } else {
-            mes->line_pos[i + 8][0] = -1;
-            mes->line_pos[i + 8][1] = -1;
+            mes->SetMovePosGyou(i + 2, -1, -1);
         }
-        mes->line_pos_on[i + 8] = 1;
     }
     memcpy(&CommonBoardDrawInfo, info, sizeof(MENUFORM_MAKEBRD_INFO));
 }
@@ -1629,8 +1633,8 @@ void CommonBoardDraw(float *pos, int &tex_block) {
     prim->Texture(Tex_CommonBoard);
     prim->Color(0x80, 0x80, 0x80, 0x80);
     int row;
-    int pass;
     int height;
+    int pass;
     for (row = 0; row < 5; row++) {
         int left = (int)(6.0f + pos[0]);
         int top = (int)(6.0f + board_y);
@@ -1681,8 +1685,8 @@ void CommonBoardDraw(float *pos, int &tex_block) {
     prim->Begin(6);
     prim->Texture(Tex_CommonBoard);
     prim->Color(0x80, 0x80, 0x80, 0x80);
-    int number_u;
     int number_v;
+    int number_u;
     for (int i = 0, line_y = 0; i < 4; i++, line_y += 34) {
         MENUFORM_MAKEBRD_LINE *line = &CommonBoardDrawInfo.line[i];
         float line_x = 20.0f + pos[0];
@@ -1891,130 +1895,165 @@ void MenuMainFrameModeSet(int mode, int restart) {
     }
 }
 #ifdef NONMATCHING
-void MenuMainFrameStep() {
+void MenuMainFrameStep(void) {
+    mgRect<int> screen;
     MenuMainFrame_PutRect.Set(0, 0, 0x2C0, 0x1E0);
-    mgRect<int> initial_rect(0, 0, 0x2C0, 0x1A0);
-    float ratio = MenuMainFrame_Display_Mode_Cnt / 10.0f;
-    float scale = 1.5f - 0.5f * ratio;
+    screen.Set(0, 0, 0x2C0, 0x1A0);
+    float progress = MenuMainFrame_Display_Mode_Cnt / 10.0f;
+    float scale = 1.5f - 0.5f * progress;
     if (init_2093 == 0) {
         MainFrameStepFlag_2092 = 0;
         init_2093 = 1;
     }
     switch (MenuMainFrame_Display_Mode) {
-    case 0:
-    case 1:
-        if (MenuMainFrame_Display_Mode == 0) {
-            if (MenuMainFrame_Display_Mode_Cnt >= 10.0f) {
-                MainFrameStepFlag_2092 = 0;
-                MenuMainFrame_Display_Mode_Cnt = 10.0f;
-                MenuMainFrame_ActionEndFlag = 1;
-            } else {
-                CalcMenuAdd(&MenuMainFrame_Display_Mode_Cnt, MenuMainFrame_Display_Mode_Cnt_Rate, 10.0f);
-                if (MenuMainFrame_Display_Mode_Cnt < 7.142857f) {
-                    CalcMenuAdd(&MenuMainFrame_Display_Mode_Cnt_Rate, 0.3f, 1.4f);
+        case 0:
+        case 1: {
+            mgRect<int> *image;
+            if (MenuMainFrame_Display_Mode == 0) {
+                if (MenuMainFrame_Display_Mode_Cnt < 10.0f) {
+                    CalcMenuAdd(&MenuMainFrame_Display_Mode_Cnt, MenuMainFrame_Display_Mode_Cnt_Rate, 10.0f);
+                    if (MenuMainFrame_Display_Mode_Cnt < 7.142857f) {
+                        CalcMenuAdd(&MenuMainFrame_Display_Mode_Cnt_Rate, 0.3f, 1.4f);
+                    } else {
+                        CalcMenuAdd(&MenuMainFrame_Display_Mode_Cnt_Rate, -0.3f, 0.6f);
+                    }
+                    MainFrameStepFlag_2092 = 0;
                 } else {
-                    CalcMenuAdd(&MenuMainFrame_Display_Mode_Cnt_Rate, -0.3f, 0.6f);
+                    MainFrameStepFlag_2092 = 0;
+                    MenuMainFrame_Display_Mode_Cnt = 10.0f;
+                    MenuMainFrame_ActionEndFlag = 1;
                 }
-                MainFrameStepFlag_2092 = 0;
             }
+            int mode = MenuMainFrame_Display_Mode;
+            if (mode == 1) {
+                if (0.0f < MenuMainFrame_Display_Mode_Cnt) {
+                    MenuMainFrame_Display_Mode_Cnt -= 1.0f;
+                }
+                if (MainFrameStepFlag_2092 > 0) {
+                    MenuMainFrame_ActionEndFlag = 1;
+                }
+                if (MenuMainFrame_Display_Mode_Cnt < 0.0f) {
+                    MenuMainFrame_Display_Mode_Cnt = 0.0f;
+                }
+            }
+            MenuMainFrame_Lenze_Pos[0] = 256.0f + 94.0f * progress;
+            MenuMainFrame_Lenze_Pos[1] = 240.0f;
+            float lenze_x = MenuMainFrame_Lenze_Pos[0];
+            MenuMainFrame_PutRect.left = (int)(lenze_x - 350.0f * scale);
+            MenuMainFrame_PutRect.top = (int)(MenuMainFrame_Lenze_Pos[1] - 240.0f * scale);
+            MenuMainFrame_PutRect.right = (int)(704.0f * scale);
+            MenuMainFrame_PutRect.bottom = (int)(480.0f * scale);
+            float image_half_height = 1.1538461f * (scale * 160.0f);
+            image = &MenuMainIMG_PutRect;
+            image->bottom = (int)(2.0f * image_half_height);
+            image->right = (int)(1.06f * image->bottom);
+            image->left = (int)(lenze_x - 198.0f * scale);
+            image->top = (int)(MenuMainFrame_Lenze_Pos[1] - image_half_height);
+            if (image->right > mgScreenWidth) {
+                if (mode == 1) {
+                    image->right = mgScreenWidth;
+                } else {
+                    image->right = mgScreenWidth;
+                    image->left = 0;
+                }
+            }
+            while (image->top < 0) {
+                image->top++;
+            }
+            while (mgScreenHeight < image->top + image->bottom) {
+                image->bottom--;
+            }
+            if (image->left < 9) {
+                image->left = 0;
+                MainFrameStepFlag_2092++;
+            }
+            break;
         }
-        if (MenuMainFrame_Display_Mode == 1) {
-            if (MenuMainFrame_Display_Mode_Cnt > 0.0f) {
-                MenuMainFrame_Display_Mode_Cnt -= 1.0f;
-            }
-            if (MainFrameStepFlag_2092 > 0) {
+        case 2:
+            MenuMainFrame_Lenze_Pos[0] -= 11.285714f;
+            if (MenuMainFrame_Lenze_Pos[0] < 158.0f) {
+                MenuMainFrame_Lenze_Pos[0] = 158.0f;
                 MenuMainFrame_ActionEndFlag = 1;
             }
-            if (MenuMainFrame_Display_Mode_Cnt < 0.0f) {
-                MenuMainFrame_Display_Mode_Cnt = 0.0f;
+            break;
+        case 3:
+            MenuMainFrame_Lenze_Pos[0] += 11.285714f;
+            if (!(MenuMainFrame_Lenze_Pos[0] < 350.0f)) {
+                MenuMainFrame_Lenze_Pos[0] = 350.0f;
+                MenuMainFrame_ActionEndFlag = 1;
             }
-        }
-        MenuMainFrame_Lenze_Pos[0] = 256.0f + ratio * 94.0f;
-        MenuMainFrame_Lenze_Pos[1] = 240.0f;
-        MenuMainFrame_PutRect.left = fptosi(MenuMainFrame_Lenze_Pos[0] - scale * 350.0f);
-        MenuMainFrame_PutRect.top = fptosi(MenuMainFrame_Lenze_Pos[1] - scale * 240.0f);
-        MenuMainFrame_PutRect.right = fptosi(scale * 704.0f);
-        MenuMainFrame_PutRect.bottom = fptosi(scale * 480.0f);
-        float image_radius = scale * 160.0f * 1.1538461f;
-        MenuMainIMG_PutRect.bottom = fptosi(image_radius * 2.0f);
-        MenuMainIMG_PutRect.right = fptosi((float)MenuMainIMG_PutRect.bottom * 1.06f);
-        MenuMainIMG_PutRect.left = fptosi(MenuMainFrame_Lenze_Pos[0] - scale * 198.0f);
-        MenuMainIMG_PutRect.top = fptosi(MenuMainFrame_Lenze_Pos[1] - image_radius);
-        if (mgScreenWidth < MenuMainIMG_PutRect.right) {
-            MenuMainIMG_PutRect.right = mgScreenWidth;
-            if (MenuMainFrame_Display_Mode != 1) {
-                MenuMainIMG_PutRect.left = 0;
+            break;
+        case 4:
+        case 5: {
+            MenuMainFrame_MoveRate_Cnt += 0.08726647f;
+            float move = MenuMainFrame_MoveRate[0] * sinf(MenuMainFrame_MoveRate_Cnt);
+            if (MenuMainFrame_Display_Mode == 4 && move < 0.0f) {
+                move = -move;
             }
+            if (MenuMainFrame_Display_Mode == 5 && move > 0.0f) {
+                move = -move;
+            }
+            MenuMainFrame_Lenze_Pos[0] += move;
+            if (MenuMainFrame_Display_Mode == 4) {
+                if (!(MenuMainFrame_Lenze_Pos[0] < 860.0f)) {
+                    MenuMainFrame_Lenze_Pos[0] = 860.0f;
+                    MenuMainFrame_ActionEndFlag = 1;
+                }
+            } else if (MenuMainFrame_Lenze_Pos[0] <= 350.0f) {
+                MenuMainFrame_Lenze_Pos[0] = 350.0f;
+                MenuMainFrame_ActionEndFlag = 1;
+            }
+            break;
         }
-        while (MenuMainIMG_PutRect.top < 0) {
-            ++MenuMainIMG_PutRect.top;
+        case 6:
+        case 7: {
+            MenuMainFrame_MoveRate_Cnt += 0.09817477f;
+            float move = MenuMainFrame_MoveRate[1] * sinf(MenuMainFrame_MoveRate_Cnt);
+            if (MenuMainFrame_Display_Mode == 6 && move < 0.0f) {
+                move = -move;
+            }
+            if (MenuMainFrame_Display_Mode == 7 && move > 0.0f) {
+                move = -move;
+            }
+            MenuMainFrame_Lenze_Pos[1] += move;
+            if (MenuMainFrame_Display_Mode == 6 && !(MenuMainFrame_Lenze_Pos[1] < 720.0f)) {
+                MenuMainFrame_Lenze_Pos[1] = 720.0f;
+                MenuMainFrame_ActionEndFlag = 1;
+            }
+            if (MenuMainFrame_Display_Mode == 7 && MenuMainFrame_Lenze_Pos[1] <= 240.0f) {
+                MenuMainFrame_Lenze_Pos[1] = 240.0f;
+                MenuMainFrame_ActionEndFlag = 1;
+            }
+            break;
         }
-        while (MenuMainIMG_PutRect.top + MenuMainIMG_PutRect.bottom > mgScreenHeight) {
-            --MenuMainIMG_PutRect.bottom;
+        case 8:
+        case 9: {
+            MenuMainFrame_MoveRate_Cnt += 0.08726647f;
+            float move = MenuMainFrame_MoveRate[1] * sinf(MenuMainFrame_MoveRate_Cnt);
+            if (MenuMainFrame_Display_Mode == 8 && move > 0.0f) {
+                move = -move;
+            }
+            if (MenuMainFrame_Display_Mode == 9 && move < 0.0f) {
+                move = -move;
+            }
+            MenuMainFrame_Lenze_Pos[1] += move;
+            if (MenuMainFrame_Display_Mode == 8 && MenuMainFrame_Lenze_Pos[1] <= -260.0f) {
+                MenuMainFrame_Lenze_Pos[1] = -260.0f;
+                MenuMainFrame_ActionEndFlag = 1;
+            }
+            if (MenuMainFrame_Display_Mode == 9 && !(MenuMainFrame_Lenze_Pos[1] < 240.0f)) {
+                MenuMainFrame_Lenze_Pos[1] = 240.0f;
+                MenuMainFrame_ActionEndFlag = 1;
+            }
+            break;
         }
-        if (MenuMainIMG_PutRect.left < 9) {
-            MenuMainIMG_PutRect.left = 0;
-            ++MainFrameStepFlag_2092;
-        }
-        break;
-    case 2:
-        MenuMainFrame_Lenze_Pos[0] -= 11.285714f;
-        if (MenuMainFrame_Lenze_Pos[0] < 158.0f) {
-            MenuMainFrame_Lenze_Pos[0] = 158.0f;
-            MenuMainFrame_ActionEndFlag = 1;
-        }
-        break;
-    case 3:
-        MenuMainFrame_Lenze_Pos[0] += 11.285714f;
-        if (MenuMainFrame_Lenze_Pos[0] >= 350.0f) {
-            MenuMainFrame_Lenze_Pos[0] = 350.0f;
-            MenuMainFrame_ActionEndFlag = 1;
-        }
-        break;
-    case 4:
-    case 5: {
-        MenuMainFrame_MoveRate_Cnt += 0.08726647f;
-        float step = MenuMainFrame_MoveRate[0] * sinf(MenuMainFrame_MoveRate_Cnt);
-        if ((MenuMainFrame_Display_Mode == 4 && step < 0.0f) ||
-            (MenuMainFrame_Display_Mode == 5 && step > 0.0f)) step = -step;
-        MenuMainFrame_Lenze_Pos[0] += step;
-        if (MenuMainFrame_Display_Mode == 4 && MenuMainFrame_Lenze_Pos[0] >= 860.0f) {
-            MenuMainFrame_Lenze_Pos[0] = 860.0f;
-            MenuMainFrame_ActionEndFlag = 1;
-        } else if (MenuMainFrame_Display_Mode == 5 && MenuMainFrame_Lenze_Pos[0] <= 350.0f) {
-            MenuMainFrame_Lenze_Pos[0] = 350.0f;
-            MenuMainFrame_ActionEndFlag = 1;
-        }
-        break;
     }
-    case 6:
-    case 7:
-    case 8:
-    case 9: {
-        MenuMainFrame_MoveRate_Cnt += MenuMainFrame_Display_Mode < 8 ? 0.09817477f : 0.08726647f;
-        float step = MenuMainFrame_MoveRate[1] * sinf(MenuMainFrame_MoveRate_Cnt);
-        if ((MenuMainFrame_Display_Mode == 6 && step < 0.0f) ||
-            (MenuMainFrame_Display_Mode == 7 && step > 0.0f) ||
-            (MenuMainFrame_Display_Mode == 8 && step > 0.0f) ||
-            (MenuMainFrame_Display_Mode == 9 && step < 0.0f)) step = -step;
-        MenuMainFrame_Lenze_Pos[1] += step;
-        float end = MenuMainFrame_Display_Mode == 6 ? 720.0f : MenuMainFrame_Display_Mode == 8 ? -260.0f : 240.0f;
-        if ((MenuMainFrame_Display_Mode == 6 || MenuMainFrame_Display_Mode == 9) && MenuMainFrame_Lenze_Pos[1] >= end) {
-            MenuMainFrame_Lenze_Pos[1] = end;
-            MenuMainFrame_ActionEndFlag = 1;
-        } else if ((MenuMainFrame_Display_Mode == 7 || MenuMainFrame_Display_Mode == 8) && MenuMainFrame_Lenze_Pos[1] <= end) {
-            MenuMainFrame_Lenze_Pos[1] = end;
-            MenuMainFrame_ActionEndFlag = 1;
-        }
-        break;
+    if (MenuMainFrame_Display_Mode >= 2) {
+        MenuMainFrame_PutRect.left = (int)(MenuMainFrame_Lenze_Pos[0] - 350.0f * scale);
+        MenuMainFrame_PutRect.top = (int)(MenuMainFrame_Lenze_Pos[1] - 240.0f * scale);
     }
-    }
-    if (MenuMainFrame_Display_Mode > 1) {
-        MenuMainFrame_PutRect.left = fptosi(MenuMainFrame_Lenze_Pos[0] - scale * 350.0f);
-        MenuMainFrame_PutRect.top = fptosi(MenuMainFrame_Lenze_Pos[1] - scale * 240.0f);
-    }
-    MenuMainFrame_LeftTop_Pos[0] = (float)MenuMainFrame_PutRect.left;
-    MenuMainFrame_LeftTop_Pos[1] = (float)MenuMainFrame_PutRect.top;
+    MenuMainFrame_LeftTop_Pos[0] = MenuMainFrame_PutRect.left;
+    MenuMainFrame_LeftTop_Pos[1] = MenuMainFrame_PutRect.top;
 }
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", MenuMainFrameStep__Fv);
@@ -2088,37 +2127,38 @@ void MenuMainFrameDraw(int &loaded_tex, int unused) {
     prim->Vertex(fptosi(x4 + size), fptosi(y4 + 1.25f * size), 0);
     prim->End();
 }
-#ifdef NONMATCHING
 void MenuMainFrameImgDraw(int &loaded_tex_no) {
     mgRect<int> dest(0, 0, 0, 0);
     mgRect<int> source(0, 0, mgScreenWidth / 2, mgScreenHeight / 2);
     int alpha = (int)(128.0f * (MenuMainFrame_Display_Mode_Cnt / 10.0f));
     dest = MenuMainIMG_PutRect;
-    if (MenuMainFrame_Display_Mode == 1 || MenuMainFrame_Display_Mode == 0) {
+    switch (MenuMainFrame_Display_Mode) {
+    case 0:
+    case 1:
         if (MenuMainFrame_Display_Mode == 1) {
             alpha = 0x80;
         }
-    } else {
+        break;
+    default:
         dest.left = (int)(MenuMainFrame_Lenze_Pos[0] - 194.0f);
         dest.top = (int)(MenuMainFrame_Lenze_Pos[1] - 184.61539f);
+        break;
     }
     mgRect<int> screen(0, 0, mgScreenWidth, mgScreenHeight);
     DrawMenuMainFrmImg(loaded_tex_no, screen, source, 0x80, 0x80, 0x80, alpha, 0);
     dest.bottom += 1;
     DrawMenuMainFrmImg(loaded_tex_no, dest, source, 0x80, 0x80, 0x80, alpha, 0);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", MenuMainFrameImgDraw__FRi);
-#endif
 #ifdef NONMATCHING
 void DrawMenuWakuStep(void) {
-    float move[2][3] = {{-0.2f, 0.0f, 18.0f}, {0.2f, 18.0f, 0.0f}};
+    float move[6] = {-0.2f, 0.0f, 18.0f, 0.2f, 18.0f, 0.0f};
     int i;
     for (i = 0; i < 2; i++) {
         float *axis = &MenuWakuPutXY[i];
-        float *entry = move[i];
-        *axis += entry[0];
-        if (CalcMenuAdd(axis, entry[0], entry[1]) != 0) {
+        float *entry = &move[i * 3];
+        float rate = entry[0];
+        *axis += rate;
+        if (CalcMenuAdd(axis, rate, entry[1]) != 0) {
             *axis = entry[2];
         }
     }
@@ -2576,8 +2616,8 @@ int CMenuPosDataForm::GetNowPosRGBA(MENUFORMPARTS_TYPE *part, MENU_BASETEXINFO *
             }
         } else if (effect->type == MENU_PARTS_EFFECT_STRETCH || effect->type == MENU_PARTS_EFFECT_STRETCH_REP) {
             grow = effect->param[0] / 3.0f;
-            scale_x = effect->param[4] + grow;
-            scale_y = effect->param[5] + grow;
+            scale_x = grow + effect->param[4];
+            scale_y = grow + effect->param[5];
             if (effect->type == MENU_PARTS_EFFECT_STRETCH_REP && grow > effect->param[1] / 2.0f) {
                 shrink = effect->param[1] - grow;
                 scale_x = (effect->param[4] - shrink) / 100.0f;
@@ -2601,14 +2641,10 @@ int CMenuPosDataForm::GetNowPosRGBA(MENUFORMPARTS_TYPE *part, MENU_BASETEXINFO *
             sway[2][1] = sin_angle;
             sway[3][0] = sin_angle;
             sway[3][1] = sin_angle;
-            pos[0] += effect->param[4] * sway[0][0];
-            pos[1] += effect->param[5] * sway[0][1];
-            pos[2] += effect->param[4] * sway[1][0];
-            pos[3] += effect->param[5] * sway[1][1];
-            pos[4] += effect->param[4] * sway[2][0];
-            pos[5] += effect->param[5] * sway[2][1];
-            pos[6] += effect->param[4] * sway[3][0];
-            pos[7] += effect->param[5] * sway[3][1];
+            for (k = 0; k < 4; k++) {
+                pos[k * 2] += effect->param[4] * sway[k][0];
+                pos[k * 2 + 1] += effect->param[5] * sway[k][1];
+            }
         }
     }
     return 1;
@@ -2731,7 +2767,8 @@ static void DrawItemIconEffect2(mgCDrawPrim *prim, mgCTexture *tex, MENUFORMPART
                 alpha = (int)(64.0f * sinf((3.1415927f / effect->param[1]) * effect->param[0]));
                 color = &star_color_table[(int)(3.0f * effect->param[4])];
                 prim->Color(color[0], color[1], color[2], alpha);
-                for (k = 0, n = 0; k < 4; k++, n += 2) {
+                n = 0;
+                for (k = 0; k < 4; k++, n += 2) {
                     dx = scale * ((float)center_x - corners[k][0]);
                     dy = scale * ((float)center_y - corners[k][1]);
                     corners[k][0] = center_x + dx * cos_angle - dy * sin_angle;
@@ -2778,6 +2815,9 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
     mgRect<int> bottom2(64, 96, 32, 32);
     mgRect<int> bottom_right(96, 96, 32, 32);
     board_frame_parts parts = at_2919;
+    int i;
+    float put_y;
+    scroll_bar_layers layers;
     parts.rect[0] = &top_left;
     parts.rect[1] = &top;
     parts.rect[2] = &top2;
@@ -2795,8 +2835,8 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
         MenuReloadTexture(tex_block, tex->block);
         put.right = 40;
         float put_x = x + 4.0f;
-        float put_y = y + 262.0f;
-        int clip_left = (int)put_x;
+        put_y = y + 262.0f;
+        int clip_left = put_x;
         int clip_top = (int)(put_y + 20.0f);
         int clip_right = (int)(put_x + 300.0f);
         mgRect<int> clip(clip_left, clip_top, clip_right, (int)(put_y + 50.0f));
@@ -2854,7 +2894,7 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
         for (i = 0; i < 2; i++) {
             put_y = y + 40;
             int put_left;
-            for (j = 0; j < 5; j++) {
+            for (j = 0; j < 5; ++j) {
                 mgRect<int> side(put_left = (int)put_x, (int)put_y, 32, 40);
                 PrimQuad(prim, side, *parts.rect[frmtbl1_2938[part++]]);
                 put_y += 40.0f;
@@ -2868,7 +2908,7 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
         scroll_bar_heights heights = at_2949__2;
         heights.height[0] = ItemBoardScrlBar1.bottom;
         heights.height[2] = ItemBoardScrlBar3.bottom;
-        scroll_bar_layers layers = at_2950__2;
+        layers = at_2950__2;
         layers.layer[0][4] = shadow_alpha;
         layers.layer[1][1] = r;
         layers.layer[1][2] = g;
@@ -2886,7 +2926,7 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
                 prim->TextureCrd(bar->left, bar->top);
                 prim->Vertex(bar_x + layer[0], bar_y + layer[0], 0.0f);
                 prim->TextureCrd(bar->left + bar->right, bar->top + bar->bottom);
-                prim->Vertex(bar_x + bar->right + layer[0], bar_y + heights.height[j] + layer[0], 0.0f);
+                prim->Vertex(bar_x + (bar->right + layer[0]), bar_y + (heights.height[j] + layer[0]), 0.0f);
                 bar_y += heights.height[j];
             }
         }
@@ -3314,7 +3354,7 @@ int CMenuPosDataForm::GetNextMovePos(int *pos) {
             target_pos = target[i];
             rate_now = rate[i];
             diff = (float)(target_pos - now[i]);
-            now[i] = (int)((float)now[i] + diff / rate_now);
+            now[i] = (int)(diff / rate_now + (float)now[i]);
             if ((float)abs(target_pos - now[i]) <= rate_now) {
                 if (mtype != MENUFORM_MTYPE_IR) {
                     if (diff > 0.0f) {
@@ -4594,10 +4634,10 @@ void MenuItemBrdItemIconEffectMalloc(mgCMemory *memory, MENUFORMPARTS_TYPE *part
 #ifdef NONMATCHING
 void CMenuPosDataManage::MallocPallet(mgCMemory *stack) {
     int i;
-    int j;
     int k;
     int grey;
     u8 *color;
+    int j;
 
     stack->Align64();
     texture_pair icon_tex = at_4526;
@@ -4630,7 +4670,7 @@ void CMenuPosDataManage::MallocPallet(mgCMemory *stack) {
             for (j = 0; j < 256; j++, color += 4) {
                 grey = (color[0] + color[1] + color[2]) / 3;
                 for (k = 1; k < 17; k++) {
-                    if (grey >= (k - 1) * 16 && grey < k * 16) {
+                    if (16 * (k - 1) <= grey && grey < k * 16) {
                         color[0] = (k - 1) * 16;
                         color[1] = (k - 1) * 16;
                         color[2] = (k - 1) * 16;
@@ -4641,9 +4681,9 @@ void CMenuPosDataManage::MallocPallet(mgCMemory *stack) {
             item_icon_tex[2][i]->clut = pallet[1][i];
             color = (u8 *)pallet[2][i];
             for (j = 0; j < 256; j++, color += 4) {
-                grey = (color[0] + color[1] + color[2]) / 3;
+                grey = (color[2] + color[0] + color[1]) / 3;
                 for (k = 1; k < 17; k++) {
-                    if (grey >= (k - 1) * 16 && grey < k * 16) {
+                    if (16 * (k - 1) <= grey && grey < k * 16) {
                         color[0] = 30.0f + 12.2f * k;
                         color[1] = 20.0f + 8.75f * k;
                         color[2] = 20.0f + 6.75f * k;
@@ -4698,25 +4738,25 @@ void CMenuPosDataManage::InitializeCMenuPosDataManage() {
 }
 #ifdef NONMATCHING
 int MenuCapture(int block, mgCMemory *stack, int draw) {
-    int half_w;
-    int half_h;
-    int tex_w;
-    int tex_h;
+    int pixel_num;
+    int b;
+    u8 *below;
     int pad_w;
     int pad_h;
-    u8 *dst;
-    u8 *src;
-    u8 *line;
-    u8 *below;
+    int y;
     int screen_w;
     int line_num;
-    int pixel_num;
-    int x;
-    int y;
-    int r;
-    int g;
-    int b;
+    u8 *line;
+    int half_w;
     mgCDrawPrim *prim;
+    int half_h;
+    int g;
+    u8 *src;
+    int tex_w;
+    int x;
+    int tex_h;
+    u8 *dst;
+    int r;
     mgCTextureManager *tex_manager;
 
     stack->Align64();
@@ -6008,8 +6048,8 @@ void CMenuEffect::PresetInfo(MENU_EFFECT_INFO *particle, int no, int mode) {
 void CMenuEffect::Step() {
     end = 0;
     if (run != 0) {
-        MENU_EFFECT_INFO *particle = info;
-        if (particle != NULL) {
+        if (info != NULL) {
+            MENU_EFFECT_INFO *particle = info;
             int i;
             s8 prev_type = type;
             int done = 1;

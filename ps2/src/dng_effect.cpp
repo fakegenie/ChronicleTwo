@@ -178,10 +178,7 @@ static inline void LocalPrimCorner(int *out, float *corner, float *center, float
     float reach_y = 1.0f * half_h;
     float shift_x = reach_x * cosf(angle) - reach_y * sinf(angle);
     float shift_y = reach_x * sinf(angle) + reach_y * cosf(angle);
-    corner[0] = center[0];
-    corner[1] = center[1];
-    corner[2] = center[2];
-    corner[3] = center[3];
+    *(u_long128 *)corner = *(u_long128 *)center;
     corner[0] += shift_x;
     corner[1] += shift_y;
     out[0] = fptosi(16.0f * corner[0]);
@@ -208,14 +205,14 @@ int LocalTransWorldPrimPos(int (*corners)[4], float *pos, float width, float hei
     half_h = half_h * inv_w * 0.5f;
     screen[1] *= inv_w;
     screen[0] *= inv_w;
-    float turn = angle + 1.5707964f;
-    LocalPrimCorner(corners[0], corner0, screen, half_w, half_h, turn);
-    turn = mgAngleLimit(turn - 1.5707964f);
-    LocalPrimCorner(corners[1], corner1, screen, half_w, half_h, turn);
-    turn = mgAngleLimit(turn - 1.5707964f);
-    LocalPrimCorner(corners[2], corner2, screen, half_w, half_h, turn);
-    turn = mgAngleLimit(turn - 1.5707964f);
-    LocalPrimCorner(corners[3], corner3, screen, half_w, half_h, turn);
+    angle += 1.5707964f;
+    LocalPrimCorner(corners[0], corner0, screen, half_w, half_h, angle);
+    angle = mgAngleLimit(angle - 1.5707964f);
+    LocalPrimCorner(corners[1], corner1, screen, half_w, half_h, angle);
+    angle = mgAngleLimit(angle - 1.5707964f);
+    LocalPrimCorner(corners[2], corner2, screen, half_w, half_h, angle);
+    angle = mgAngleLimit(angle - 1.5707964f);
+    LocalPrimCorner(corners[3], corner3, screen, half_w, half_h, angle);
     if (corner0[0] < 0.0f || !(corner0[0] <= 4095.0f)) {
         return 0;
     }
@@ -691,15 +688,16 @@ void CThunder::Draw(void) {
         return;
     }
     mgC3DSprite sprite;
+    mgC3DSprite *packet = &sprite;
     mgCDrawEnv env = *mgGetpDrawEnv(0);
     sceGsTest *test = &env.test;
     test->bits.zte = 1;
     test->bits.ztst = 2;
     env.SetZBuf(MG_ZBUF_NO_WRITE);
     env.SetAlpha(MG_ALPHA_MACRO_ADD);
-    sprite.BeginCreatePacket(1, NULL);
-    sprite.CPSetDrawEnv(&env);
-    sprite.CPSetTexture(TEX_ExFx_THUN);
+    packet->BeginCreatePacket(1, NULL);
+    packet->CPSetDrawEnv(&env);
+    packet->CPSetTexture(TEX_ExFx_THUN);
     THUNDER_SPARK *bolt = spark;
     for (int i = 0; i < THUNDER_SPARK_MAX; i++) {
         if (bolt->life > 0.0f) {
@@ -709,18 +707,20 @@ void CThunder::Draw(void) {
             float color[4] = {128.0f, 128.0f, 128.0f, 96.0f};
             size[0] = (0.2f + 0.8f * rate) * (bolt->scale * (4.0f * thn_tbl[bolt->frame][0]));
             size[1] = (0.2f + 0.8f * rate) * (bolt->scale * (4.0f * thn_tbl[bolt->frame][1]));
-            size[2] = mgAngleLimit(bolt->angle);
+            float *angle = &size[2];
+            *angle = bolt->angle;
+            *angle = mgAngleLimit(*angle);
             uv0[0] = thn_uv[bolt->frame][0];
             uv0[1] = thn_uv[bolt->frame][1];
             uv1[0] = uv0[0] + thn_uv[bolt->frame][2];
             uv1[1] = uv0[1] + thn_uv[bolt->frame][3];
-            sprite.BeginCPSprite();
-            sprite.CPSetSprite(bolt->pos, size, color, uv0, uv1);
-            sprite.EndCPSprite();
+            packet->BeginCPSprite();
+            packet->CPSetSprite(bolt->pos, size, color, uv0, uv1);
+            packet->EndCPSprite();
         }
         bolt++;
     }
-    sprite.EndCreatePacket();
+    packet->EndCreatePacket();
     if (live_num > 0) {
         mgCFrame *frame_ptr = &frame;
         frame_ptr->SetVisual(&sprite);
@@ -1513,7 +1513,8 @@ void CHitEffectImage::DrawBord(void) {
     prim.Texture(TEX_SystemEffect2);
     prim.AlphaTestEnable(1);
     BattleEffectPrim *spark = this->spark;
-    for (int i = 0; i < spark_num; i++) {
+    int i;
+    for (i = 0; i < spark_num; i++) {
         if (spark->life > 0) {
             prim.Color(0x80, 0x80, 0x80, fptosi(128.0f * spark->alpha));
             int w = tex_rect.right - 1;
@@ -1567,7 +1568,8 @@ void CHitEffectImage::DrawSpark(float size) {
     prim.Begin(1);
 
     BattleEffectPrim *spark = this->spark;
-    for (int i = 0; i < spark_num; i++) {
+    int i;
+    for (i = 0; i < spark_num; i++) {
         if (spark->life > 0) {
             prim.Color(0x80, 0x80, 0x80, 0x80);
             tip[0] = spark->pos[0] + spark->velocity[0] * size;
@@ -1635,8 +1637,9 @@ void CFlushEffect::Draw(void) {
 #ifdef NONMATCHING
 void CFlushEffect::Step() {
     if (active != 0) {
-        if (follow != NULL) {
-            follow->GetWorldPosition0(pos);
+        mgCFrame *frame;
+        if ((frame = follow) != NULL) {
+            frame->GetWorldPosition0(pos);
         }
         size += grow;
         alpha = alpha - fptosi(fade_speed);
@@ -1831,6 +1834,7 @@ void CDeadEffect::Step(void) {
 }
 #ifdef NONMATCHING
 void CDeadEffect::Draw(void) {
+    union { CPreSprite prim_draw; };
     float world[4];
     int corner0[4];
     int corner_b_r[4];
@@ -1840,7 +1844,7 @@ void CDeadEffect::Draw(void) {
     if (duration <= 0 && live_num <= 0) {
         return;
     }
-    CPreSprite prim_draw;
+    __ct__11mgCDrawPrimFv(&prim_draw);
     prim_draw.Initialize(0, 0);
     prim_draw.Preset2D();
     prim_draw.DepthTestEnable(1);
@@ -1851,17 +1855,18 @@ void CDeadEffect::Draw(void) {
     prim_draw.Begin(3);
     prim_draw.Texture(TEX_SystemEffect2);
     prim_draw.AlphaTestEnable(1);
+    int u;
+    int v;
+    int span;
     BattleEffectPrim *fleck = prim;
     for (int i = 0; i < prim_max; i++) {
         if (fleck->life > 0) {
-            int u;
-            int v;
-            int span;
             if (fleck->kind == 0) {
                 u = 0x80;
                 v = 0x40;
                 span = 0x1F;
-            } else {
+            }
+            if (fleck->kind == 1) {
                 u = 0xA0;
                 v = 0x40;
                 if (fleck->life % 3 == 1) {
@@ -1977,61 +1982,79 @@ void CMapEffect_Sprite::Step(mgCCamera *camera) {
     }
 }
 #ifdef NONMATCHING
-void CMapEffect_Sprite::Draw(mgCCamera *camera, CPreSprite *prim) {
-    if (life <= 0) {
-        return;
-    }
-    sceVu0FVECTOR draw_pos;
-    sceVu0CopyVector(draw_pos, pos);
-    draw_pos[1] += 10.0f * (bob_height * sinf(bob_angle));
-    int alpha = 0x10;
-    int u = 0;
-    int v = 0xA1;
-    int span = 0x5E;
-    float draw_size = 100.0f;
-    if (type == MAP_EFFECT_D01) {
-        if (life < 0x40) {
-            alpha = fptosi(0.25f * (float)life);
-        } else if (life_max - life < 0x40) {
-            alpha = fptosi(0.25f * (float)(life_max - life));
-        }
-    }
-    if (type == MAP_EFFECT_D02) {
-        alpha = 0x80;
-        if (life < 0x14) {
-            alpha = life * 6;
-        }
-        u = 0x20;
-        v = 0;
-        span = 0x1F;
-        draw_size = 5.0f;
-    }
-    if (type == MAP_EFFECT_D03) {
-        if (life < 0x40) {
-            alpha = fptosi(0.25f * (float)life);
-        } else if (life_max - life < 0x40) {
-            alpha = fptosi(0.25f * (float)(life_max - life));
-        }
-        alpha = fptosi((float)alpha * 3.0f);
-    }
+void CMapEffect_Sprite::Draw(mgCCamera *camera, CPreSprite *sprite) {
+    float world[4];
     int corner0[4];
+    int corner_b_r[4];
+    int corner_t_l[4];
     int corner1[4];
-    if (mgTransWorldPrim3DSprite(corner0, corner1, draw_pos, draw_size, draw_size, 0) != 0) {
-        int top_right[4] = {corner1[0], corner0[1], corner0[2], corner0[3]};
-        int bottom_left[4] = {corner0[0], corner1[1], corner1[2], corner1[3]};
-        prim->Color(0x80, 0x80, 0x80, alpha);
-        prim->TextureCrd(u, v);
-        prim->Vertex4(corner0);
-        prim->TextureCrd(u + span, v);
-        prim->Vertex4(top_right);
-        prim->TextureCrd(u, v + span);
-        prim->Vertex4(bottom_left);
-        prim->TextureCrd(u, v + span);
-        prim->Vertex4(bottom_left);
-        prim->TextureCrd(u + span, v);
-        prim->Vertex4(top_right);
-        prim->TextureCrd(u + span, v + span);
-        prim->Vertex4(corner1);
+    int u;
+    int v;
+    int span;
+    int alpha;
+    float size;
+
+    if (life > 0) {
+        sceVu0CopyVector(world, pos);
+        world[1] += 10.0f * (bob_height * sinf(bob_angle));
+        int kind = type;
+        alpha = 0x10;
+        if (kind == MAP_EFFECT_D01) {
+            if (life < 0x40) {
+                alpha = fptosi(0.25f * (float)life);
+            } else if (life_max - life < 0x40) {
+                alpha = fptosi(0.25f * (float)(life_max - life));
+            }
+            u = 0;
+            size = 100.0f;
+            v = 0xA1;
+            span = 0x5E;
+        }
+        if (kind == MAP_EFFECT_D02) {
+            alpha = 0x80;
+            if (life < 0x14) {
+                alpha = life * 6;
+            }
+            u = 0x20;
+            size = 5.0f;
+            v = 0;
+            span = 0x1F;
+        }
+        if (kind == MAP_EFFECT_D03) {
+            if (life < 0x40) {
+                alpha = fptosi(0.25f * (float)life);
+            } else if (life_max - life < 0x40) {
+                alpha = fptosi(0.25f * (float)(life_max - life));
+            }
+            alpha *= 3.0f;
+            u = 0;
+            v = 0xA1;
+            size = 100.0f;
+            span = 0x5E;
+        }
+        if (mgTransWorldPrim3DSprite(corner0, corner1, world, size, size, 0) != 0) {
+            corner_b_r[0] = corner1[0];
+            corner_b_r[1] = corner0[1];
+            corner_b_r[2] = corner0[2];
+            corner_b_r[3] = corner0[3];
+            corner_t_l[0] = corner0[0];
+            corner_t_l[1] = corner1[1];
+            corner_t_l[2] = corner1[2];
+            corner_t_l[3] = corner1[3];
+            sprite->Color(0x80, 0x80, 0x80, alpha);
+            sprite->TextureCrd(u, v);
+            sprite->Vertex4(corner0);
+            sprite->TextureCrd(u + span, v);
+            sprite->Vertex4(corner_b_r);
+            sprite->TextureCrd(u, v + span);
+            sprite->Vertex4(corner_t_l);
+            sprite->TextureCrd(u, v + span);
+            sprite->Vertex4(corner_t_l);
+            sprite->TextureCrd(u + span, v);
+            sprite->Vertex4(corner_b_r);
+            sprite->TextureCrd(u + span, v + span);
+            sprite->Vertex4(corner1);
+        }
     }
 }
 #else
@@ -2424,31 +2447,34 @@ void CWeaponElement::Draw(void) {
     }
 }
 #ifdef NONMATCHING
-void CWeaponElement::Init_Cold(float *position) {
-    count = fptosi(power * 12.0f) + 2;
+void CWeaponElement::Init_Cold(float *center) {
+    int j;
+    int i;
+
+    count = fptosi(12.0f * power) + 2;
     if (count > WEAPON_ELEMENT_SPARK_MAX) {
         count = WEAPON_ELEMENT_SPARK_MAX;
     }
-    spawn_budget = fptosi(power * 10.0f) + 5;
-    spawn_delay_max = 12 - fptosi(power * 6.0f);
+    spawn_budget = fptosi(10.0f * power) + 5;
+    spawn_delay_max = 12 - fptosi(6.0f * power);
     spawn_delay = 0;
-    bolt_count = 4;
-    spread *= power * 0.4f + 0.8f;
-    scale = power * 0.7f + 0.5f;
-    for (int i = 0; i < WEAPON_ELEMENT_SPARK_MAX; ++i) {
+    frame_timer = 4;
+    spread *= (float)(0.8 + 0.4f * power);
+    scale = 0.5f + 0.7f * power;
+    for (i = 0; i < WEAPON_ELEMENT_SPARK_MAX; i++) {
         shrink[i] = 0.0f;
         alpha[i] = 0.0f;
     }
-    for (int i = 0; i < count; ++i) {
-        size[i] = (float)rand() * 6.0f / 2.1474836e9f + 3.0f;
-        shrink[i] = 1.0f;
-        alpha[i] = (float)rand() * 48.0f / 2.1474836e9f + 1.0f;
-        fading[i] = 0;
-        offset[i][0] = (spread * (float)rand() * 2.0f) / 2.1474836e9f - spread;
-        offset[i][1] = spread / 2.0f + spread * (float)rand() / 2.1474836e9f;
-        offset[i][2] = (spread * (float)rand() * 2.0f) / 2.1474836e9f - spread;
-        offset[i][3] = 1.0f;
-        frame[i] = fptosi((float)rand() * 5.0f / 2.1474836e9f) * 0x30;
+    for (j = 0; j < count; j++) {
+        size[j] = 3.0f + (6.0f * (float)rand()) / 2.1474836e9f;
+        shrink[j] = 1.0f;
+        alpha[j] = 1.0f + (48.0f * (float)rand()) / 2.1474836e9f;
+        fading[j] = 0;
+        offset[j][0] = (2.0f * (spread * (float)rand())) / 2.1474836e9f - spread;
+        offset[j][1] = spread / 2.0f + (spread * (float)rand()) / 2.1474836e9f;
+        offset[j][2] = (2.0f * (spread * (float)rand())) / 2.1474836e9f - spread;
+        offset[j][3] = 1.0f;
+        frame[j] = fptosi((5.0f * (float)rand()) / 2.1474836e9f) * 0x30;
     }
 }
 #else
@@ -2564,33 +2590,36 @@ void CWeaponElement::Draw_Cold(void) {
     prim.End();
 }
 #ifdef NONMATCHING
-void CWeaponElement::Init_Wind(float *position) {
-    count = fptosi(power * 10.0f) + 1;
-    spawn_budget = fptosi(power * 20.0f) + 10;
-    spawn_delay_max = 8 - fptosi(power * 4.0f);
+void CWeaponElement::Init_Wind(float *center) {
+    int i;
+    int j;
+
+    count = fptosi(10.0f * power) + 1;
+    spawn_budget = fptosi(20.0f * power) + 10;
+    spawn_delay_max = 8 - fptosi(4.0f * power);
     spawn_delay = 0;
-    bolt_count = 4;
-    spread *= power * 0.4f + 0.8f;
-    scale = 0.5f + 1.3f * (power * 0.7f);
-    for (int i = 0; i < WEAPON_ELEMENT_SPARK_MAX; ++i) {
+    frame_timer = 4;
+    spread *= (float)(0.8 + 0.4f * power);
+    scale = 0.5f + 1.3f * (0.7f * power);
+    for (i = 0; i < WEAPON_ELEMENT_SPARK_MAX; i++) {
         shrink[i] = 0.0f;
         alpha[i] = 0.0f;
     }
-    for (int i = 0; i < count; ++i) {
-        size[i] = 2.0f + 4.0f * (float)rand() / 2.1474836e9f;
-        shrink[i] = 1.0f;
-        alpha[i] = 1.0f + 48.0f * (float)rand() / 2.1474836e9f;
-        fading[i] = 0;
-        offset[i][0] = 2.0f * spread * (float)rand() / 2.1474836e9f - spread;
-        offset[i][1] = 2.0f * spread * (float)rand() / 2.1474836e9f - spread;
-        offset[i][2] = 2.0f * spread * (float)rand() / 2.1474836e9f - spread;
-        offset[i][3] = 1.0f;
-        sceVu0CopyVector(velocity[i], offset[i]);
-        sceVu0Normalize(velocity[i], velocity[i]);
-        sceVu0ScaleVector(velocity[i], velocity[i], 0.3f * (float)rand() / 2.1474836e9f);
-        spin[i] = 2.0f * 3.1415927f * (float)rand() / 2.1474836e9f - 3.1415927f;
-        spin_speed[i] = 0.09817477f + 0.19634955f * (float)rand() / 2.1474836e9f;
-        frame[i] = fptosi(5.0f * (float)rand() / 2.1474836e9f) * 0x30;
+    for (j = 0; j < count; j++) {
+        size[j] = 2.0f + (4.0f * (float)rand()) / 2.1474836e9f;
+        shrink[j] = 1.0f;
+        alpha[j] = 1.0f + (48.0f * (float)rand()) / 2.1474836e9f;
+        fading[j] = 0;
+        offset[j][0] = (2.0f * (spread * (float)rand())) / 2.1474836e9f - spread;
+        offset[j][1] = (2.0f * (spread * (float)rand())) / 2.1474836e9f - spread;
+        offset[j][2] = (2.0f * (spread * (float)rand())) / 2.1474836e9f - spread;
+        offset[j][3] = 1.0f;
+        sceVu0CopyVector(&velocity[j][0], &offset[j][0]);
+        sceVu0Normalize(&velocity[j][0], &velocity[j][0]);
+        sceVu0ScaleVector(&velocity[j][0], &velocity[j][0], (0.3f * (float)rand()) / 2.1474836e9f);
+        spin[j] = (2.0f * (3.1415927f * (float)rand())) / 2.1474836e9f - 3.1415927f;
+        spin_speed[j] = 0.09817477f + (0.19634955f * (float)rand()) / 2.1474836e9f;
+        frame[j] = fptosi((5.0f * (float)rand()) / 2.1474836e9f) * 0x30;
     }
 }
 #else
@@ -2718,32 +2747,35 @@ void CWeaponElement::Draw_Wind(void) {
     prim.End();
 }
 #ifdef NONMATCHING
-void CWeaponElement::Init_Fire(float *position) {
-    count = fptosi(power * 12.0f) + 2;
+void CWeaponElement::Init_Fire(float *center) {
+    int i;
+    int j;
+
+    count = fptosi(12.0f * power) + 2;
     if (count > WEAPON_ELEMENT_SPARK_MAX) {
         count = WEAPON_ELEMENT_SPARK_MAX;
     }
-    spawn_budget = fptosi(power * 10.0f) + 5;
-    spawn_delay_max = 6 - fptosi(power * 3.0f);
+    spawn_budget = fptosi(10.0f * power) + 5;
+    spawn_delay_max = 6 - fptosi(3.0f * power);
     spawn_delay = 0;
-    bolt_count = 4;
-    spread *= power * 0.4f + 0.8f;
-    scale = 0.5f + power * 0.7f;
-    sceVu0CopyVector(fire_pos, position);
-    for (int i = 0; i < WEAPON_ELEMENT_SPARK_MAX; ++i) {
+    frame_timer = 4;
+    spread *= (float)(0.8 + 0.4f * power);
+    scale = 0.5f + 0.7f * power;
+    sceVu0CopyVector(fire_pos, center);
+    for (i = 0; i < WEAPON_ELEMENT_SPARK_MAX; i++) {
         shrink[i] = 0.0f;
         alpha[i] = 0.0f;
     }
-    for (int i = 0; i < count; ++i) {
-        size[i] = 2.0f + 6.0f * (float)rand() / 2.1474836e9f;
-        shrink[i] = 1.0f;
-        alpha[i] = 1.0f + 48.0f * (float)rand() / 2.1474836e9f;
-        fading[i] = 0;
-        offset[i][0] = 2.0f * spread * (float)rand() / 2.1474836e9f - spread;
-        offset[i][1] = 2.0f * spread * (float)rand() / 2.1474836e9f - spread;
-        offset[i][2] = 2.0f * spread * (float)rand() / 2.1474836e9f - spread;
-        offset[i][3] = 1.0f;
-        frame[i] = fptosi(5.0f * (float)rand() / 2.1474836e9f) * 0x30;
+    for (j = 0; j < count; j++) {
+        size[j] = 2.0f + (6.0f * (float)rand()) / 2.1474836e9f;
+        shrink[j] = 1.0f;
+        alpha[j] = 1.0f + (48.0f * (float)rand()) / 2.1474836e9f;
+        fading[j] = 0;
+        offset[j][0] = (2.0f * (spread * (float)rand())) / 2.1474836e9f - spread;
+        offset[j][1] = (2.0f * (spread * (float)rand())) / 2.1474836e9f - spread;
+        offset[j][2] = (2.0f * (spread * (float)rand())) / 2.1474836e9f - spread;
+        offset[j][3] = 1.0f;
+        frame[j] = fptosi((5.0f * (float)rand()) / 2.1474836e9f) * 0x30;
     }
 }
 #else
@@ -2859,38 +2891,42 @@ void CWeaponElement::Draw_Fire(void) {
     prim.End();
 }
 #ifdef NONMATCHING
-void CWeaponElement::Init_Thunder(float *position) {
-    count = fptosi(power * 18.0f) + 6;
-    bolt_count = fptosi(power * 7.0f) + 1;
+void CWeaponElement::Init_Thunder(float *center) {
+    float scaled[4];
+    float dir[4];
+    int i;
+    int j;
+
+    count = fptosi(18.0f * power) + 6;
+    bolt_count = fptosi(7.0f * power) + 1;
     if (count > WEAPON_ELEMENT_SPARK_MAX) {
         count = WEAPON_ELEMENT_SPARK_MAX;
     }
     if (bolt_count > WEAPON_ELEMENT_BOLT_MAX) {
         bolt_count = WEAPON_ELEMENT_BOLT_MAX;
     }
-    spread *= power * 0.4f + 0.8f;
-    for (int i = 0; i < count; ++i) {
-        velocity[i][0] = 8.0f * (float)rand() / 2.1474836e9f - 4.0f;
-        velocity[i][1] = 8.0f * (float)rand() / 2.1474836e9f - 4.0f;
-        velocity[i][2] = 8.0f * (float)rand() / 2.1474836e9f - 4.0f;
-        sceVu0FVECTOR direction;
-        sceVu0FVECTOR radius;
-        sceVu0Normalize(direction, velocity[i]);
-        sceVu0ScaleVectorXYZ(radius, direction, spread);
-        offset[i][0] = position[0] + velocity[i][0] + radius[0] * (float)rand() / 2.1474836e9f;
-        offset[i][1] = position[1] + velocity[i][1] + radius[1] * (float)rand() / 2.1474836e9f;
-        offset[i][2] = position[2] + velocity[i][2] + radius[2] * (float)rand() / 2.1474836e9f;
+
+    spread *= (float)(0.8 + 0.4f * power);
+    for (i = 0; i < count; i++) {
+        velocity[i][0] = (8.0f * (float)rand()) / 2.1474836e9f - 4.0f;
+        velocity[i][1] = (8.0f * (float)rand()) / 2.1474836e9f - 4.0f;
+        velocity[i][2] = (8.0f * (float)rand()) / 2.1474836e9f - 4.0f;
+        sceVu0Normalize(dir, &velocity[i][0]);
+        sceVu0ScaleVectorXYZ(scaled, dir, spread);
+        offset[i][0] = center[0] + velocity[i][0] + (scaled[0] * (float)rand()) / 2.1474836e9f;
+        offset[i][1] = center[1] + velocity[i][1] + (scaled[1] * (float)rand()) / 2.1474836e9f;
+        offset[i][2] = center[2] + velocity[i][2] + (scaled[2] * (float)rand()) / 2.1474836e9f;
         offset[i][3] = 1.0f;
-        sceVu0ScaleVectorXYZ(velocity[i], direction, 0.3f * (float)rand() / 2.1474836e9f);
-        size[i] = 0.5f + 2.5f * (float)rand() / 2.1474836e9f;
+        sceVu0ScaleVectorXYZ(&velocity[i][0], dir, (0.3f * (float)rand()) / 2.1474836e9f);
+        size[i] = 0.5f + (2.5f * (float)rand()) / 2.1474836e9f;
         shrink[i] = 1.0f;
-        alpha[i] = 96.0f + (float)fptosi(64.0f * (float)rand() / 2.1474836e9f);
+        alpha[i] = 96.0f + (float)fptosi((64.0f * (float)rand()) / 2.1474836e9f);
     }
-    for (int i = 0; i < bolt_count; ++i) {
-        bolt_head[i] = fptosi((float)count * (float)rand() / 2.1474836e9f);
-        bolt_tail[i] = fptosi((float)count * (float)rand() / 2.1474836e9f);
-        bolt_timer[i] = fptosi(6.0f * (float)rand() / 2.1474836e9f) * 3 + 3;
-        bolt_frame[i] = fptosi(4.0f * (float)rand() / 2.1474836e9f);
+    for (j = 0; j < bolt_count; j++) {
+        bolt_head[j] = fptosi(((float)count * (float)rand()) / 2.1474836e9f);
+        bolt_tail[j] = fptosi(((float)count * (float)rand()) / 2.1474836e9f);
+        bolt_timer[j] = fptosi((6.0f * (float)rand()) / 2.1474836e9f) * 3 + 3;
+        bolt_frame[j] = fptosi((4.0f * (float)rand()) / 2.1474836e9f);
     }
 }
 #else

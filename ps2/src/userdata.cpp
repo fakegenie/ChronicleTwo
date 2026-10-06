@@ -964,24 +964,28 @@ int CGameDataUsed::IsSpectolTrans() {
     }
     return 0;
 }
-#ifdef NONMATCHING
 void CGameDataUsed::ToSpectolTrans(CGameDataUsed *attach, int num) {
+    int count;
+    char *name;
+    int level;
+    int bonus;
     if (attach != NULL) {
         attach->Init();
-        int count = GetNum();
+        count = GetNum();
         if (0 < num) {
             count = num;
         }
         ATTACH_USED *spectol = &attach->data.attach;
         spectol->spectol_item_no = item_no;
-        char *name = GetName(0);
-        int level = GetLevel();
+        name = GetName(0);
+        level = GetLevel();
         switch (used_type) {
-            case 3:
+            case 3: {
+                WEAPON_USED *weapon = &data.weapon;
                 if (level < 5) {
                     spectol->spectol_type = 3;
                     spectol->spectol_value = GetRandI(4) + 1;
-                    short bonus = GetRandI(4) + 1;
+                    bonus = GetRandI(4) + 1;
                     int slot = GetRandI(10);
                     if (slot < 8) {
                         spectol->attribute[slot] = bonus;
@@ -991,33 +995,46 @@ void CGameDataUsed::ToSpectolTrans(CGameDataUsed *attach, int num) {
                     spectol->special = 0;
                 } else {
                     spectol->spectol_type = 1;
-                    spectol->spectol_value = (u8)(s8)data.weapon.level;
-                    if (spectol->spectol_value >= 21) {
+                    spectol->spectol_value = (u8)(s8)weapon->level;
+                    if (spectol->spectol_value > 20) {
                         spectol->spectol_value = 20;
                     }
-                    spectol->special = data.weapon.special;
-                    spectol->level = data.weapon.level;
-                    spectol->status[0] = data.weapon.status[0];
-                    spectol->status[1] = fptosi(0.6f * (float)data.weapon.status[1]);
-                    for (int i = 0; i < 8; i++) {
-                        spectol->attribute[i] = fptosi(0.6f * (float)data.weapon.attribute[i]);
-                    }
+                    spectol->special = weapon->special;
+                    spectol->level = weapon->level;
+                    spectol->status[0] = weapon->status[0];
+                    spectol->status[1] = fptosi(0.6f * (float)weapon->status[1]);
+                    spectol->attribute[0] = fptosi(0.6f * (float)weapon->attribute[0]);
+                    spectol->attribute[1] = fptosi(0.6f * (float)weapon->attribute[1]);
+                    spectol->attribute[2] = fptosi(0.6f * (float)weapon->attribute[2]);
+                    spectol->attribute[3] = fptosi(0.6f * (float)weapon->attribute[3]);
+                    spectol->attribute[4] = fptosi(0.6f * (float)weapon->attribute[4]);
+                    spectol->attribute[5] = fptosi(0.6f * (float)weapon->attribute[5]);
+                    spectol->attribute[6] = fptosi(0.6f * (float)weapon->attribute[6]);
+                    spectol->attribute[7] = fptosi(0.6f * (float)weapon->attribute[7]);
                 }
                 break;
-            case 2:
+            }
+            case 2: {
                 spectol->level = 0;
-                spectol->status[0] = data.attach.status[0] * count;
-                spectol->status[1] = data.attach.status[1] * count;
-                for (int i = 0; i < 8; i++) {
-                    spectol->attribute[i] = data.attach.attribute[i] * count;
-                }
-                spectol->special = data.attach.special;
+                ATTACH_USED *source = &data.attach;
+                spectol->status[0] = source->status[0] * count;
+                spectol->status[1] = source->status[1] * count;
+                spectol->attribute[0] = source->attribute[0] * count;
+                spectol->attribute[1] = source->attribute[1] * count;
+                spectol->attribute[2] = source->attribute[2] * count;
+                spectol->attribute[3] = source->attribute[3] * count;
+                spectol->attribute[4] = source->attribute[4] * count;
+                spectol->attribute[5] = source->attribute[5] * count;
+                spectol->attribute[6] = source->attribute[6] * count;
+                spectol->attribute[7] = source->attribute[7] * count;
+                spectol->special = source->special;
                 spectol->spectol_type = 2;
                 spectol->spectol_value = count;
                 if (item_no == 0x17F) {
-                    spectol->spectol_value = data.attach.spectol_value;
+                    spectol->spectol_value = source->spectol_value;
                 }
                 break;
+            }
             case 6:
                 spectol->level = 0;
                 spectol->attribute[7] = 2;
@@ -1041,9 +1058,6 @@ void CGameDataUsed::ToSpectolTrans(CGameDataUsed *attach, int num) {
         attach->CheckParamLimmit();
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/userdata", ToSpectolTrans__13CGameDataUsedFP13CGameDataUsedi);
-#endif
 void CGameDataUsed::GetStatusParam(short *param) {
     if (param != NULL) {
         if (used_type == 3) {
@@ -2747,7 +2761,7 @@ void CUserDataManager::RefreshNPCStatus(int mode) {
         refresh = 1;
     }
     if (refresh != 0) {
-        s16 time = fptosi(elapsed);
+        int time = fptosi(elapsed);
         if (NowPartyCharaID() == 0xB) {
             int repair_num = 0;
             if (time > 0) {
@@ -2758,7 +2772,7 @@ void CUserDataManager::RefreshNPCStatus(int mode) {
                     }
                 }
                 if (repair_num > 0) {
-                    s16 uses = 0;
+                    int uses = 0;
                     if (time > 0) {
                         while (uses < time) {
                             if (UseNpcAbility(0xB, 3, 1) == 0) {
@@ -3424,7 +3438,7 @@ int CUserDataManager::CheckItemLimmitOver() {
             if (0 < used->GetGiftBoxItemNum()) {
                 for (int k = 0; k < 3; k++) {
                     int gift = used->GetGiftBoxItemNo(k);
-                    if (0 < gift) {
+                    if (gift > 0) {
                         item_count[gift]++;
                     }
                 }
@@ -3433,16 +3447,15 @@ int CUserDataManager::CheckItemLimmitOver() {
     }
     CHARA_DATA *charas = GetCharaDataPtr(0);
     for (int chara = 0; chara < 2; chara++) {
-        CHARA_DATA *data = &charas[chara];
         for (int slot = 0; slot < 3; slot++) {
-            CGameDataUsed *active = &data->active_item[slot];
+            CGameDataUsed *active = &charas[chara].active_item[slot];
             int active_no = active->item_no;
             if (0 < active_no) {
                 item_count[active_no] += active->GetNum();
                 if (0 < active->GetGiftBoxItemNum()) {
                     for (int k = 0; k < 3; k++) {
                         int gift = active->GetGiftBoxItemNo(k);
-                        if (0 < gift) {
+                        if (gift > 0) {
                             item_count[gift]++;
                         }
                     }
@@ -3450,7 +3463,7 @@ int CUserDataManager::CheckItemLimmitOver() {
             }
         }
     }
-    for (int item_no = 1; item_no < 0x200; item_no++) {
+    for (unsigned int item_no = 1; item_no < 0x200; item_no++) {
         CDataCommon *common = GetCommonItemData(item_no);
         if (common != NULL && common->max_num < item_count[item_no]) {
             return item_no;
@@ -3787,14 +3800,10 @@ short CBattleCharaInfo::GetPalletNo(int slot) {
 }
 #ifdef NONMATCHING
 void CBattleCharaInfo::RefreshParamater() {
-    float weapon_rate[2] = {1.0f, 1.0f};
-    short status[10];
-    int capacity;
-
     if (chara_data == NULL) {
         return;
     }
-    memset(weapon_param, 0, sizeof(weapon_param));
+    memset(weapon_param, 0, 0x40);
     BATTLE_WEAPON_PARAM *param = weapon_param;
     CUserDataManager *user_data = GetUserDataMan();
     now_npc = 0;
@@ -3803,71 +3812,74 @@ void CBattleCharaInfo::RefreshParamater() {
     }
     CGameDataUsed *equipment = equip;
     CScene *scene = GetMainScene();
-    switch (chara_type) {
-        case BATTLE_CHARA_HUMAN:
-            if (((CHARA_DATA *)chara_data)->status_attr & CHARA_STATUS_POWER) {
-                weapon_rate[0] = 1.5f;
-                weapon_rate[1] = 1.5f;
-            }
-            defence = ((CHARA_DATA *)chara_data)->defence;
-            for (int i = 0; i < 2; i++) {
-                CGameDataUsed *item = &equipment[i];
-                item->GetStatusParam(status, scene->time);
-                param->status[0] = fptosi((float)status[0] * weapon_rate[i]);
-                param->status[1] = status[1];
-                param->status[2] = status[2];
-                param->status[3] = status[3];
-                param->status[4] = status[4];
-                param->status[5] = status[5];
-                param->status[6] = status[6];
-                param->status[7] = status[7];
-                param->status[8] = status[8];
-                param->status[9] = status[9];
-                param->special = item->data.weapon.special;
-                param->pallet_no = item->GetPalletColor();
-                param++;
-            }
-            break;
-        case BATTLE_CHARA_ROBO:
-            robo_hp_drain = 0.006f * ((float)CheckNowRoboUseCapacity((ROBO_DATA *)chara_data, &capacity) / (float)capacity);
-            defence = ((ROBO_DATA *)chara_data)->GetDefenceVol();
-            for (int i = 0; i < 2; i++) {
-                param->status[0] = equipment->data.weapon.level;
-                param->status[1] = equipment->data.weapon.status[0];
-                param->status[2] = equipment->data.weapon.status[1];
-                param->status[3] = equipment->data.weapon.attribute[0];
-                param->status[4] = equipment->data.weapon.attribute[1];
-                param->status[5] = equipment->data.weapon.attribute[2];
-                param->status[6] = equipment->data.weapon.attribute[3];
-                param->status[7] = equipment->data.weapon.attribute[4];
-                param->status[8] = equipment->data.weapon.attribute[5];
-                param->status[9] = equipment->data.weapon.attribute[6];
-                param++;
-            }
-            break;
-        case BATTLE_CHARA_MONSTER: {
-            monster_hp_drain = 0.005f;
-            if (user_data->monster_box.IsChange(0xC) != 0) {
-                monster_hp_drain = 0.0025f;
-            }
-            float monster_rate = 1.0f;
-            if (user_data->monster_box.IsChange(0xB) != 0) {
-                monster_rate = 1.25f;
-            }
-            MOS_CHANGE_PARAM *monster = (MOS_CHANGE_PARAM *)chara_data;
-            weapon_param[0].status[0] = fptosi(monster_rate * (float)monster->GetAttackVol(-1));
-            weapon_param[0].status[1] = fptosi(monster_rate * (float)monster->GetAttackVol(-1));
-            defence = fptosi(monster_rate * (float)monster->GetDefenceVol(-1));
-            weapon_param[0].status[2] = 0;
-            weapon_param[0].status[3] = 0;
-            weapon_param[0].status[4] = 0;
-            weapon_param[0].status[5] = 0;
-            weapon_param[0].status[6] = 0;
-            weapon_param[0].status[7] = 0;
-            weapon_param[0].status[8] = 0;
-            weapon_param[0].status[9] = 0;
-            break;
+    if (chara_type == BATTLE_CHARA_HUMAN) {
+        float weapon_rate[2] = {1.0f, 1.0f};
+        short status[10];
+        if (((CHARA_DATA *)chara_data)->status_attr & CHARA_STATUS_POWER) {
+            weapon_rate[0] = 1.5f;
+            weapon_rate[1] = 1.5f;
         }
+        defence = (u16)((CHARA_DATA *)chara_data)->defence;
+        int i = 0;
+        while (i < 2) {
+            WEAPON_USED *weapon0 = &equipment[i].data.weapon;
+            WEAPON_USED *weapon = weapon0;
+            CGameDataUsed *item = &equipment[i];
+            item->GetStatusParam(status, scene->time);
+            param->status[0] = fptosi((float)status[0] * weapon_rate[i]);
+            param->status[1] = status[1];
+            param->status[2] = status[2];
+            param->status[3] = status[3];
+            param->status[4] = status[4];
+            param->status[5] = status[5];
+            param->status[6] = status[6];
+            param->status[7] = status[7];
+            param->status[8] = status[8];
+            param->status[9] = status[9];
+            param->special = weapon->special;
+            param->pallet_no = item->GetPalletColor();
+            i++;
+            param++;
+        }
+    } else if (chara_type == BATTLE_CHARA_ROBO) {
+        int capacity;
+        robo_hp_drain = 0.006f * ((float)CheckNowRoboUseCapacity((ROBO_DATA *)chara_data, &capacity) / (float)capacity);
+        defence = ((ROBO_DATA *)chara_data)->GetDefenceVol();
+        WEAPON_USED *weapon = &equipment->data.weapon;
+        for (int i = 0; i < 2; i++) {
+            param->status[0] = weapon->level;
+            param->status[1] = weapon->status[0];
+            param->status[2] = weapon->status[1];
+            param->status[3] = weapon->attribute[0];
+            param->status[4] = weapon->attribute[1];
+            param->status[5] = weapon->attribute[2];
+            param->status[6] = weapon->attribute[3];
+            param->status[7] = weapon->attribute[4];
+            param->status[8] = weapon->attribute[5];
+            param->status[9] = weapon->attribute[6];
+            param++;
+        }
+    } else if (chara_type == BATTLE_CHARA_MONSTER) {
+        monster_hp_drain = 0.005f;
+        if (user_data->monster_box.IsChange(0xC) != 0) {
+            monster_hp_drain = 0.0025f;
+        }
+        float monster_rate = 1.0f;
+        if (user_data->monster_box.IsChange(0xB) != 0) {
+            monster_rate = 1.25f;
+        }
+        MOS_CHANGE_PARAM *monster = (MOS_CHANGE_PARAM *)chara_data;
+        weapon_param[0].status[0] = fptosi(monster_rate * (float)monster->GetAttackVol(-1));
+        weapon_param[0].status[1] = fptosi(monster_rate * (float)monster->GetAttackVol(-1));
+        defence = fptosi(monster_rate * (float)monster->GetDefenceVol(-1));
+        weapon_param[0].status[2] = 0;
+        weapon_param[0].status[3] = 0;
+        weapon_param[0].status[4] = 0;
+        weapon_param[0].status[5] = 0;
+        weapon_param[0].status[6] = 0;
+        weapon_param[0].status[7] = 0;
+        weapon_param[0].status[8] = 0;
+        weapon_param[0].status[9] = 0;
     }
     if (scene != NULL) {
         BattleParamater_Time = scene->time;

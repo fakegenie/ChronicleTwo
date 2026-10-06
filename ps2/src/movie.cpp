@@ -736,30 +736,29 @@ int viBufStopDMA(ViBuf *buf) {
     SignalSema(buf->sema);
     return 1;
 }
-#pragma optimization_level reset
+#pragma divbyzerocheck on
 #ifdef NONMATCHING
 int viBufRestartDMA(ViBuf *buf) {
     u32 ipubp = buf->env.ipubp;
+    int fifo_bits = ipubp & 0x7F;
     u32 tag_addr = buf->env.d4tadr;
-    u32 chcr = buf->env.d4chcr | 0x100;
     int fifo_quads = ((ipubp >> 16) & 3) + ((ipubp >> 8) & 0xF);
-    u32 qwc = buf->env.d4qwc + fifo_quads;
     u32 madr = buf->env.d4madr - fifo_quads * 0x10;
+    u32 qwc = buf->env.d4qwc + fifo_quads;
+    u32 chcr = buf->env.d4chcr | 0x100;
 
     WaitSema(buf->sema);
     if (madr < (u32)buf->data) {
         int size = buf->n << 11;
         int mode = 0;
-        int distance;
         qwc = (u32)((u8 *)buf->data - madr) >> 4;
         tag_addr = (u32)buf->tag & 0xFFFFFFF;
         madr += size;
         if (buf->env.d4madr != (u32)buf->data && buf->env.d4madr != (u32)buf->data + size) {
             mode = 3;
         }
-        distance = (buf->n - buf->dma_start) % buf->n;
         chcr = (((u_long)buf->env.d4chcr << 36) >> 36) | (mode << 28) | 0x100;
-        if (distance < 0 || distance >= buf->dma_n) {
+        if ((buf->n - buf->dma_start) % buf->n < 0 || (buf->n - buf->dma_start) % buf->n >= buf->dma_n) {
             buf->dma_start = buf->n - 1;
             buf->dma_n++;
         }
@@ -768,16 +767,14 @@ int viBufRestartDMA(ViBuf *buf) {
         int fifo_index = getFIFOindex(buf, (void *)madr);
         if (index != fifo_index) {
             int mode = 0;
-            int distance;
-            qwc = (u32)(((u8 *)buf->data + (fifo_index << 11)) - madr) >> 4;
+                qwc = (u32)(((u8 *)buf->data + (fifo_index << 11)) - madr) >> 4;
             tag_addr = (u32)(buf->tag + fifo_index) & 0xFFFFFFF;
-            distance = (fifo_index + buf->n - buf->dma_start) % buf->n;
-            if ((u32)buf->data + (buf->env.d4madr - (u32)buf->data) % (buf->n << 11) !=
-                (u32)buf->data + ((buf->dma_start + buf->dma_n) % buf->n << 11)) {
+            if ((u32)buf->data + ((buf->dma_start + buf->dma_n) % buf->n << 11) !=
+                (u32)buf->data + (buf->env.d4madr - (u32)buf->data) % (buf->n << 11)) {
                 mode = 3;
             }
             chcr = (((u_long)buf->env.d4chcr << 36) >> 36) | (mode << 28) | 0x100;
-            if (distance < 0 || distance >= buf->dma_n) {
+            if ((fifo_index + buf->n - buf->dma_start) % buf->n < 0 || (fifo_index + buf->n - buf->dma_start) % buf->n >= buf->dma_n) {
                 buf->dma_start = fifo_index;
                 buf->dma_n++;
             }
@@ -791,7 +788,7 @@ int viBufRestartDMA(ViBuf *buf) {
     if (buf->dma_n != 0) {
         while (*(volatile int *)0x10002010 < 0) {
         }
-        *(int *)0x10002000 = ipubp & 0x7F;
+        *(int *)0x10002000 = fifo_bits;
         while (*(volatile int *)0x10002010 < 0) {
         }
     }
@@ -809,6 +806,8 @@ int viBufRestartDMA(ViBuf *buf) {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/movie", viBufRestartDMA__FP5ViBuf);
 #endif
+#pragma divbyzerocheck reset
+#pragma optimization_level reset
 int viBufDelete(ViBuf *buf) {
     setD4_CHCR(5U);
     *(int *)0x1000B420 = 0;
@@ -825,9 +824,9 @@ void viBufFlush(ViBuf *buf) {
 #pragma divbyzerocheck on
 #ifdef NONMATCHING
 int viBufModifyPts(ViBuf *buf, TimeStamp *ts) {
-    int index = (buf->n_ts + (buf->wt_ts - buf->count_ts)) % buf->n_ts;
     int size = buf->n << 11;
     int keep_going = 1;
+    int index = (buf->n_ts + (buf->wt_ts - buf->count_ts)) % buf->n_ts;
 
     if (buf->count_ts > 0) {
         do {
@@ -889,22 +888,22 @@ int viBufPutTs(ViBuf *buf, TimeStamp *ts) {
 #pragma divbyzerocheck on
 #ifdef NONMATCHING
 int viBufGetTs(ViBuf *buf, TimeStamp *ts) {
-    int found = 0;
     u32 ipu_ctrl = *(u32 *)0x10002020;
+    u32 read_pos;
+    int dma_addr = *(int *)0x1000B410 - ((((ipu_ctrl >> 16) & 3) + ((ipu_ctrl >> 8) & 0xF)) * 0x10);
     u32 size = buf->n << 11;
     int fifo_bits = buf->env.ipubp & 0x7F;
-    int dma_addr = *(int *)0x1000B410 - ((((ipu_ctrl >> 16) & 3) + ((ipu_ctrl >> 8) & 0xF)) * 0x10);
-    u32 read_pos;
-    int i;
 
     WaitSema(buf->sema);
     ts->pts = -1;
     ts->dts = -1;
     read_pos = (size + (dma_addr + (fifo_bits >> 3)) - (u32)buf->data) % size;
-    for (i = 0; i < buf->count_ts && found == 0; i++) {
-        int index = (i + (buf->n_ts + (buf->wt_ts - buf->count_ts))) % buf->n_ts;
+    int found = 0;
+    int count = buf->count_ts;
+    for (int i = 0; i < count && found == 0; i++) {
+        int index = (i + (buf->n_ts + (buf->wt_ts - count))) % buf->n_ts;
         TimeStamp *entry = &buf->ts[index];
-        if ((int)((read_pos + size - entry->pos) % size) < entry->len) {
+        if ((int)(read_pos + size - entry->pos) % (int)size < entry->len) {
             ts->pts = entry->pts;
             ts->dts = buf->ts[index].dts;
             buf->ts[index].pts = -1;
@@ -1292,22 +1291,24 @@ int decBs0(VideoDec *dec) {
     return 1;
 }
 #ifdef NONMATCHING
+struct GifTagData {
+    u_long128 value;
+};
 void setImageTag(u32 *tag, void *data, int a, int width, int height) {
     sceGifPacket packet;
-    u_long128 giftag = at_1276__2;
-    sceGsTex0 tex0;
+    GifTagData giftag = *(GifTagData *)&at_1276__2;
     int x;
     int y;
     int blocks_x;
     int blocks_y;
-    int tile_x;
-    int tile_y;
+    unsigned int tile_x;
+    unsigned int tile_y;
 
     sceGifPkInit(&packet, (u_long128 *)(((u32)tag & 0xFFFFFFF) | 0x20000000));
     sceGifPkReset(&packet);
-    tex0 = mgTexManager.GetTexture(TexName, -1)->tex0;
+    sceGsTex0 tex0 = mgTexManager.GetTexture(TexName, -1)->tex0;
     sceGifPkCnt(&packet, 0, 0, 0);
-    sceGifPkOpenGifTag(&packet, giftag);
+    sceGifPkOpenGifTag(&packet, *(u_long128 *)&giftag);
     sceGifPkAddGsAD(&packet, 0x50, SCE_GS_SET_BITBLTBUF(0, 0, 0, tex0.TBP0, tex0.TBW, 0));
     sceGifPkAddGsAD(&packet, 0x52, SCE_GS_SET_TRXREG(16, 16));
     sceGifPkCloseGifTag(&packet);
@@ -1318,7 +1319,7 @@ void setImageTag(u32 *tag, void *data, int a, int width, int height) {
         tile_y = 0;
         for (y = 0; y < blocks_y; y++) {
             sceGifPkCnt(&packet, 0, 0, 0);
-            sceGifPkOpenGifTag(&packet, giftag);
+            sceGifPkOpenGifTag(&packet, *(u_long128 *)&giftag);
             sceGifPkAddGsAD(&packet, 0x51, SCE_GS_SET_TRXPOS(0, 0, tile_x, tile_y, 0));
             sceGifPkAddGsAD(&packet, 0x53, 0);
             sceGifPkCloseGifTag(&packet);
@@ -1331,9 +1332,9 @@ void setImageTag(u32 *tag, void *data, int a, int width, int height) {
         }
         tile_x += 0x10;
     }
-    giftag = at_1287__2;
+    GifTagData end_tag = *(GifTagData *)&at_1287__2;
     sceGifPkEnd(&packet, 0, 0, 0);
-    sceGifPkOpenGifTag(&packet, giftag);
+    sceGifPkOpenGifTag(&packet, *(u_long128 *)&end_tag);
     sceGifPkAddGsAD(&packet, 0x3F, 0);
     sceGifPkCloseGifTag(&packet);
     sceGifPkTerminate(&packet);

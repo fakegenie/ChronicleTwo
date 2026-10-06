@@ -1402,7 +1402,7 @@ class CItemSelect : public CBaseMenuClass {
 public:
     int item_num;                 /**< Number of items in the list. */
     CGameDataUsed *item_list[150];/**< Items that can be chosen. */
-    u8 limit_disp[150];           /**< Non-zero for each listed item that is shown as unavailable. */
+    s8 limit_disp[150];           /**< Non-zero for each listed item that is shown as unavailable. */
     s16 alpha_step;               /**< Amount the alpha changes each frame. */
     int alpha;                    /**< Alpha the list is drawn with. */
     int bg_alpha;                 /**< Alpha the background is drawn with. */

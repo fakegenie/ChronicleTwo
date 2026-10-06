@@ -876,6 +876,9 @@ void CCharacter2::ResetFloor() {
 
 #ifdef NONMATCHING
 void CCharacter2::NormalDrive() {
+    float  frame_step;
+    float  motion_speed = 1.2f;
+
     if (next_key != now_key && next_key != NULL) {
         posed_key = now_key;
         prev_flags = now_flags;
@@ -887,68 +890,67 @@ void CCharacter2::NormalDrive() {
         now_flags = next_flags;
         blend = 0.1f;
         motion_status = CHARA_MOTION_STATUS_START;
-        if (next_flags & CHARA_MOTION_RESTART) {
+        if ((next_flags & CHARA_MOTION_RESTART) != 0) {
             posed_key = next_key;
-            frame = (float)now_key->start_frame;
+            frame = now_key->start_frame;
         }
         ExecEntryEffect(now_key);
-    } else if (next_key != NULL && now_flags != next_flags) {
+    } else if (now_flags != next_flags && next_key != NULL) {
         now_flags = next_flags;
-        if (next_flags & CHARA_MOTION_RESTART) {
+        if ((next_flags & CHARA_MOTION_RESTART) != 0) {
             motion_status = CHARA_MOTION_STATUS_START;
             posed_key = next_key;
-            frame = (float)now_key->start_frame;
+            frame = now_key->start_frame;
         }
     }
     if (now_key == NULL) {
         return;
     }
     if (posed_key == now_key) {
-        float advance = step * 1.2f;
-        if (now_flags & CHARA_MOTION_PAUSE) {
-            advance = 0.0f;
+        frame_step = step * motion_speed;
+        if ((now_flags & CHARA_MOTION_PAUSE) != 0) {
+            frame_step = 0.0f;
         }
-        frame += advance;
-        if (advance > 0.0f) {
+        frame += frame_step;
+        if (!(frame_step <= 0.0f)) {
             motion_status = CHARA_MOTION_STATUS_PLAY;
         }
-        float first = (float)now_key->start_frame;
-        if (frame >= first && frame < first + step * 1.2f) {
-            frame = first;
+        if (frame < now_key->start_frame + step * motion_speed && !(frame < now_key->start_frame)) {
+            frame = now_key->start_frame;
             motion_status = CHARA_MOTION_STATUS_START;
         }
-        float last = (float)now_key->end_frame;
-        if (frame + step * 1.2f > last) {
-            if (now_flags & CHARA_MOTION_HOLD) {
-                frame = last;
+        if (!(frame + step * motion_speed <= now_key->end_frame)) {
+            if ((now_flags & CHARA_MOTION_HOLD) != 0) {
+                frame = now_key->end_frame;
                 motion_status = CHARA_MOTION_STATUS_END;
                 step = 0.0f;
             } else {
-                frame = first;
+                frame = now_key->start_frame;
                 motion_status = CHARA_MOTION_STATUS_END;
                 ExecEntryEffect(now_key);
             }
         }
     }
     if (posed_key == now_key) {
-        frame_ratio = (float)(now_key->end_frame - now_key->start_frame);
-        frame_ratio = (frame - (float)now_key->start_frame) / frame_ratio;
+        frame_ratio = now_key->end_frame - now_key->start_frame;
+        frame_ratio = (frame - now_key->start_frame) / frame_ratio;
         SetMotionTime(CObjectFrame::frame, &motion[now_set], frame, NULL);
-    } else if (blend >= 1.0f) {
+        return;
+    }
+    if (!(blend < 1.0f)) {
         posed_key = now_key;
-        frame = (float)now_key->start_frame;
+        frame = now_key->start_frame;
         motion_status = CHARA_MOTION_STATUS_START;
-    } else {
-        frame_ratio = 0.0f;
-        motion_status = CHARA_MOTION_STATUS_BLEND;
-        ChangeMotion(CObjectFrame::frame, &motion[now_set], fptosi(frame + 0.9f),
-                     now_key->start_frame, blend, NULL);
-        blend += blend_speed;
-        if (blend >= 1.0f) {
-            posed_key = now_key;
-            frame = (float)now_key->start_frame;
-            motion_status = CHARA_MOTION_STATUS_START;
-        }
+        return;
+    }
+    frame_ratio = 0.0f;
+    motion_status = CHARA_MOTION_STATUS_BLEND;
+    ChangeMotion(CObjectFrame::frame, &motion[now_set], (int)(0.9f + frame), now_key->start_frame, blend, NULL);
+    blend += blend_speed;
+    if (!(blend < 1.0f)) {
+        posed_key = now_key;
+        frame = now_key->start_frame;
+        motion_status = CHARA_MOTION_STATUS_START;
     }
 }
 #else
@@ -2483,28 +2485,22 @@ mgCFrame *CreateChangeFrame(mgLoadData *data, mgCFrame *target) {
 #ifdef NONMATCHING
 
 static int _SKIN_MOTION(SPI_STACK *stack, int count) {
-    mgCMemory           work_memory;
-    mgCreateVisualType  visual_type[64];
-    mgIMG_HEADER        image_header;
-    mgLoadData          load;
-    u_long128           work_buffer[6400];
-    sceVu0FVECTOR       box_max;
-    sceVu0FVECTOR       box_min;
-    mgCFrame           *root;
-    mgCFrame           *source_frame;
-    mgCFrame           *dest_frame;
-    mgCVisualMDT       *visual;
-    char               *matrix_name;
-    char               *weight_name;
-    unsigned char      *weight_file;
-    unsigned char      *matrix_file;
-    unsigned char      *model_file;
-    unsigned char      *image;
-    char              **group_names;
-    int                 index;
-    int                 visual_count;
-    int                 deform_index;
-    int                 image_count;
+    mgCreateVisualType visual_type[64];
+    mgLoadData load;
+    u_long128 work_buffer[6400];
+    sceVu0FVECTOR box_max;
+    sceVu0FVECTOR box_min;
+    mgCFrame *root;
+    mgCVisualMDT *visual;
+    char *matrix_name;
+    unsigned char *weight_file;
+    unsigned char *image;
+    char **group_names;
+    char *weight_name;
+    int visual_count;
+    mgCFrame *dest_frame;
+    int deform_index;
+    int image_count;
 
     if (nowChr->CObjectFrame::frame == NULL) {
         return 0;
@@ -2514,21 +2510,26 @@ static int _SKIN_MOTION(SPI_STACK *stack, int count) {
     matrix_name = spiGetStackString(stack++);
     weight_name = spiGetStackString(stack++);
     weight_file = (unsigned char *)GetPackFile(pack_file, weight_name, NULL);
+    unsigned char *matrix_file;
     matrix_file = (unsigned char *)GetPackFile(pack_file, matrix_name, NULL);
     if (weight_file == NULL) {
         printf("not found %s\n", weight_name);
         return 0;
     }
+    mgCFrame *root_skin_frame2 = root_skin_frame;
     if (nowChr->shape_anime == 0) {
+        int index;
+        unsigned char *model_file;
         model_file = (unsigned char *)GetPackFile(pack_file, skin_mds_name, NULL);
+        mgCMemory work_memory;
         visual_count = 0;
         deform_index = 0;
         for (index = 0; index < nowChr->deform_frame_num; index++) {
             if (nowChr->deform_frame[deform_index] != NULL) {
                 visual_type[visual_count].type = MG_VISUAL_CREATE_MOTION_MDT;
                 visual_type[visual_count].name = nowChr->deform_frame[deform_index]->name;
-                visual_count++;
                 deform_index++;
+                visual_count++;
             }
         }
         visual_type[visual_count].type = MG_VISUAL_CREATE_END;
@@ -2538,8 +2539,8 @@ static int _SKIN_MOTION(SPI_STACK *stack, int count) {
             memcpy(image, load_img_ptr, load_img_size);
             image_count = mgGetIMGHeaderNum((char *)image);
             for (index = 0; index < image_count; index++) {
-                image_header = mgGetIMGHeader((char *)image, index);
-                mgTexManager.DeleteTexture(image_header.name, set_imgblock);
+                mgIMG_HEADER header = mgGetIMGHeader((char *)image, index);
+                mgTexManager.DeleteTexture(header.name, set_imgblock);
             }
             mgTexManager.EnterIMGFile(image, set_imgblock, base_stack, NULL);
             group_names = mgTexManager.GetGroupNameList(set_imgblock, &nowChr->tex_anime_group_num);
@@ -2564,23 +2565,28 @@ static int _SKIN_MOTION(SPI_STACK *stack, int count) {
             return 0;
         }
         root = nowChr->CObjectFrame::frame;
-        for (index = 0; index < root_skin_frame->frame_num; index++) {
-            source_frame = root_skin_frame->frame_list[index];
-            if (source_frame != NULL && source_frame->visual != NULL) {
-                source_frame->GetBBox(box_max, box_min);
-                dest_frame = root->SearchFrame(source_frame->name);
-                if (dest_frame != NULL) {
-                    dest_frame->SetVisual(source_frame->visual);
-                    dest_frame->SetBBox(box_max, box_min);
+        index = 0;
+        if (index < root_skin_frame2->frame_num) {
+            do {
+                mgCFrame *source_frame = root_skin_frame2->frame_list[index];
+                if (source_frame != NULL && NULL != source_frame->visual) {
+                    source_frame->GetBBox(box_max, box_min);
+                    dest_frame = root->SearchFrame(source_frame->name);
+                    if (dest_frame != NULL) {
+                        dest_frame->SetVisual(source_frame->visual);
+                        dest_frame->SetBBox(box_max, box_min);
+                    }
                 }
-            }
+                index++;
+            } while (index < root_skin_frame2->frame_num);
         }
     } else {
         if (skin_frame != NULL) {
             root = nowChr->CObjectFrame::frame;
             if (root != NULL) {
                 visual = (mgCVisualMDT *)skin_frame->visual;
-                ChangeWeight(nowChr->motion[0].skin_list, base_stack, weight_file, root->SearchFrameID(skin_name_ptr), nowChr->motion[0].frame_info, visual, root, root_skin_frame);
+                int skin_id = root->SearchFrameID(skin_name_ptr);
+                ChangeWeight(nowChr->motion[0].skin_list, base_stack, weight_file, skin_id, nowChr->motion[0].frame_info, visual, root, root_skin_frame);
                 dest_frame = root->SearchFrame(skin_name_ptr);
                 if (dest_frame != NULL) {
                     dest_frame->SetVisual(visual);

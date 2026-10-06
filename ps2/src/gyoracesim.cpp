@@ -185,9 +185,12 @@ int StepFish(int index, RACE_FISH_PARAM *fish) {
 }
 #ifdef NONMATCHING
 void LaneBattleStep(RACE_FISH_PARAM *fish, int count) {
-    int lane_count[6] = {0, 0, 0, 0, 0, 0};
-    int lane_fish[6][6];
     int order[6];
+    int lane_fish[6][6];
+    int lane_count[6];
+    for (int lane = 0; lane < 6; lane++) {
+        lane_count[lane] = 0;
+    }
     for (int i = 0; i < count; ++i) {
         order[i] = i;
         int lane = fish[i].lane;
@@ -201,53 +204,59 @@ void LaneBattleStep(RACE_FISH_PARAM *fish, int count) {
         order[b] = swap;
     }
     for (int turn = 0; turn < count; ++turn) {
-        int index = order[turn];
-        RACE_FISH_PARAM &current = fish[index];
+        RACE_FISH_PARAM *current = &fish[order[turn]];
+        int crowded[2];
         int neighbor[2] = {-1, -1};
-        bool crowded[2] = {false, false};
-        float best_distance[2] = {-1.0f, -1.0f};
+        float best_distance[2];
         for (int side = 0; side < 2; ++side) {
-            int adjacent_lane = current.lane + (side == 0 ? -1 : 1);
+            crowded[side] = 0;
+            int adjacent_lane = current->lane + (side == 0 ? -1 : 1);
             if (adjacent_lane < 0 || adjacent_lane >= 6) continue;
             for (int j = 0; j < lane_count[adjacent_lane]; ++j) {
-                int other_index = lane_fish[adjacent_lane][j];
-                RACE_FISH_PARAM &other = fish[other_index];
-                float distance = FishDist(&other, &current);
-                float magnitude = distance < 0.0f ? -distance : distance;
-                if (magnitude < 0.075f) crowded[side] = true;
-                if (magnitude < 0.05f && other.state != GR_RACE_STATE_BATTLE &&
+                RACE_FISH_PARAM *other = &fish[lane_fish[adjacent_lane][j]];
+                float distance = FishDist(other, current);
+                float magnitude = abs(distance);
+                if (magnitude < 0.075f) crowded[side] = 1;
+                if (magnitude < 0.05f && crowded[side] && other->state != GR_RACE_STATE_BATTLE &&
                     (neighbor[side] < 0 || best_distance[side] < distance)) {
-                    neighbor[side] = other_index;
+                    neighbor[side] = lane_fish[adjacent_lane][j];
                     best_distance[side] = distance;
                 }
             }
         }
-        bool fish_ahead = false;
-        for (int j = 0; j < lane_count[current.lane]; ++j) {
-            float distance = FishDist(&fish[lane_fish[current.lane][j]], &current);
-            if (distance > 0.0f && distance < 0.1f) fish_ahead = true;
+        int fish_ahead = 0;
+        for (int j = 0; j < lane_count[current->lane]; ++j) {
+            float distance = FishDist(&fish[lane_fish[current->lane][j]], current);
+            if (distance > 0.0f && distance < 0.1f) fish_ahead = 1;
         }
-        if (current.state == GR_RACE_STATE_BATTLE) {
-            current.battle_time -= 1.0f;
-            RACE_FISH_PARAM &other = fish[current.battle_target];
-            float difference = current.power - other.power;
+        if (current->state == GR_RACE_STATE_BATTLE) {
+            current->battle_time -= 1.0f;
+            RACE_FISH_PARAM *other = &fish[current->battle_target];
+            float difference = current->power - other->power;
             if (difference > 30.0f) difference = 30.0f;
             if (difference < -30.0f) difference = -30.0f;
-            int chance = (int)(((difference + 30.0f) / 60.0f) * 100.0f);
-            if (chance < 1) chance = 1;
+            int chance = (int)((difference + 30.0f) / 60.0f * 100.0f);
+            if (chance == 0) chance = 1;
             if (chance > 100) chance = 100;
-            if (rand_prob(chance)) ++current.battle_hits;
-            if (current.battle_time < 0.0f) {
-                RACE_FISH_PARAM *winner = rand_prob(chance) ? &current : &other;
-                RACE_FISH_PARAM *loser = winner == &current ? &other : &current;
-                winner->boost = 0.5f;
-                loser->boost = -0.25f;
-                current.battle_time = 0.0f;
-                current.state = GR_RACE_STATE_SWIM;
-                current.battle = 0;
-                other.state = GR_RACE_STATE_SWIM;
-                other.battle = 0;
-                other.battle_time = 0.0f;
+            if (rand_prob(chance)) ++current->battle_hits;
+            if (current->battle_time < 0.0f) {
+                RACE_FISH_PARAM *winner;
+                RACE_FISH_PARAM *loser;
+                if (rand_prob(chance)) {
+                    winner = current;
+                    loser = other;
+                } else {
+                    winner = other;
+                    loser = current;
+                }
+                winner->boost = 0.5f + 0.0f / (float)(winner->battle_hits + loser->battle_hits);
+                loser->boost = 0.5f * -winner->boost;
+                current->battle_time = 0.0f;
+                current->state = GR_RACE_STATE_SWIM;
+                current->battle = 0;
+                other->state = GR_RACE_STATE_SWIM;
+                other->battle = 0;
+                other->battle_time = 0.0f;
             }
         } else {
             float crowd_effect = 0.0f;
@@ -255,43 +264,51 @@ void LaneBattleStep(RACE_FISH_PARAM *fish, int count) {
             if (!crowded[0] && !crowded[1]) crowd_effect = -increment;
             if (crowded[0]) crowd_effect += increment;
             if (crowded[1]) crowd_effect += increment;
-            current.battle_urge += current.aggression * crowd_effect;
-            if (current.battle_urge < 0.0f) current.battle_urge = 0.0f;
+            current->battle_urge += current->aggression * crowd_effect;
+            if (current->battle_urge < 0.0f) current->battle_urge = 0.0f;
         }
-        if (current.state == GR_RACE_STATE_BATTLE) continue;
-        if (rand_prob(10) && !crowded[0]) {
-            if (--current.lane < 0) current.lane = 0;
-        } else if (fish_ahead && rand_prob(75)) {
-            int change = 0;
-            if (!crowded[0]) {
-                if (!crowded[1]) change = rand_prob(80) ? 1 : -1;
-                else change = -1;
-            } else if (!crowded[1]) change = 1;
-            current.lane += change;
-            if (current.lane < 0) current.lane = 0;
-            if (current.lane >= 6) current.lane = 5;
-        } else if ((neighbor[0] >= 0 || neighbor[1] >= 0) && current.battle_urge > 1.0f) {
-            int target = -1;
-            if (crowded[0] && crowded[1]) target = rand_prob(50) ? neighbor[0] : neighbor[1];
-            else if (crowded[0]) target = neighbor[0];
-            else if (crowded[1]) target = neighbor[1];
-            if (target >= 0) {
-                RACE_FISH_PARAM &other = fish[target];
-                float speed = current.velocity > other.velocity ? current.velocity : other.velocity;
-                current.state = GR_RACE_STATE_BATTLE;
-                current.battle = 1;
-                current.battle_target = target;
-                current.battle_hits = 0;
-                current.battle_urge = 0.0f;
-                current.battle_time = 5.0f;
-                current.velocity = speed;
-                other.state = GR_RACE_STATE_BATTLE;
-                other.battle = 1;
-                other.battle_target = index;
-                other.battle_hits = 0;
-                other.battle_urge = 0.0f;
-                other.battle_time = 5.0f;
-                other.velocity = speed;
+        if (current->state != GR_RACE_STATE_BATTLE) {
+            if (rand_prob(10) && !crowded[0]) {
+                if (--current->lane < 0) current->lane = 0;
+            } else {
+                int change = 0;
+                if (fish_ahead && rand_prob(75)) {
+                    if (!crowded[0]) {
+                        if (!crowded[1]) change = rand_prob(80) ? 1 : -1;
+                        else change = -1;
+                    } else if (!crowded[1]) change = 1;
+                    current->lane += change;
+                    if (current->lane < 0) current->lane = 0;
+                    if (current->lane >= 6) current->lane = 5;
+                }
+                if (change == 0 && (neighbor[0] >= 0 || neighbor[1] >= 0) && current->battle_urge > 1.0f) {
+                    int target = -1;
+                    if (crowded[0] && crowded[1]) {
+                        target = rand_prob(50) ? neighbor[0] : neighbor[1];
+                    } else {
+                        if (crowded[0]) target = neighbor[0];
+                        if (crowded[1]) target = neighbor[1];
+                    }
+                    if (target >= 0) {
+                        RACE_FISH_PARAM *other = &fish[target];
+                        float speed = current->velocity;
+                        if (speed < other->velocity) speed = other->velocity;
+                        current->state = GR_RACE_STATE_BATTLE;
+                        current->battle = 1;
+                        current->battle_target = target;
+                        current->battle_hits = 0;
+                        current->battle_urge = 0.0f;
+                        current->battle_time = 5.0f;
+                        current->velocity = speed;
+                        other->state = GR_RACE_STATE_BATTLE;
+                        other->battle = 1;
+                        other->battle_target = order[turn];
+                        other->battle_hits = 0;
+                        other->battle_urge = 0.0f;
+                        other->battle_time = 5.0f;
+                        other->velocity = speed;
+                    }
+                }
             }
         }
     }
@@ -329,71 +346,69 @@ static void CollisionFish(RACE_FISH_PARAM *fish, int count) {
         int lane = fish[index].lane;
         lane_fish[lane][lane_count[lane]++] = index;
     }
-    for (int j = 0; j < 6; ++j) {
-        RACE_FISH_PARAM *ahead = &fish[lane_fish[j][0]];
-        for (i = 1; i < lane_count[j]; ++i) {
-            RACE_FISH_PARAM *behind = &fish[lane_fish[j][i]];
+    int lane_no = 0;
+    do {
+        RACE_FISH_PARAM *ahead = &fish[lane_fish[lane_no][0]];
+        for (i = 1; i < lane_count[lane_no]; ++i) {
+            RACE_FISH_PARAM *behind = &fish[lane_fish[lane_no][i]];
             float limit = ahead->pos - 0.05f;
             if (limit < behind->pos) behind->pos = limit;
             ahead = behind;
         }
-    }
+        ++lane_no;
+    } while (lane_no < 6);
 }
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/gyoracesim", CollisionFish__FP15RACE_FISH_PARAMi);
 #endif
 #ifdef NONMATCHING
-int StepGyoRace(RACE_FISH_PARAM *fish, grRACE_INFO *race) {
-    int finished[6];
-    for (int i = 0; i < 6; ++i) {
-        race->rank[i] = 0;
-        race->goal_time[i] = 0.0f;
-    }
+int StepGyoRace(RACE_FISH_PARAM *fish, grRACE_INFO *info) {
+    int i;
     int step;
-    for (step = 0; step < race->step_max; ++step) {
-        for (int i = 0; i < race->fish_num; ++i) {
+    for (i = 0; i < 6; ++i) {
+        info->rank[i] = 0;
+        info->goal_time[i] = 0.0f;
+    }
+    step = 0;
+    for (; step < info->step_max; ++step) {
+        int finished[6];
+        for (i = 0; i < 6; ++i) finished[i] = 0;
+        for (i = 0; i < info->fish_num; ++i) {
             finished[i] = StepFish(step, &fish[i]);
-            if (finished[i] != 0 && race->goal_time[i] == 0.0f) {
-                race->goal_time[i] = (float)step - (fish[i].pos - 16.0f) / fish[i].velocity;
+            if (finished[i] && info->goal_time[i] == 0.0f) {
+                info->goal_time[i] = (float)step - (fish[i].pos - 16.0f) / fish[i].velocity;
             }
         }
-        for (int i = 0; i < race->fish_num; ++i) {
-            int ahead = 0;
-            for (int j = 0; j < race->fish_num; ++j) {
-                if (i != j && fish[i].pos < fish[j].pos) {
-                    ++ahead;
-                }
+        for (i = 0; i < info->fish_num; ++i) {
+            int j;
+            int rank = 0;
+            for (j = 0; j < info->fish_num; ++j) {
+                if (i != j && fish[i].pos < fish[j].pos) ++rank;
             }
-            fish[i].rank = ahead + 1;
+            fish[i].rank = rank + 1;
         }
-        CollisionFish(fish, race->fish_num);
-        LaneBattleStep(fish, race->fish_num);
+        CollisionFish(fish, info->fish_num);
+        LaneBattleStep(fish, info->fish_num);
         int all_finished = 1;
-        for (int i = 0; i < race->fish_num; ++i) {
-            if (finished[i] == 0) {
-                all_finished = 0;
-            }
+        for (i = 0; i < info->fish_num; ++i) {
+            if (!finished[i]) all_finished = 0;
         }
-        if (all_finished != 0) {
-            break;
-        }
+        if (all_finished) break;
     }
-    for (int i = 0; i < race->fish_num; ++i) {
-        int ahead = 0;
-        for (int j = 0; j < race->fish_num; ++j) {
-            if (i != j && race->goal_time[i] > race->goal_time[j]) {
-                ++ahead;
-            }
+    for (i = 0; i < info->fish_num; ++i) {
+        int number=info->fish_num;
+        int rank = 0;
+        for (unsigned int j = 0; (int)j < (int)number; ++j) {
+            if (i != (int)j && info->goal_time[i] > info->goal_time[j]) ++rank;
         }
-        race->rank[i] = ahead + 1;
+        info->rank[i] = rank + 1;
     }
-    int next_step = step + 1;
-    for (int i = 0; i <= race->after_goal_step && next_step < race->step_max; ++i, ++next_step) {
-        for (int j = 0; j < race->fish_num; ++j) {
-            StepFish(next_step, &fish[j]);
-        }
+    ++step;
+    for (int extra = 0; extra < info->after_goal_step + 1; ++extra, ++step) {
+        if (step >= info->step_max) break;
+        for (i = 0; i < info->fish_num; ++i) StepFish(step, &fish[i]);
     }
-    return next_step;
+    return step;
 }
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/gyoracesim", StepGyoRace__FP15RACE_FISH_PARAMP11grRACE_INFO);

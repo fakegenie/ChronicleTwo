@@ -117,9 +117,9 @@ void dngDebugStart() {
     command_int[DNG_DEBUG_CMD_SOUND_FLAG * 2] = dbinfo.sound_flag;
     command_int[DNG_DEBUG_CMD_MONSTER_TALK * 2] = dbinfo.monster_talk;
     command_int[DNG_DEBUG_CMD_EFFECT_ID * 2] = dbinfo.effect_id;
-    command_int[DNG_DEBUG_CMD_EFFECT_VOL * 2] = fptosi(dbinfo.effect_vol);
+    command_int[DNG_DEBUG_CMD_EFFECT_VOL * 2] = (int)dbinfo.effect_vol;
     GamePad__2.SetAutoRepeat(0xF000, 15, 4);
-    GamePad__2.SetAutoRepeat(0x5000, 8, 1);
+    GamePad__2.SetAutoRepeat(PAD_UP | PAD_DOWN, 8, 1);
     dbinfo.saved_pause_flag = BattleAreaScene->pause_flag;
     BattleAreaScene->pause_flag = 15;
 }

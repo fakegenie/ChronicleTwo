@@ -13,7 +13,9 @@ static void MulMatrix3(float (*matrix)[4], float (*second)[4], float (*third)[4]
 // Code (.text)
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgFotI4__FPiPf);
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgCreateBox8__FPA4_fPfPf);
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgZeroVector__FPf);
+void mgZeroVector(float *vector) {
+    *(u_long128 *)vector = 0;
+}
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgZeroVectorW__FPf);
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgClipBoxVertex__FPfPfPf);
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgClipBox__FPfPfPfPf);

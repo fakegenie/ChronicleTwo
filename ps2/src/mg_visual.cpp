@@ -139,21 +139,21 @@ int mgCVisualMDT::SetMaterialRef(u_long128 *packet, mgMaterial *material, int fl
 
     texture = material->texture;
     if (texture == NULL) {
-        packet[0] = mat_vif;
+        packet[0] = *(u_long128 *)&mat_vif;
         packet[1] = *(u_long128 *)material->diffuse;
         packet[2] = *(u_long128 *)material->unk_10;
         packet[3] = 0;
-        packet[4] = mat_pw;
+        packet[4] = *(u_long128 *)&mat_pw;
         prev_tex = NULL;
         return 5;
     }
     if (flags & 0x1) {
-        packet[0] = mat_vif;
+        packet[0] = *(u_long128 *)&mat_vif;
         packet[1] = *(u_long128 *)material->diffuse;
         packet[2] = *(u_long128 *)material->unk_10;
         packet[3] = 0;
         packet[4] = 3;
-        packet[5] = mat_vif_d_tex;
+        packet[5] = *(u_long128 *)&mat_vif_d_tex;
         *(u_long *)&packet[6] = (u_long)0x30000000 << 32 | 0x8001;
         ((u_long *)&packet[6])[1] = 0x86E;
         *(u_long *)&packet[7] = *(u_long *)&texture->tex1;
@@ -163,9 +163,9 @@ int mgCVisualMDT::SetMaterialRef(u_long128 *packet, mgMaterial *material, int fl
         prev_tex = texture;
         return 10;
     } else {
-        packet[0] = mat_vif_dif;
+        packet[0] = *(u_long128 *)&mat_vif_dif;
         packet[1] = *(u_long128 *)material->diffuse;
-        packet[2] = mat_vif_d_tex;
+        packet[2] = *(u_long128 *)&mat_vif_d_tex;
         *(u_long *)&packet[3] = (u_long)0x30000000 << 32 | 0x8001;
         ((u_long *)&packet[3])[1] = 0x86E;
         *(u_long *)&packet[4] = *(u_long *)&texture->tex1;
@@ -840,21 +840,22 @@ u_long128 *SetData5(int count, int type, int **index, u_long128 *packet, u_long1
 u_long128 *SetData6(int count, int type, int **index, u_long128 *packet, u_long128 *vertex, u_long128 *normal, u_long128 *uv, u_long128 *colour) {
     int       *cursor;
     u_long128 *vertex_out;
-
     ((int *)packet)[0] = count;
     ((int *)packet)[1] = 0;
     ((int *)packet)[2] = 0;
     ((int *)packet)[3] = type;
     vertex_out = packet + 1;
-    u_long128 unused;
-    u_long128 *unused_out = &unused;
     cursor = *index;
-    while (count > 0) {
-        count--;
-        u_long128 element = vertex[cursor[0]];
-        *vertex_out++ = element;
-        *unused_out = element;
-        cursor += 1;
+    if (count > 0) {
+        u_long128 unused;
+        u_long128 *unused_out = &unused;
+        do {
+            count--;
+            u_long128 element = vertex[cursor[0]];
+            *vertex_out++ = element;
+            *unused_out = element;
+            cursor += 1;
+        } while (count > 0);
     }
     *index = cursor;
     return vertex_out;
@@ -893,16 +894,16 @@ int mgCVisualMDT::CreateFacePacket(u_int *packet, mgCFace *face) {
     static u_int progf_vif[4] __attribute__((aligned(16))) = {0, 0, 0, MG_VIF_MSCNT};
     sceGifTag  batch_tag;
     sceGifTag  end_tag;
-    u_int      finish[4] __attribute__((aligned(16))) = {MG_VIF_FLUSHA, 0, 0, 0};
     int       *indices;
-    u_int     *destination;
+    u_int     *start;
     u_int     *write;
     u_int     *buffer_start;
     u_int     *unpack;
+    u_int     *payload;
     u_long128 *end;
-    short      remaining;
-    short      batch_limit;
-    short      count;
+    int        remaining;
+    int        batch_limit;
+    int        count;
     int        variant;
     int        primitive;
     int        use_scratchpad;
@@ -912,6 +913,7 @@ int mgCVisualMDT::CreateFacePacket(u_int *packet, mgCFace *face) {
     if (face == NULL) {
         return 0;
     }
+    start = packet;
     use_scratchpad = 0;
     if (((u_int)packet & 0xF0000000) == MG_UNCACHED) {
         use_scratchpad = 1;
@@ -955,8 +957,8 @@ int mgCVisualMDT::CreateFacePacket(u_int *packet, mgCFace *face) {
     packet[2] = 0;
     packet[3] = MG_VIF_UNPACK_V4_32 | (1 << MG_VIF_NUM_SHIFT) | 0x0027;
     *(u_long128 *)&packet[4] = *(u_long128 *)&end_tag;
-    destination = packet + 8;
-    write = use_scratchpad ? GetScrPad() : destination;
+    packet += 8;
+    write = use_scratchpad ? GetScrPad() : packet;
     buffer_start = write;
     while (remaining > 0) {
         count = batch_limit;
@@ -968,11 +970,12 @@ int mgCVisualMDT::CreateFacePacket(u_int *packet, mgCFace *face) {
         write[2] = 0;
         write[3] = 0;
         unpack = write + 3;
+        payload = write + 4;
         batch_tag.NLOOP = count | 0x8000;
         *(u_long128 *)&write[4] = *(u_long128 *)&batch_tag;
         end = set_data_func[variant](count, face->type, &indices, (u_long128 *)&write[8],
                                     (u_long128 *)vertex, (u_long128 *)normal, (u_long128 *)uv, (u_long128 *)colour);
-        *unpack = (((u_int *)end - (write + 4)) / 4 << MG_VIF_NUM_SHIFT) | MG_VIF_UNPACK_V4_32 | MG_VIF_UNPACK_FLG;
+        *unpack = (((u_int *)end - payload) / 4 << MG_VIF_NUM_SHIFT) | MG_VIF_UNPACK_V4_32 | MG_VIF_UNPACK_FLG;
         if (started == 0) {
             started = 1;
             *end = *(u_long128 *)prog_vif;
@@ -987,22 +990,23 @@ int mgCVisualMDT::CreateFacePacket(u_int *packet, mgCFace *face) {
         words = write - buffer_start;
         if (words > 0x514) {
             if (use_scratchpad != 0) {
-                SendDMA(destination, words / 4);
+                SendDMA(packet, words / 4);
             }
-            destination += words;
-            write = use_scratchpad ? GetScrPad() : destination;
+            packet += words;
+            write = use_scratchpad ? GetScrPad() : packet;
             buffer_start = write;
         }
         remaining -= batch_limit;
     }
     words = write - buffer_start;
     if (use_scratchpad != 0 && words > 0) {
-        SendDMA(destination, words / 4);
+        SendDMA(packet, words / 4);
     }
-    destination += words;
-    *(u_long128 *)destination = *(u_long128 *)finish;
-    destination += 4;
-    return (destination - packet) / 4;
+    packet += words;
+    u_int finish[4] __attribute__((aligned(16))) = {MG_VIF_FLUSHA, 0, 0, 0};
+    *(u_long128 *)packet = *(u_long128 *)finish;
+    packet += 4;
+    return (packet - start) / 4;
 }
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_visual", CreateFacePacket__12mgCVisualMDTFPUiP7mgCFace);
@@ -1323,18 +1327,22 @@ int mgCVisualPrim::CreateRenderInfoPacket(u_int *packet, float (*matrix)[4], mgR
     u_int      *start;
     u_int      *write;
     mgCDrawEnv *environment;
-    u_int       tag[4] __attribute__((aligned(16))) = {0x10000007, 0, 0, 0x50000007};
     int         size;
 
     start = GetScrPad();
+    u_int tag[4] __attribute__((aligned(16)));
+    *(u_long128 *)tag = 0;
+    tag[0] = 0x10000007;
+    tag[3] = 0x50000007;
     *(u_long128 *)start = *(u_long128 *)tag;
-    *(u_int *)&giftag = 0x8002;
+    giftag.word0 = 0x8002;
     *(u_long128 *)&start[4] = *(u_long128 *)&giftag;
+    u_int *body = start + 8;
     *(u_long *)&start[8] = 1;
     *(u_long *)&start[10] = MG_GS_PRMODECONT;
     *(u_long *)&start[12] = 0;
     *(u_long *)&start[14] = SCE_GS_TEXFLUSH;
-    environment = (mgCDrawEnv *)&start[16];
+    environment = (mgCDrawEnv *)(body + 8);
     if (draw_env != NULL) {
         *environment = *draw_env;
     } else {

@@ -159,7 +159,7 @@ struct BASE_MONSTER_TBL {
     s16   gekirin_num;   /**< Hits that fill the monster's rage. */
     s8    guard_rate;    /**< Chance out of 100 that the monster guards a hit. */
     s8    escape_rate[2]; /**< Chances out of 100 that the monster dodges each kind of attack of its target. */
-    s16   attack;        /**< Attack power of the monster. */
+    u16   attack;        /**< Attack power of the monster. */
     u8    defense;       /**< Defence that is taken off the attack power of a hit. */
     s8    stagger;       /**< Stagger that hits must build up to make the monster flinch; 0 to flinch at every hit. */
     s8    boss;          /**< Nonzero for a boss, whose life is shown across the foot of the screen. */

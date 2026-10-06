@@ -93,8 +93,8 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/screeneffect", DepthOfField__FiPfP10mgCTex
 void LensFlare(int *screen, float *color, int bank, char *texture_a, char *texture_b) {
     int width = mgScreenWidth;
     int height = mgScreenHeight;
-    float dx = (float)(screen[0] / 16 - width / 2);
-    float dy = (float)(screen[1] / 16 - height / 2);
+    float dx = (float)screen[0] / 16.0f - (float)(width / 2);
+    float dy = (float)screen[1] / 16.0f - (float)(height / 2);
     float distance = sqrtf(dx * dx + dy * dy);
     if (distance > (float)width) {
         return;
@@ -134,7 +134,9 @@ void LensFlare(int *screen, float *color, int bank, char *texture_a, char *textu
     prim.DepthTestEnable(0);
     prim.TextureMapEnable(1);
 
-    mgCTexture *textures[2] = {first, second};
+    mgCTexture *textures[2] = {NULL, NULL};
+    textures[0] = first;
+    textures[1] = second;
     mgSetPkFrameBuffer(second);
     prim.Begin(MG_PRIM_SPRITE);
     prim.Direct(0x3B, 0x8000000080ULL);
@@ -165,9 +167,9 @@ void LensFlare(int *screen, float *color, int bank, char *texture_a, char *textu
     prim.Vertex(small_width, small_height + 1, 0);
     prim.End();
 
-    int current = 0;
+    unsigned char current = 0;
     for (int pass = 0; pass < 4; pass++) {
-        int next = current ^ 1;
+        unsigned char next = current == 0;
         mgSetPkFrameBuffer(textures[next]);
         int brightness = (int)(128.0f * ((float)(4 - pass) / 4.0f));
         int spread = (int)(10.0f * (float)(pass + 1));
@@ -201,7 +203,9 @@ void LensFlare(int *screen, float *color, int bank, char *texture_a, char *textu
     prim.AlphaBlendEnable(1);
     prim.TextureMapEnable(0);
     prim.AlphaBlend(MG_ALPHA_BLEND_SUB);
-    int radii[2] = {(small_width + small_height) * 6, (small_width + small_height) * 6 - small_width};
+    int radii[2] = {0, 0};
+    radii[0] = (small_width + small_height) * 6;
+    radii[1] = radii[0] - small_width;
     int centre_x = screen[0] / 3;
     int centre_y = screen[1] / 3;
     prim.Begin(MG_PRIM_SPRITE);

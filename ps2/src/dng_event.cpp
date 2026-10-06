@@ -49,6 +49,7 @@
 #include "editexception.hpp"
 #include "pot.hpp"
 #include <cstring>
+extern "C" void *__ct__11mgCDrawPrimFv(void *);
 
 extern "C" int fptosi(float value);
 extern int FLS_FLOOR_ID;
@@ -80,38 +81,42 @@ static MapJumpMapInfo MainMapInfo;
 // Code (.text)
 #ifdef NONMATCHING
 void CStartupEpisodeTitle::DrawEpisode(int mes_tex_block, int frame_tex_block) {
+    union { CPreSprite prim; };
+
     if (mes == NULL || state == 0) {
         return;
     }
     mgTexManager.ReloadTexture(mes_tex_block, (sceVif1Packet *)NULL);
     mes->DrawMesWin();
     mgTexManager.ReloadTexture(frame_tex_block, (sceVif1Packet *)NULL);
-    CPreSprite sprite;
-    sprite.Initialize(NULL, NULL);
-    sprite.Preset2D();
-    sprite.Coord(0);
-    sprite.TextureMapEnable(1);
-    sprite.Begin(6);
-    sprite.Texture(TEX_SystenFrame2);
-    int y = mgScreenHeight - 0x38;
-    sprite.Color(0x80, 0x80, 0x80, fptosi(128.0f * alpha));
-    sprite.SetIRect(0x16, y, 10, 8, 0x62, 0x38);
-    int fill_width = fptosi((float)width * alpha);
-    sprite.SetIStretch(0x20, y, fill_width, 8, 0x6C, 0x38, 10, 8);
-    sprite.SetIRect(fill_width + 0x20, y, 10, 8, 0x76, 0x38);
-    y = mgScreenHeight - 0x34;
-    int half = width / 2;
-    int revealed = fptosi(154.0f * reveal);
-    if (LanguageCode == 3) {
-        sprite.SetScirror(half + 0x92 - revealed, y, revealed, 0xE);
-        sprite.SetIRect(half - 8, y, 0x48, 0xE, 0, 0x24);
+    __ct__11mgCDrawPrimFv(&prim);
+    prim.Initialize(NULL, NULL);
+    prim.Preset2D();
+    prim.Coord(0);
+    prim.TextureMapEnable(1);
+    prim.Begin(6);
+    prim.Texture(TEX_SystenFrame2);
+    int bar_y = mgScreenHeight - 0x38;
+    prim.Color(0x80, 0x80, 0x80, (int)(128.0f * alpha));
+    prim.SetIRect(0x16, bar_y, 0xA, 8, 0x62, 0x38);
+    int bar_w = (int)((float)width * alpha);
+    prim.SetIStretch(0x20, bar_y, bar_w, 8, 0x6C, 0x38, 0xA, 8);
+    prim.SetIRect(bar_w + 0x20, bar_y, 0xA, 8, 0x76, 0x38);
+    int title_y = mgScreenHeight - 0x34;
+    if (LanguageCode == LANG_GERMAN) {
+        int title_x = width / 2 - 8;
+        int shown = (int)(154.0f * reveal);
+        prim.SetScirror(title_x + 0x9A - shown, title_y, shown, 0xE);
+        prim.SetIRect(title_x, title_y, 0x48, 0xE, 0, 0x24);
     } else {
-        sprite.SetScirror(half + 0x69 - revealed, y, revealed, 0xE);
-        sprite.SetIRect(half - 0x31, y, 0x48, 0xE, 0, 0x24);
-        sprite.SetIRect(half + 0x17, y, 0x52, 0xE, 0, 0x32);
+        int title_x = width / 2 - 0x31;
+        int shown = (int)(154.0f * reveal);
+        prim.SetScirror(title_x + 0x9A - shown, title_y, shown, 0xE);
+        prim.SetIRect(title_x, title_y, 0x48, 0xE, 0, 0x24);
+        prim.SetIRect(title_x + 0x48, title_y, 0x52, 0xE, 0, 0x32);
     }
-    sprite.SetScirror(0, 0, mgScreenWidth - 1, mgScreenHeight - 1);
-    sprite.End();
+    prim.SetScirror(0, 0, mgScreenWidth - 1, mgScreenHeight - 1);
+    prim.End();
 }
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/dng_event", DrawEpisode__20CStartupEpisodeTitleFii);
@@ -1204,61 +1209,64 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/dng_event", SearchMapFlatPosition__FPfP11C
 #endif
 #ifdef NONMATCHING
 int GetDungeonEventPoint(float *out_pos, float *out_rot, int kind) {
-    CMap *map;
-    CMapParts *parts;
-    float rotation;
     float euler[4];
-    CTreasureBoxManager *boxes;
-    CTreasureBox *box;
-
     if (kind == DUNGEON_EVENT_POINT_PLAYER) {
         CCharacter2 *player = DngMainScene->GetCharacter(0);
         if (player == NULL) {
             return 0;
         }
         player->GetPosition(out_pos);
-        out_pos[0] = fptosi((80.0f + out_pos[0]) / 160.0f) * 160;
+        out_pos[0] = (int)((80.0f + out_pos[0]) / 160.0f) * 160;
         out_pos[1] = 0;
-        out_pos[2] = fptosi((80.0f + out_pos[2]) / 160.0f) * 160;
+        out_pos[2] = (int)((80.0f + out_pos[2]) / 160.0f) * 160;
         *out_rot = 0;
     }
     if (kind == DUNGEON_EVENT_POINT_WAY_20) {
-        map = DngMainScene->GetMap(DngMainScene->active_map);
+        CMapParts *parts[8];
+        float rotation[8];
+        CMap *map = DngMainScene->GetMap(DngMainScene->active_map);
         if (map == NULL) {
             return 0;
         }
-        if (SearchMapEventParts(0, &parts, &rotation, 8) <= 0) {
+        if (SearchMapEventParts(0, parts, rotation, 8) <= 0) {
             return 0;
         }
-        parts->GetPosition(out_pos);
-        *out_rot = rotation;
-        DngMainScene->event_parts_id = map->ConvertParts(parts);
-        EdEventInfo.dng_event_parts = parts;
+        CMapParts *found = parts[0];
+        found->GetPosition(out_pos);
+        *out_rot = rotation[0];
+        CSceneEventData *event = &DngMainScene->event_data;
+        event->map_event.parts_no = map->ConvertParts(found);
+        EdEventInfo.dng_event_parts = found;
         EdEventInfo.dng_event_found = 1;
     }
     if (kind == DUNGEON_EVENT_POINT_WAY_24) {
-        map = DngMainScene->GetMap(DngMainScene->active_map);
+        CMapParts *parts[16];
+        float rotation[16];
+        CMap *map = DngMainScene->GetMap(DngMainScene->active_map);
         if (map == NULL) {
             return 0;
         }
-        if (SearchMapEventParts(2, &parts, &rotation, 0x10) <= 0) {
+        if (SearchMapEventParts(2, parts, rotation, 0x10) <= 0) {
             return 0;
         }
-        parts->GetPosition(out_pos);
-        *out_rot = rotation;
-        DngMainScene->event_parts_id = map->ConvertParts(parts);
-        EdEventInfo.dng_event_parts = parts;
+        CMapParts *found = parts[0];
+        found->GetPosition(out_pos);
+        *out_rot = rotation[0];
+        CSceneEventData *event = &DngMainScene->event_data;
+        event->map_event.parts_no = map->ConvertParts(found);
+        EdEventInfo.dng_event_parts = found;
         EdEventInfo.dng_event_found = 1;
     }
     if (kind == DUNGEON_EVENT_POINT_TREASURE_BOX) {
-        boxes = DngMainScene->battle_area.treasure_box;
-        if (&DngMainScene->battle_area == NULL) {
+        DNG_BATTLE_AREA *area = &DngMainScene->battle_area;
+        if (area == NULL) {
             return 0;
         }
+        CTreasureBoxManager *boxes = area->treasure_box;
         if (boxes == NULL) {
             return 0;
         }
-        box = &boxes->box[boxes->near_box];
+        CTreasureBox *box = &boxes->box[boxes->near_box];
         if (box == NULL) {
             return 0;
         }
@@ -1622,24 +1630,22 @@ void AutoSetTreasureBox() {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/dng_event", AutoSetTreasureBox__Fv);
 #endif
-#ifdef NONMATCHING
 int _FLS(SPI_STACK *stack, int argc) {
     FLS_FLOOR_ID = spiGetStackInt(stack++);
     spiGetStackInt(stack);
-    int floor = DngSaveDataDungeon->floor_id[DngSaveDataDungeon->stage_id];
-    if (floor == FLS_FLOOR_ID) {
+    int current_floor = DngSaveDataDungeon->floor_id[DngSaveDataDungeon->stage_id];
+    int floor = current_floor;
+    if (FLS_FLOOR_ID == floor) {
         ((CMonsterMan *)ActiveMonster)->locate.num = 0;
     }
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dng_event", _FLS__FP9SPI_STACKi);
-#endif
-#ifdef NONMATCHING
 int _FL(SPI_STACK *stack, int argc) {
     int i;
     int entry;
-    if (DngSaveDataDungeon->floor_id[DngSaveDataDungeon->stage_id] != FLS_FLOOR_ID) {
+    int current_floor = DngSaveDataDungeon->floor_id[DngSaveDataDungeon->stage_id];
+    int floor = current_floor;
+    if (FLS_FLOOR_ID != floor) {
         return 1;
     }
     {
@@ -1652,9 +1658,6 @@ int _FL(SPI_STACK *stack, int argc) {
     }
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dng_event", _FL__FP9SPI_STACKi);
-#endif
 int _FLE(SPI_STACK *stack, int argc) {
     FLS_FLOOR_ID = -1;
     return 1;

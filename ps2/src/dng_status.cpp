@@ -216,7 +216,6 @@ void DrawMainUnitStatusBord(float rate) {
     CBattleCharaInfo *info;
     CGameDataUsed    *active_items;
     int               hp_max;
-    int               hp_now;
     /**
      *
      * Screen positions of the charge display elements.
@@ -262,10 +261,6 @@ void DrawMainUnitStatusBord(float rate) {
     mgRect<int> second_whp_max_glyph;
     int               whp[2][2];
     int               abs[2][2];
-    int               weapon_y;
-    int               hp_y;
-    int               weapon_x;
-    int               second_weapon_x;
     int               second_weapon_y;
     int               event_running;
     float             hp_rate;
@@ -275,8 +270,6 @@ void DrawMainUnitStatusBord(float rate) {
     int               item_x;
     int               charge_max;
     int               charge_now;
-    int               element;
-    int               alpha;
     int               status_attr;
     int               status_x;
     int               width;
@@ -288,6 +281,7 @@ void DrawMainUnitStatusBord(float rate) {
     int               pulse;
     int               gauge_left;
     int               gauge_right;
+    int               second_weapon_x;
     int               number_x;
     s16               weapon_no;
     s16               second_weapon_no;
@@ -296,10 +290,12 @@ void DrawMainUnitStatusBord(float rate) {
     color.g = 0x80;
     color.b = 0x80;
     color.a = 0x80;
+    int weapon_y;
     weapon_y = (int)(80.0f * rate) - 72;
+    int hp_y;
     hp_y = weapon_y;
-    weapon_x = 280;
     second_weapon_x = 580 - (int)(300.0f * rate);
+    int weapon_x = 280;
     second_weapon_y = 8;
     if (SubGameRunning() != 0) {
         weapon_y = -72;
@@ -313,6 +309,7 @@ void DrawMainUnitStatusBord(float rate) {
     }
     info = GetBattleCharaInfo();
     hp_max = info->GetMaxHp_i();
+    int hp_now;
     hp_now = info->GetNowHp_i();
     info->GetNowWhp(0, whp[0]);
     info->GetNowWhp(1, whp[1]);
@@ -366,12 +363,13 @@ void DrawMainUnitStatusBord(float rate) {
     }
     DrawActiveItemCursor(DngStatus.active_item * 42 + 68, hp_y + 38, DngStatus.cursor_fade);
     for (index = 0, item_x = 0; index < 3; index++, active_items++, item_x += 41) {
-        if (active_items->GetNum() >= 2) {
+        if (active_items->GetNum() > 1) {
             item_glyph.Set(0, 0xE8, 12, 12);
             PrintV__FiiiP10mgCTexture9mgRect_i_iiiP7SP_RGBA(item_x + 64, hp_y + 45, active_items->GetNum(), TEX_SystenFrame, &item_glyph, 2, 1, 10, NULL);
         }
     }
     charge_max = info->GetMagicSwordCounterMax();
+    int element;
     element = info->GetMagicSwordElem();
     charge_now = info->GetMagicSwordCounterNow();
     extern charge_position_data at_1048__2__DATA;
@@ -384,6 +382,7 @@ void DrawMainUnitStatusBord(float rate) {
     sprite.Preset2D();
     sprite.Begin(MG_PRIM_SPRITE);
     sprite.Texture(TEX_SystenFrame);
+    int alpha;
     alpha = (int)(128.0f * rate);
     sprite.Color(0x80, 0x80, 0x80, alpha);
     for (index = 0; index < charge_max; index++) {
@@ -587,30 +586,28 @@ void DrawMainUnitStatusBord(float rate) {
     PrintV__FiiiP10mgCTexture9mgRect_i_iiiP7SP_RGBA(number_x - 61, second_weapon_y + 28, whp[1][0], TEX_SystenFrame, &second_whp_now_glyph, 5, 1, 10, &color);
     second_whp_max_glyph.Set(0, 0xE8, 12, 12);
     PrintV__FiiiP10mgCTexture9mgRect_i_iiiP7SP_RGBA(number_x - 4, second_weapon_y + 28, whp[1][1], TEX_SystenFrame, &second_whp_max_glyph, 5, 0, 10, &color);
-    if (rate >= 1.0f) {
-        if (SubGameRunning() != 0) {
-            return;
-        }
-        if (hp_rate < 0.3f) {
-            WarningGage2.warning[0] = 1;
-        } else {
-            WarningGage2.warning[0] = 0;
-        }
-        if (whp_rate[0] < 0.2f) {
-            WarningGage2.warning[1] = 1;
-        } else {
-            WarningGage2.warning[1] = 0;
-        }
-        if (whp_rate[1] < 0.2f) {
-            WarningGage2.warning[2] = 1;
-        } else {
-            WarningGage2.warning[2] = 0;
-        }
-        WarningGage2.rate[0] = hp_rate;
-        WarningGage2.rate[1] = whp_rate[0];
-        WarningGage2.rate[2] = whp_rate[1];
-        WarningGage2.layout = WARNING_GAGE_LAYOUT_MAIN;
+    if (rate < 1.0f || SubGameRunning() != 0) {
+        return;
     }
+    if (hp_rate < 0.3f) {
+        WarningGage2.warning[0] = 1;
+    } else {
+        WarningGage2.warning[0] = 0;
+    }
+    if (whp_rate[0] < 0.2f) {
+        WarningGage2.warning[1] = 1;
+    } else {
+        WarningGage2.warning[1] = 0;
+    }
+    if (whp_rate[1] < 0.2f) {
+        WarningGage2.warning[2] = 1;
+    } else {
+        WarningGage2.warning[2] = 0;
+    }
+    WarningGage2.rate[0] = hp_rate;
+    WarningGage2.rate[1] = whp_rate[0];
+    WarningGage2.rate[2] = whp_rate[1];
+    WarningGage2.layout = WARNING_GAGE_LAYOUT_MAIN;
 }
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/dng_status", DrawMainUnitStatusBord__Ff);

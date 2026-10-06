@@ -76,6 +76,10 @@ void MenuWorldTrans(void);
 void MenuDebugModeDraw(void);
 void DrawMenuTopic(void);
 
+static inline void SetCursorPos(CMenuKeyFunc *keys, int *pos) {
+    keys->MenuSetPos(pos[0], pos[1]);
+}
+
 static inline void SetFormPoint(CMenuPosDataForm *form, int x, int y) {
     form->x = (float)x;
     form->y = (float)y;
@@ -139,6 +143,7 @@ extern char *fname_1858[2];
 extern MovePoint at_1865;
 extern MovePoint at_1866;
 extern MovePoint at_1867;
+extern MovePoint at_2209__3;
 extern char at_1930[];
 extern char at_1931[];
 extern char at_1932[];
@@ -428,11 +433,11 @@ int MenuMainInit(MENU_INIT_ARG *arg) {
     if (MenuActiveSaveData != NULL) {
         user = MenuActiveSaveData->GetUserDataManager();
         MenuUserDataManPtr = user;
-        MenuConfigPtr = MenuActiveSaveData->GetConfig();
         MenuSystemDataPtr = &MenuActiveSaveData->menu_system_data;
+        MenuConfigPtr = MenuActiveSaveData->GetConfig();
         MenuSaveDataDungeonPtr = &MenuActiveSaveData->save_dungeon;
-        int active_chara_no = user->active_chr_no;
         MenuFishAquarium = &user->aquarium;
+        int active_chara_no = user->active_chr_no;
         MenuArg.active_chara_no = active_chara_no;
     }
     MenuCommonInfo->user_data = MenuUserDataManPtr;
@@ -1142,68 +1147,80 @@ void MakeMenuTopic(void) {
 #ifdef NONMATCHING
 void DrawMenuTopic(void) {
     mgRect<int> box;
-    mgRect<int> title_rect;
-    mgRect<float> fill[4];
 
-    if (MenuTopicType > 0 && MenuNowMapType != 5) {
-        if (MenuNowMapType == 6) {
-            return;
+    if (MenuTopicType <= 0 || MenuNowMapType == 5 || MenuNowMapType == 6) {
+        return;
+    }
+    if (MenuTopicAlphaCalc == 0) {
+        CalcMenuAdd(&MenuTopicAlpha, 4, 0x80);
+    } else if (MenuTopicAlphaCalc == 1) {
+        CalcMenuAdd(&MenuTopicAlpha, -18, 0);
+    }
+    box.Set(20, 36, 200, 60);
+    if (MenuTopicAlpha > 0) {
+        mgCTextureManager *manager = &mgTexManager;
+        mgCDrawPrim *prim = GetMenuPrim();
+        manager->ReloadTexture(TopicTex->block, (sceVif1Packet *)NULL);
+        SetSpriteEnv(prim, 0);
+        prim->Begin(6);
+        prim->Texture(TopicTex);
+        prim->Color(0x80, 0x80, 0x80, MenuTopicAlpha);
+        int title_width = 0x28;
+        if (LanguageCode == 3) {
+            title_width = 0x32;
         }
-        if (MenuTopicAlphaCalc == 0) {
-            CalcMenuAdd(&MenuTopicAlpha, 4, 0x80);
-        } else if (MenuTopicAlphaCalc == 1) {
-            CalcMenuAdd(&MenuTopicAlpha, -18, 0);
+        mgRect<int> title_rect(0x66, 0, title_width, 0xC);
+        PrimQuad(prim, 22.0f, 22.0f, title_rect);
+        prim->End();
+        manager->ReloadTexture(MenuArg.mes_tex_block, (sceVif1Packet *)NULL);
+        SetSpriteEnv(prim, 1);
+        prim->Begin(6);
+        prim->Color(0x2A, 0x22, 0x1E, MenuTopicAlpha * 6 / 10);
+        prim->Vertex(box.left - 2, box.top - 2, 0);
+        prim->Vertex(box.right + 2, box.bottom + 2, 0);
+        prim->End();
+        SetMenuScissor(box);
+        TopicFontX--;
+        if (TopicFontX < 0x1E - MenuTopicLength) {
+            TopicFontX = 0xD2;
         }
-        box.Set(20, 36, 200, 60);
-        if (MenuTopicAlpha > 0) {
-            mgCTextureManager *manager = &mgTexManager;
-            mgCDrawPrim *prim = GetMenuPrim();
-            manager->ReloadTexture(TopicTex->block, (sceVif1Packet *)NULL);
-            SetSpriteEnv(prim, 0);
-            prim->Begin(6);
-            prim->Texture(TopicTex);
-            prim->Color(0x80, 0x80, 0x80, MenuTopicAlpha);
-            int title_width = 0x28;
-            if (LanguageCode == 3) {
-                title_width = 0x32;
-            }
-            title_rect.Set(0x66, 0, title_width, 0xC);
-            PrimQuad(prim, 22.0f, 22.0f, title_rect);
-            prim->End();
-            manager->ReloadTexture(MenuArg.mes_tex_block, (sceVif1Packet *)NULL);
-            SetSpriteEnv(prim, 1);
-            prim->Begin(6);
-            prim->Color(0x2A, 0x22, 0x1E, MenuTopicAlpha * 6 / 10);
-            prim->Vertex(box.left - 2, box.top - 2, 0);
-            prim->Vertex(box.right + 2, box.bottom + 2, 0);
-            prim->End();
-            SetMenuScissor(box);
-            TopicFontX--;
-            if (TopicFontX < 0x1E - MenuTopicLength) {
-                TopicFontX = 0xD2;
-            }
-            TopicFont.alpha = MenuTopicAlpha;
-            TopicFont.SetPos(TopicFontX, 0x26);
-            TopicFont.DrawDirect(TopicFont.str, TopicFont.pos_x, TopicFont.pos_y);
-            ResetMenuScissor();
-            menu_maintopic_colortbl_shadow[0][3] = menu_maintopic_colortbl_shadow[2][3] = 64.0f * (float)MenuTopicAlpha / 128.0f;
-            prim->Begin(4);
-            fill[0].Set(20.0f, 36.0f, 40.0f, 24.0f);
-            PrimFillRect4(prim, fill[0], menu_maintopic_colortbl_shadow[0], menu_maintopic_colortbl_shadow[1], menu_maintopic_colortbl_shadow[2], menu_maintopic_colortbl_shadow[3]);
-            prim->End();
-            prim->Begin(4);
-            fill[1].Set(162.0f, 36.0f, 40.0f, 24.0f);
-            PrimFillRect4(prim, fill[1], menu_maintopic_colortbl_shadow[1], menu_maintopic_colortbl_shadow[0], menu_maintopic_colortbl_shadow[3], menu_maintopic_colortbl_shadow[2]);
-            prim->End();
-            prim->Begin(4);
-            fill[2].Set(20.0f, 36.0f, 90.0f, 24.0f);
-            PrimFillRect4(prim, fill[2], menu_maintopic_colortbl[1], menu_maintopic_colortbl[0], menu_maintopic_colortbl[3], menu_maintopic_colortbl[2]);
-            prim->End();
-            prim->Begin(4);
-            fill[3].Set(110.0f, 36.0f, 90.0f, 24.0f);
-            PrimFillRect4(prim, fill[3], menu_maintopic_colortbl[0], menu_maintopic_colortbl[1], menu_maintopic_colortbl[2], menu_maintopic_colortbl[3]);
-            prim->End();
-        }
+        TopicFont.alpha = MenuTopicAlpha;
+        TopicFont.SetPos(TopicFontX, 0x26);
+        TopicFont.DrawDirect(TopicFont.str, TopicFont.pos_x, TopicFont.pos_y);
+        ResetMenuScissor();
+        menu_maintopic_colortbl_shadow[0][3] = menu_maintopic_colortbl_shadow[2][3] = 64.0f * (float)MenuTopicAlpha / 128.0f;
+        prim->Begin(4);
+        float h = 24.0f;
+        float w = 40.0f;
+        float x = 20.0f;
+        float y = 36.0f;
+        mgRect<float> fill0(x, y, w, h);
+        PrimFillRect4(prim, fill0, menu_maintopic_colortbl_shadow[0], menu_maintopic_colortbl_shadow[1], menu_maintopic_colortbl_shadow[2], menu_maintopic_colortbl_shadow[3]);
+        prim->End();
+        prim->Begin(4);
+        float h1 = 24.0f;
+        float w1 = 40.0f;
+        float x1 = 162.0f;
+        float y1 = 36.0f;
+        mgRect<float> fill1(x1, y1, w1, h1);
+        PrimFillRect4(prim, fill1, menu_maintopic_colortbl_shadow[1], menu_maintopic_colortbl_shadow[0], menu_maintopic_colortbl_shadow[3], menu_maintopic_colortbl_shadow[2]);
+        prim->End();
+        prim->Begin(4);
+        float h2 = 24.0f;
+        float w2 = 90.0f;
+        float x2 = 20.0f;
+        float y2 = 36.0f;
+        mgRect<float> fill2(x2, y2, w2, h2);
+        PrimFillRect4(prim, fill2, menu_maintopic_colortbl[1], menu_maintopic_colortbl[0], menu_maintopic_colortbl[3], menu_maintopic_colortbl[2]);
+        prim->End();
+        prim->Begin(4);
+        float h3 = 24.0f;
+        float w3 = 90.0f;
+        float x3 = 110.0f;
+        float y3 = 36.0f;
+        mgRect<float> fill3(x3, y3, w3, h3);
+        PrimFillRect4(prim, fill3, menu_maintopic_colortbl[0], menu_maintopic_colortbl[1], menu_maintopic_colortbl[2], menu_maintopic_colortbl[3]);
+        prim->End();
     }
 }
 #else
@@ -1231,8 +1248,9 @@ int MenuInternInit(mgCMemory *stack, int open_type, int capture) {
     MenuMainImageDataEnter(MenuCommonInfo->tex_block[1]);
     MenuInterMes = new ((u_long128 *)stack->Alloc(0x2A7)) CDC2Mes;
     int script_size;
+    char *config = (char *)GetMenuMainPosCfgBuffer(&script_size);
     char *script = (char *)(stack->stack + stack->stack_used) + (stack->stack_size - stack->stack_used) * 16 - 0x32000;
-    memcpy(script, GetMenuMainPosCfgBuffer(&script_size), script_size);
+    memcpy(script, config, script_size);
     MenuDataAnalyze(script, script_size, stack);
     AttachMessageForm();
     MenuAreaBrdForm = MenuPosData->GetFormInfo(at_1930);
@@ -1247,18 +1265,18 @@ int MenuInternInit(mgCMemory *stack, int open_type, int capture) {
     TopicTex = mgTexManager.GetTexture(at_1028__4, -1);
     MenuDCMsg[0]->MsgPreset(3);
     MenuDCMsg[1]->MsgPreset(5);
-    MenuDCMsg[1]->cursor = 0;
-    MenuDCMsg[1]->cursor_on = 1;
+    MenuDCMsg[1]->value_sign = 0;
+    MenuDCMsg[1]->value_zero = 1;
     MenuMesForm[0]->draw_flag = 1;
     MenuMesForm[1]->draw_flag = 1;
     MenuInterMesDrawFlag = 0;
     MenuPosData->AttachCommonTexInfo();
     HatumeiMenuOkFlag = 0;
-    if (MenuUserDataManPtr->GetNumSameItem(0x171) > 0) {
+    if (0 < MenuUserDataManPtr->GetNumSameItem(0x171)) {
         HatumeiMenuOkFlag = 1;
     }
     ManualMenuOkFlag = 0;
-    if (MenuUserDataManPtr->GetNumSameItem(0x167) > 0) {
+    if (0 < MenuUserDataManPtr->GetNumSameItem(0x167)) {
         ManualMenuOkFlag = 1;
     }
     if (OmakeFlag == 1) {
@@ -1277,7 +1295,7 @@ int MenuInternInit(mgCMemory *stack, int open_type, int capture) {
         MenuCommonReadData(stack, fname_1858, 0);
         MenuMainFrameModeSet(0, 1);
         int icon_count = 0;
-        while (CMenuInterPt->mode_list[icon_count] >= 0) {
+        while (0 <= CMenuInterPt->mode_list[icon_count]) {
             icon_count++;
         }
         MovePoint origin = at_1865;
@@ -1288,35 +1306,37 @@ int MenuInternInit(mgCMemory *stack, int open_type, int capture) {
             pos.y = origin.y + step.y * icon;
             MenuPosData->SetFormPos(name, &pos.x);
         }
-        int shown = 1;
-        int hidden = 0;
+        bool shown = true;
+        bool hidden = false;
         CMenuPosDataForm *form = MenuPosData->GetFormInfo(at_1933);
         if (form != NULL) {
             if (HatumeiMenuOkFlag == 0) {
-                shown = 0;
-                hidden = 1;
+                shown = false;
+                hidden = true;
             }
             form->SetPartDrawFlag(at_1934, shown);
             form->SetPartDrawFlag(at_1935, hidden);
         }
+        bool manual_hidden;
         CMenuPosDataForm *manual_form = MenuPosData->GetFormInfo(at_1936);
         if (manual_form != NULL) {
-            bool manual_hidden = false;
-            int manual_shown = 1;
+            bool manual_shown = true;
+            manual_hidden = false;
             if (ManualMenuOkFlag == 0) {
+                manual_shown = false;
                 manual_hidden = true;
-                manual_shown = 0;
             }
             manual_form->SetPartDrawFlag(at_1934, manual_shown);
             manual_form->SetPartDrawFlag(at_1935, manual_hidden);
         }
+        bool world_hidden;
         CMenuPosDataForm *world_form = MenuPosData->GetFormInfo(at_1937);
         if (world_form != NULL) {
-            bool world_hidden = false;
-            int world_shown = 1;
+            bool world_shown = true;
+            world_hidden = false;
             if (WorldMapOkFlag == 0) {
+                world_shown = false;
                 world_hidden = true;
-                world_shown = 0;
             }
             world_form->SetPartDrawFlag(at_1934, world_shown);
             world_form->SetPartDrawFlag(at_1935, world_hidden);
@@ -1324,13 +1344,14 @@ int MenuInternInit(mgCMemory *stack, int open_type, int capture) {
                 world_form->draw_flag = 0;
             }
         }
+        bool floor_hidden;
         CMenuPosDataForm *floor_form = MenuPosData->GetFormInfo(at_1938);
         if (floor_form != NULL) {
-            bool floor_hidden = false;
-            int floor_shown = 1;
+            bool floor_shown = true;
+            floor_hidden = false;
             if (DngMoveMenuOkFlag == 0) {
+                floor_shown = false;
                 floor_hidden = true;
-                floor_shown = 0;
             }
             floor_form->SetPartDrawFlag(at_1934, floor_shown);
             floor_form->SetPartDrawFlag(at_1935, floor_hidden);
@@ -1405,8 +1426,8 @@ void CMenuInter::InitEnd() {
         MenuCommonBaseDataEnter(&MenuMainStack, (u_int *)base_data->buffer, base_data->size, base_block);
         help_update = 1;
         MenuMainStack.Align64();
-        int remain = MenuMainStack.stack_size - MenuMainStack.stack_used;
-        MenuMainStack_Next.stSetBuffer(MenuMainStack.stack + MenuMainStack.stack_used, remain);
+        int remain = MenuMainStack.stGetRest();
+        MenuMainStack_Next.stSetBuffer(MenuMainStack.stGetTop(), remain);
     }
     MenuCommonInfo->cursor = 0;
     step = 0;
@@ -1419,17 +1440,20 @@ void CMenuInter::InitEnd() {
     MenuCommonInfo->SetWakuType(-1);
     CMenuPosDataForm *board = MenuPosData->GetFormInfo(at_2003);
     if (board != NULL) {
-        MovePoint pos = {0, 0};
-        pos.x = (int)(board->x - 30.0f);
-        pos.y = (int)(4.0f + board->y);
-        SetFormPoint(MenuCommonInfo->cursor_form, (int)(board->x - 30.0f), (int)(4.0f + board->y));
-        MenuCommonInfo->cursor_form->SetNextMovePos(&pos.x, 2);
+        {
+            int pos[2] = {0, 0};
+            pos[0] = (int)(board->x - 30.0f);
+            pos[1] = (int)(4.0f + board->y);
+            SetFormPoint(MenuCommonInfo->cursor_form, (int)(board->x - 30.0f), (int)(4.0f + board->y));
+            MenuCommonInfo->cursor_form->SetNextMovePos(pos, 2);
+        }
         CMenuPosDataForm *next_form = MenuPosData->GetFormInfo(at_2004__2);
         if (next_form != NULL) {
-            pos.x = (int)board->x;
-            pos.y = (int)(4.0f + board->y);
+            int pos[2];
+            pos[0] = (int)board->x;
+            pos[1] = (int)(4.0f + board->y);
             SetFormPoint(next_form, (int)board->x, (int)(4.0f + board->y));
-            next_form->SetNextMovePos(&pos.x, 2);
+            next_form->SetNextMovePos(pos, 2);
         }
     }
     ReturnMenuIntern(0);
@@ -1439,7 +1463,6 @@ void CMenuInter::InitEnd() {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/menumain", InitEnd__10CMenuInterFv);
 #endif
-#ifdef NONMATCHING
 void CMenuInter::PushOk() {
     int mode = mode_list[select_no];
     MenuCommonInfo->SetWakuType(-1);
@@ -1447,9 +1470,6 @@ void CMenuInter::PushOk() {
     int message_no = -1;
     int enable = 1;
     switch (mode) {
-    default:
-        enable = 0;
-        break;
     case MENU_MODE_MANUAL:
         if (ManualMenuOkFlag == 0) {
             enable = 0;
@@ -1469,13 +1489,12 @@ void CMenuInter::PushOk() {
         if (MenuNowMapType == 5 || MenuNowMapType == 6) {
             show_message = 1;
             message_no = 0x28;
-            enable = 0;
             if (CheckBitFlagMenu(0x258) == 1) {
                 if (CheckBitFlagMenu(0x2E0) == 0) {
                     message_no = 0x2E;
                 }
-                enable = 0;
             }
+            enable = 0;
         } else if (WorldMapOkFlag == 0) {
             enable = 0;
         } else if (MenuActiveSaveData->GetBitCtrl() & 1) {
@@ -1497,6 +1516,9 @@ void CMenuInter::PushOk() {
             MenuMainScene->fade.FadeOut(0x28, 0.0f, 0.0f, 0.0f);
         }
         break;
+    default:
+        enable = 0;
+        break;
     }
     if (show_message != 0) {
         step = MENU_INTER_STEP_MESSAGE;
@@ -1506,8 +1528,9 @@ void CMenuInter::PushOk() {
         MenuInterMes->MakeMsg(message_no);
         MenuInterMes->SetAbsPos(5);
         MenuInterMesDrawFlag = 1;
-        if (MenuCommonInfo->cursor_form != NULL) {
-            MenuCommonInfo->cursor_form->draw_flag = 0;
+        CMenuKeyFunc *common = MenuCommonInfo;
+        if (common->cursor_form != NULL) {
+            common->cursor_form->draw_flag = 0;
         }
     }
     if (enable != 0) {
@@ -1516,12 +1539,14 @@ void CMenuInter::PushOk() {
         MenuCommonInfo->CursorFadeOut(1.0f, 0);
         MenuSePlay(0x13);
         bg_read_wait = 0;
-        if (MenuFormMI2 != NULL) {
-            MenuFormMI2->rate_x = 4.0f;
-            MenuFormMI2->rate_y = 4.0f;
+        CMenuPosDataForm *form = MenuFormMI2;
+        if (form != NULL) {
+            form->rate_x = 4.0f;
+            form->rate_y = 4.0f;
             if (next_mode == MENU_MODE_CHARA_CHANGE) {
-                MenuFormMI2->rate_x = 4.0f;
-                MenuFormMI2->rate_y = 12.0f;
+                CMenuPosDataForm *current = MenuFormMI2;
+                current->rate_x = 4.0f;
+                current->rate_y = 12.0f;
             }
         }
         if (next_mode != MENU_MODE_DNG_TREE_MAP && next_mode != MENU_MODE_WORLD_MOVE) {
@@ -1534,9 +1559,6 @@ void CMenuInter::PushOk() {
         MenuSePlay(5);
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menumain", PushOk__10CMenuInterFv);
-#endif
 int CMenuInter::ReadBGTexture(int bgNo, int restart) {
     char name[0x80];
     char **entry;
@@ -1613,16 +1635,16 @@ int MenuInternSelectKey(void) {
         MenuPosData->StepMainMenuIconMove(mode_list, mode, closing);
     }
     CMenuPosDataForm *icon_form = MenuPosData->GetFormInfo((char *)GetMenuMainIconChar(mode));
-    if (old_select != CMenuInterPt->select_no && abs(old_select - CMenuInterPt->select_no) >= 2) {
+    if (old_select != CMenuInterPt->select_no && abs(old_select - CMenuInterPt->select_no) > 1) {
         CMenuInterPt->cursor_jump = 1;
     }
     if (icon_form != NULL) {
-        int pos[2] = {0, 0};
-        pos[0] = (int)(icon_form->x - 42.0f);
-        pos[1] = (int)icon_form->y;
-        MenuCommonInfo->MenuPosStep(pos, NULL);
+        MovePoint pos = at_2209__3;
+        pos.x = (int)(icon_form->x - 42.0f);
+        pos.y = (int)icon_form->y;
+        MenuCommonInfo->MenuPosStep(&pos.x, NULL);
         if (CMenuInterPt->cursor_jump != 0) {
-            MenuCommonInfo->MenuSetPos(pos[0], pos[1]);
+            SetCursorPos(MenuCommonInfo, &pos.x);
             CMenuInterPt->cursor_jump = 0;
         }
     }
@@ -1699,6 +1721,11 @@ int MenuInternSelectKey(void) {
             return 0;
         }
         switch (push) {
+        case 1:
+        case 4:
+        case 8:
+            CMenuInterPt->PushOk();
+            break;
         case 2:
             CMenuInterPt->step = MENU_INTER_STEP_CLOSE;
             CMenuInterPt->select_no = -1;
@@ -1713,11 +1740,6 @@ int MenuInternSelectKey(void) {
             MenuMainFrameModeSet(1, 1);
             MenuMesForm[0]->SetAction(at_1684);
             MenuSePlay(5);
-            break;
-        case 8:
-        case 4:
-        case 1:
-            CMenuInterPt->PushOk();
             break;
         }
         break;
@@ -1786,6 +1808,8 @@ void CopyActiveItemAndWeapon(int slot, int weaponSlot) {
 #ifdef NONMATCHING
 int CopyActiveIconTexture(mgCTexture **textures, int chara_no, u_int *unused) {
     CUserDataManager *user = GetUserDataMan();
+    int x;
+    int offset;
     if (user == NULL) {
         return 0;
     }
@@ -1819,11 +1843,10 @@ int CopyActiveIconTexture(mgCTexture **textures, int chara_no, u_int *unused) {
             continue;
         }
         u8 transparent;
+        u8 *dest;
         int row;
         u8 *source;
         int slot;
-        int offset;
-        u8 *dest;
         u8 *pixels;
         manager->ReloadCLUT(textures[sheet], (sceVif1Packet *)NULL);
         memcpy(textures[sheet]->clut, icon_clut[sheet], 0x400);
@@ -1845,15 +1868,8 @@ int CopyActiveIconTexture(mgCTexture **textures, int chara_no, u_int *unused) {
             int item_no = items[sheet * 4 + slot];
             if (item_no <= 0) {
                 for (row = 0; row < 0x20; ++row) {
-                    for (int x = 0; x < 0x20; x += 8) {
+                    for (x = 0; x < 0x20; x++) {
                         dest[x] = transparent;
-                        dest[x + 1] = transparent;
-                        dest[x + 2] = transparent;
-                        dest[x + 3] = transparent;
-                        dest[x + 4] = transparent;
-                        dest[x + 5] = transparent;
-                        dest[x + 6] = transparent;
-                        dest[x + 7] = transparent;
                     }
                     dest += 0x40;
                 }

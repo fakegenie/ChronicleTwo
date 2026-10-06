@@ -435,7 +435,6 @@ CFuncPoint *CFuncPointMngr::Add(int type, CList<CFuncPoint> *node) {
 }
 #ifdef NONMATCHING
 void CFuncPointMngr::Reserve(int num, mgCMemory *stack) {
-    int index;
     unsigned int size = num * sizeof(CList<CFuncPoint>);
     int blocks;
     if (size & 0xF) {
@@ -445,7 +444,7 @@ void CFuncPointMngr::Reserve(int num, mgCMemory *stack) {
     }
     CList<CFuncPoint> *nodes = new ((u_long128 *)stack->Alloc(blocks + 2)) CList<CFuncPoint>[num];
     if (num > 0) {
-        for (index = 0; index < num; index++) {
+        for (int index = 0; index < num; index++) {
             Add(FUNC_POINT_NONE, &nodes[index]);
         }
     }
@@ -713,16 +712,17 @@ int CFuncPointMngr::GetLight(float *sphere, CFuncPoint *out_lights, int max, CFu
                 CFuncPoint *out = &out_lights[i];
                 *out = *light;
                 out->type = FUNC_POINT_PLIGHT;
-                sceVu0ScaleVector(out->plight.color, light->fire.color, 1.0f);
+                CFuncPoint::PlightData *plight = &out->plight;
+                sceVu0ScaleVector(plight->color, light->fire.color, 1.0f);
                 float power = 60.0f * light->scale[1];
-                out->plight.power = power;
-                out->plight.range = 8.0f * power;
-                out->plight.light_type = FUNC_PLIGHT_POINT;
-                out->plight.light_chara = 1;
-                out->plight.unk_40 = 1;
-                out->plight.unk_44 = 0;
-                out->plight.flicker_type = FUNC_PLIGHT_FLICKER_RANDOM;
-                out->plight.flicker_depth = 0.2f;
+                plight->power = power;
+                plight->range = 8.0f * power;
+                plight->light_type = FUNC_PLIGHT_POINT;
+                plight->light_chara = 1;
+                plight->unk_40 = 1;
+                plight->unk_44 = 0;
+                plight->flicker_type = FUNC_PLIGHT_FLICKER_RANDOM;
+                plight->flicker_depth = 0.2f;
                 break;
             }
         }
@@ -1099,7 +1099,7 @@ float GetLightAnimeWeight(CFuncPoint *point, int frame) {
                     return weight * (1.0f - depth + depth * (float)rand() / 2147483648.0f);
                 case FUNC_PLIGHT_FLICKER_SINE:
                     if (period > 0) {
-                        return weight * (1.0f - 0.5f * depth * (1.0f + sinf((float)(frame % period) * 6.2831855f / (float)period)));
+                        return weight * (1.0f - 0.5f * depth * (1.0f + sinf(6.2831855f * (float)(frame % period) / (float)period)));
                     }
                     return weight;
                 case FUNC_PLIGHT_FLICKER_SAW:

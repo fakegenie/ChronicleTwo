@@ -2245,8 +2245,8 @@ int _SET_DEAD_OFF(RS_STACKDATA *args, int argc) {
         return 0;
     }
     nowMonster->dead_alpha = 128;
-    height = 2.0f * nowMonster->body_height;
     radius = 3.0f * nowMonster->body_width;
+    height = 2.0f * nowMonster->body_height;
     if (height >= 60.0f) {
         height = 60.0f;
     }
@@ -2283,7 +2283,8 @@ int _SET_DEAD_OFF(RS_STACKDATA *args, int argc) {
     experience = nowMonster->reward_exp;
     pickup_count = 0;
     if (nowMonster->last_hit_attr & 0x800) {
-        experience = (int)(1.2f * experience);
+        float bonus = 1.2f;
+        experience = (int)((float)experience * bonus);
     }
     if (experience < 6 && experience > 0) {
         pickup_count = 6;
@@ -2543,7 +2544,6 @@ void _ESM_DELETE(RS_STACKDATA *stack, int argc) {
     int effect_id = nowMonster->chara_type;
     ActiveMonster->effect_man->DeleteEffSpt(effect_id, GetStackInt(stack));
 }
-#ifdef NONMATCHING
 int _ESM_SET_VECT1(RS_STACKDATA *stack, int argc) {
     sceVu0FVECTOR vector;
     int slot = GetStackInt(stack++);
@@ -2551,28 +2551,24 @@ int _ESM_SET_VECT1(RS_STACKDATA *stack, int argc) {
     vector[1] = GetStackFloat(stack++);
     vector[2] = GetStackFloat(stack);
     vector[3] = 1.0f;
-    return ActiveMonster->effect_man->SetScriptVect1(vector, nowMonster->chara_type, slot);
+    int monster_type = nowMonster->chara_type;
+    int group = monster_type;
+    return ActiveMonster->effect_man->SetScriptVect1(vector, group, slot);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/runscript_opcodes", _ESM_SET_VECT1__FP12RS_STACKDATAi);
-#endif
-#ifdef NONMATCHING
 int _ESM_GET_VECT1(RS_STACKDATA *stack, int argc) {
     sceVu0FVECTOR vector;
     if (argc != 4) {
         return 0;
     }
     int slot = GetStackInt(stack++);
-    int result = ActiveMonster->effect_man->GetScriptVect1(vector, nowMonster->chara_type, slot);
+    int monster_type = nowMonster->chara_type;
+    int group = monster_type;
+    int result = ActiveMonster->effect_man->GetScriptVect1(vector, group, slot);
     SetStack(stack++, vector[0]);
     SetStack(stack++, vector[1]);
     SetStack(stack, vector[2]);
     return result;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/runscript_opcodes", _ESM_GET_VECT1__FP12RS_STACKDATAi);
-#endif
-#ifdef NONMATCHING
 int _ESM_SET_VECT2(RS_STACKDATA *stack, int argc) {
     sceVu0FVECTOR vector;
     if (argc != 4) {
@@ -2583,66 +2579,55 @@ int _ESM_SET_VECT2(RS_STACKDATA *stack, int argc) {
     vector[1] = GetStackFloat(stack++);
     vector[2] = GetStackFloat(stack);
     vector[3] = 1.0f;
-    return ActiveMonster->effect_man->SetScriptVect2(vector, nowMonster->chara_type, slot);
+    int monster_type = nowMonster->chara_type;
+    int group = monster_type;
+    return ActiveMonster->effect_man->SetScriptVect2(vector, group, slot);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/runscript_opcodes", _ESM_SET_VECT2__FP12RS_STACKDATAi);
-#endif
-#ifdef NONMATCHING
 int _ESM_GET_VECT2(RS_STACKDATA *stack, int argc) {
     sceVu0FVECTOR vector;
     if (argc != 4) {
         return 0;
     }
     int slot = GetStackInt(stack++);
-    int result = ActiveMonster->effect_man->GetScriptVect2(vector, nowMonster->chara_type, slot);
+    int monster_type = nowMonster->chara_type;
+    int group = monster_type;
+    int result = ActiveMonster->effect_man->GetScriptVect2(vector, group, slot);
     SetStack(stack++, vector[0]);
     SetStack(stack++, vector[1]);
     SetStack(stack, vector[2]);
     return result;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/runscript_opcodes", _ESM_GET_VECT2__FP12RS_STACKDATAi);
-#endif
-#ifdef NONMATCHING
 int _ESM_SET_TARGET_ID(RS_STACKDATA *stack, int argc) {
     int slot = GetStackInt(stack++);
     int id = GetStackInt(stack);
-    return ActiveMonster->effect_man->SetScriptTargetId(id, nowMonster->chara_type, slot);
+    int monster_type = nowMonster->chara_type;
+    int group = monster_type;
+    return ActiveMonster->effect_man->SetScriptTargetId(id, group, slot);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/runscript_opcodes", _ESM_SET_TARGET_ID__FP12RS_STACKDATAi);
-#endif
-#ifdef NONMATCHING
 void _ESM_GET_TARGET_ID(RS_STACKDATA *stack, int argc) {
     int id;
     int slot = GetStackInt(stack++);
-    ActiveMonster->effect_man->GetScriptTargetId(id, nowMonster->chara_type, slot);
+    int monster_type = nowMonster->chara_type;
+    int group = monster_type;
+    ActiveMonster->effect_man->GetScriptTargetId(id, group, slot);
     SetStack(stack, id);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/runscript_opcodes", _ESM_GET_TARGET_ID__FP12RS_STACKDATAi);
-#endif
-#ifdef NONMATCHING
 int _ESM_SET_USER_ID(RS_STACKDATA *stack, int argc) {
     int slot = GetStackInt(stack++);
     int id = GetStackInt(stack);
-    return ActiveMonster->effect_man->SetScriptUserId(id, nowMonster->chara_type, slot);
+    int monster_type = nowMonster->chara_type;
+    int group = monster_type;
+    return ActiveMonster->effect_man->SetScriptUserId(id, group, slot);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/runscript_opcodes", _ESM_SET_USER_ID__FP12RS_STACKDATAi);
-#endif
-#ifdef NONMATCHING
 int _ESM_GET_USER_ID(RS_STACKDATA *stack, int argc) {
     int id;
     int slot = GetStackInt(stack++);
-    int result = ActiveMonster->effect_man->GetScriptUserId(id, nowMonster->chara_type, slot);
+    int monster_type = nowMonster->chara_type;
+    int group = monster_type;
+    int result = ActiveMonster->effect_man->GetScriptUserId(id, group, slot);
     SetStack(stack, id);
     return result;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/runscript_opcodes", _ESM_GET_USER_ID__FP12RS_STACKDATAi);
-#endif
 int _ESM_SET_VALUE(RS_STACKDATA *stack, int argc) {
     int slot;
     int index;

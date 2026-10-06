@@ -1208,16 +1208,16 @@ void sndSetSeVolf(unsigned int snd_id, int se_no, float vol, int voice) {
 
 #ifdef NONMATCHING
 void sndSetSePanf(unsigned int snd_id, int se_no, float pan, int voice) {
-    int position = fptosi(64.0f * pan) + 64;
-    int in_range = position < 128;
-    if (position < 0) {
-        position = 0;
-        in_range = 1;
+    int driver_pan;
+
+    driver_pan = (int)(64.0f * pan) + 64;
+    if (driver_pan < 0) {
+        driver_pan = 0;
     }
-    if (!in_range) {
-        position = 127;
+    if (driver_pan > 127) {
+        driver_pan = 127;
     }
-    sndSetSePan(snd_id, se_no, position, voice);
+    sndSetSePan(snd_id, se_no, driver_pan, voice);
 }
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/snd_mngr", sndSetSePanf__FUiifi);
@@ -1518,13 +1518,11 @@ int sndBankInfo::SearchSeq(char *name, int *index) {
     return SND_SE_TYPE_KEYON;
 }
 
-#ifdef NONMATCHING
 void sndPortInfo::LoadSeInfoTxt(int bank_no, char *text, int size, mgCMemory *memory) {
     sndBankInfo *bank_info;
     sndSeInfo   *entry;
     char        *end;
     char        *begin;
-    char        *line;
     char         name[64];
     char         description[64];
     char         filename[64];
@@ -1535,6 +1533,7 @@ void sndPortInfo::LoadSeInfoTxt(int bank_no, char *text, int size, mgCMemory *me
     char         flag[8];
     unsigned int bytes;
     unsigned int quadwords;
+    int          se_count;
     int          count;
     int          index;
     int          reverb_type;
@@ -1556,16 +1555,21 @@ void sndPortInfo::LoadSeInfoTxt(int bank_no, char *text, int size, mgCMemory *me
         }
         bank_info->se_num++;
     }
-    bytes = bank_info->se_num * sizeof(sndSeInfo);
-    quadwords = bytes >> 4;
+    se_count = bank_info->se_num;
+    bytes = se_count * sizeof(sndSeInfo);
     if (bytes & 0xF) {
-        quadwords++;
+        quadwords = (bytes >> 4) + 1;
+    } else {
+        quadwords = bytes >> 4;
     }
-    bank_info->se = new (memory->Alloc(quadwords + 2)) sndSeInfo[bank_info->se_num];
-    line = begin;
+    bank_info->se = new (memory->Alloc(quadwords + 2)) sndSeInfo[se_count];
+    text = begin;
     count = 0;
-    while (line < end && count < bank_info->se_num) {
-        line = GetLine(col, line, end);
+    while (text < end) {
+        if (!(count < bank_info->se_num)) {
+            break;
+        }
+        text = GetLine(col, text, end);
         if (strcmp(col[0], "END") == 0) {
             break;
         }
@@ -1630,9 +1634,6 @@ void sndPortInfo::LoadSeInfoTxt(int bank_no, char *text, int size, mgCMemory *me
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/snd_mngr", LoadSeInfoTxt__11sndPortInfoFiPciP9mgCMemory);
-#endif
 
 sndSeInfo::sndSeInfo(void) {
     this->unk_0 = 0;

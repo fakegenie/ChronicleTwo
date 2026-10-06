@@ -136,31 +136,33 @@ void CMiniMapSymbol::DrawSymbolClose() {
 }
 #ifdef NONMATCHING
 void CMiniMapSymbol::DrawSymbol(float *pos, int symbol) {
+    float delta[4];
+
     if (BattleAreaScene->boss_map != 0) {
         return;
     }
-    sceVu0FVECTOR relative;
-    sceVu0SubVector(relative, pos, center);
-    int screen_x = x + fptosi(16.0f * (relative[0] / cell_w));
-    int screen_y = y + fptosi(16.0f * (relative[2] / cell_d));
-    int col = fptosi((pos[0] + 0.5f * cell_w) / cell_w);
-    int row = fptosi((pos[2] + 0.5f * cell_d) / cell_d);
-    int visible = grid != NULL && grid[row * grid_w + col].visible != 0;
-    if (BattleAreaScene->minimap_reveal & MINIMAP_REVEAL_ROOMS) {
-        visible = 1;
+    sceVu0SubVector(delta, pos, center);
+    float sizeX = cell_w;
+    float ratio = delta[0] / sizeX;
+    int screen_x = x + (int)(16.0f * ratio);
+    int screen_y = y + (int)(16.0f * (delta[2] / cell_d));
+    int cell_x = (int)((pos[0] + 0.5f * sizeX) / sizeX);
+    int cell_z = (int)((pos[2] + 0.5f * cell_d) / cell_d);
+    int revealed = 0;
+    if (grid != NULL && (grid + cell_z * grid_w)[cell_x].visible != 0) {
+        revealed = 1;
     }
-    for (MINIMAP_SYMBOL_INFO *entry = symbol_table; entry->symbol != -1; ++entry) {
-        if (entry->symbol != symbol) {
-            continue;
+    if (BattleAreaScene->minimap_reveal & MINIMAP_REVEAL_SYMBOLS) {
+        revealed = 1;
+    }
+    for (MINIMAP_SYMBOL_INFO *info = symbol_table; info->symbol != MINIMAP_SYMBOL_END; info++) {
+        if (info->symbol == symbol) {
+            if ((info->need_visible == 0 || revealed != 0) && (info->blink == 0 || blink_cnt < 16)) {
+                prim.Color(info->r, info->g, info->b, 0x80);
+                prim.SetIStretch(screen_x - info->w / 2 + 8, screen_y - info->h / 2 + 8, info->w, info->w, 0xBA, 0xF6, 10, 10);
+            }
+            break;
         }
-        if ((entry->need_visible != 0 && visible == 0) ||
-            (entry->blink != 0 && blink_cnt >= 16)) {
-            return;
-        }
-        prim.Color(entry->r, entry->g, entry->b, 0x80);
-        prim.SetIStretch(screen_x - entry->w / 2 + 8, screen_y - entry->h / 2 + 8,
-                         entry->w, entry->w, 0xBA, 0xF6, 10, 10);
-        return;
     }
 }
 #else
@@ -168,16 +170,21 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/automap", DrawSymbol__14CMiniMapSymbolFPfi
 #endif
 #ifdef NONMATCHING
 void CMiniMapSymbol::DrawSymbol_Chara(CCharacter2 *chara) {
-    if (chara == NULL || BattleAreaScene->boss_map != 0) {
+    float pos[4];
+    float rot[4];
+
+    if (chara == NULL) {
         return;
     }
-    sceVu0FVECTOR position;
-    sceVu0FVECTOR rotation;
-    chara->GetPosition(position);
-    chara->GetRotation(rotation);
-    sceVu0SubVector(position, position, center);
-    int px = x + fptosi(16.0f * (position[0] / cell_w)) + 8;
-    int py = y + fptosi(16.0f * (position[2] / cell_d)) + 8;
+    if (BattleAreaScene->boss_map != 0) {
+        return;
+    }
+    chara->GetPosition(pos);
+    chara->GetRotation(rot);
+    sceVu0SubVector(pos, pos, center);
+    int screen_x = x + (int)(16.0f * (pos[0] / cell_w)) + 8;
+    int screen_y = y + (int)(16.0f * (pos[2] / cell_d)) + 8;
+    float angle = rot[1];
     CPreSprite sprite;
     sprite.Initialize(NULL, NULL);
     sprite.Preset2D();
@@ -185,20 +192,22 @@ void CMiniMapSymbol::DrawSymbol_Chara(CCharacter2 *chara) {
     sprite.Color(0x80, 0x80, 0x80, 0x60);
     sprite.Texture(TEX_SystenFrame);
     sprite.SetScirror(x - w / 2, y - h / 2, w, h);
-    float sine = sinf(rotation[1]);
-    float cosine = cosf(rotation[1]);
+    int off_x = (int)(-7.0f * sinf(angle) - -6.0f * cosf(angle));
+    int off_y = (int)(-6.0f * sinf(angle) + -7.0f * cosf(angle));
     sprite.TextureCrd(0xC4, 0xF2);
-    sprite.Vertex(px + fptosi(-7.0f * sine + 6.0f * cosine),
-                  py + fptosi(-6.0f * sine - 7.0f * cosine), 0);
+    sprite.Vertex(screen_x + off_x, screen_y + off_y, 0);
+    off_x = (int)(-7.0f * sinf(angle) - 6.0f * cosf(angle));
+    off_y = (int)(6.0f * sinf(angle) + -7.0f * cosf(angle));
     sprite.TextureCrd(0xD0, 0xF2);
-    sprite.Vertex(px + fptosi(-7.0f * sine - 6.0f * cosine),
-                  py + fptosi(6.0f * sine - 7.0f * cosine), 0);
+    sprite.Vertex(screen_x + off_x, screen_y + off_y, 0);
+    off_x = (int)(7.0f * sinf(angle) - -6.0f * cosf(angle));
+    off_y = (int)(-6.0f * sinf(angle) + 7.0f * cosf(angle));
     sprite.TextureCrd(0xC4, 0x100);
-    sprite.Vertex(px + fptosi(7.0f * sine + 6.0f * cosine),
-                  py + fptosi(-6.0f * sine + 7.0f * cosine), 0);
+    sprite.Vertex(screen_x + off_x, screen_y + off_y, 0);
+    off_x = (int)(7.0f * sinf(angle) - 6.0f * cosf(angle));
+    off_y = (int)(6.0f * sinf(angle) + 7.0f * cosf(angle));
     sprite.TextureCrd(0xD0, 0x100);
-    sprite.Vertex(px + fptosi(7.0f * sine - 6.0f * cosine),
-                  py + fptosi(6.0f * sine + 7.0f * cosine), 0);
+    sprite.Vertex(screen_x + off_x, screen_y + off_y, 0);
     sprite.SetScirror(0, 0, mgScreenWidth - 1, mgScreenHeight - 1);
     sprite.End();
 }
@@ -375,6 +384,7 @@ void CAutoMapGen::SetupRoomInfo(char *name, int length, mgCMemory *mem) {
 }
 #ifdef NONMATCHING
 int CAutoMapGen::CreatRoom(int x, int y, int room_no, int info_no) {
+    AUTOMAP_PARTS_INFO *parts_info;
     if (info_no == -1) {
         int pick;
         do {
@@ -388,42 +398,43 @@ int CAutoMapGen::CreatRoom(int x, int y, int room_no, int info_no) {
             info_no = pick;
         } while (pick == -1);
     }
-    AUTOMAP_ROOM_INFO *info = &room_info[info_no];
-    s16 *table = info->table;
+    s16 *table = room_info[info_no].table;
+    int col, row;
     if (table == NULL) {
         return 0;
     }
-    int h = info->h;
-    int w = info->w;
+    int w = room_info[info_no].w, h = room_info[info_no].h;
     if (x < 0 || y < 0) {
         return 0;
     }
-    int right = x + w;
-    int bottom = y + h;
-    if (grid_w < right || grid_h < bottom) {
+    if (x + w > grid_w || grid_h < y + h) {
         return 0;
     }
-    for (int row = y - 1; row < bottom + 1; row++) {
-        for (int col = x; col < right; col++) {
+    for (int row = y - 1; row < y + h + 1; row++) {
+        for (int col = x; col < x + w; col++) {
             if ((grid + row * grid_w)[col].kind != 0) {
                 return 0;
             }
         }
     }
-    for (int row = y; row < bottom; row++) {
-        for (int col = x - 1; col < right + 1; col++) {
-            if ((grid + row * grid_w)[col].kind != 0) {
-                return 0;
-            }
+    for (row = y; row < y + h; row++) {
+        col = x - 1;
+        if (col < x + w + 1) {
+            do {
+                if ((grid + grid_w * row)[col].kind != 0) {
+                    return 0;
+                }
+                col++;
+            } while (col < x + w + 1);
         }
     }
-    for (int row = y; row < bottom; row++) {
-        for (int col = x; col < right; col++) {
+    for (row = y; row < y + h; row++) {
+        for (col = x; col < x + w; col++) {
             s16 parts_no = table[0];
             s16 attr = table[1];
             table += 2;
             if (parts_no != -1) {
-                AUTOMAP_PARTS_INFO *parts_info = &PartsInfoData[parts_no];
+                parts_info = &PartsInfoData[parts_no];
                 (grid + row * grid_w)[col].parts_no = parts_no;
                 (grid + row * grid_w)[col].attr = attr;
                 (grid + row * grid_w)[col].kind = parts_info->kind;
@@ -522,11 +533,10 @@ void CAutoMapGen::RoomLink(int from, int to) {
     AUTOMAP_ROOM *src = &room[from];
     AUTOMAP_ROOM *dst = &room[to];
 
-    int src_cx = src->x + src->w / 2;
+    int goal_y = dst->y + dst->h / 2;
     int src_cy = src->y + src->h / 2;
     int goal_x = dst->x + dst->w / 2;
-    int goal_y = dst->y + dst->h / 2;
-    int dx = src_cx - goal_x;
+    int dx = src->x + src->w / 2 - goal_x;
     float dist_x = (float)dx;
     if (dist_x < 0.0f) {
         dist_x = -dist_x;
@@ -537,21 +547,19 @@ void CAutoMapGen::RoomLink(int from, int to) {
         dist_y = -dist_y;
     }
     int side;
-    if (!(dist_x <= dist_y)) {
-        side = kStepLeft;
-        if (dx < 0) {
-            side = kStepRight;
-        }
-    } else {
+    if ((dist_x <= dist_y)) {
         side = kStepUp;
         if (dy < 0) {
             side = kStepDown;
         }
-    }
-    if (gen_flag & AUTOMAP_GEN_FIXED_START) {
-        if (from == 0) {
+    } else {
+        side = kStepLeft;
+        if (dx < 0) {
             side = kStepRight;
         }
+    }
+    if (gen_flag & AUTOMAP_GEN_FIXED_START && from == 0) {
+        side = kStepRight;
     }
     int start_num = 0;
     int depth = 0;
@@ -560,24 +568,21 @@ void CAutoMapGen::RoomLink(int from, int to) {
             do {
                 for (int col = src->x; col < src->x + src->w; col++) {
                     u32 kind = (grid + (src->y + depth) * grid_w)[col].kind;
-                    if ((kind & (AUTOMAP_KIND_ROOM | AUTOMAP_KIND_ROOM_ALT)) &&
-                        !(kind & (AUTOMAP_KIND_PART | AUTOMAP_KIND_HEALING))) {
+                    if ((kind & (AUTOMAP_KIND_ROOM | AUTOMAP_KIND_ROOM_ALT)) && !(kind & (AUTOMAP_KIND_PART | AUTOMAP_KIND_HEALING))) {
                         starts[start_num].x = col;
                         starts[start_num].y = src->y + depth;
                         start_num++;
                     }
                 }
                 depth++;
-            } while (start_num <= 0);
+            } while (0 >= start_num);
             break;
         case kStepDown:
             do {
-                for (int col = src->x; col < src->x + src->w; col++) {
-                    u32 kind = (grid + (src->y + src->h - 1 - depth) * grid_w)[col].kind;
-                    if ((kind & (AUTOMAP_KIND_ROOM | AUTOMAP_KIND_ROOM_ALT)) &&
-                        !(kind & (AUTOMAP_KIND_PART | AUTOMAP_KIND_HEALING))) {
+                for (s16 col = src->x; col < src->x + src->w; col++) {
+                    if (((grid + (src->y + src->h - 1 - depth) * grid_w)[col].kind & (AUTOMAP_KIND_ROOM | AUTOMAP_KIND_ROOM_ALT)) && !((grid + (src->y + src->h - 1 - depth) * grid_w)[col].kind & (AUTOMAP_KIND_PART | AUTOMAP_KIND_HEALING))) {
                         starts[start_num].x = col;
-                        starts[start_num].y = src->y + src->h - 1 - depth;
+                        starts[start_num].y = src->y + (src->h - 1 - depth);
                         start_num++;
                     }
                 }
@@ -587,10 +592,8 @@ void CAutoMapGen::RoomLink(int from, int to) {
         case kStepRight:
             do {
                 for (int row = src->y; row < src->y + src->h; row++) {
-                    u32 kind = (grid + row * grid_w)[src->x + src->w - 1 - depth].kind;
-                    if ((kind & (AUTOMAP_KIND_ROOM | AUTOMAP_KIND_ROOM_ALT)) &&
-                        !(kind & (AUTOMAP_KIND_PART | AUTOMAP_KIND_HEALING))) {
-                        starts[start_num].x = src->x + src->w - 1 - depth;
+                    if (((grid + row * grid_w)[src->x + (src->w - 1) - depth].kind & (AUTOMAP_KIND_ROOM | AUTOMAP_KIND_ROOM_ALT)) && !((grid + row * grid_w)[src->x + (src->w - 1 - depth)].kind & (AUTOMAP_KIND_PART | AUTOMAP_KIND_HEALING))) {
+                        starts[start_num].x = src->x + (src->w - 1) - depth;
                         starts[start_num].y = row;
                         start_num++;
                     }
@@ -601,9 +604,7 @@ void CAutoMapGen::RoomLink(int from, int to) {
         case kStepLeft:
             do {
                 for (int row = src->y; row < src->y + src->h; row++) {
-                    u32 kind = (grid + row * grid_w)[src->x + depth].kind;
-                    if ((kind & (AUTOMAP_KIND_ROOM | AUTOMAP_KIND_ROOM_ALT)) &&
-                        !(kind & (AUTOMAP_KIND_PART | AUTOMAP_KIND_HEALING))) {
+                    if (((grid + grid_w * row)[depth + src->x].kind & (AUTOMAP_KIND_ROOM | AUTOMAP_KIND_ROOM_ALT)) && !((grid + grid_w * row)[depth + src->x].kind & (AUTOMAP_KIND_PART | AUTOMAP_KIND_HEALING))) {
                         starts[start_num].x = src->x + depth;
                         starts[start_num].y = row;
                         start_num++;
@@ -613,16 +614,15 @@ void CAutoMapGen::RoomLink(int from, int to) {
             } while (start_num <= 0);
             break;
     }
-    if (start_num <= 0) {
+    if (0 >= start_num) {
         printf(at_1661);
         return;
     }
     ROOM_LINK_POINT *start = &starts[iRand(start_num)];
-    int x = start->x;
-    int y = start->y;
-    (grid + y * grid_w)[x].kind |= AUTOMAP_KIND_ENTRANCE;
-    int steps;
-    dist_x = (float)dx;
+    unsigned int x = start->x, y = start->y;
+    (grid + grid_w * y)[x].kind |= AUTOMAP_KIND_ENTRANCE;
+    dist_x = dx;
+    s32 steps;
     if (dist_x < 0.0f) {
         dist_x = -dist_x;
     }
@@ -784,9 +784,10 @@ void CAutoMapGen::CreatDummyRoot(int room_no) {
         }
         steps = iRand((int)d) + 1;
     } else {
-        side = kStepUp;
-        if (dy < 0) {
+        if (0 > dy) {
             side = kStepDown;
+        } else {
+            side = kStepUp;
         }
         float d = (float)dy;
         if (d < 0.0f) {
@@ -873,7 +874,7 @@ void CAutoMapGen::CreatDummyRoot(int room_no) {
             } else {
                 side = kStepUp;
             }
-            float d = (float)dy;
+            float d = dy;
             if (d < 0.0f) {
                 d = -d;
             }

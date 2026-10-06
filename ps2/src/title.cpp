@@ -368,8 +368,9 @@ void TitleBootInit() {
     TitleScene->SetActive(2, 0);
     TitleMap = TitleScene->GetMap(TitleScene->active_map);
     u32 file_size;
-    if (LoadFile2(at_1222__4, DataBuffer.stAllocTest(1), (int *)&file_size, 0) != 0) {
-        textures->EnterIMGFile((u_char *)DataBuffer.Alloc(Align16Blocks(file_size)), 0x6A, NULL, NULL);
+    u32 bg_size;
+    if (LoadFile2(at_1222__4, DataBuffer.stAllocTest(1), (int *)&bg_size, 0) != 0) {
+        textures->EnterIMGFile((u_char *)DataBuffer.Alloc(Align16Blocks(bg_size)), 0x6A, NULL, NULL);
     }
     textures->EnterTexture(0x6A, at_1223__4, NULL, mgScreenWidth, mgScreenHeight, 0x20, 0, 0, 0);
     char lang_file[0x40];
@@ -434,7 +435,8 @@ void TitleBootInit() {
     sndInitPort(4);
     TitleEventSound = sndLoadSound(4, (u_int *)sound_buffer, &snd_memory);
     DataBuffer.Align64();
-    Stack_ReadBuff.stSetBuffer(DataBuffer.stGetTop(), DataBuffer.stGetRest());
+    int rest = DataBuffer.stGetRest();
+    Stack_ReadBuff.stSetBuffer(DataBuffer.stGetTop(), rest);
     read_buffer = Stack_ReadBuff.stGetTop();
     TitleScene->read_buff = read_buffer;
     TitleScene->fade.Initialize();
@@ -1288,11 +1290,13 @@ void TitleModeDraw() {
     int y;
     int row_num;
     int row_y[2];
+    int row;
     TitleMapDraw();
     mgTexManager.ReloadTexture(0x40, (sceVif1Packet *)NULL);
     mgCDrawPrim prim;
     SetSpriteEnv(&prim, 0);
-    PrimQuad(Tex_Chronicle, 0.0f, 24.0f, mgRect<int>(0, 0, 0x200, 0x1A0), fptosi(TitleInfo->title_alpha), 0x80, 0x80, 0x80);
+    float title_alpha = TitleInfo->title_alpha;
+    PrimQuad(Tex_Chronicle, 0.0f, 24.0f, mgRect<int>(0, 0, 0x200, 0x1A0), fptosi(title_alpha), 0x80, 0x80, 0x80);
     mgRect<int> start_rect(start_button_tbl_1826[LanguageCode].left, start_button_tbl_1826[LanguageCode].top,
                            start_button_tbl_1826[LanguageCode].right, start_button_tbl_1826[LanguageCode].bottom);
     if (LanguageCode == 0) {
@@ -1347,11 +1351,11 @@ void TitleModeDraw() {
         prim.TextureMapEnable(1);
         prim.Begin(6);
         prim.Texture(Tex_Logo);
-        int row = 0;
+        row = 0;
         row_y[0] = 0xD0 - TitleInfo->omake_num * 0x1B;
         row_y[1] = row_y[0] + 0x3C;
         cursor_goal_y = (float)row_y[TitleInfo->omake_select];
-        prim.Color(0x80, 0x80, 0x80, fptosi(TitleInfo->omake_alpha));
+        prim.Color(0x80, 0x80, 0x80, (int)TitleInfo->omake_alpha);
         if (OmakePlayEnableAttr & 2) {
             mgRect<int> dungeon_rect(0x5C, 0x100, 0xD2, 0x36);
             PrimQuad(&prim, 151.0f, (float)row_y[row++], dungeon_rect);
@@ -1391,8 +1395,6 @@ void TitleMapDraw() {
     float ref[4];
     float view[4][4];
     mgCTextureManager *textures = &mgTexManager;
-    int i;
-    int block;
 
     mgFogEnable(1);
     mgCCamera *camera = TitleScene->GetCamera(TitleScene->active_camera);
@@ -1436,7 +1438,6 @@ void TitleMapDraw() {
         }
     }
     int texture_group;
-    texture_group = 6;
     if (TitleMap != NULL) {
         int texture_order[72];
         TitleWorkBuffer.stack_used = 0;
@@ -1457,11 +1458,14 @@ void TitleMapDraw() {
             WaveTable__3->GetEffect();
         }
         mgPreEndDraw(NULL);
-        for (texture_group = 0; texture_group < 6; texture_group++) {
-            int block_count = TitleScene->mds_list_set.GetTextureBlockNo(texture_group, texture_blocks, 128);
-            for (int i = 0; i < block_count; i++) {
-                int block = texture_blocks[block_count - i - 1];
-                if (0 != mgEndDrawReloadTexture(block, NULL) && texture_blocks[block_count - i - 1] == water_block) {
+        for (int group = 0; group < 6; group++) {
+            int i;
+            int block;
+            int block_count = TitleScene->mds_list_set.GetTextureBlockNo(group, texture_blocks, 128);
+            for (i = 0; i < block_count; i++) {
+                int index = block_count - i - 1;
+                block = texture_blocks[index];
+                if (0 != mgEndDrawReloadTexture(block, NULL) && texture_blocks[index] == water_block) {
                     WaveTable__3->CreateTexture(water);
                 }
                 mgEndDraw(block, NULL);
@@ -1469,9 +1473,11 @@ void TitleMapDraw() {
         }
         mgSetPkTextureRepeat(0);
     }
-    for (; texture_group < 16; texture_group++) {
+    for (texture_group = 6; texture_group < 16; texture_group++) {
         int later_blocks[128];
         int block_count = TitleScene->mds_list_set.GetTextureBlockNo(texture_group, later_blocks, 128);
+        int i;
+        int block;
         for (i = 0; i < block_count; i++) {
             block = later_blocks[i];
             mgEndDrawReloadTexture(block, NULL);
@@ -1508,7 +1514,7 @@ void TitleMapDraw() {
         }
         case 1:
             TitleCameraPhaseCounter++;
-            if ((u_int)TitleCameraPhaseCounter >= 251) {
+            if ((u_int)TitleCameraPhaseCounter > 250) {
                 follow->FollowOff();
                 TitleCameraPhaseCounter = 0;
                 TitleCameraAddAngle = 0.0f;
@@ -1635,11 +1641,12 @@ int TitleMCCheckKey() {
         case TITLE_MC_PHASE_OMAKE_2:
             if (busy) {
                 CMemoryCardManager *manager = TitleMCCheck;
-                if (manager->file_exists != 0) {
-                    if (manager->omake_flag & 1) {
+                int *found = &manager->file_exists;
+                if (*found != 0) {
+                    if (found[1] & 1) {
                         OmakePlayEnableAttr |= 2;
                     }
-                    if (manager->omake_flag & 2) {
+                    if (found[1] & 2) {
                         OmakePlayEnableAttr |= 1;
                     }
                 }
@@ -2251,39 +2258,46 @@ int TitleHDDInstallKey() {
     return 0;
 }
 #ifdef NONMATCHING
-void DrawMenuDl(int x, int y, int width, int alpha, float progress) {
+void DrawMenuDl(int x, int y, int width, int alpha, float rate) {
     mgCDrawPrim prim;
+    mgRect<int> frame_tex;
+    mgRect<int> bar_tex;
+    mgRect<int> frame_put;
+    mgRect<int> bar_put;
+    mgRect<int> shadow_put;
+    mgRect<int> body_put;
+
     SetSpriteEnv(&prim, 0);
     prim.Begin(6);
     prim.Texture(HDDDlBar);
     prim.Color(0x80, 0x80, 0x80, alpha);
-    mgRect<int> bar_uv(0x74, 0, 0xC, 0xC);
-    mgRect<int> progress_uv(0x6D, 1, 6, 0xA);
-    mgRect<int> bar(x + 4, y + 0x2E, width - 0xA, 0xE);
-    PrimQuad(&prim, bar, bar_uv);
+    frame_tex.Set(0x74, 0, 0xC, 0xC);
+    bar_tex.Set(0x6D, 1, 6, 0xA);
+    frame_put.Set(x + 4, y + 0x2E, width - 0xA, 0xE);
+    PrimQuad(&prim, frame_put, frame_tex);
     prim.End();
     prim.Begin(6);
-    int fill_width = fptosi(((float)width - (float)(table_2611[0][2] - 0x14 + table_2611[1][4]) - 2.0f) * progress);
-    if (progress < 1.0f) {
+    int end_width = table_2611[0][2] - 0x14 + table_2611[1][4];
+    float inner = ((float)width - (float)end_width) - 2.0f;
+    int bar_width = (int)(inner * rate);
+    if (rate < 1.0f) {
         prim.Color(0x80, 0x80, 0x80, alpha);
     } else {
         prim.Color(0x40, 0x94, 0x40, alpha);
     }
-    mgRect<int> fill(x + 0x17, y + 0x2F, fill_width, 0xA);
-    PrimQuad(&prim, fill, progress_uv);
+    bar_put.Set(x + 0x17, y + 0x2F, bar_width, 0xA);
+    PrimQuad(&prim, bar_put, bar_tex);
     prim.End();
     prim.Bilinear(0);
     prim.Begin(6);
-    for (int i = 0; i < 3; ++i) {
-        short *row = table_2611[i];
-        int height = row[3];
+    for (int i = 0; i < 3; i++) {
         prim.Color(0, 0, 0, alpha >> 2);
-        mgRect<int> shadow(x + 4, y + 4, width, height);
-        Menu3DivideTextureDraw(&prim, shadow, row, 1);
+        shadow_put.Set(x + 4, y + 4, width, table_2611[i][3]);
+        Menu3DivideTextureDraw(&prim, shadow_put, table_2611[i], 1);
         prim.Color(0x80, 0x80, 0x80, alpha);
-        mgRect<int> panel(x, y, width, height);
-        Menu3DivideTextureDraw(&prim, panel, row, 1);
-        y += height;
+        body_put.Set(x, y, width, table_2611[i][3]);
+        Menu3DivideTextureDraw(&prim, body_put, table_2611[i], 1);
+        y += table_2611[i][3];
     }
     prim.End();
 }

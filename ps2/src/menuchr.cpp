@@ -880,7 +880,123 @@ void CMenuChrCngMenu::AttachForm() {
         cmd_part[j] = form->GetPartInfo(name);
     }
 }
+#ifdef NONMATCHING
+void CMenuChrCngMenu::EnterDataMenu(u8 *pack) {
+    char name[0x20];
+    int size;
+    mgCTextureManager *texManager = &mgTexManager;
+    int block = tex_block[0];
+    int i;
+
+    texManager->EnterIMGFile((u_char *)GetPackFile((u_int *)pack, at_1276__3, NULL), block, NULL, NULL);
+    char *cfg = (char *)GetPackFile((u_int *)pack, at_1277__3, &size);
+    if (MenuCharaChangePosDataCfgBuffer == 0 && cfg != NULL) {
+        MenuCharaChangePosDataCfgBuffer = (int)cfg;
+        MenuDataAnalyze(cfg, size, &MenuChangeMemory);
+    }
+    MenuRepairMan->Initialize();
+    MenuRepairMan->SetRepairData(&MenuChangeMemory, block, (u32 *)pack);
+    script = (char *)GetPackFile((u_int *)pack, at_1278__3, &script_size);
+    MenuCharaChangeStar_Tex = texManager->GetTexture(at_1279__4, -1);
+    MenuCharaChangeBase_Tex = texManager->GetTexture(at_1280__3, -1);
+    MenuCharaChangeCLUT = clut;
+    texManager->ReloadTexture(block, (sceVif1Packet *)NULL);
+    if (MenuCharaChangeCLUT_Tex == NULL) {
+        MenuCharaChangeCLUT_Tex = new ((u_long128 *)MenuChangeMemory.Alloc(9)) mgCTexture;
+    }
+    memcpy(MenuCharaChangeCLUT_Tex, MenuCharaChangeBase_Tex, sizeof(mgCTexture));
+    memcpy(MenuCharaChangeCLUT, MenuCharaChangeBase_Tex->clut, sizeof(clut));
+    MenuCharaChangeCLUT_Tex->clut = (u_long128 *)MenuCharaChangeCLUT;
+    u8 *color = (u8 *)MenuCharaChangeCLUT;
+    for (i = 0; i < CHR_CNG_CLUT_NUM; i++) {
+        float level = (color[0] + color[1] + color[2]) / 3;
+        int step;
+        for (step = 1; step < 33; step++) {
+            if (8.0f * (step - 1) <= level && level < 8.0f * step) {
+                break;
+            }
+        }
+        color[0] = 7.75f * step;
+        color[1] = 5.625f * step;
+        color[2] = 4.6875f * step;
+        color += 4;
+    }
+    MenuPosData->InitDrawList();
+    AttachForm();
+    AttachMessageForm();
+    ExeScript(at_1281__5);
+    party_member = MenuUserDataManPtr->GetNowPartyMember();
+    enable_change = MenuUserDataManPtr->GetEnableCharaChangeFlag();
+    for (int p = 0; p < 4; p++) {
+        sprintf(name, at_1282__5, p);
+        MENUFORMPARTS_TYPE *face = form->GetPartInfo(name);
+        sprintf(name, at_1283__4, p);
+        MENUFORMPARTS_TYPE *lock = form->GetPartInfo(name);
+        sprintf(name, at_1284__4, p);
+        MENUFORMPARTS_TYPE *frame = form->GetPartInfo(name);
+        face->draw_flag = 1;
+        int bit = 1 << p;
+        if (party_member & bit) {
+            frame->draw_flag = 1;
+            face->draw_flag = 1;
+            lock->draw_flag = 0;
+            if ((p < 2 && (enable_change & bit)) || !(p < 2)) {
+                face->draw_flag = 0;
+            } else {
+                lock->draw_flag = 1;
+            }
+        } else {
+            frame->draw_flag = 0;
+        }
+    }
+    UpdataLife();
+    mes_data = (s16 *)GetPackFile((u_int *)pack, at_1285__2, NULL);
+    sys_mes = MenuDCMsg[0]->buff;
+    MenuCommandAnalyzeInfo.system_mes_buff[0] = GetSystemMesBuffer();
+    MenuCommandAnalyzeInfo.system_mes_buff[1] = mes_data;
+    MenuCommandAnalyzeInfo.mes_buff[0] = sys_mes;
+    MenuCommandAnalyzeInfo.mes_buff[1] = mes_data;
+    if (key_arg_no == 2) {
+        MenuDCMsg[0]->SetBuff(mes_data);
+    }
+    npc_mes_talk = 0;
+    npc_mes_cmd = 0;
+    npc_mes_cancel = 0;
+    npc_cmd_mes[0] = 0;
+    npc_cmd_mes[1] = 0;
+    npc_cmd_mes[2] = 0;
+    npc_cmd_mes[3] = 0;
+    unk_23C = 0;
+    party_info = NULL;
+    npc_data = NULL;
+    npc_no = MenuUserDataManPtr->NowPartyCharaID();
+    if (npc_no > 0) {
+        party_info = MenuUserDataManPtr->GetPartyCharaInfo(npc_no);
+        npc_data = GetPartyNPCData(npc_no);
+        npc_mes_talk = GetPartyCharaMessage(npc_no, 1, 0);
+        npc_mes_cmd = GetPartyCharaMessage(npc_no, 0, 0);
+        npc_mes_cancel = GetPartyCharaMessage(npc_no, 3, 0);
+        int cmdMes = GetPartyCharaMessage(npc_no, 5, 0);
+        for (i = 0; i < npc_data->ability_num; i++) {
+            npc_cmd_mes[i] = cmdMes + i;
+        }
+        for (; i < 4; i++) {
+            npc_cmd_mes[i] = 0;
+        }
+        if (npc_data->ability_num == 0) {
+            npc_cmd_mes[0] = 10;
+        }
+        for (i = 0; i < npc_data->ability_num; i++) {
+            form->SetNumber(tbl_1233[i], npc_data->ability_cost[i]);
+        }
+        for (; i < 4; i++) {
+            form->SetPartDrawFlag(tbl_1233[i], false);
+        }
+    }
+}
+#else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuchr", EnterDataMenu__15CMenuChrCngMenuFPUc);
+#endif
 void CMenuChrCngMenu::LoadNPCFaceData(mgCMemory *memory, int mode) {
     char path[0x40];
     unsigned int size;
@@ -2401,7 +2517,8 @@ void MenuCharaChangeStarDraw() {
     float offset = size / 2.0f - 2.0f;
     RingCenter center = at_2371__4;
     center.x = menu->star_x + offset;
-    center.y = menu->star_y + 1.1538461f * offset;
+    float center_y;
+    center_y = menu->star_y + 1.1538461f * offset;
     float angle = menu->star_angle;
     mgCDrawPrim *prim = GetMenuPrim();
     mgRect<int> baseRect(0x13F, 0xC0, 0x40, 0x40);
@@ -2422,7 +2539,7 @@ void MenuCharaChangeStarDraw() {
     for (int i = 0; i < 4; i++) {
         prim->TextureCrd((int)crd.uv[i][0], (int)crd.uv[i][1]);
         float x = 1.0f + (center.x + size * cosf(angle));
-        prim->Vertex(x, center.y + 1.1538461f * (size * sinf(angle)), 0.0f);
+        prim->Vertex(x, center_y + 1.1538461f * (size * sinf(angle)), 0.0f);
         angle += 1.5707964f;
     }
     prim->End();
@@ -2443,12 +2560,12 @@ void MenuCharaChangeStarDraw() {
         float x = ringSize * cosf(angle);
         float y = ringSize * sinf(angle);
         x = center.x + x;
-        mgRect<float> inner(x - 0.5f * circle, 6.0f + (center.y + 1.1538461f * (y - 0.5f * circle)), circle,
+        mgRect<float> inner(x - 0.5f * circle, 6.0f + (center_y + 1.1538461f * (y - 0.5f * circle)), circle,
                             circle);
         DrawWakuCircle(prim, MenuCharaChangeBase_Tex, inner, wakuRect, wave, ringSize, (int)alpha, 0x80, 0x80,
                        0x80);
         circle *= 1.4f;
-        mgRect<float> outer(x - 0.5f * circle, 6.0f + (center.y + 1.1538461f * (y - 0.5f * circle)), circle,
+        mgRect<float> outer(x - 0.5f * circle, 6.0f + (center_y + 1.1538461f * (y - 0.5f * circle)), circle,
                             circle);
         DrawWakuCircle(prim, MenuCharaChangeBase_Tex, outer, wakuRect, wave, ringSize, (int)pulseAlpha, 0x80, 0x80,
                        0x80);
@@ -2460,7 +2577,8 @@ void MenuCharaChangeStarDraw() {
         return;
     }
     texManager->ReloadTexture(MenuCharaChangeStar_Tex->block, (sceVif1Packet *)NULL);
-    mgRect<short> starRect(0, 0x20, 8, 8);
+    mgRect<short> starRect;
+    starRect.Set(0, 0x20, 8, 8);
     prim->Begin(6);
     prim->Texture(MenuCharaChangeStar_Tex);
     for (int k = 0; k < CHR_CNG_STAR_NUM; k++) {
@@ -4861,10 +4979,9 @@ void MenuRoboPartsLightOff(mgCFrame *arg0) {
         }
     }
 }
-#ifdef NONMATCHING
 int MenuMonsterLoadBG(mgCMemory *stack, MENU_BGREAD_INFO2 **info, int monster_no, int restart_read) {
-    char model[0x40];
-    char script[0x40];
+    char model_buf[0x40];
+    char script_buf[0x40];
     char path[0x6C];
     int size;
 
@@ -4881,34 +4998,33 @@ int MenuMonsterLoadBG(mgCMemory *stack, MENU_BGREAD_INFO2 **info, int monster_no
         dir = 2;
     }
     monster_load_id = monster_no;
+    char *model = model_buf;
     if (GetMonsterModelFile(monster_no, 0, model) == 0) {
         return 0;
     }
+    char *script = script_buf;
     GetMonsterModelFile(monster_no, 2, script);
     strcpy(info[0]->name, model);
     strcpy(path, MonsterDataPath[dir]);
     strcat(path, model);
     strcpy(info[0]->path, path);
     stack->Align64();
-    if (LoadFileBG(info[0]->path, stack->stGetTop(), &size) == 0) {
-        return 1;
-    }
-    info[0]->reading = 1;
-    stack->Alloc(blocks_for(size));
-    if (MenuLoadInfo.mode == 2) {
-        stack->Align64();
-        u_long128 *buffer = stack->stGetTop();
-        strcpy(path, at_4548);
-        strcat(path, script);
-        strcpy(script_file_name, script);
-        LoadFileBG(path, buffer, &size);
+    u_long128 *top = stack->stGetTop();
+    if (LoadFileBG(info[0]->path, top, &size) != 0) {
+        info[0]->reading = 1;
         stack->Alloc(blocks_for(size));
+        if (MenuLoadInfo.mode == 2) {
+            stack->Align64();
+            u_long128 *buffer = stack->stGetTop();
+            strcpy(path, at_4548);
+            strcat(path, script);
+            strcpy(script_file_name, script);
+            LoadFileBG(path, buffer, &size);
+            stack->Alloc(blocks_for(size));
+        }
     }
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuchr", MenuMonsterLoadBG__FP9mgCMemoryPP17MENU_BGREAD_INFO2ii);
-#endif
 extern SceneCharaList at_4565;
 extern LoadTargetList at_4585;
 extern LoadStackList at_4586;
@@ -5379,7 +5495,7 @@ void CMenuCostumeSel::LoadMenuData(mgCMemory *stack, int *texBlock) {
     short *systemMes;
     int freeSize;
 
-    SetTexBlock(texBlock);
+    ((CBaseMenuClass *)this)->SetTexBlock(texBlock);
     for (i = 0; i < 7; i++) {
         MenuActionChara[i] = NewMenuActionChara(stack);
         MenuActionChara[i]->Initialize(NULL);
@@ -5731,12 +5847,13 @@ void CMenuCostumeSel::Draw() {
             wave = -wave;
         }
         float leftX;
+        leftX = 55.0f - wave;
         float rightX;
         float arrowY;
-        leftX = 55.0f - wave;
         arrowY = (float)(lineY + 3);
-        rightX = wave + (float)(lineRect.right + 0x49);
-        PrimQuad(prim, 4.0f + leftX, 4.0f + arrowY, leftRect);
+        rightX = (float)(0x49 + lineRect.right) + wave;
+        float shadowY = 4.0f + arrowY;
+        PrimQuad(prim, 4.0f + leftX, shadowY, leftRect);
         PrimQuad(prim, 4.0f + rightX, 4.0f + arrowY, rightRect);
         if (i == select) {
             prim->Color(0xA4, 0xA4, 0xA4, 0x80);
@@ -5835,7 +5952,84 @@ extern void *__vt__15CMenuCostumeSel[];
 extern u_long CostumeOptionEnv;
 extern "C" void *__ct__15mgCCameraFollowFffff(void *camera, float distance, float height, float angle,
                                                float speed);
+#ifdef NONMATCHING
+void MenuCostumeInit(mgCMemory *stack, int *tex_block, int mode) {
+    int i;
+    CMenuCostumeSel *menu;
+
+    int size = memory_free_size(stack);
+    MenuChangeMemory.stSetBuffer((u_long128 *)memory_free_top(stack), size);
+    if ((menu = (CMenuCostumeSel *)operator new(sizeof(CMenuCostumeSel),
+                                                (u_long128 *)MenuChangeMemory.Alloc(0x2F))) != NULL) {
+        __ct__14CBaseMenuClassFv(menu);
+        float distance = 40.0f, height = 30.0f, angle = 0.0f, width = 8.0f;
+        void **vtable = (void **)((u8 *)menu + 0x10C);
+        *vtable = __vt__15CMenuCostumeSel;
+        __ct__15mgCCameraFollowFffff(&menu->camera, distance, height, angle, width);
+        menu->stack.Init();
+        menu->select = 0;
+        MenuCosutumeLoadPhase = 0;
+        menu->tile_scroll = 0.0f;
+        menu->chara_data = GetUserDataMan()->GetCharaDataPtr(0);
+        menu->costume_select[0] = 0;
+        menu->costume_select[1] = 0;
+        menu->costume_select[2] = 0;
+        menu->line_wave[0] = 0.0f;
+        menu->line_wave[1] = 0.0f;
+        menu->line_wave[2] = 0.0f;
+        menu->load_wait = 0;
+        menu->loading = 0;
+        menu->wait_load = 0;
+        menu->show_help = 0;
+        menu->cursor_show = 0;
+        menu->chara = 0;
+        menu->monica_enabled = 0;
+        menu->tile_tex = NULL;
+        menu->cursor_tex = NULL;
+        menu->chara_pos[0] = 15.0f;
+        menu->chara_pos[1] = -14.0f;
+        menu->chara_pos[2] = 4.0f;
+        menu->chara_pos[3] = 1.0f;
+        menu->unk_270[0] = 0.0f;
+        menu->unk_270[1] = 0.1f;
+        menu->unk_270[2] = 0.0f;
+        menu->unk_270[3] = 1.0f;
+        for (i = 0; i < COSTUME_LIST_MAX; i++) {
+            menu->costume_list[0][i] = 0;
+            menu->costume_list[1][i] = 0;
+            menu->costume_list[2][i] = 0;
+        }
+        menu->list[0] = menu->costume_list[1];
+        menu->list[1] = menu->costume_list[0];
+        menu->list[2] = menu->costume_list[2];
+        menu->unk_220 = 0;
+        menu->unk_280 = 0;
+        menu->change_chara = 0;
+        menu->camera.SetDistance(100.0f);
+        menu->camera.SetAngle(0.0f);
+        menu->camera.SetHeight(3.0f);
+        menu->camera.SetSpeed(4.0f, -1.0f);
+        menu->camera.SetFollow(0.0f, 0.0f, 0.0f);
+        menu->camera.Step(-1);
+    }
+    MenuCosPtr = menu;
+    CostumeAttr = 0x1274521CBUL;
+    if (MenuArg.param[0] == 1) {
+        menu->monica_enabled = 1;
+        CostumeAttr |= CostumeOptionEnv;
+    }
+    MenuCosPtr->UpdateCostumeList(0, CostumeAttr);
+    MenuCosPtr->LoadMenuData(&MenuChangeMemory, tex_block);
+    MenuCosPtr->FadeInMenu(40, 0.0f);
+    MenuArg.end_code = 0;
+    MenuArg.result[0] = 0;
+    MenuArg.result[1] = 0;
+    MenuArg.result[2] = 0;
+    MenuCamInit(1.0f);
+}
+#else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuchr", MenuCostumeInit__FP9mgCMemoryPii);
+#endif
 int MenuCostumeKey() {
     return MenuCosPtr->KeyStep();
 }
@@ -5980,7 +6174,208 @@ void CMosBookMenu::InitEnd(void) {
     this->SetMonsterInfo(this->monster_info);
     FadeInMenu(0x32, 0.0f);
 }
+#ifdef NONMATCHING
+void CMosBookMenu::Draw() {
+    sceVu0FMATRIX view;
+    sceVu0FVECTOR eye;
+    mgRect<int> scissor;
+    mgRect<int> numberRect;
+
+    if (Tex_MBg == NULL || Tex_MBook == NULL || Tex_MBase == NULL) {
+        return;
+    }
+    mgCTextureManager *texManager = &mgTexManager;
+    texManager->ReloadTexture(Tex_MBase->block, (sceVif1Packet *)NULL);
+    mgCDrawPrim *prim = GetMenuPrim();
+    SetSpriteEnv(prim, 0);
+    DrawMenuTilePattern(prim, Tex_MBg, bg_scroll, bg_scroll, mgRect<int>(0, 0, 0x100, 0x100), 0, NULL);
+    prim->Begin(6);
+    prim->Texture(Tex_MBase);
+    prim->Color(0, 0, 0, 0x40);
+    Menu3DivideTextureDraw(prim, mgRect<int>(0x1A, 0x4B, 0x1CC, 0x24), tiletbl_5573[0], 1);
+    Menu3DivideTextureDraw(prim, mgRect<int>(0x1A, 0x6F, 0x1CC, 0x116), tiletbl_5573[1], 1);
+    Menu3DivideTextureDraw(prim, mgRect<int>(0x1A, 0x185, 0x1CC, 0x24), tiletbl_5573[2], 1);
+    prim->Color(0x80, 0x80, 0x80, 0x80);
+    Menu3DivideTextureDraw(prim, mgRect<int>(0x16, 0x47, 0x1CC, 0x24), tiletbl_5573[0], 1);
+    Menu3DivideTextureDraw(prim, mgRect<int>(0x16, 0x6B, 0x1CC, 0x116), tiletbl_5573[1], 1);
+    Menu3DivideTextureDraw(prim, mgRect<int>(0x16, 0x181, 0x1CC, 0x24), tiletbl_5573[2], 1);
+    prim->End();
+    int boxW = 0xB6;
+    if (CheckNowEurope()) {
+        boxW = 0xBE;
+    }
+    float x = 52.0f, y = 101.0f;
+    DrawMenuFillBox(x, y, (float)boxW, 220.0f, 0x80, 0xD, 0xD, 0xD);
+    SetSpriteEnv(prim, 0);
+    prim->Begin(6);
+    prim->Texture(Tex_MBase);
+    prim->Color(0x80, 0x80, 0x80, 0x80);
+    Menu3DivideTextureDraw(prim,
+                           mgRect<int>(put_under_offset_5577[1][0] + 0x16, put_under_offset_5577[1][1] + 0x47, 0x52,
+                                       0x20),
+                           under_brdtbl_5576, 1);
+    Menu3DivideTextureDraw(prim,
+                           mgRect<int>(put_under_offset_5577[1][0] + 0x6E, put_under_offset_5577[1][1] + 0x47, 0x52,
+                                       0x20),
+                           under_brdtbl_5576, 1);
+    int shift = 0;
+    int boardW = 0xB0;
+    int shortShift = 0;
+    int shortW = boardW;
+    if (CheckNowEurope()) {
+        shift = 2;
+        boardW = 0xB6;
+        shortShift = 4;
+        shortW = 0xBE;
+    }
+    Menu3DivideTextureDraw(prim,
+                           mgRect<int>(put_under_offset_5577[3][0] + 0x16 - shift,
+                                       put_under_offset_5577[3][1] + 0x47, boardW, 0x20),
+                           under_brdtbl_5576, 1);
+    Menu3DivideTextureDraw(prim,
+                           mgRect<int>(put_under_offset_5577[5][0] + 0x16 - shift,
+                                       put_under_offset_5577[5][1] + 0x47, boardW, 0x20),
+                           under_brdtbl_5576, 1);
+    Menu3DivideTextureDraw(prim,
+                           mgRect<int>(put_under_offset_5577[7][0] + 0x16 - shift,
+                                       put_under_offset_5577[7][1] + 0x47, boardW, 0x20),
+                           under_brdtbl_5576, 1);
+    Menu3DivideTextureDraw(prim,
+                           mgRect<int>(put_under_offset_5577[9][0] + 0x16 - shift,
+                                       put_under_offset_5577[9][1] + 0x47, boardW, 0x20),
+                           under_brdtbl_5576, 1);
+    Menu3DivideTextureDraw(prim,
+                           mgRect<int>(put_under_offset_5577[9][0] + 0x16 - shift,
+                                       put_under_offset_5577[9][1] + 0x69, boardW, 0x20),
+                           under_brdtbl_5576, 1);
+    Menu3DivideTextureDraw(prim,
+                           mgRect<int>(put_under_offset_5577[9][0] + 0x16 - shift,
+                                       put_under_offset_5577[9][1] + 0x8B, boardW, 0x20),
+                           under_brdtbl_5576, 1);
+    Menu3DivideTextureDraw(prim,
+                           mgRect<int>(put_under_offset_5577[11][0] + 0x16 - shortShift,
+                                       put_under_offset_5577[11][1] + 0x47, shortW, 0x20),
+                           under_brdtbl_5576, 1);
+    Menu3DivideTextureDraw(prim, mgRect<int>(0x140, 0x27, 0x9C, 0x20), under_brdtbl_5576, 1);
+    prim->End();
+    prim->Begin(6);
+    prim->Color(0x80, 0x80, 0x80, 0x80);
+    prim->Texture(Tex_MBook);
+    PrimQuad(prim, 18.0f, 16.0f, mgRect<int>(0, 0, 0xA8, 0x16));
+    int titleX = put_under_offset_5577[0][0] + 0x16;
+    int titleY = put_under_offset_5577[0][1] + 0x47;
+    PrimQuad(prim, (float)titleX, (float)(put_under_offset_5577[0][1] + 0x47), mgRect<int>(0, 0x82, 0xB0, 0x12));
+    PrimQuad(prim, (float)(titleX + 0xB), (float)(titleY + 0x19), mgRect<int>(0xC, 0x2C, 0xC, 0x10));
+    PrimQuad(prim, (float)(titleX + 0x5E), (float)(titleY + 0x15), mgRect<int>(0xC, 0x16, 0x14, 0x16));
+    PrimQuad(prim, (float)(put_under_offset_5577[2][0] + 0x16), (float)(put_under_offset_5577[2][1] + 0x47),
+             mgRect<int>(0, 0x94, 0xB0, 0x12));
+    PrimQuad(prim, (float)(put_under_offset_5577[4][0] + 0x16), (float)(put_under_offset_5577[4][1] + 0x47),
+             mgRect<int>(0, 0xA6, 0xB0, 0x12));
+    PrimQuad(prim, (float)(put_under_offset_5577[6][0] + 0x16), (float)(put_under_offset_5577[6][1] + 0x47),
+             mgRect<int>(0, 0xB8, 0xB0, 0x12));
+    PrimQuad(prim, (float)(put_under_offset_5577[8][0] + 0x16), (float)(put_under_offset_5577[8][1] + 0x47),
+             mgRect<int>(0, 0xCA, 0xB0, 0x12));
+    PrimQuad(prim, (float)(put_under_offset_5577[10][0] + 0x16), (float)(put_under_offset_5577[10][1] + 0x47),
+             mgRect<int>(0, 0xDC, 0xB0, 0x12));
+    PrimQuad(prim, (float)(put_under_offset_5577[12][0] + 0x16), (float)(put_under_offset_5577[12][1] + 0x47),
+             mgRect<int>(0, 0xEE, 0xB0, 0x12));
+    int iconX = put_under_offset_5577[4][0] + 0x1D;
+    int iconY = put_under_offset_5577[4][1] + 0x5C;
+    for (int bit = 0; bit < 8; bit++) {
+        if (strong_bit & (1 << bit)) {
+            PrimQuad(prim, (float)iconX, (float)iconY, mgRect<int>(ic_5580[bit][0], ic_5580[bit][1], 0x16, 0x16));
+            iconX += 0x16;
+        }
+    }
+    iconX = put_under_offset_5577[4][0] + 0x1D;
+    iconY = put_under_offset_5577[4][1] + 0x8E;
+    for (int bit = 0; bit < 8; bit++) {
+        if (weak_bit & (1 << bit)) {
+            PrimQuad(prim, (float)iconX, (float)iconY, mgRect<int>(ic_5580[bit][0], ic_5580[bit][1], 0x16, 0x16));
+            iconX += 0x16;
+        }
+    }
+    Menu3DivideTextureDraw(prim, mgRect<int>(0xFB, 0x55, 0xC, 0x13C), line_5595, 0);
+    prim->End();
+    camera.GetCameraMatrix(view);
+    camera.GetPos(eye);
+    mgSetViewMatrix(view, eye);
+    if (monster != NULL && load_phase == 4 && show_wait > 16) {
+        scissor.Set(0x20, 0x69, 0xE8, 0x135);
+        SetMenuScissor(scissor);
+        texManager->ReloadTexture(tex_block_no, (sceVif1Packet *)NULL);
+        monster->DrawDirect();
+        ResetMenuScissor();
+    }
+    texManager->ReloadTexture(Tex_MBase->block, (sceVif1Packet *)NULL);
+    int frameW = 0xD6;
+    if (CheckNowEurope()) {
+        frameW = 0xDA;
+    }
+    SetSpriteEnv(prim, 0);
+    prim->Begin(6);
+    prim->Texture(Tex_MBase);
+    prim->Color(0x80, 0x80, 0x80, 0x80);
+    Menu3DivideTextureDraw(prim, mgRect<int>(0x20, 0x55, frameW, 0x36), wakutbl_5600[0], 1);
+    Menu3DivideTextureDraw(prim, mgRect<int>(0x20, 0x8B, frameW, 0x92), wakutbl_5600[1], 1);
+    Menu3DivideTextureDraw(prim, mgRect<int>(0x20, 0x11D, frameW, 0x32), wakutbl_5600[2], 1);
+    prim->End();
+    numberRect.Set(0, 0x14A, 0xC, 0xD);
+    prim->Begin(6);
+    prim->Texture(Tex_MBase);
+    prim->Color(0x80, 0x80, 0x80, 0x80);
+    PrimDrawNumber(prim, hp, 0, 0x156, 0x6D, numberRect, -1, 0);
+    PrimDrawNumber(prim, abs, 0, 0x1AE, 0x6D, numberRect, -1, 0);
+    PrimDrawNumber(prim, kill_num, 0, 0xEC, 0x185, numberRect, -2, 0);
+    prim->End();
+    texManager->ReloadTexture(MenuArg.mes_tex_block, (sceVif1Packet *)NULL);
+    CMenuFont font;
+    char text[0x80];
+    int nameH;
+    int nameW;
+    font.SetStr(name);
+    font.CalcDrawWH(font.str, &nameW, &nameH);
+    int nameX = 0x92 - nameW / 2;
+    font.SetStr(name);
+    font.SetPos(nameX, 0x6D);
+    font.DrawDirect(font.str, font.pos_x, font.pos_y);
+    font.SetStr(type_name);
+    font.SetStr(type_name);
+    font.SetPos(0x4E, 0x123);
+    font.DrawDirect(font.str, font.pos_x, font.pos_y);
+    int areaH;
+    int areaW;
+    font.SetStr(area_name);
+    font.CalcDrawWH(font.str, &areaW, &areaH);
+    int areaX = 0x92 - areaW / 2;
+    font.SetStr(area_name);
+    font.SetPos(areaX, 0x163);
+    font.DrawDirect(font.str, font.pos_x, font.pos_y);
+    font.SetStr(weak_name);
+    font.SetStr(weak_name);
+    font.SetPos(0x11E, 0x9D);
+    font.DrawDirect(font.str, font.pos_x, font.pos_y);
+    font.SetStr(drop_item[0]);
+    font.SetPos(0x11A, 0x131);
+    font.DrawDirect(font.str, font.pos_x, font.pos_y);
+    font.SetStr(drop_item[1]);
+    font.SetPos(0x11A, 0x153);
+    font.DrawDirect(font.str, font.pos_x, font.pos_y);
+    font.SetStr(drop_item[2]);
+    font.SetPos(0x11A, 0x175);
+    font.DrawDirect(font.str, font.pos_x, font.pos_y);
+    int page = select + 1;
+    if (list_num <= 0) {
+        page = 0;
+    }
+    sprintf(text, monstere_file_template[LanguageCode], page, list_num);
+    font.SetStr(text);
+    font.SetPos(0x14C, 0x2D);
+    font.DrawDirect(font.str, font.pos_x, font.pos_y);
+}
+#else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuchr", Draw__12CMosBookMenuFv);
+#endif
 int CMosBookMenu::KeyStep(void) {
     int select;
     int lr;

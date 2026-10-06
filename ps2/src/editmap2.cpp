@@ -45,14 +45,14 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/editmap2", PlaneNormalXZ__FPfPfPfPf);
 #endif
 #ifdef NONMATCHING
 float CEditMap::GetEditPartsAlt(CEditPartsInfo *info, float *pos, float rot_y, CEditParts **parts, int num) {
+    sceVu0FVECTOR parts_pos;
     sceVu0FMATRIX parts_matrix;
     sceVu0FMATRIX invers_matrix;
     sceVu0FMATRIX matrix;
-    sceVu0FVECTOR parts_pos;
-    sceVu0FVECTOR offset;
+    mgVu0FBOX box;
     sceVu0FVECTOR parts_rot;
     sceVu0FVECTOR triangle[3];
-    mgVu0FBOX box;
+    sceVu0FVECTOR offset;
     sceVu0FVECTOR normal;
     float area;
 

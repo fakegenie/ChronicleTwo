@@ -60,6 +60,25 @@ extern u_long128 **user_prog_adr;
 extern int user_prog_num;
 extern int font_cons;
 extern int font_draw_flag;
+struct mgFrameTex0 {
+    union {
+        u_long value;
+        struct {
+            u_long tbp0 : 14;
+            u_long tbw : 6;
+            u_long psm : 6;
+            u_long tw : 4;
+            u_long th : 4;
+            u_long tcc : 1;
+            u_long tfx : 2;
+            u_long cbp : 14;
+            u_long cpsm : 4;
+            u_long csm : 1;
+            u_long csa : 5;
+            u_long cld : 3;
+        } bits;
+    };
+};
 struct mgFrameTextureCopy {
     short block;
     short width;
@@ -179,11 +198,8 @@ int GetScreenSize(int mode, int *width, int *height, int *left, int *top, int *r
 }
 #ifdef NONMATCHING
 void mgInit(int screen_mode, int video_mode) {
-    sceGsDBuff *buffers = (sceGsDBuff *)mgDBuff;
     static signed char dimx[16] = { 10, 4, 6, 8, 12, 0, 2, 14, 7, 9, 11, 5, 3, 15, 13, 1 };
     sceDmaEnv          dma_env;
-    u_long128          clear_pixels[8192];
-    sceGsLoadImage     load_image;
     u_long             packed_dimx;
     int                aligned_height;
     int                buffer;
@@ -211,6 +227,7 @@ void mgInit(int screen_mode, int video_mode) {
     mgGiftagAD.NREG = 1;
     mgGiftagAD.REGS0 = SCE_GIF_PACKED_AD;
     mgScreenMode = GetScreenSize(screen_mode, &mgScreenWidth, &mgScreenHeight, &mgScreenNX, &mgScreenNY, &mgScreenMX, &mgScreenMY);
+    u_long128 clear_pixels[8192];
     aligned_height = mgScreenHeight;
     if (aligned_height % 32 != 0) {
         aligned_height += 32 - aligned_height % 32;
@@ -228,11 +245,12 @@ void mgInit(int screen_mode, int video_mode) {
         clear_pixels[i] = 0;
     }
     for (buffer = 0; buffer < 32; buffer++) {
+        sceGsLoadImage load_image;
         sceGsSetDefLoadImage(&load_image, buffer * 0x200, 2, SCE_GS_PSMCT32, 0, 0, 128, 256);
         FlushCache(0);
         sceGsExecLoadImage(&load_image, clear_pixels);
     }
-    sceGsSetDefDBuff(buffers, SCE_GS_PSMCT32, (short)mgScreenWidth, (short)mgScreenHeight, SCE_GS_ZGEQUAL, SCE_GS_PSMZ24, 0);
+    sceGsSetDefDBuff((sceGsDBuff *)mgDBuff, SCE_GS_PSMCT32, (short)mgScreenWidth, (short)mgScreenHeight, SCE_GS_ZGEQUAL, SCE_GS_PSMZ24, 0);
     frame_buf0 = 0;
     frame_buf1 = mgScreenDepth * (mgScreenWidth * aligned_height / 2048) / 32;
     mgBackColor[0] = 0.0f;
@@ -240,24 +258,24 @@ void mgInit(int screen_mode, int video_mode) {
     mgBackColor[2] = 0.0f;
     mgBackColor[3] = 128.0f;
     mgClearBackFlag = 1;
-    buffers->draw0.frame1.FBP = frame_buf1;
-    buffers->draw1.frame1.FBP = frame_buf0;
-    buffers->draw1.zbuf1.bits.zbp = frame_buf1 * 2;
-    buffers->draw0.zbuf1.bits.zbp = buffers->draw1.zbuf1.bits.zbp;
-    buffers->clear0.rgbaq.bytes.red = (int)mgBackColor[0];
-    buffers->clear0.rgbaq.bytes.green = (int)mgBackColor[1];
-    buffers->clear0.rgbaq.bytes.blue = (int)mgBackColor[2];
-    buffers->clear0.rgbaq.bytes.alpha = (int)mgBackColor[3];
-    buffers->clear1.rgbaq.bytes.red = buffers->clear0.rgbaq.bytes.red;
-    buffers->clear1.rgbaq.bytes.green = buffers->clear0.rgbaq.bytes.green;
-    buffers->clear1.rgbaq.bytes.blue = buffers->clear0.rgbaq.bytes.blue;
-    buffers->clear1.rgbaq.bytes.alpha = buffers->clear0.rgbaq.bytes.alpha;
+    ((sceGsDBuff *)mgDBuff)->draw0.frame1.FBP = frame_buf1;
+    ((sceGsDBuff *)mgDBuff)->draw1.frame1.FBP = frame_buf0;
+    ((sceGsDBuff *)mgDBuff)->draw1.zbuf1.bits.zbp = frame_buf1 * 2;
+    ((sceGsDBuff *)mgDBuff)->draw0.zbuf1.bits.zbp = ((sceGsDBuff *)mgDBuff)->draw1.zbuf1.bits.zbp;
+    ((sceGsDBuff *)mgDBuff)->clear0.rgbaq.bytes.red = (int)mgBackColor[0];
+    ((sceGsDBuff *)mgDBuff)->clear0.rgbaq.bytes.green = (int)mgBackColor[1];
+    ((sceGsDBuff *)mgDBuff)->clear0.rgbaq.bytes.blue = (int)mgBackColor[2];
+    ((sceGsDBuff *)mgDBuff)->clear0.rgbaq.bytes.alpha = (int)mgBackColor[3];
+    ((sceGsDBuff *)mgDBuff)->clear1.rgbaq.bytes.red = ((sceGsDBuff *)mgDBuff)->clear0.rgbaq.bytes.red;
+    ((sceGsDBuff *)mgDBuff)->clear1.rgbaq.bytes.green = ((sceGsDBuff *)mgDBuff)->clear0.rgbaq.bytes.green;
+    ((sceGsDBuff *)mgDBuff)->clear1.rgbaq.bytes.blue = ((sceGsDBuff *)mgDBuff)->clear0.rgbaq.bytes.blue;
+    ((sceGsDBuff *)mgDBuff)->clear1.rgbaq.bytes.alpha = ((sceGsDBuff *)mgDBuff)->clear0.rgbaq.bytes.alpha;
     *(u_long *)&mgTEX1_1 = 0x261;
     mgTEX1_2 = mgTEX1_1;
     *(u_long *)&mgTEST_1 = 0x5000B;
     mgTEST_2 = mgTEST_1;
-    mgZBUF_1 = buffers->draw0.zbuf1;
-    mgZBUF_2 = buffers->draw0.zbuf1;
+    mgZBUF_1 = ((sceGsDBuff *)mgDBuff)->draw0.zbuf1;
+    mgZBUF_2 = ((sceGsDBuff *)mgDBuff)->draw0.zbuf1;
     *(u_long *)&mgALPHA_1 = 0x44;
     mgALPHA_2 = mgALPHA_1;
     *(u_long *)&mgTEXA_1 = 0x100400000ULL;
@@ -265,8 +283,10 @@ void mgInit(int screen_mode, int video_mode) {
     mgDrawManager.texture_manager = &mgTexManager;
     mgDrawManager.render_info = &mgRenderInfo;
     mgRenderInfo.Initialize();
-    mgRenderInfo.draw_env[0].zbuf = mgZBUF_1;
-    mgRenderInfo.draw_env[1].zbuf = mgZBUF_2;
+    sceGsZbuf zbuf_0 = mgZBUF_1;
+    mgRenderInfo.draw_env[0].zbuf = zbuf_0;
+    sceGsZbuf zbuf_1 = mgZBUF_2;
+    mgRenderInfo.draw_env[1].zbuf = zbuf_1;
     FlushCache(0);
     sceDmaSend(DmaCH1, My_dma_start0);
     sceGsSyncPath(0, 0);
@@ -288,15 +308,23 @@ void mgInit(int screen_mode, int video_mode) {
     VSyncCallBack2 = 0;
     call_back_active = 0;
     FlushCache(0);
-    sceGsSwapDBuff(buffers, 0);
+    sceGsSwapDBuff((sceGsDBuff *)mgDBuff, 0);
     sceDmaSync(DmaCH2, 0, 0);
     mgCreateSinTable();
-    for (i = 0; i < 16; i++) {
-        dimx[i] = dimx[i] / 2 - 4;
+    i = 0;
+    if (i < 16) {
+        do {
+            dimx[i] = dimx[i] / 2 - 4;
+            i++;
+        } while (i < 16);
     }
+    i = 0;
     packed_dimx = 0;
-    for (i = 0; i < 16; i++) {
-        packed_dimx |= (u_long)(dimx[i] & 0x7) << (i * 4);
+    if (i < 16) {
+        do {
+            packed_dimx |= (u_long)(dimx[i] & 0x7) << (i * 4);
+            i++;
+        } while (i < 16);
     }
     mgDIMX.value = packed_dimx;
     mgDIMX.bits.dm00 = dimx[0];
@@ -938,7 +966,6 @@ void mgSetPkFrameBuffer(mgCTexture *texture) {
 #ifdef NONMATCHING
 void mgSetPkFrameBuffer(int fbp, int width, int height, int psm) {
     sceGsDBuff *buffers = (sceGsDBuff *)mgDBuff;
-    mgCTexture *frame_texture = (mgCTexture *)&frame_tex;
     sceGsFrame     frame;
     sceGsFrame    *default_frame;
     sceGsXyOffset  offset;
@@ -1031,17 +1058,17 @@ void mgSetPkFrameBuffer(int fbp, int width, int height, int psm) {
             bpp = 16;
             break;
     }
-    frame_texture->Initialize();
-    frame_texture->width = width;
-    frame_texture->height = height;
-    frame_texture->bpp = bpp;
-    frame_texture->vram_size = bpp * (width * height) / 8 / 256;
-    frame_texture->clut_size = 0;
-    frame_texture->image_blocks = frame_texture->vram_size;
-    frame_texture->tex0.value = 0;
-    frame_texture->tex0.TBP0 = fbp << 5;
-    frame_texture->tex0.TBW = width / 64;
-    frame_texture->tex0.PSM = psm;
+    ((mgCTexture *)&frame_tex)->Initialize();
+    frame_tex.width = width;
+    frame_tex.height = height;
+    frame_tex.bpp = bpp;
+    frame_tex.vram_size = bpp * (width * height) / 8 / 256;
+    frame_tex.clut_size = 0;
+    frame_tex.image_blocks = frame_tex.vram_size;
+    ((mgFrameTex0 *)&frame_tex.tex0)->value = 0;
+    ((mgFrameTex0 *)&frame_tex.tex0)->bits.tbp0 = fbp << 5;
+    ((mgFrameTex0 *)&frame_tex.tex0)->bits.tbw = width / 64;
+    ((mgFrameTex0 *)&frame_tex.tex0)->bits.psm = psm;
     width_shift = 0;
     for (size = width; size >= 2; size >>= 1) {
         width_shift++;
@@ -1064,11 +1091,11 @@ void mgSetPkFrameBuffer(int fbp, int width, int height, int psm) {
     if (height != size) {
         height_shift++;
     }
-    frame_texture->tex0.bits.tw = width_shift;
-    frame_texture->tex0.bits.th = height_shift;
-    frame_texture->tex0.bits.tcc = 1;
-    frame_texture->tex0.bits.tfx = 0;
-    *(u_long *)&frame_texture->tex1 = 0x261;
+    ((mgFrameTex0 *)&frame_tex.tex0)->bits.tw = width_shift;
+    ((mgFrameTex0 *)&frame_tex.tex0)->bits.th = height_shift;
+    ((mgFrameTex0 *)&frame_tex.tex0)->bits.tcc = 1;
+    ((mgFrameTex0 *)&frame_tex.tex0)->bits.tfx = 0;
+    frame_tex.tex1 = 0x261;
 }
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mglib", mgSetPkFrameBuffer__Fiiii);
