@@ -2666,28 +2666,19 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
     mgRect<int> bottom(32, 96, 32, 32);
     mgRect<int> bottom2(64, 96, 32, 32);
     mgRect<int> bottom_right(96, 96, 32, 32);
-    board_frame_parts parts = at_2919;
+    mgRect<int> *parts[12] = {&top_left, &top, &top2, &top_right, &left, &right,
+                              &left2, &right2, &bottom_left, &bottom, &bottom2, &bottom_right};
     int i;
+    float put_x;
     float put_y;
-    scroll_bar_layers layers;
-    parts.rect[0] = &top_left;
-    parts.rect[1] = &top;
-    parts.rect[2] = &top2;
-    parts.rect[3] = &top_right;
-    parts.rect[4] = &left;
-    parts.rect[5] = &right;
-    parts.rect[6] = &left2;
-    parts.rect[7] = &right2;
-    parts.rect[8] = &bottom_left;
-    parts.rect[9] = &bottom;
-    parts.rect[10] = &bottom2;
-    parts.rect[11] = &bottom_right;
     mgCTexture *tex = mgTexManager.GetTexture(at_3054, -1);
     if (tex != NULL) {
         MenuReloadTexture(tex_block, tex->block);
         put.right = 40;
-        float put_x = x + 4.0f;
-        put_y = y + 262.0f;
+        put_x = x;
+        put_y = y;
+        put_x += 4.0f;
+        put_y += 262.0f;
         int clip_left = put_x;
         int clip_top = (int)(put_y + 20.0f);
         int clip_right = (int)(put_x + 300.0f);
@@ -2702,18 +2693,18 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
         int part = 8;
         prim->Color(0, 0, 0, shadow_alpha = (int)(2.0f * a / 3.0f));
         mgRect<float> corner(put_x, put_y, 40.0f, 32.0f);
-        PrimQuad(prim, corner, *parts.rect[frmtbl0_2922[part++]]);
+        PrimQuad(prim, corner, *parts[frmtbl0_2922[part++]]);
         put_x += 40.0f;
         int i;
         int j;
         int put_top;
         for (i = 0; i < 5; i++) {
             mgRect<int> edge((int)put_x, put_top = (int)put_y, 40, 32);
-            PrimQuad(prim, edge, *parts.rect[frmtbl0_2922[part++]]);
+            PrimQuad(prim, edge, *parts[frmtbl0_2922[part++]]);
             put_x += 40.0f;
         }
         mgRect<int> end_corner((int)put_x, put_top, 32, 32);
-        PrimQuad(prim, end_corner, *parts.rect[11]);
+        PrimQuad(prim, end_corner, *parts[11]);
         prim->End();
         ResetMenuScissor();
         SetSpriteEnv(prim, 0);
@@ -2725,19 +2716,19 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
         for (i = 0; i < 2; i++) {
             put_x = x;
             mgRect<int> row_left((int)put_x, put_top = (int)put_y, 32, 40);
-            PrimQuad(prim, row_left, *parts.rect[frmtbl0_2922[part++]]);
+            PrimQuad(prim, row_left, *parts[frmtbl0_2922[part++]]);
             mgRect<int> row_join((int)(put_x + 32.0f), put_top, 8, 40);
-            PrimQuad(prim, row_join, *parts.rect[frmtbl0_2922[part++]]);
+            PrimQuad(prim, row_join, *parts[frmtbl0_2922[part++]]);
             put_x += 40.0f;
             for (j = 0; j < 5; j++) {
                 mgRect<int> edge((int)put_x, put_top, 40, 40);
-                PrimQuad(prim, edge, *parts.rect[frmtbl0_2922[part++]]);
+                PrimQuad(prim, edge, *parts[frmtbl0_2922[part++]]);
                 put_x += 40.0f;
             }
             mgRect<int> row_fill((int)(put_x - 8.0f), put_top, 6, 40);
-            PrimQuad(prim, row_fill, *parts.rect[frmtbl0_2922[part - 1]]);
+            PrimQuad(prim, row_fill, *parts[frmtbl0_2922[part - 1]]);
             mgRect<int> row_right((int)(put_x - 2.0f), put_top, 32, 40);
-            PrimQuad(prim, row_right, *parts.rect[frmtbl0_2922[part++]]);
+            PrimQuad(prim, row_right, *parts[frmtbl0_2922[part++]]);
             put_y += 250.0f;
         }
         put.right = 32;
@@ -2748,29 +2739,22 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
             int put_left;
             for (j = 0; j < 5; ++j) {
                 mgRect<int> side(put_left = (int)put_x, (int)put_y, 32, 40);
-                PrimQuad(prim, side, *parts.rect[frmtbl1_2938[part++]]);
+                PrimQuad(prim, side, *parts[frmtbl1_2938[part++]]);
                 put_y += 40.0f;
             }
             mgRect<int> side_end(put_left, (int)put_y, 32, 10);
-            PrimQuad(prim, side_end, *parts.rect[frmtbl1_2938[part - 1]]);
+            PrimQuad(prim, side_end, *parts[frmtbl1_2938[part - 1]]);
             put_x += 238.0f;
         }
         prim->End();
         float bar_x = x + 260;
-        scroll_bar_heights heights = at_2949__2;
-        heights.height[0] = ItemBoardScrlBar1.bottom;
-        heights.height[2] = ItemBoardScrlBar3.bottom;
-        layers = at_2950__2;
-        layers.layer[0][4] = shadow_alpha;
-        layers.layer[1][1] = r;
-        layers.layer[1][2] = g;
-        layers.layer[1][3] = b;
-        layers.layer[1][4] = a;
+        int heights[3] = {ItemBoardScrlBar1.bottom, 0x102, ItemBoardScrlBar3.bottom};
+        int layers[2][5] = {{4, 0, 0, 0, shadow_alpha}, {0, r, g, b, a}};
         scroll_bar_parts bars = at_2951__2;
         prim->Begin(6);
         prim->Texture(tex);
         for (i = 0; i < 2; i++) {
-            int *layer = layers.layer[i];
+            int *layer = layers[i];
             prim->Color(layer[1], layer[2], layer[3], layer[4]);
             float bar_y = y + 9;
             for (j = 0; j < 3; j++) {
@@ -2778,12 +2762,12 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
                 prim->TextureCrd(bar->left, bar->top);
                 prim->Vertex(bar_x + layer[0], bar_y + layer[0], 0.0f);
                 prim->TextureCrd(bar->left + bar->right, bar->top + bar->bottom);
-                prim->Vertex(bar_x + (bar->right + layer[0]), bar_y + (heights.height[j] + layer[0]), 0.0f);
-                bar_y += heights.height[j];
+                prim->Vertex(bar_x + (bar->right + layer[0]), bar_y + (heights[j] + layer[0]), 0.0f);
+                bar_y += heights[j];
             }
         }
         prim->End();
-        float bar_top = y + 9 + layers.layer[0][0];
+        float bar_top = y + 9 + layers[0][0];
         if (MenuItemBrdScrlBarY < bar_top) {
             MenuItemBrdScrlBarY = bar_top;
         }
