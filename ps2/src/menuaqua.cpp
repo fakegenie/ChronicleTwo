@@ -1556,9 +1556,10 @@ void CFishFood::Step() {
     SetRotation(rot);
     CCharacter2::Step();
 }
-#ifdef NONMATCHING
 void DrawEsaDropRoot(CFishFood *food, float bottom) {
-    if (food != NULL) {
+    if (food == NULL) {
+        return;
+    } else {
         static int count = 0;
         mgCDrawPrim prim;
         float pos[4];
@@ -1570,7 +1571,7 @@ void DrawEsaDropRoot(CFishFood *food, float bottom) {
         prim.DepthTestEnable(1);
         food->GetPosition(pos);
         for (; bottom < pos[1]; pos[1] -= 2.4f) {
-            if (0 != mgTransWorldPrim3DSprite(left, right, pos, 0.3f, 1.0f, 0)) {
+            if (mgTransWorldPrim3DSprite(left, right, pos, 0.3f, 1.0f, 0) != 0) {
                 prim.Begin(6);
                 prim.Color(0x80, 0x80, 0xC8, 0x60);
                 prim.Vertex4(left);
@@ -1580,9 +1581,6 @@ void DrawEsaDropRoot(CFishFood *food, float bottom) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuaqua", DrawEsaDropRoot__FP9CFishFoodf);
-#endif
 void AquaMesDispAdjustPos(ClsMes *window, int *pos) {
     int width;
     int height;
