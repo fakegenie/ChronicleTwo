@@ -119,7 +119,7 @@ int CheckRobotCore(void) {
     return CheckRobotCore__16CUserDataManagerFv(GetUserDataMan());
 }
 void CShop::CheckEventItem() {
-    CUserDataManager *userData = (CUserDataManager *)((u8 *)GetSaveData__Fv() + 0x1D2A0);
+    CUserDataManager *userData = &GetSaveData()->user_data;
     if (NowSellMode == 3) {
         item_num = GetDonyShopLineUp(item_no, NULL);
         return;
