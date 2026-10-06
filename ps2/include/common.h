@@ -10,6 +10,7 @@
 
 #ifdef __cplusplus
 extern "C" int fptosi(float value);
+extern "C" unsigned int fptoui(float value);
 #endif
 
 #endif

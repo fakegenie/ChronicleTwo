@@ -5680,8 +5680,8 @@ int _GOTO_SUBGAME(RS_STACKDATA *stack, int argc) {
     int type = GetStackInt(stack);
     SubGameInfo info;
     info.scene = EventScene;
-    info.texb = EventScene->unk_3e68;
-    info.texb_num = EventScene->unk_3e6c;
+    info.texb = EventScene->tex_block_base;
+    info.texb_num = EventScene->tex_block_count;
     return sgInitSubGame(type, &info) != 0;
 }
 int _SET_GYORACE_ETC(RS_STACKDATA *stack, int argc) {

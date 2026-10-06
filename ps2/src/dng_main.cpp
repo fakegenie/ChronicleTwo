@@ -925,8 +925,8 @@ int LoopDungeonMain() {
             if (MenuArg.end_code == 11) {
                 SubGameInfo info;
 
-                DngMainScene->unk_3e68 = 40;
-                DngMainScene->unk_3e6c = 31;
+                DngMainScene->tex_block_base = 40;
+                DngMainScene->tex_block_count = 31;
                 info.scene = DngMainScene;
                 info.rod_no = MenuArg.result[0];
                 info.esa_no = MenuArg.result[1];

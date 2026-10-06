@@ -57,7 +57,6 @@ extern signed char tbl1_5167[3];
 extern signed char tbl2_5168[2];
 extern unsigned int at_table_5400[12];
 extern signed char equip_type_tbl_5456[15];
-extern "C" unsigned int fptoui(float);
 extern char at_1378__2[];
 extern char at_1379__2[];
 extern char at_1623[];
@@ -232,10 +231,10 @@ void CGameDataUsed::Init() {
     memset(this, 0, sizeof(CGameDataUsed));
 }
 int CGameDataUsed::CheckTypeEnableStack() {
-    if (used_type == 1) {
+    if (used_type == USED_ITEM_TYPE_ITEM) {
         return 1;
     }
-    if (used_type == 2) {
+    if (used_type == USED_ITEM_TYPE_ATTACH) {
         if (item_no == 185) {
             return 0;
         }
@@ -249,7 +248,7 @@ char *CGameDataUsed::GetDataPath() {
 int CGameDataUsed::IsWhoEquip() {
     int item_type;
 
-    if (this->used_type == 3) {
+    if (this->used_type == USED_ITEM_TYPE_WEAPON) {
         item_type = this->item_type;
         if (item_type == 1 || item_type == 2 || item_type == 5 || item_type == 6 || item_type == 7) {
             return 0;
@@ -259,16 +258,16 @@ int CGameDataUsed::IsWhoEquip() {
         }
         return -1;
     }
-    if (this->used_type == 5) {
+    if (this->used_type == USED_ITEM_TYPE_ROBO_PART) {
         return 2;
     }
     return -1;
 }
 int CGameDataUsed::GetLevel() {
-    if (used_type == 3) {
+    if (used_type == USED_ITEM_TYPE_WEAPON) {
         return data.weapon.level;
     }
-    if (used_type == 2) {
+    if (used_type == USED_ITEM_TYPE_ATTACH) {
         return this->data.attach.level;
     }
     return 0;
@@ -277,7 +276,7 @@ int CGameDataUsed::GetPalletColor() {
     CDataWeapon *data;
 
     switch (this->used_type) {
-        case 3:
+        case USED_ITEM_TYPE_WEAPON:
             data = (CDataWeapon *)GameItemDataManage.GetWeaponData(this->item_no);
             if (data != NULL) {
                 return *(s8 *)&data->pallet_color;
@@ -309,10 +308,10 @@ int CGameDataUsed::GetNum() {
         return 0;
     }
     switch (used_type) {
-        case 1:
-        case 4:
+        case USED_ITEM_TYPE_ITEM:
+        case USED_ITEM_TYPE_UNK_4:
             return this->data.item.num;
-        case 2:
+        case USED_ITEM_TYPE_ATTACH:
             if (item_type == 0x11) {
                 return 1;
             }
@@ -337,9 +336,9 @@ int CGameDataUsed::AddNum(int count, int clear) {
         return 0;
     }
     record = GetCommonItemData(item_no);
-    if (used_type != 2) {
+    if (used_type != USED_ITEM_TYPE_ATTACH) {
         num = 1;
-        if (used_type != 1) {
+        if (used_type != USED_ITEM_TYPE_ITEM) {
             num += count;
         } else {
             stacked->data.item.num += count;
@@ -375,7 +374,7 @@ int CGameDataUsed::GetUseCapacity() {
     return 0;
 }
 int CGameDataUsed::AddFishHp(int amount) {
-    if (used_type == 6) {
+    if (used_type == USED_ITEM_TYPE_FISH) {
         CGameDataUsed *fish = this;
         int hp = fish->data.fish.hp + amount;
         if (hp < 0) {
@@ -402,7 +401,7 @@ int CGameDataUsed::Boiled() {
     fish->data.boiled.base_item_no = fish->item_no;
     fish->data.boiled.value = value + 0x14;
     fish->item_type = 0x23;
-    fish->used_type = 8;
+    fish->used_type = USED_ITEM_TYPE_BOILED;
     fish->item_no = 0x1AA;
     return 1;
 }
@@ -418,16 +417,16 @@ void CGameDataUsed::SetName(char *name) {
 
     buffer = NULL;
     switch (used_type) {
-        case 3:
+        case USED_ITEM_TYPE_WEAPON:
             buffer = this->data.weapon.name;
             break;
-        case 5:
+        case USED_ITEM_TYPE_ROBO_PART:
             buffer = &data.robopart.name[0];
             break;
-        case 6:
+        case USED_ITEM_TYPE_FISH:
             buffer = this->data.fish.name;
             break;
-        case 2:
+        case USED_ITEM_TYPE_ATTACH:
             buffer = this->data.attach.name;
             break;
     }
@@ -482,7 +481,7 @@ char *CGameDataUsed::GetName(int name_type) {
             strcpy(word_1327, name);
         }
     }
-    if (name_type > 0 && (used_type == 3 || used_type == 2)) {
+    if (name_type > 0 && (used_type == USED_ITEM_TYPE_WEAPON || used_type == USED_ITEM_TYPE_ATTACH)) {
         weapon_level = GetLevel();
         if (weapon_level > 0) {
             if ((int)LanguageCode > 0) {
@@ -524,7 +523,7 @@ void CGameDataUsed::TransToPassword(char *data, int length) {
     if (data != NULL) {
         memset(data, 0, 4);
         switch (used_type) {
-            case 6: {
+            case USED_ITEM_TYPE_FISH: {
                 body = &item->data.fish;
                 memset(&buffer, 0, 14);
                 buffer.fish.item_no = item->item_no;
@@ -556,7 +555,7 @@ void CGameDataUsed::TransToData(char *data, int length) {
 
     if (data != NULL) {
         switch (used_type) {
-            case 6: {
+            case USED_ITEM_TYPE_FISH: {
                 dst = buffer.bytes;
                 for (i = 0; i < 14 && i < length; i++) {
                     dst[i] = ((signed char *)data)[i];
@@ -586,8 +585,8 @@ int CGameDataUsed::DeleteNum(int count) {
     }
     before = GetNum();
     switch (this->used_type) {
-        case 1:
-        case 2:
+        case USED_ITEM_TYPE_ITEM:
+        case USED_ITEM_TYPE_ATTACH:
             delta = AddNum(-count, 1);
             break;
         default:
@@ -598,7 +597,7 @@ int CGameDataUsed::DeleteNum(int count) {
     return before - delta;
 }
 int CGameDataUsed::RemainFusion() {
-    if (used_type == 3) {
+    if (used_type == USED_ITEM_TYPE_WEAPON) {
         return this->data.weapon.fusion_point;
     }
     return 0;
@@ -607,7 +606,7 @@ int CGameDataUsed::AddFusionPoint(int points) {
     int total;
     CGameDataUsed *weapon = this;
 
-    if (used_type == 3) {
+    if (used_type == USED_ITEM_TYPE_WEAPON) {
         total = weapon->data.weapon.fusion_point + points;
         if (total < 0) {
             total = 0;
@@ -627,7 +626,7 @@ int CGameDataUsed::AddFusionPoint(int points) {
 int CGameDataUsed::GetEffectReadType(char **effect, char **sound, int *power) {
     int elem;
 
-    if (used_type == 3) {
+    if (used_type == USED_ITEM_TYPE_WEAPON) {
         int weapon_type = item_type;
         GetWeaponInfoData(item_no);
         if (weapon_type == 4) {
@@ -661,17 +660,17 @@ void CGameDataUsed::GetMsgAddInfo(char **message, char **extra_message, int *val
     }
     *message = GetName(2);
     switch (used_type) {
-        case 1:
+        case USED_ITEM_TYPE_ITEM:
             if (item_no == 0x137) {
                 values[0] = GetUserDataMan()->GetYarikomiMedal();
             }
             break;
-        case 3:
+        case USED_ITEM_TYPE_WEAPON:
             if (values != NULL) {
                 values[0] = GetLevel();
             }
             break;
-        case 2:
+        case USED_ITEM_TYPE_ATTACH:
             body = &this->data.attach;
             if (values != NULL) {
                 values[0] = 0;
@@ -705,10 +704,10 @@ float CGameDataUsed::GetWHp(int *hp) {
         hp[1] = 0;
     }
     switch (used_type) {
-        case 3:
+        case USED_ITEM_TYPE_WEAPON:
             gauge = &data.weapon.whp;
             break;
-        case 5:
+        case USED_ITEM_TYPE_ROBO_PART:
             if (item_type == 0xD) {
                 gauge = &data.weapon.abs;
             }
@@ -728,12 +727,12 @@ float CGameDataUsed::GetWHp(int *hp) {
 }
 int CGameDataUsed::IsRepair() {
     switch (this->used_type) {
-        case 3:
+        case USED_ITEM_TYPE_WEAPON:
             if ((float)GetDispVolumeForFloat(this->data.weapon.whp.now) < this->data.weapon.whp.max) {
                 return 1;
             }
             break;
-        case 5:
+        case USED_ITEM_TYPE_ROBO_PART:
             if (this->item_type == 0xD &&
                 (float)GetDispVolumeForFloat(this->data.weapon.abs.now) < this->data.weapon.abs.max) {
                 return 1;
@@ -751,10 +750,10 @@ int CGameDataUsed::Repair(int points) {
 
     gauge = NULL;
     switch (this->used_type) {
-        case 3:
+        case USED_ITEM_TYPE_WEAPON:
             gauge = &this->data.weapon.whp;
             break;
-        case 5:
+        case USED_ITEM_TYPE_ROBO_PART:
             if (this->item_type == 0xD) {
                 gauge = &this->data.weapon.abs;
     }
@@ -840,7 +839,7 @@ int CGameDataUsed::IsBroken() {
 int CGameDataUsed::IsLevelUp() {
 
     switch (this->used_type) {
-        case 3:
+        case USED_ITEM_TYPE_WEAPON:
             if (this->data.weapon.level < 99) {
                 if (this->data.weapon.abs.max <= (float)GetDispVolumeForFloat(this->data.weapon.abs.now)) {
                     return 1;
@@ -957,7 +956,7 @@ int CGameDataUsed::IsTrush(void) {
 }
 int CGameDataUsed::IsSpectolTrans() {
     CDataCommon *record = GetCommonItemData(item_no);
-    if (record != NULL && (record->attribute & 2)) {
+    if (record != NULL && (record->attribute & ITEM_ATTRIBUTE_SPECTOL_TRANS)) {
         return 1;
     }
     return 0;
@@ -978,7 +977,7 @@ void CGameDataUsed::ToSpectolTrans(CGameDataUsed *attach, int num) {
         name = GetName(0);
         level = GetLevel();
         switch (used_type) {
-            case 3: {
+            case USED_ITEM_TYPE_WEAPON: {
                 WEAPON_USED *weapon = &data.weapon;
                 if (level < 5) {
                     spectol->spectol_type = 3;
@@ -1012,7 +1011,7 @@ void CGameDataUsed::ToSpectolTrans(CGameDataUsed *attach, int num) {
                 }
                 break;
             }
-            case 2: {
+            case USED_ITEM_TYPE_ATTACH: {
                 spectol->level = 0;
                 ATTACH_USED *source = &data.attach;
                 spectol->status[0] = source->status[0] * count;
@@ -1033,7 +1032,7 @@ void CGameDataUsed::ToSpectolTrans(CGameDataUsed *attach, int num) {
                 }
                 break;
             }
-            case 6:
+            case USED_ITEM_TYPE_FISH:
                 spectol->level = 0;
                 spectol->attribute[7] = 2;
                 spectol->special = 0;
@@ -1049,7 +1048,7 @@ void CGameDataUsed::ToSpectolTrans(CGameDataUsed *attach, int num) {
         }
         spectol->level = level;
         attach->item_type = GameItemDataManage.GetDataType(0xB9);
-        attach->used_type = 2;
+        attach->used_type = USED_ITEM_TYPE_ATTACH;
         attach->item_no = 0xB9;
         spectol->num = 1;
         attach->SetName(name);
@@ -1058,7 +1057,7 @@ void CGameDataUsed::ToSpectolTrans(CGameDataUsed *attach, int num) {
 }
 void CGameDataUsed::GetStatusParam(short *param) {
     if (param != NULL) {
-        if (used_type == 3) {
+        if (used_type == USED_ITEM_TYPE_WEAPON) {
             param[0] = data.weapon.status[0];
             param[1] = data.weapon.status[1];
             param[2] = data.weapon.attribute[0];
@@ -1069,7 +1068,7 @@ void CGameDataUsed::GetStatusParam(short *param) {
             param[7] = data.weapon.attribute[5];
             param[8] = data.weapon.attribute[6];
             param[9] = data.weapon.attribute[7];
-        } else if (used_type == 2) {
+        } else if (used_type == USED_ITEM_TYPE_ATTACH) {
             CGameDataUsed *attachment = this;
             param[0] = attachment->data.attach.status[0];
             param[1] = attachment->data.attach.status[1];
@@ -1081,7 +1080,7 @@ void CGameDataUsed::GetStatusParam(short *param) {
             param[7] = attachment->data.attach.attribute[5];
             param[8] = attachment->data.attach.attribute[6];
             param[9] = attachment->data.attach.attribute[7];
-        } else if (used_type == 5) {
+        } else if (used_type == USED_ITEM_TYPE_ROBO_PART) {
 
             param[0] = data.weapon.level;
             param[1] = data.weapon.status[0];
@@ -1120,7 +1119,7 @@ int CGameDataUsed::IsBuildUp(int *count, int *item_nos, int *flags) {
 
     built_up = 0;
     found = 0;
-    if (this->used_type == 3) {
+    if (this->used_type == USED_ITEM_TYPE_WEAPON) {
         weapon = &this->data.weapon;
         info = (CDataWeapon *)GetWeaponInfoData(this->item_no);
         if (info == NULL) {
@@ -1185,7 +1184,7 @@ int CGameDataUsed::GetActiveElem() {
     int best;
     int i;
 
-    if (this->used_type == 3) {
+    if (this->used_type == USED_ITEM_TYPE_WEAPON) {
         best = 0;
         for (i = 1; i < 4; i++) {
             if (weapon->data.weapon.attribute[best] < weapon->data.weapon.attribute[i]) {
@@ -1199,13 +1198,13 @@ int CGameDataUsed::GetActiveElem() {
 int CGameDataUsed::GetAttackType() {
     CDataWeapon *info;
 
-    if (this->used_type == 3) {
+    if (this->used_type == USED_ITEM_TYPE_WEAPON) {
         info = (CDataWeapon *)GetWeaponInfoData(this->item_no);
         if (info != NULL) {
             return *(s8 *)&info->attack_type;
         }
     }
-    return this->used_type == 5 ? this->GetRoboInfoType() : -1;
+    return this->used_type == USED_ITEM_TYPE_ROBO_PART ? this->GetRoboInfoType() : -1;
 }
 int CGameDataUsed::GetModelNo(void) {
     if (used_type == USED_ITEM_TYPE_WEAPON) {
@@ -1245,7 +1244,7 @@ int GetMainCharaModelName(int character_index, char *model_name, int alternate) 
     }
 }
 void CGameDataUsed::CheckParamLimmit() {
-    if (used_type == 3) {
+    if (used_type == USED_ITEM_TYPE_WEAPON) {
         CDataWeapon *weapon_info = GetWeaponInfoData(item_no);
         if (weapon_info == NULL) {
             return;
@@ -1276,7 +1275,7 @@ void CGameDataUsed::CheckParamLimmit() {
             LevelUp();
         }
     }
-    if (used_type == 2) {
+    if (used_type == USED_ITEM_TYPE_ATTACH) {
         ATTACH_USED *attach = &data.attach;
         if (attach->status[0] > 999) {
             attach->status[0] = 999;
@@ -1290,7 +1289,7 @@ void CGameDataUsed::CheckParamLimmit() {
             }
         }
     }
-    if (used_type == 6) {
+    if (used_type == USED_ITEM_TYPE_FISH) {
         BREEDFISH_USED *fish = &data.fish;
         int excess = CalcBreedFishParam(fish) - 400;
         u16 *param[5] = {&fish->param[0], &fish->param[1], &fish->param[2], &fish->param[3], &fish->param[4]};
@@ -1337,7 +1336,7 @@ void CGameDataUsed::CheckParamLimmit() {
 void CGameDataUsed::TimeCheck(int elapsed) {
     int time_left;
 
-    if (used_type == 6) {
+    if (used_type == USED_ITEM_TYPE_FISH) {
         CGameDataUsed *fish = this;
         time_left = (int)(fish->data.fish.timer - elapsed);
         if (time_left < 0) {
@@ -1348,7 +1347,7 @@ void CGameDataUsed::TimeCheck(int elapsed) {
 }
 int CGameDataUsed::GetGiftBoxItemNum() {
     int count = 0;
-    if (used_type == 7) {
+    if (used_type == USED_ITEM_TYPE_GIFT_BOX) {
         for (int i = 0; i < 3; i++) {
             if (this->data.giftbox.item_no[i] > 0) {
                 count++;
@@ -1363,7 +1362,7 @@ int CGameDataUsed::SetGiftBoxItem(int item_no, int slot) {
     int i;
 
     result = -1;
-    if (this->used_type == 7) {
+    if (this->used_type == USED_ITEM_TYPE_GIFT_BOX) {
         if (slot < 0) {
             for (i = 0; i < 3; i++) {
                 if (box->data.giftbox.item_no[i] <= 0) {
@@ -1379,7 +1378,7 @@ int CGameDataUsed::SetGiftBoxItem(int item_no, int slot) {
     return result;
 }
 int CGameDataUsed::GetGiftBoxItemNo(int slot) {
-    if (used_type == 7) {
+    if (used_type == USED_ITEM_TYPE_GIFT_BOX) {
         if (0 <= slot && slot < 3) {
             return data.giftbox.item_no[slot];
         }
@@ -1387,7 +1386,7 @@ int CGameDataUsed::GetGiftBoxItemNo(int slot) {
     return 0;
 }
 int CGameDataUsed::GetGiftBoxSameItemNum(int box_item_no) {
-    if (used_type != 7) {
+    if (used_type != USED_ITEM_TYPE_GIFT_BOX) {
         return 0;
     }
     int count = 0;
@@ -1427,7 +1426,7 @@ int CGameDataUsed::CopyDataWeapon(int item_no) {
     if (record == NULL) {
         return 0;
     }
-    this->used_type = 3;
+    this->used_type = USED_ITEM_TYPE_WEAPON;
     this->item_no = item_no;
     this->item_type = GetItemDataType(item_no);
     weapon = &this->data.weapon;
@@ -1471,7 +1470,7 @@ int CGameDataUsed::CopyDataAttach(int new_item_no) {
             return 1;
         }
     }
-    used_type = 2;
+    used_type = USED_ITEM_TYPE_ATTACH;
     item_no = (short)new_item_no;
     item_type = GetItemDataType(new_item_no);
 
@@ -1522,7 +1521,7 @@ int CGameDataUsed::CopyDataFish(int item_no) {
     if (record == NULL) {
         return 0;
     }
-    this->used_type = 6;
+    this->used_type = USED_ITEM_TYPE_FISH;
     this->item_no = item_no;
     this->item_type = GetItemDataType(item_no);
     message = GetItemMessage(item_no);
@@ -1596,7 +1595,7 @@ int CGameDataUsed::CopyDataRoboPart(int item_no) {
     if (record == NULL) {
         return 0;
     }
-    this->used_type = 5;
+    this->used_type = USED_ITEM_TYPE_ROBO_PART;
     this->item_no = item_no;
     this->item_type = GetItemDataType(item_no);
     base = (char *)&this->data.robopart.gage0;
@@ -2732,7 +2731,7 @@ void CUserDataManager::AllWeaponRepair() {
 
     for (; i < 150; i++) {
         CGameDataUsed *item = &used_data[i];
-        if (item->used_type == 5) {
+        if (item->used_type == USED_ITEM_TYPE_ROBO_PART) {
             item->Repair(999);
         }
     }
@@ -2765,7 +2764,7 @@ void CUserDataManager::RefreshNPCStatus(int mode) {
             if (time > 0) {
                 for (int i = 0; i < 144; i++) {
                     CGameDataUsed *item = GetUsedDataPtr(i);
-                    if (item->used_type == 3 && item->IsRepair() != 0) {
+                    if (item->used_type == USED_ITEM_TYPE_WEAPON && item->IsRepair() != 0) {
                         repair_item[repair_num++] = item;
                     }
                 }
@@ -3481,7 +3480,7 @@ int DeleteItem_Local(CGameDataUsed *item, int item_no, int count) {
     removed = 0;
     if (item_no == item->item_no) {
         removed += item->DeleteNum(count);
-    } else if (item->used_type == 7) {
+    } else if (item->used_type == USED_ITEM_TYPE_GIFT_BOX) {
         for (int index = 0; index < 3; index++) {
             if (0 < count && item_no == item->GetGiftBoxItemNo(index)) {
                 item->SetGiftBoxItem(0, index);
@@ -3529,23 +3528,23 @@ int CUserDataManager::CopyGameData(CGameDataUsed *item, int item_no) {
     }
     used_type = ConvertUsedItemType(common->type);
     switch (used_type) {
-        case 1:
-        case 4:
+        case USED_ITEM_TYPE_ITEM:
+        case USED_ITEM_TYPE_UNK_4:
             item->CopyDataItem(item_no);
             break;
-        case 2:
+        case USED_ITEM_TYPE_ATTACH:
             item->CopyDataAttach(item_no);
             break;
-        case 3:
+        case USED_ITEM_TYPE_WEAPON:
             item->CopyDataWeapon(item_no);
             break;
-        case 5:
+        case USED_ITEM_TYPE_ROBO_PART:
             item->CopyDataRoboPart(item_no);
             break;
-        case 7:
+        case USED_ITEM_TYPE_GIFT_BOX:
             item->CopyDataGiftBox(item_no);
             break;
-        case 6:
+        case USED_ITEM_TYPE_FISH:
             item->CopyDataFish(item_no);
             break;
     }
@@ -3578,7 +3577,7 @@ int CUserDataManager::CountFish() {
     int count = 0;
     CGameDataUsed *item = used_data;
     for (int i = 0; i < 150; i++, item++) {
-        if (item->used_type == 6) {
+        if (item->used_type == USED_ITEM_TYPE_FISH) {
             count++;
         }
     }
@@ -4710,7 +4709,7 @@ int CheckGetItemRemainNum(int item_no) {
         return 0;
     }
     held = manager->GetNumSameItem(item_no);
-    return *(u16 *)((u8 *)GetCommonItemData(item_no) + 0xA) - held;
+    return GetCommonItemData(item_no)->max_num - held;
 }
 void CheckItemDngKey(void) {
     CUserDataManager *user_data = GetUserDataMan();
@@ -4847,7 +4846,7 @@ void AquaFishFatigueClear(void) {
     }
     fish = (CGameDataUsed *)user_data->GetUsedDataPtr(0);
     for (i = 0; i < 150; i++, fish++) {
-        if (fish->item_no > 0 && fish->used_type == 6) {
+        if (fish->item_no > 0 && fish->used_type == USED_ITEM_TYPE_FISH) {
             fish->data.fish.fatigue = 0;
             fish->data.fish.unk_3d = 0;
         }
@@ -4861,7 +4860,7 @@ void AquaFishFatigueClear(void) {
         tank_fish = (CGameDataUsed *)aquarium->GetAquariumFishTop(tank);
         if (tank_fish != NULL) {
             for (slot = 0; slot < aquarium_fish_maxtbl[tank]; tank_fish++, slot++) {
-                if (tank_fish->used_type == 6) {
+                if (tank_fish->used_type == USED_ITEM_TYPE_FISH) {
                     tank_fish->data.fish.fatigue = 0;
                     tank_fish->data.fish.unk_3d = 0;
                 }

@@ -32,8 +32,8 @@ void InitSubGame(CScene *scene) {
     ItemOver = 0;
     if (scene->GetCharacter(scene->player_chara) != 0) {
         mgCTextureManager *tex_manager = &mgTexManager;
-        for (int i = 0; i < scene->unk_3e6c; i++) {
-            tex_manager->DeleteBlock(scene->unk_3e68 + i);
+        for (int i = 0; i < scene->tex_block_count; i++) {
+            tex_manager->DeleteBlock(scene->tex_block_base + i);
         }
         for (int j = 0; j < SUBGAME_CHARA_NUM; j++) {
             scene->DeleteChara(j + SUBGAME_CHARA_BASE);
@@ -76,8 +76,8 @@ int sgInitSubGame(int type, SubGameInfo *info) {
     }
     result = 0;
     GameInfo = *info;
-    GameInfo.texb = GameInfo.scene->unk_3e68;
-    GameInfo.texb_num = GameInfo.scene->unk_3e6c;
+    GameInfo.texb = GameInfo.scene->tex_block_base;
+    GameInfo.texb_num = GameInfo.scene->tex_block_count;
     switch (type) {
         case SUBGAME_FISHING:
             result = sgInitFishing(&GameInfo);

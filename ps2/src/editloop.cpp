@@ -474,8 +474,8 @@ void EditInit(INIT_LOOP_ARG arg) {
     MainScene__2->event_texb_num = 2;
     MainScene__2->GetActiveBgmInfo()->unk_c = 1.0f;
     MainScene__2->SetVolfBGM(MainScene__2->GetActiveBgmInfo()->volf);
-    MainScene__2->unk_3e68 = 185;
-    MainScene__2->unk_3e6c = 21;
+    MainScene__2->tex_block_base = 185;
+    MainScene__2->tex_block_count = 21;
     effects = new (TotalDataBuff.Alloc(sizeof(CEffectScriptMan) / 16 + 2)) CEffectScriptMan;
     effects->Initialize(&TotalDataBuff, 174, 11);
     effects->load_buffer = read_buffer;

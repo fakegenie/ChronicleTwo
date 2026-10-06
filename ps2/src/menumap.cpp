@@ -784,8 +784,8 @@ void CWorldMapMenu::Draw() {
         prim->Texture(mark_tex);
         for (int i = 0; i < 3; i++) {
             prim->Color(0, 0, 0, 0x2E);
-            int temp = i * 0x1E;
-            PrimQuad(prim, mgRect < int > (frame.left + 4, frame.top + 4, frame.right, frame.bottom), mgRect < int > (temp, 0x60, 0x1E, 0x32));
+            int source_x = i * 0x1E;
+            PrimQuad(prim, mgRect < int > (frame.left + 4, frame.top + 4, frame.right, frame.bottom), mgRect < int > (source_x, 0x60, 0x1E, 0x32));
             prim->Color(0x80, 0x80, 0x80, 0x80);
             PrimQuad(prim, frame, mgRect < int > (i * 0x1E, 0x60, 0x1E, 0x32));
             frame.left += frame_step[i];

@@ -77,7 +77,6 @@ struct RangeEntry {
     float distance; /**< Range distance. */
     int id; /**< Entry identifier. */
 };
-extern "C" int fptoui(float);
 
 // Code (.text)
 void CMonsterMan::RunScript(int index) {

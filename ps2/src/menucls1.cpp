@@ -3,6 +3,7 @@
 #include "prespr.hpp"
 #include "mg_drawprim.hpp"
 #include <cstdio>
+#include <cmath>
 #include "font.hpp"
 #include "sysmes.hpp"
 #include "scenesnd.hpp"
@@ -25,7 +26,6 @@
 #include "gamepad.hpp"
 
 extern "C" int GetNumberKeta__Fi(int);
-extern "C" double pow(double, double);
 
 extern char *MenuHatena_894;
 extern signed char init_895;
@@ -1078,7 +1078,7 @@ int MenuUseItemCheckFunc(CGameDataUsed *item, CItemUseTarget *target, int apply)
             return 0;
         }
         if (MenuUsedItemNo == 0x127) {
-            if (weapon->used_type == 3 && !weapon->IsLevelUp() && weapon->IsFishingRod() != 1) {
+            if (weapon->used_type == USED_ITEM_TYPE_WEAPON && !weapon->IsLevelUp() && weapon->IsFishingRod() != 1) {
                 count++;
                 if (apply != 0) {
                     used++;

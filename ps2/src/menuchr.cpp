@@ -127,13 +127,13 @@ void SetupUnitMan(CScene *scene, CUserDataManager *userData, int unit, ROBO_INFO
 void GetBajjiPosition(CMenuPosDataForm *form, int slot, int unused, int *pos);
 void SetSwordBlurEffect(CCharacter2 *chara, mgCMemory *stack, int blur_type);
 
-struct temp_v0_champs_a42004 {
-    char pad0[0xF4];
-      struct unkF4_champs_a42004 *unkF4;
-};
-struct unkF4_champs_a42004 {
+struct RoboPartsLight {
     char pad0[0x18];
-      int unk18;
+    int enable;
+};
+struct RoboPartsFrame {
+    char pad0[0xF4];
+    RoboPartsLight *light;
 };
 /**
  *
@@ -703,8 +703,8 @@ void MenuBGReadInfo2Malloc(mgCMemory *memory, int *wanted) {
         }
     }
 }
-short ConvertCharaLoadDataPhase(int a0, int a1) {
-    return tbl_992[a1 + a0 * 5];
+short ConvertCharaLoadDataPhase(int chara_no, int part) {
+    return tbl_992[part + chara_no * 5];
 }
 int CheckBattleLoop() {
     if (MenuCommonInfo == NULL) {
@@ -3840,7 +3840,7 @@ int CMenuMosSelect::KeyStep() {
                                     CGameDataUsed reward;
                                     reward.Init();
                                     reward.item_no = 0x17F;
-                                    reward.used_type = 2;
+                                    reward.used_type = USED_ITEM_TYPE_ATTACH;
                                     reward.item_type = 0x22;
                                     reward.data.attach.spectol_value = select_badge->class_level + 1;
                                     if (select_badge->class_level == 3) {
@@ -4959,14 +4959,13 @@ int MenuItemRoboDataLoadEndCheck(MENU_BGREAD_INFO2 **info, mgCMemory *stack, CAc
     }
     return 0;
 }
-void MenuRoboPartsLightOff(mgCFrame *arg0) {
-    struct temp_v0_champs_a42004 *temp_v0;
+void MenuRoboPartsLightOff(mgCFrame *root) {
+    RoboPartsFrame *parts_frame;
 
-    if (arg0 != NULL) {
-        temp_v0 =
-            (struct temp_v0_champs_a42004 *)(SearchFrame__8mgCFrameFPc(arg0, &at_4517__2));
-        if (temp_v0 != NULL) {
-            temp_v0->unkF4->unk18 = 0;
+    if (root != NULL) {
+        parts_frame = (RoboPartsFrame *)(SearchFrame__8mgCFrameFPc(root, &at_4517__2));
+        if (parts_frame != NULL) {
+            parts_frame->light->enable = 0;
         }
     }
 }

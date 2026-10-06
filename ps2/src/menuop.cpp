@@ -2905,8 +2905,8 @@ int SubGameSaveKey(void) {
             }
             break;
         case SUB_SAVE_WRITE_DONE:
-            unsigned int temp = pushed != 0;
-            if (temp) {
+            unsigned int confirmed = pushed != 0;
+            if (confirmed) {
                 MenuSePlay(1);
                 SubGameSaveLoadStatus = 1;
             }
@@ -2970,8 +2970,8 @@ int SubGameSaveKey(void) {
             break;
         case SUB_SAVE_FORMATTING:
             card = GetSubGameCard(MemoryCardPtr);
-            int temp3 = stepResult != 0;
-            if (temp3) {
+            int format_done = stepResult != 0;
+            if (format_done) {
                 if (McCheckMCPs2(card) != 0) {
                     next = SUB_SAVE_DIR_MAKING;
                     if (card != NULL && card->formatted == 0) {
