@@ -119,14 +119,23 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/swordeffect", CreatSmoothPassSW__FPA4_fPA4
 
 #ifdef NONMATCHING
 void CSWordAfterEffect::Draw() {
-    if (!active || point_num <= 0) return;
+    if (!active) return;
+    if (point_num <= 0) return;
+    int projected[4];
+    float alpha_step;
     float opacity = alpha;
     int count = (int)((float)length * opacity);
     if (smooth_num < count) count = smooth_num;
     if (count <= 0) return;
-    float alpha_step = opacity / (float)count;
+    alpha_step = opacity / (float)count;
     mgCDrawPrim prim;
-    if (texture != NULL) mgTexManager.ReloadTexture(tex_block, (sceVif1Packet *)NULL);
+    mgCTextureManager *textures = &mgTexManager;
+    switch ((int)texture) {
+    case 0:
+        break;
+    default:
+        textures->ReloadTexture(tex_block, (sceVif1Packet *)NULL);
+    }
     prim.Initialize(NULL, NULL);
     prim.AlphaBlendEnable(1);
     prim.AlphaBlend(2);
@@ -145,9 +154,8 @@ void CSWordAfterEffect::Draw() {
     prim.DepthTest(1);
     prim.Begin(4);
     if (texture != NULL) prim.Texture(texture);
-    float u_step = (float)tex_w / (float)count;
     float u = (float)tex_u;
-    int projected[4];
+    float u_step = (float)tex_w / (float)count;
     if (texture == NULL) {
         for (int point = 0; point < count; ++point) {
             if (mgTransWorldPrim(projected, smooth0[point])) {
@@ -161,8 +169,9 @@ void CSWordAfterEffect::Draw() {
             opacity -= alpha_step;
         }
     } else {
+        int texel_u;
         for (int point = 0; point < count; ++point) {
-            int texel_u = (int)u;
+            texel_u = (int)u;
             if (mgTransWorldPrim(projected, smooth0[point])) {
                 prim.Color(color0[0], color0[1], color0[2], (int)((float)color0[3] * opacity));
                 prim.TextureCrd(texel_u, tex_v);
