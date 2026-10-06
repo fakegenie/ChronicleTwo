@@ -78,8 +78,9 @@ A function is in one of four states:
   `main.symbols.txt`, are `static` in the `.cpp`. A global definition fails
   at link. The reverse also happens: `gameutil`'s `def_vrtx` is referenced by
   `libdev` assembly, so it has to be a plain global.
-- Functions whose bodies are only `asm { ... }` blocks (VU0 vector and matrix
-  code) are kept as `INCLUDE_ASM` here. Most have no C form. `mgZeroVector` does:
+- Functions whose bodies are only VU0 vector and matrix code have no C form
+  in most cases. The `mg_math` ones are written as `asm void f(...) { .set noreorder
+  ... jr ra; <delay slot> }` and match at 100%. `mgZeroVector` does have a C form:
   `*(u_long128 *)vector = 0;` compiles to the retail `sq $0, 0($4)`.
 
 ## Compiler state and `state.py`
@@ -366,3 +367,12 @@ only functions present in both objects can be replaced, the plain build keeps th
 - A meaningless `switch` on a value the function already tests, with `case 0: break;` and a `default:` holding the real code, turns on the "no fall-through delay-slot fill" style. It also gives retail's extra label `nop`s and a dead `move` after a `b`. In `mgCVisualMDT::CreateFace` redundant if/else stores did nothing and the switch matched outright.
 - When retail reuses a parameter's register for a derived pointer and returns it, advance the parameter itself (`faces = (FACES_ID *)faces->index;`) and drop the separate local.
 - When a pointer offset that should fold comes out as two `addiu`s, write it with one constant offset (`(u_long128 *)environment + 5`). When a copy such as `start = write` is coalesced into a saved register too early, reusing `write` for a later unrelated value keeps the first value in v0.
+- A dead `if` written as a `switch` (`switch (x) { case 0: break; default: ...; }`) turns on retail's style of unfilled fall-through delay slots plus copying the branch target's first instruction into the slot. With `global_optimizer off` this needs no dummy branch, and it finished `GetLWMatrix`.
+- A store through an address register (`addiu aN,sp,K; sw x,0(aN)`) where retail stores directly means the source reads that element back later (`powers[0] = t * powers[1]`). Write the value again instead (`t * (t * t)`). The reverse also holds: retail's address register on `basis[0][3]` points to a read-back in the original source.
+- Variadic functions: retail's `li v1,4; slti; branch; (8 - v1) * 8` before `vsprintf` is `(char *)__builtin_next_arg(fmt) - (__builtin_args_info(2) >= 8 ? 0 : (8 - __builtin_args_info(2)) * 8)`. MWCC does not fold `__builtin_args_info`; arguments 0 and 1 crash the compiler.
+- Under `primer=u64div`, `(int)` casts respond to the state and `fptosi()` does not. Switching to casts fixed `LocalTransWorldPrimPos`.
+- A scheduling difference where retail computes one call argument before another statement's value can be fixed by an assignment inside the argument list: `f(a + 1, (b = expr) + 1)`.
+- Defining the final value as a fresh local (`float last = g(angle);`) instead of reassigning the variable fixed register colouring at the last of several repeated inline expansions.
+- In movie.cpp the `and` mask followed by the dsll32/dsrl32 pair appears with the global optimizer on, and both calls become shifts under `global_optimizer off`.
+- MWCC `asm void` bodies accept `vsqrt Q, vfNx`, `ctc2.ni zero, vi16`, `cfc2.ni v0, vi22` and `qmfc2.ni`. Keep the explicit `nop` after `jr ra` where retail leaves the slot empty. A parameter named `v0` or `v1` collides with the register names inside `asm {}`.
+- The worktree bash sandbox refuses compound commands with loops or globs that call `./dev.sh`. Put loops in a Python file and call that.
