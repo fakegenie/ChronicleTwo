@@ -1640,7 +1640,6 @@ void MenuCursorDraw(mgCTexture *tex, float *pos, float rot, int reverse, int alp
 void MenuCursorDraw(mgCTexture *texture, float *position, float value, int flag) {
     MenuCursorDraw(texture, position, value, 0, flag, 1.0f);
 }
-#ifdef STATEMATCHING
 void DrawMenuTilePattern(mgCDrawPrim *prim, mgCTexture *tex, float x, float y, mgRect<int> tex_rect, int unused,
                          u8 *rgba) {
     mgRect<int> dest(0, 0, 0, 0);
@@ -1671,9 +1670,6 @@ void DrawMenuTilePattern(mgCDrawPrim *prim, mgCTexture *tex, float x, float y, m
     }
     prim->End();
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", DrawMenuTilePattern__FP11mgCDrawPrimP10mgCTextureff9mgRect_i_iPUc);
-#endif
 void DrawMenuMainFrmImg(int &loaded_tex_no, mgRect<int> dest, mgRect<int> source, int red, int green,
                         int blue, int alpha, int unused) {
     mgCTexture *texture = MenuPosData->common_tex;
