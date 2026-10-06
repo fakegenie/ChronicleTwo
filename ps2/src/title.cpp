@@ -1281,7 +1281,6 @@ int TitleModeKey() {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/title", TitleModeKey__Fv);
 #endif
-#ifdef NONMATCHING
 void TitleModeDraw() {
     int i;
     int x;
@@ -1293,8 +1292,10 @@ void TitleModeDraw() {
     mgTexManager.ReloadTexture(0x40, (sceVif1Packet *)NULL);
     mgCDrawPrim prim;
     SetSpriteEnv(&prim, 0);
+    float left = 0.0f;
+    float top = 24.0f;
     float title_alpha = TitleInfo->title_alpha;
-    PrimQuad(Tex_Chronicle, 0.0f, 24.0f, mgRect<int>(0, 0, 0x200, 0x1A0), fptosi(title_alpha), 0x80, 0x80, 0x80);
+    PrimQuad(Tex_Chronicle, 0.0f, top, mgRect<int>(0, 0, 0x200, 0x1A0), fptosi(TitleInfo->title_alpha), 0x80, 0x80, 0x80);
     mgRect<int> start_rect(start_button_tbl_1826[LanguageCode].left, start_button_tbl_1826[LanguageCode].top,
                            start_button_tbl_1826[LanguageCode].right, start_button_tbl_1826[LanguageCode].bottom);
     if (LanguageCode == 0) {
@@ -1302,7 +1303,7 @@ void TitleModeDraw() {
         prim.Begin(6);
         prim.Texture(Tex_Logo);
         prim.Color(0x80, 0x80, 0x80, fptosi(TitleInfo->push_alpha));
-        PrimQuad(&prim, 162.0f, 338.0f, start_rect);
+        PrimQuad(&prim, 162.0f, float(338.0), start_rect);
         prim.Color(0x80, 0x80, 0x80, fptosi(TitleInfo->title_alpha));
         PrimQuad(&prim, 84.0f, 384.0f, mgRect<int>(0, 0, 0x166, 0x16));
         prim.End();
@@ -1313,7 +1314,7 @@ void TitleModeDraw() {
         prim.Color(0x80, 0x80, 0x80, fptosi(TitleInfo->push_alpha));
         PrimQuad(&prim, 162.0f, (float)(mgScreenHeight - 0x6C), start_rect);
         prim.Color(0x80, 0x80, 0x80, fptosi(TitleInfo->title_alpha));
-        PrimQuad(&prim, 0.0f, (float)(mgScreenHeight - 0x38), mgRect<int>(0, 0x180, 0x200, 0x30));
+        PrimQuad(&prim, left, (float)(mgScreenHeight - 0x38), mgRect<int>(0, 0x180, 0x200, 0x30));
         prim.End();
     }
     mgRect<int> button_rect(0x12E, 0x28, 0xD2, 0x36);
@@ -1384,9 +1385,6 @@ void TitleModeDraw() {
         TitleInfo->cursor_count = 0;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/title", TitleModeDraw__Fv);
-#endif
 #ifdef NONMATCHING
 void TitleMapDraw() {
     float pos[4];
