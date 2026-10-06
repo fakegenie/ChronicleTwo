@@ -27,5 +27,5 @@ sound primer=u64div
 pbuggy drafts
 menushop drafts primer=u64div
 menumap primer=u64div
-menumain primer=u64div
+menumain drafts primer=u64div
 gyorace primer=u64div
