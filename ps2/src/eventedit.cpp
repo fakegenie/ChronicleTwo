@@ -825,7 +825,6 @@ int EventEdit(mgCMemory *memory) {
     }
     return 1;
 }
-#ifdef NONMATCHING
 void DrawEventEdit(void) {
     if (DebugFlag == 1 && g_info.disp != 0) {
         EventMarker.Draw();
@@ -869,77 +868,54 @@ void DrawEventEdit(void) {
         if (g_info.disp != 0) {
             switch (g_info.mode) {
             case 0: {
-                y += 0x16;
-                JisFont.PrintDirect(0x10, y, at_1383, EventScene->active_camera);
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1384, (double)eye[0]);
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1385__3, (double)eye[1]);
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1386__2, (double)eye[2]);
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1387__3);
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1384, (double)look[0]);
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1385__3, (double)look[1]);
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1386__2, (double)look[2]);
+                JisFont.PrintDirect(0x10, y += 0x16, at_1383, EventScene->active_camera);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1384, (double)eye[0]);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1385__3, (double)eye[1]);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1386__2, (double)eye[2]);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1387__3);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1384, (double)look[0]);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1385__3, (double)look[1]);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1386__2, (double)look[2]);
                 angle -= EdEventInfo.world_coord_rot[1];
                 if (angle > 3.1415927f) {
                     angle -= 6.2831855f;
                 } else if (angle <= -3.1415927f) {
                     angle += 6.2831855f;
                 }
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1388__3, (double)angle);
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1389__2, (double)(eye[1] - look[1]));
+                JisFont.PrintDirect(0x10, y += 0x12, at_1388__3, (double)angle);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1389__2, (double)(eye[1] - look[1]));
                 eye[1] = 0.0f;
                 look[1] = 0.0f;
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1390, (double)mgDistVector(eye, look));
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1391, (double)EdEventInfo.projection);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1390, (double)mgDistVector(eye, look));
+                JisFont.PrintDirect(0x10, y += 0x12, at_1391, (double)EdEventInfo.projection);
                 float remain;
                 mgCMemory *stack = EventScene->GetStack(EventScene->stack_no);
                 if (stack != NULL) {
                     remain = (float)stack->stGetRest();
                 }
                 remain = ((16.0f * remain) / 1024.0f) / 1024.0f;
-                y += 0x20;
-                JisFont.PrintDirect(0x10, y, at_1392, (double)remain);
+                JisFont.PrintDirect(0x10, y += 0x20, at_1392, (double)remain);
                 break;
             }
             case 1: {
                 float chara_pos[4];
                 float chara_rot[4];
-                y += 0x16;
-                JisFont.PrintDirect(0x10, y, at_1393, g_info.chara_no);
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1394__2, g_info.collision);
+                JisFont.PrintDirect(0x10, y += 0x16, at_1393, g_info.chara_no);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1394__2, g_info.collision);
                 chara->GetPosition(chara_pos);
                 chara->GetRotation(chara_rot);
                 CalcPosWorldCoordGyaku(chara_pos);
                 chara_rot[0] -= EdEventInfo.world_coord_rot[0];
                 chara_rot[1] -= EdEventInfo.world_coord_rot[1];
                 chara_rot[2] -= EdEventInfo.world_coord_rot[2];
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1395__3);
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1384, (double)chara_pos[0]);
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1385__3, (double)chara_pos[1]);
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1386__2, (double)chara_pos[2]);
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1396__2);
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1384, (double)chara_rot[0]);
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1385__3, (double)chara_rot[1]);
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1386__2, (double)chara_rot[2]);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1395__3);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1384, (double)chara_pos[0]);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1385__3, (double)chara_pos[1]);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1386__2, (double)chara_pos[2]);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1396__2);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1384, (double)chara_rot[0]);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1385__3, (double)chara_rot[1]);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1386__2, (double)chara_rot[2]);
                 break;
             }
             case 2: {
@@ -951,47 +927,33 @@ void DrawEventEdit(void) {
                 float cam_box_max[4];
                 float cam_box_min[4];
                 if (g_cp_cursor == 0) {
-                    y += 0x16;
-                    JisFont.PrintDirect(0x10, y, at_1397__2, cam_op_names[g_cp_mode]);
+                    JisFont.PrintDirect(0x10, y += 0x16, at_1397__2, cam_op_names[g_cp_mode]);
                 } else {
-                    y += 0x16;
-                    JisFont.PrintDirect(0x10, y, at_1398__3, cam_op_names[g_cp_mode]);
+                    JisFont.PrintDirect(0x10, y += 0x16, at_1398__3, cam_op_names[g_cp_mode]);
                 }
                 if (g_cp_cursor == 1) {
-                    y += 0x12;
-                    JisFont.PrintDirect(0x10, y, at_1399__2, g_cp_selno);
+                    JisFont.PrintDirect(0x10, y += 0x12, at_1399__2, g_cp_selno);
                 } else {
-                    y += 0x12;
-                    JisFont.PrintDirect(0x10, y, at_1400__3, g_cp_selno);
+                    JisFont.PrintDirect(0x10, y += 0x12, at_1400__3, g_cp_selno);
                 }
                 g_cmr_pas.GetCameraPas(g_cp_selno, cam_eye, cam_look);
                 CalcPosWorldCoordGyaku(cam_eye);
                 CalcPosWorldCoordGyaku(cam_look);
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1395__3);
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1384, (double)cam_eye[0]);
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1385__3, (double)cam_eye[1]);
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1386__2, (double)cam_eye[2]);
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1387__3);
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1384, (double)cam_look[0]);
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1385__3, (double)cam_look[1]);
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1386__2, (double)cam_look[2]);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1395__3);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1384, (double)cam_eye[0]);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1385__3, (double)cam_eye[1]);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1386__2, (double)cam_eye[2]);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1387__3);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1384, (double)cam_look[0]);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1385__3, (double)cam_look[1]);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1386__2, (double)cam_look[2]);
+                int frame_no = g_cmr_pas.GetFrame();
                 if (g_cp_cursor == 2) {
-                    y += 0x12;
-                    JisFont.PrintDirect(0x10, y, at_1401__2, g_cmr_pas.GetFrame());
+                    JisFont.PrintDirect(0x10, y += 0x12, at_1401__2, frame_no);
                 } else {
-                    y += 0x12;
-                    JisFont.PrintDirect(0x10, y, at_1402__2, g_cmr_pas.GetFrame());
+                    JisFont.PrintDirect(0x10, y += 0x12, at_1402__2, frame_no);
                 }
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1403__2, g_cmr_pas.pas_num);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1403__2, g_cmr_pas.pas_num);
                 for (int i = 0; i < g_cmr_pas.pas_num; i++) {
                     g_cmr_pas.GetCameraPas(i, cam_point_eye, cam_point_look);
                     CalcPosWorldCoordGyaku(cam_point_eye);
@@ -1024,38 +986,28 @@ void DrawEventEdit(void) {
                 float path_box_max[4];
                 float path_box_min[4];
                 if (g_chara_pas_cursor == 0) {
-                    y += 0x16;
-                    JisFont.PrintDirect(0x10, y, at_1397__2, chara_op_names[g_chara_pas_mode]);
+                    JisFont.PrintDirect(0x10, y += 0x16, at_1397__2, chara_op_names[g_chara_pas_mode]);
                 } else {
-                    y += 0x16;
-                    JisFont.PrintDirect(0x10, y, at_1398__3, chara_op_names[g_chara_pas_mode]);
+                    JisFont.PrintDirect(0x10, y += 0x16, at_1398__3, chara_op_names[g_chara_pas_mode]);
                 }
                 if (g_chara_pas_cursor == 1) {
-                    y += 0x12;
-                    JisFont.PrintDirect(0x10, y, at_1399__2, g_chara_pas_selno);
+                    JisFont.PrintDirect(0x10, y += 0x12, at_1399__2, g_chara_pas_selno);
                 } else {
-                    y += 0x12;
-                    JisFont.PrintDirect(0x10, y, at_1400__3, g_chara_pas_selno);
+                    JisFont.PrintDirect(0x10, y += 0x12, at_1400__3, g_chara_pas_selno);
                 }
                 g_chara_pas.GetCharaPas(g_chara_pas_selno, path_pos);
                 CalcPosWorldCoordGyaku(path_pos);
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1395__3);
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1384, (double)path_pos[0]);
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1385__3, (double)path_pos[1]);
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1386__2, (double)path_pos[2]);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1395__3);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1384, (double)path_pos[0]);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1385__3, (double)path_pos[1]);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1386__2, (double)path_pos[2]);
+                int frame_no = g_chara_pas.GetFrame();
                 if (g_chara_pas_cursor == 2) {
-                    y += 0x12;
-                    JisFont.PrintDirect(0x10, y, at_1401__2, g_chara_pas.GetFrame());
+                    JisFont.PrintDirect(0x10, y += 0x12, at_1401__2, frame_no);
                 } else {
-                    y += 0x12;
-                    JisFont.PrintDirect(0x10, y, at_1402__2, g_chara_pas.GetFrame());
+                    JisFont.PrintDirect(0x10, y += 0x12, at_1402__2, frame_no);
                 }
-                y += 0x12;
-                JisFont.PrintDirect(0x10, y, at_1403__2, g_chara_pas.pas_num);
+                JisFont.PrintDirect(0x10, y += 0x12, at_1403__2, g_chara_pas.pas_num);
                 for (int i = 0; i < g_chara_pas.pas_num; i++) {
                     g_chara_pas.GetCharaPas(i, path_point);
                     CalcPosWorldCoordGyaku(path_point);
@@ -1074,11 +1026,11 @@ void DrawEventEdit(void) {
             }
         }
         if (g_info.mode == 1 || g_info.mode == 3) {
+            mgVu0FBOX bbox;
             float frame_rot[4];
             chara->GetRotation(frame_rot);
             mgCFrame *frame = chara->CObjectFrame::frame;
             if (frame != NULL) {
-                mgVu0FBOX bbox;
                 float frame_pos[4];
                 float corners[8][4];
                 float lo[4];
@@ -1090,38 +1042,38 @@ void DrawEventEdit(void) {
                 frame->GetWorldBBox(&bbox);
                 *(u_long128 *)lo = *(u_long128 *)bbox.min;
                 *(u_long128 *)hi = *(u_long128 *)bbox.max;
+                corners[0][3] = 1.0f;
                 corners[0][0] = lo[0];
                 corners[0][1] = lo[1];
                 corners[0][2] = lo[2];
-                corners[0][3] = 1.0f;
+                corners[1][3] = 1.0f;
                 corners[1][0] = hi[0];
                 corners[1][1] = lo[1];
                 corners[1][2] = lo[2];
-                corners[1][3] = 1.0f;
+                corners[2][3] = 1.0f;
                 corners[2][0] = lo[0];
                 corners[2][1] = hi[1];
                 corners[2][2] = lo[2];
-                corners[2][3] = 1.0f;
+                corners[3][3] = 1.0f;
                 corners[3][0] = hi[0];
                 corners[3][1] = hi[1];
                 corners[3][2] = lo[2];
-                corners[3][3] = 1.0f;
+                corners[4][3] = 1.0f;
                 corners[4][0] = lo[0];
                 corners[4][1] = lo[1];
                 corners[4][2] = hi[2];
-                corners[4][3] = 1.0f;
+                corners[5][3] = 1.0f;
                 corners[5][0] = hi[0];
                 corners[5][1] = lo[1];
                 corners[5][2] = hi[2];
-                corners[5][3] = 1.0f;
+                corners[6][3] = 1.0f;
                 corners[6][0] = lo[0];
                 corners[6][1] = hi[1];
                 corners[6][2] = hi[2];
-                corners[6][3] = 1.0f;
+                corners[7][3] = 1.0f;
                 corners[7][0] = hi[0];
                 corners[7][1] = hi[1];
                 corners[7][2] = hi[2];
-                corners[7][3] = 1.0f;
                 mgRotMatrixXYZ(matrix, frame_rot);
                 VectMatMul(corners[0], corners[0], matrix);
                 VectMatMul(corners[1], corners[1], matrix);
@@ -1170,9 +1122,6 @@ void DrawEventEdit(void) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/eventedit", DrawEventEdit__Fv);
-#endif
 
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/eventedit", at_1208__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/eventedit", at_1226__2__DATA);

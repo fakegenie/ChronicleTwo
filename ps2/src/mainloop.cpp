@@ -545,8 +545,6 @@ void MenuInit(INIT_LOOP_ARG arg) {
     mgTexManager.EnterIMGFile(GetFontTex2ImgPtr(), 1, NULL, NULL);
     LoadEventViewData(read_buffer, &MenuBuffer);
 }
-#ifdef NONMATCHING
-
 static int MenuLoop() {
     mgCTextureManager *textures = &mgTexManager;
     int map_result;
@@ -625,11 +623,15 @@ static int MenuLoop() {
     if (GamePad__2.Down(PAD_L1)) {
         menu_arguments[select] -= 10;
     }
+    int step = 100;
+    if (select == 1) {
+        step = 100;
+    }
     if (GamePad__2.Down(PAD_R2)) {
-        menu_arguments[select] += 100;
+        menu_arguments[select] += step;
     }
     if (GamePad__2.Down(PAD_L2)) {
-        menu_arguments[select] -= 100;
+        menu_arguments[select] -= step;
     }
     if (menu_arguments[select] < -1) {
         menu_arguments[select] = -1;
@@ -664,7 +666,7 @@ static int MenuLoop() {
     if (CaptureMode > CAPTURE_PLAY_SCREEN) {
         CaptureMode = CAPTURE_OFF;
     }
-    for (; row < DEBUG_ROW_NUM && menu[row][0] != '\0'; row++) {
+    while (menu[row][0] != '\0') {
         if (row == DEBUG_ROW_ITEM_SET) {
             text_end += sprintf(text_end, "%s%s%s\n", cursor[row == select], menu[row], item_set[menu_arguments[row]]);
         } else if (row == DEBUG_ROW_LANGUAGE) {
@@ -673,6 +675,9 @@ static int MenuLoop() {
             text_end += sprintf(text_end, "%s%s\n", cursor[row == select], menu[row]);
         } else {
             text_end += sprintf(text_end, "%s%s%d\n", cursor[row == select], menu[row], menu_arguments[row]);
+        }
+        if (++row >= DEBUG_ROW_NUM) {
+            break;
         }
     }
     Font.DrawDirect(text, 10, 10);
@@ -684,7 +689,8 @@ static int MenuLoop() {
             LanguageChange(menu_arguments[select], read_buffer);
             return 0;
         } else if (select == DEBUG_ROW_ITEM_SET) {
-            DebugGetItem(&GetSaveData()->user_data, item_set_no[menu_arguments[select]]);
+            CUserDataManager *user = &GetSaveData()->user_data;
+            DebugGetItem(user, item_set_no[menu_arguments[select]]);
             return 0;
         } else if (select == DEBUG_ROW_SAVE_DATA) {
             InitSaveDataEdit(&MenuBuffer);
@@ -717,9 +723,6 @@ static int MenuLoop() {
     }
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mainloop", MenuLoop__Fv);
-#endif
 void MenuExit(void) {
     GamePad__2.AutoRepeatOff();
     mgCloseFont();
@@ -776,22 +779,22 @@ static int EventSelect() {
         result = HDDMenuLoop();
         if (result == 0) {
             return 0;
+        } else if (result > 0) {
+            return 1;
+        } else {
+            return 0;
         }
-        return result > 0;
     }
 
+    char          display[1024];
     char         *subgame_name[3] = { "Spheda", "GyoRace", "Fishing" };
-    static int    select = 0;
-    char         *cursor[2] = { "  ", ">>" };
     int           row = 0;
     char         *map_name;
-    char         *text;
-    char          display[1024];
-    char          config_path[64];
-    int           chapter;
-    int           subgame;
+    static int    select = 0;
     int           loop_no;
     int           monica;
+    char         *text = display;
+    char         *cursor[2] = { "  ", ">>" };
 
     if (GamePad__2.Down(PAD_DOWN)) {
         select++;
@@ -847,7 +850,6 @@ static int EventSelect() {
             break;
     }
 
-    text = display;
     text += sprintf(text, "\n\x83\x5F\x81\x5B\x83\x4E\x83\x4E\x83\x8D\x83\x6A\x83\x4E\x83\x8B\x83\x56\x83\x58\x83\x65\x83\x80\x92\xB2\x90\xAE" "ROM %s %s\n", "2003/07/29", "Ver0.334");
     for (; menu[row][0] != '\0'; row++) {
         text += sprintf(text, "%s%s", cursor[row == select], menu[row]);
@@ -870,8 +872,8 @@ static int EventSelect() {
     }
     text += sprintf(text, "\n");
     switch (select) {
-        case 1:
         case 2:
+        case 1:
             sprintf(text, "\x95\xFB\x8C\xFC\x83\x4C\x81\x5B\x8D\xB6\x89\x45\x82\xC5\x8F\xCD\x91\x49\x91\xF0\n");
             break;
         case 3:
@@ -884,118 +886,121 @@ static int EventSelect() {
         menu_mode = DEBUG_MENU_TOP;
         return 0;
     }
-    if (!GamePad__2.Down(PAD_CIRCLE)) {
-        return 0;
-    }
+    if (GamePad__2.Down(PAD_CIRCLE)) {
+        INIT_LOOP_ARG arg;
+        char config_name[64] = "";
+        char config_path[64];
 
-    INIT_LOOP_ARG arg;
-
-    char config_name[64] = "";
-
-    loop_no = LOOP_EDIT;
-    monica = 0;
-    switch (select) {
-        case 0:
-            arg.map_no = 0;
-            loop_no = LOOP_TITLE;
-            config_name[0] = '\0';
-            break;
-        case 1:
-        case 2:
-            chapter = menu_sel[select];
-            switch (chapter) {
-                case 0:
-                    arg.floor_no = 1;
-                    loop_no = LOOP_DUNGEON;
-                    arg.map_no = 0;
+        loop_no = LOOP_EDIT;
+        monica = 0;
+        switch (select) {
+            case 0:
+                arg.map_no = 0;
+                loop_no = LOOP_TITLE;
+                config_name[0] = '\0';
+                break;
+            case 1:
+            case 2:
+                {
+                    int chapter = menu_sel[select];
+                    switch (chapter) {
+                        case 0:
+                            arg.floor_no = 1;
+                            loop_no = LOOP_DUNGEON;
+                            arg.map_no = 0;
+                            break;
+                        case 1:
+                            arg.map_no = 15;
+                            arg.event_no = 502;
+                            break;
+                        case 2:
+                            arg.map_no = 54;
+                            arg.event_no = 502;
+                            break;
+                        case 3:
+                            arg.map_no = 83;
+                            arg.event_no = 100;
+                            break;
+                        case 4:
+                            arg.map_no = 87;
+                            arg.event_no = 100;
+                            break;
+                        case 5:
+                            arg.map_no = 110;
+                            arg.event_no = 100;
+                            break;
+                        case 6:
+                            arg.map_no = 109;
+                            arg.event_no = 502;
+                            break;
+                    }
+                    if (chapter >= 2) {
+                        monica = 1;
+                    }
+                    if (select == 1) {
+                        sprintf(config_name, "cap%d.cfg", chapter + 1);
+                    } else {
+                        sprintf(config_name, "db_cap%d.cfg", chapter + 1);
+                    }
                     break;
-                case 1:
-                    arg.map_no = 15;
-                    arg.event_no = 502;
+                }
+            case 3:
+                {
+                    int subgame = menu_sel[select];
+                    switch (subgame) {
+                        case 0:
+                            arg.floor_no = 1;
+                            arg.event_no = 4000;
+                            arg.map_no = 2;
+                            loop_no = LOOP_DUNGEON;
+                            break;
+                        case 1:
+                            arg.map_no = 95;
+                            break;
+                        case 2:
+                            arg.map_no = 65;
+                            break;
+                    }
+                    sprintf(config_name, "sg%d.cfg", subgame);
                     break;
-                case 2:
-                    arg.map_no = 54;
-                    arg.event_no = 502;
-                    break;
-                case 3:
-                    arg.map_no = 83;
-                    arg.event_no = 100;
-                    break;
-                case 4:
-                    arg.map_no = 87;
-                    arg.event_no = 100;
-                    break;
-                case 5:
-                    arg.map_no = 110;
-                    arg.event_no = 100;
-                    break;
-                case 6:
-                    arg.map_no = 109;
-                    arg.event_no = 502;
-                    break;
-            }
-            if (chapter >= 2) {
-                monica = 1;
-            }
-            if (select == 1) {
-                sprintf(config_name, "cap%d.cfg", chapter + 1);
-            } else {
-                sprintf(config_name, "db_cap%d.cfg", chapter + 1);
-            }
-            break;
-        case 3:
-            subgame = menu_sel[select];
-            switch (subgame) {
-                case 0:
-                    arg.floor_no = 1;
-                    arg.event_no = 4000;
-                    arg.map_no = 2;
-                    loop_no = LOOP_DUNGEON;
-                    break;
-                case 1:
-                    arg.map_no = 95;
-                    break;
-                case 2:
-                    arg.map_no = 65;
-                    break;
-            }
-            sprintf(config_name, "sg%d.cfg", subgame);
-            break;
-        case 4:
-            sprintf(config_name, "pb.cfg");
-            arg.map_no = 10;
-            break;
-        case 6:
-            BossBattleSelFlag = 1;
-        case 5:
-            event_view = 1;
-            return 0;
-        case 7:
-            future_sel = 1;
-            return 0;
-        case 8:
-            arg.map_no = menu_sel[select];
-            sprintf(config_name, "geo.cfg");
-            break;
-        case 9:
-            hdd_sel = 1;
-            InitHDDMenu(MenuBuffer.stack + MenuBuffer.stack_used);
-            return 0;
-        case 10:
-            InitSaveData();
-            InitOmakeEnv(menu_sel[select], &arg, &loop_no);
-            NextLoop(loop_no, arg);
-            return 1;
+                }
+            case 4:
+                sprintf(config_name, "pb.cfg");
+                arg.map_no = 10;
+                break;
+            case 6:
+                BossBattleSelFlag = 1;
+            case 5:
+                event_view = 1;
+                return 0;
+            case 7:
+                future_sel = 1;
+                return 0;
+            case 8:
+                arg.map_no = menu_sel[select];
+                sprintf(config_name, "geo.cfg");
+                break;
+            case 9:
+                hdd_sel = 1;
+                InitHDDMenu(MenuBuffer.stack + MenuBuffer.stack_used);
+                return 0;
+            case 10:
+                InitSaveData();
+                InitOmakeEnv(menu_sel[select], &arg, &loop_no);
+                NextLoop(loop_no, arg);
+                return 1;
+        }
+        sprintf(config_path, "dbg/%s", config_name);
+        InitSaveData();
+        LoadGameConfig(config_path);
+        if (monica != 0) {
+            GetSaveData()->user_data.JoinPartyMember(USER_CHARA_MONICA);
+            GetSaveData()->user_data.EnableCharaChange(USER_CHARA_MONICA);
+        }
+        NextLoop(loop_no, arg);
+        return 1;
     }
-    sprintf(config_path, "dbg/%s", config_name);
-    InitSaveData();
-    LoadGameConfig(config_path);
-    if (monica != 0) {
-        GetSaveData()->user_data.JoinPartyMember(USER_CHARA_MONICA);
-        GetSaveData()->user_data.EnableCharaChange(USER_CHARA_MONICA);
-    }
-    NextLoop(loop_no, arg);
-    return 1;
+    return 0;
 }
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mainloop", EventSelect__Fv);
