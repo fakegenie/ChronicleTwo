@@ -332,8 +332,8 @@ void TitleBootInit() {
     WaveTable__3 = new ((u_long128 *)DataBuffer.Alloc(0x123)) CWaveTable;
     mgCTextureManager *textures = &mgTexManager;
     DataBuffer.Align64();
-    u_long128 *map_top;
-    TitleMapBuffer.stSetBuffer(map_top = DataBuffer.stGetTop(), 0x40000);
+    u_long128 *map_top = DataBuffer.stGetTop();
+    TitleMapBuffer.stSetBuffer(map_top, 0x40000);
     DataBuffer.Alloc(0x60000);
     TitleWorkBuffer.stSetBuffer(DataBuffer.stGetTop(), 0x2800);
     DataBuffer.Alloc(0x2800);
@@ -345,8 +345,10 @@ void TitleBootInit() {
     TitleScene->before_camera = 0;
     TitleScene->SetStack(1, &TitleMapBuffer);
     TitleScene->work_stack = &TitleWorkBuffer;
-    u8 *map_buffer = (u8 *)DataBuffer.stGetTop();
-    int map_no = SearchMapNo(at_1221__4);
+    int map_no;
+    u8 *map_buffer;
+    map_buffer = (u8 *)DataBuffer.stGetTop();
+    map_no = SearchMapNo(at_1221__4);
     TitleScene->active_map = 0;
     MapJumpMapInfo main_map;
     SCN_LOADMAP_INFO2 load_info;
@@ -357,23 +359,23 @@ void TitleBootInit() {
     main_map.load_buf = map_buffer;
     SetMainMapInfo(&main_map);
     GetLoadMapInfo(&load_info, map_no);
+    load_info.load_sky = 1;
     load_info.sky_tex_block = 0x6B;
     load_info.place_parts_max = 0x190;
-    load_info.load_sky = 1;
     TitleScene->DeleteMap(0, 1);
     TitleScene->LoadMap(0, &load_info, 0);
     TitleScene->SetNowMapNo(map_no);
     TitleScene->SetActive(2, 0);
     TitleMap = TitleScene->GetMap(TitleScene->active_map);
-    u32 file_size;
-    u32 bg_size;
-    if (LoadFile2(at_1222__4, DataBuffer.stAllocTest(1), (int *)&bg_size, 0) != 0) {
+    int file_size;
+    int bg_size;
+    if (LoadFile2(at_1222__4, DataBuffer.stAllocTest(1), &bg_size, 0) != 0) {
         textures->EnterIMGFile((u_char *)DataBuffer.Alloc(Align16Blocks(bg_size)), 0x6A, NULL, NULL);
     }
     textures->EnterTexture(0x6A, at_1223__4, NULL, mgScreenWidth, mgScreenHeight, 0x20, 0, 0, 0);
     char lang_file[0x40];
     sprintf(lang_file, at_1224__4, LanguageCode);
-    LoadFile2(lang_file, map_buffer, (int *)&file_size, 0);
+    LoadFile2(lang_file, map_buffer, &file_size, 0);
     DataBuffer.Alloc(Align16Blocks(file_size));
     textures->EnterIMGFile(map_buffer, 0x40, NULL, NULL);
     Tex_TitleBG = textures->GetTexture(at_1225__4, -1);
@@ -388,11 +390,9 @@ void TitleBootInit() {
     u_long128 *save_pack = (u_long128 *)((u8 *)DataBuffer.stGetTop() + 0x41000);
     if (LoadFileMenu(at_1233, save_pack, MENU_FILE_LOAD_DIRECT) != 0) {
         for (int i = 0; i < 3; i++) {
-            MC_ICON_DATA *icon = &MC_ICON_Data[i];
-            u_int *icon_file = GetPackFile((u_int *)save_pack, icon->name, &icon->size);
-            int *size = &icon->size;
-            icon->data = DataBuffer.Alloc(Align16Blocks(icon->size));
-            memcpy(icon->data, icon_file, *size);
+            u_int *icon_file = GetPackFile((u_int *)save_pack, MC_ICON_Data[i].name, &MC_ICON_Data[i].size);
+            MC_ICON_Data[i].data = DataBuffer.Alloc(Align16Blocks(MC_ICON_Data[i].size));
+            memcpy(MC_ICON_Data[i].data, icon_file, MC_ICON_Data[i].size);
         }
     }
     TitleMCCheck->SetIconData(MC_ICON_Data, 0);
@@ -400,7 +400,7 @@ void TitleBootInit() {
     RushWork = textures->EnterTexture(0x43, at_1234, NULL, mgScreenWidth, mgScreenHeight, mgScreenDepth, 0, 0, 0);
     DataBuffer.Align64();
     u_long128 *push_start_img = DataBuffer.stGetTop();
-    if (LoadFile2(at_1235, push_start_img, (int *)&file_size, 0) != 0) {
+    if (LoadFile2(at_1235, push_start_img, &file_size, 0) != 0) {
         textures->EnterIMGFile((u_char *)push_start_img, 0x43, NULL, NULL);
     }
     RushStart = textures->GetTexture(at_1236, 0x43);
@@ -414,9 +414,9 @@ void TitleBootInit() {
     textures->EnterIMGFile(GetFontTex2ImgPtr(), 0x46, NULL, NULL);
     DataBuffer.Align64();
     MenuArg.mes_tex_block = 0x46;
+    MenuArg.scene = TitleScene;
     MenuArg.tex_block_top = 0x54;
     MenuArg.tex_block_num = 0x10;
-    MenuArg.scene = TitleScene;
     MenuArg.pack = (u_int *)DataBuffer.stGetTop();
     file_size = LoadFileMenu(at_1237__2, (u_long128 *)MenuArg.pack, MENU_FILE_LOAD_DIRECT);
     DataBuffer.Alloc(Align16Blocks(file_size));
@@ -429,7 +429,7 @@ void TitleBootInit() {
     TitleScene->LoadSound(0x1F4, sound_buffer);
     TitleScene->StopEnvBGM();
     sndWaitTransBd();
-    LoadFile2(at_1239__2, sound_buffer, (int *)&file_size, 0);
+    LoadFile2(at_1239__2, sound_buffer, &file_size, 0);
     sndInitPort(4);
     TitleEventSound = sndLoadSound(4, (u_int *)sound_buffer, &snd_memory);
     DataBuffer.Align64();
@@ -1020,11 +1020,13 @@ int TitleModeKey() {
         TitlePhase == TITLE_PHASE_MC_MESSAGE) {
         CMemoryCardManager *card_manager = TitleMCCheck;
         u8 inport1;
+        MC_CARD_INFO *card0;
         u8 inport0;
-        inport0 = TitleMCCheckInport[0];
+        MC_CARD_INFO *card1;
         inport1 = TitleMCCheckInport[1];
-        MC_CARD_INFO *card0 = &card_manager->card[0];
-        MC_CARD_INFO *card1 = &card_manager->card[1];
+        inport0 = TitleMCCheckInport[0];
+        card0 = &card_manager->card[0];
+        card1 = &card_manager->card[1];
         if (TitleMCCheckNow != 0) {
             switch (TitleMainMCCheckPhase) {
             case 0:
@@ -1115,10 +1117,10 @@ int TitleModeKey() {
         }
         break;
     case TITLE_PHASE_PUSH_START:
-        CalcMenuAdd(&TitleInfo->menu_alpha, -12.0f, 0.0f);
-        CalcMenuAdd(&TitleInfo->cursor_alpha, -12.0f, 0.0f);
+        CalcMenuAdd(&TitleInfo->menu_alpha, float(-12.0), float(0.0));
+        CalcMenuAdd(&TitleInfo->cursor_alpha, float(-12.0), 0.0f);
         CalcMenuAdd(&TitleInfo->title_alpha, 8.0f, 128.0f);
-        CalcMenuAdd(&TitleInfo->omake_alpha, -8.0f, 0.0f);
+        CalcMenuAdd(&TitleInfo->omake_alpha, float(-8.0), 0.0f);
         if (start_pushed != 0) {
             sndSePlay(TitleEventSound, 0, 0);
             TitlePhase = TITLE_PHASE_MENU;
@@ -1129,8 +1131,8 @@ int TitleModeKey() {
         TitlePushStart_AlphaPlus = 0;
         int old_select = TitleInfo->select;
         CalcMenuAdd(&TitleInfo->title_alpha, -8.0f, 0.0f);
-        CalcMenuAdd(&TitleInfo->menu_alpha, 12.0f, 128.0f);
-        CalcMenuAdd(&TitleInfo->cursor_alpha, 12.0f, 128.0f);
+        CalcMenuAdd(&TitleInfo->menu_alpha, float(12.0), float(128.0));
+        CalcMenuAdd(&TitleInfo->cursor_alpha, float(12.0), float(128.0));
         if (GamePad__2.Down(PAD_UP) != 0) {
             TitleInfo->select--;
         }
@@ -1234,8 +1236,8 @@ int TitleModeKey() {
         break;
     case TITLE_PHASE_OMAKE_MENU: {
         TitlePushStart_AlphaPlus = 0;
-        CalcMenuAdd(&TitleInfo->menu_alpha, -8.0f, 0.0f);
-        CalcMenuAdd(&TitleInfo->cursor_alpha, 3.0f, 128.0f);
+        CalcMenuAdd(&TitleInfo->menu_alpha, float(-8.0), float(0.0));
+        CalcMenuAdd(&TitleInfo->cursor_alpha, float(3.0), float(128.0));
         int old_select = TitleInfo->omake_select;
         if (GamePad__2.Down(PAD_UP) != 0) {
             TitleInfo->omake_select--;
@@ -1281,7 +1283,6 @@ int TitleModeKey() {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/title", TitleModeKey__Fv);
 #endif
-#ifdef NONMATCHING
 void TitleModeDraw() {
     int i;
     int x;
@@ -1293,8 +1294,10 @@ void TitleModeDraw() {
     mgTexManager.ReloadTexture(0x40, (sceVif1Packet *)NULL);
     mgCDrawPrim prim;
     SetSpriteEnv(&prim, 0);
+    float left = 0.0f;
+    float top = 24.0f;
     float title_alpha = TitleInfo->title_alpha;
-    PrimQuad(Tex_Chronicle, 0.0f, 24.0f, mgRect<int>(0, 0, 0x200, 0x1A0), fptosi(title_alpha), 0x80, 0x80, 0x80);
+    PrimQuad(Tex_Chronicle, 0.0f, top, mgRect<int>(0, 0, 0x200, 0x1A0), fptosi(TitleInfo->title_alpha), 0x80, 0x80, 0x80);
     mgRect<int> start_rect(start_button_tbl_1826[LanguageCode].left, start_button_tbl_1826[LanguageCode].top,
                            start_button_tbl_1826[LanguageCode].right, start_button_tbl_1826[LanguageCode].bottom);
     if (LanguageCode == 0) {
@@ -1302,7 +1305,7 @@ void TitleModeDraw() {
         prim.Begin(6);
         prim.Texture(Tex_Logo);
         prim.Color(0x80, 0x80, 0x80, fptosi(TitleInfo->push_alpha));
-        PrimQuad(&prim, 162.0f, 338.0f, start_rect);
+        PrimQuad(&prim, 162.0f, float(338.0), start_rect);
         prim.Color(0x80, 0x80, 0x80, fptosi(TitleInfo->title_alpha));
         PrimQuad(&prim, 84.0f, 384.0f, mgRect<int>(0, 0, 0x166, 0x16));
         prim.End();
@@ -1313,7 +1316,7 @@ void TitleModeDraw() {
         prim.Color(0x80, 0x80, 0x80, fptosi(TitleInfo->push_alpha));
         PrimQuad(&prim, 162.0f, (float)(mgScreenHeight - 0x6C), start_rect);
         prim.Color(0x80, 0x80, 0x80, fptosi(TitleInfo->title_alpha));
-        PrimQuad(&prim, 0.0f, (float)(mgScreenHeight - 0x38), mgRect<int>(0, 0x180, 0x200, 0x30));
+        PrimQuad(&prim, left, (float)(mgScreenHeight - 0x38), mgRect<int>(0, 0x180, 0x200, 0x30));
         prim.End();
     }
     mgRect<int> button_rect(0x12E, 0x28, 0xD2, 0x36);
@@ -1384,9 +1387,6 @@ void TitleModeDraw() {
         TitleInfo->cursor_count = 0;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/title", TitleModeDraw__Fv);
-#endif
 #ifdef NONMATCHING
 void TitleMapDraw() {
     float pos[4];
@@ -1459,8 +1459,9 @@ void TitleMapDraw() {
         for (int group = 0; group < 6; group++) {
             int i;
             int block;
-            int block_count = TitleScene->mds_list_set.GetTextureBlockNo(group, texture_blocks, 128);
-            for (i = 0; i < block_count; i++) {
+            int block_count;
+            block_count = TitleScene->mds_list_set.GetTextureBlockNo(group, texture_blocks, 128);
+            for (i = 0; block_count > i; i++) {
                 int index = block_count - i - 1;
                 block = texture_blocks[index];
                 if (0 != mgEndDrawReloadTexture(block, NULL) && texture_blocks[index] == water_block) {
@@ -1473,10 +1474,11 @@ void TitleMapDraw() {
     }
     for (texture_group = 6; texture_group < 16; texture_group++) {
         int later_blocks[128];
-        int block_count = TitleScene->mds_list_set.GetTextureBlockNo(texture_group, later_blocks, 128);
         int i;
         int block;
-        for (i = 0; i < block_count; i++) {
+        int block_count;
+        block_count = TitleScene->mds_list_set.GetTextureBlockNo(texture_group, later_blocks, 128);
+        for (i = 0; block_count > i; i++) {
             block = later_blocks[i];
             mgEndDrawReloadTexture(block, NULL);
             mgEndDraw(block, NULL);
@@ -1587,7 +1589,6 @@ void TitleMCCheckInit(int boot_mode) {
         TitleMCCheckMes->MakeMesWin(0x66);
     }
 }
-#ifdef NONMATCHING
 int TitleMCCheckKey() {
     MC_CARD_INFO *cards[2];
     u8 inserted[2];
@@ -1677,8 +1678,6 @@ int TitleMCCheckKey() {
             break;
     }
     switch (result) {
-        default:
-            return 0;
         case 0:
             TitleMCCheckPort = 0;
             TitleMCCheck->port = 0;
@@ -1723,9 +1722,6 @@ int TitleMCCheckKey() {
     }
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/title", TitleMCCheckKey__Fv);
-#endif
 void TitleMCCheckDraw(void) {
     if (TitleMCCheckMes != NULL) {
         mgTexManager.ReloadTexture(0x46, (sceVif1Packet *)NULL);

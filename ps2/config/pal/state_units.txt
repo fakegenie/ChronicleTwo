@@ -31,3 +31,4 @@ menumain drafts primer=u64div
 gyorace primer=u64div
 dng_status primer=u64div
 menuaqua primer=u64div
+userdata primer=u64div

@@ -29,7 +29,10 @@ CWaveTable::~CWaveTable() {
 
 #ifdef NONMATCHING
 void CWaveTable::CreateTexture(mgCTexture *output_texture) {
-    if (output_texture == NULL || output_texture->bpp < 24) {
+    if (output_texture == NULL) {
+        return;
+    }
+    if (output_texture->bpp < 24) {
         return;
     }
 
@@ -62,7 +65,7 @@ void CWaveTable::CreateTexture(mgCTexture *output_texture) {
                 sample_column = 0;
             }
             int next_column = (sample_column + 1) % WAVE_TABLE_DIM;
-            float *line = height[current][row];
+            float *line = height[0][row] + current * (WAVE_TABLE_DIM * WAVE_TABLE_DIM);
             float intensity = 40.0f + 540.0f * (line[sample_column] - line[next_column]);
             if (!(intensity <= 200.0f)) {
                 intensity = 200.0f;
@@ -77,7 +80,7 @@ void CWaveTable::CreateTexture(mgCTexture *output_texture) {
             prim.Data0(color);
             prim.Data4(position);
 
-            float *next_line = height[current][(row + 1) % WAVE_TABLE_DIM];
+            float *next_line = height[0][(row + 1) % WAVE_TABLE_DIM] + current * (WAVE_TABLE_DIM * WAVE_TABLE_DIM);
             intensity = 40.0f + 540.0f * (next_line[sample_column] - next_line[next_column]);
             if (intensity < 0.0f) {
                 intensity = 0.0f;

@@ -577,9 +577,10 @@ void CSound::LoadHdBd(int port, int hd, int hd_size, int bd, int bd_size) {
 void CSound::LoadHdBd2(int port, int hd, int hd_size, int bd, int bd_size) {
     int        dependent;
     int        dependent_port;
+    MIDI_PORT *child;
     int        stream_port;
     MSIN_BUFFER *buffer;
-    MIDI_PORT *child;
+    int slot;
 
     stream_port = port - MIDI_PORT_MSIN_FIRST;
     if (stream_port >= 0) {
@@ -607,7 +608,7 @@ void CSound::LoadHdBd2(int port, int hd, int hd_size, int bd, int bd_size) {
         ezMidi(midi_state.port[port].linked_port + 0x20, 0);
         ezMidi(midi_state.port[port].linked_port + 0x9050, (int)&gBank);
     }
-    for (int slot = 0; slot < midi_state.port[port].bank_count; slot++) {
+    for (slot = 0; slot < midi_state.port[port].bank_count; slot++) {
         sceSifInitIopHeap();
         sceSifFreeSysMemory(midi_state.port[port].bank[slot]);
         midi_state.port[port].bank[slot] = NULL;
@@ -627,7 +628,7 @@ void CSound::LoadHdBd2(int port, int hd, int hd_size, int bd, int bd_size) {
             buffer = &msinBf[stream_port];
             buffer->length = 0;
         }
-        for (int slot = 0; slot < midi_state.port[midi_state.port[port].linked_port].bank_count; slot++) {
+        for (slot = 0; slot < midi_state.port[midi_state.port[port].linked_port].bank_count; slot++) {
             midi_state.port[midi_state.port[port].linked_port].bank[slot] = NULL;
         }
         midi_state.port[midi_state.port[port].linked_port].bank_count = 0;
