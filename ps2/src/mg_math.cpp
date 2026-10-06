@@ -109,7 +109,26 @@ asm int mgClipBoxW(float *max0, float *min0, float *max1, float *min1) {
     jr ra
     sltiu v0, v0, 0x1
 }
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgClipInBox__FPfPfPfPf);
+asm int mgClipInBox(float *max0, float *min0, float *max1, float *min1) {
+    .set noreorder
+    lqc2 vf10, 0x0(a0)
+    lqc2 vf11, 0x0(a1)
+    lqc2 vf1, 0x0(a2)
+    lqc2 vf2, 0x0(a3)
+    ctc2.ni zero, vi16
+    vsub.xyz vf25, vf1, vf10
+    vsub.xyz vf25, vf11, vf2
+    vnop
+    vnop
+    vnop
+    vnop
+    vnop
+    cfc2.ni v0, vi16
+    andi v0, v0, 0x80
+    xor v0, v0, zero
+    jr ra
+    sltiu v0, v0, 0x1
+}
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgClipInBoxW__FPfPfPfPf);
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgAddVector__FPfPf);
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgSubVector__FPfPf);
