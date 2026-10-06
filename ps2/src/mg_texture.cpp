@@ -11,8 +11,6 @@
 #include "mg_texture.hpp"
 #include "mglib.hpp"
 
-#define QWORDS(bytes) ((bytes) % 16 == 0 ? (bytes) / 16 : (bytes) / 16 + 1)
-
 enum {
     DMA_ID_CNT = 0x10000000,
     DMA_ID_REF = 0x30000000,

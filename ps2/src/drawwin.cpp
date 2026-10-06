@@ -23,15 +23,6 @@
         set2DSprite(prim, screen, texture, color); \
     } while (0)
 
-#define DrawWindowRow(prim, part, win, y, height, color) \
-    do { \
-        DrawWindowPart(prim, part, win.x, y, 0x17, height, color); \
-        DrawWindowPart(prim, part + 1, win.x + 0x17, y, win.width - 0x2E, height, color); \
-        DrawWindowPart(prim, part + 2, win.x + win.width - 0x17, y, 0x17, height, color); \
-    } while (0)
-
-#define WindowFillAlpha(alpha, opaque) ((opaque) ? 0x80 : (alpha) * 0x36 / 128)
-
 void CalcSelectCursorPos(RECT rect, int *out) {
     int left = rect.x + 0x17;
     int inner = rect.width - 0x2E;
