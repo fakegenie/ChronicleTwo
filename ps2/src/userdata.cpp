@@ -956,7 +956,7 @@ int CGameDataUsed::IsTrush(void) {
 }
 int CGameDataUsed::IsSpectolTrans() {
     CDataCommon *record = GetCommonItemData(item_no);
-    if (record != NULL && (record->attribute & 2)) {
+    if (record != NULL && (record->attribute & ITEM_ATTRIBUTE_SPECTOL_TRANS)) {
         return 1;
     }
     return 0;

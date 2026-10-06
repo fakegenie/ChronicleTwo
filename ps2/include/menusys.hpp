@@ -95,6 +95,16 @@ enum MENU_INPUTKEY_TYPE {
 };
 
 // clang-format on
+enum MENU_SWAP_TYPE {
+    MENU_SWAP_TYPE_ACTIVE_ITEM = 0,
+    MENU_SWAP_TYPE_EQUIP = 1,
+    MENU_SWAP_TYPE_ROBO_PART = 2,
+    MENU_SWAP_TYPE_ITEM_BOARD = 3,
+    MENU_SWAP_TYPE_UNK_4 = 4,
+    MENU_SWAP_TYPE_UNK_9 = 9,
+    MENU_SWAP_TYPE_ACTIVE_ESA = 10,
+};
+
 /**
  *
  * Where an item that is being moved came from, so that it can be put back or swapped.

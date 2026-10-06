@@ -2013,32 +2013,32 @@ int ExchangeItemInfoMake(MENU_SWAPITEM_INFO *info, int (*row)[4], int mode, int 
     row[1][1] = 0;
     if (mode == 0) {
         short kind = info->type;
-        if (kind == 0 || kind == 1 || kind == 2) {
+        if (kind == MENU_SWAP_TYPE_ACTIVE_ITEM || kind == MENU_SWAP_TYPE_EQUIP || kind == MENU_SWAP_TYPE_ROBO_PART) {
             if (is_equip != 0) {
                 row[0][0] = 0;
                 made = 1;
                 row[0][1] = info->chara;
                 row[0][2] = made;
-                if (info->type == 0) {
+                if (info->type == MENU_SWAP_TYPE_ACTIVE_ITEM) {
                     row[0][2] = 0;
                 }
                 row[0][3] = info->no;
-                if (info->type == 2) {
+                if (info->type == MENU_SWAP_TYPE_ROBO_PART) {
                     row[0][3] = MenuRoboEquipTable[info->no];
                 }
                 return made;
             }
         }
-        if (kind == 3 || kind == 9) {
+        if (kind == MENU_SWAP_TYPE_ITEM_BOARD || kind == MENU_SWAP_TYPE_UNK_9) {
             made = 1;
             row[0][0] = made;
             row[0][3] = info->no;
-        } else if (kind == 10) {
+        } else if (kind == MENU_SWAP_TYPE_ACTIVE_ESA) {
             made = 1;
             row[0][0] = 5;
         }
     } else if (mode == 1) {
-        if (info->type == 4) {
+        if (info->type == MENU_SWAP_TYPE_UNK_4) {
             row[0][0] = 1;
             made = 1;
             row[0][3] = info->no;
@@ -2554,7 +2554,7 @@ int CMenuKeyFunc::EnableSwapNowPos(MENU_SWAPITEM_INFO *swap) {
     }
     switch (swap->type) {
             int num;
-        case 0: {
+        case MENU_SWAP_TYPE_ACTIVE_ITEM: {
             if (common != NULL && common->active_set == 0) {
                 result = 1;
                 break;
@@ -2589,7 +2589,7 @@ int CMenuKeyFunc::EnableSwapNowPos(MENU_SWAPITEM_INFO *swap) {
             }
             break;
         }
-        case 1:
+        case MENU_SWAP_TYPE_EQUIP:
             if (held_used != 0) {
                 if (held_used == 2 || (u32)(held_used - 5) < 3 || held_used == 4) {
                     result = 1;
@@ -2626,7 +2626,7 @@ int CMenuKeyFunc::EnableSwapNowPos(MENU_SWAPITEM_INFO *swap) {
                 result = 8;
             }
             break;
-        case 2:
+        case MENU_SWAP_TYPE_ROBO_PART:
             if (held_used != 0 && held_used != 5) {
                 result = 1;
                 if (held_used != 1) {
@@ -2656,9 +2656,9 @@ int CMenuKeyFunc::EnableSwapNowPos(MENU_SWAPITEM_INFO *swap) {
                 }
             }
             break;
-        case 3:
-        case 4:
-        case 9: {
+        case MENU_SWAP_TYPE_ITEM_BOARD:
+        case MENU_SWAP_TYPE_UNK_4:
+        case MENU_SWAP_TYPE_UNK_9: {
             CGameDataUsed *used = &MenuUserParam.used_data[swap->no];
             if (used == NULL) {
                 result = 9;
@@ -2685,7 +2685,7 @@ int CMenuKeyFunc::EnableSwapNowPos(MENU_SWAPITEM_INFO *swap) {
             }
             break;
         }
-        case 10: {
+        case MENU_SWAP_TYPE_ACTIVE_ESA: {
             CGameDataUsed *esa = GetUserDataMan()->GetActiveEsa();
             if (esa == NULL) {
                 result = 9;
@@ -3340,16 +3340,16 @@ CGameDataUsed *GetGameDataUsedForSWAPINFO(MENU_SWAPITEM_INFO *info) {
         CHARA_DATA *chara = MenuUserParam.chara[owner];
         ROBO_DATA *robo = MenuUserParam.robo;
         short kind = info->type;
-        if (kind == 0) {
+        if (kind == MENU_SWAP_TYPE_ACTIVE_ITEM) {
             item = &chara->active_item[info->no];
         }
-        if (kind == 1) {
+        if (kind == MENU_SWAP_TYPE_EQUIP) {
             item = &chara->equip[info->no];
         }
-        if (kind == 2) {
+        if (kind == MENU_SWAP_TYPE_ROBO_PART) {
             item = &robo->parts[info->no];
         }
-        if (kind == 10) {
+        if (kind == MENU_SWAP_TYPE_ACTIVE_ESA) {
             return MenuUserDataManPtr->GetActiveEsa();
         }
         return item;
@@ -3365,10 +3365,10 @@ int CMenuKeyFunc::ReturnItemMenu(int hide) {
         return 0;
     }
     CUserDataManager *manager = GetUserDataMan();
-    if (have_swap.type == 0) {
+    if (have_swap.type == MENU_SWAP_TYPE_ACTIVE_ITEM) {
         CDataCommon *common = GameItemDataManage.GetCommonData(have_item.item_no);
         if (common != NULL && common->active_set == 0) {
-            have_swap.type = 3;
+            have_swap.type = MENU_SWAP_TYPE_ITEM_BOARD;
             have_swap.no = manager->SearchSpaceUsedData();
             if (have_swap.no < 0) {
                 return 0;
@@ -4215,25 +4215,25 @@ int CMenuItemInfo::EquipDirect(int chara, CGameDataUsed *item, int &slot) {
         return 0;
     }
     MENU_SWAPITEM_INFO swap;
-    swap.Set(1, slot, chara_no, 0);
+    swap.Set(MENU_SWAP_TYPE_EQUIP, slot, chara_no, 0);
     if (chara < 2) {
         __typeof__(&MenuUserParam) menuUserParam_ptr2 = &MenuUserParam;
         target = &menuUserParam_ptr2->chara[chara_no]->equip[slot];
-        swap.type = 1;
+        swap.type = MENU_SWAP_TYPE_EQUIP;
         if (robo_slot4 == 1) {
             slot = 1;
             target = &menuUserParam_ptr2->chara[0]->equip[4];
-            swap.type = 2;
+            swap.type = MENU_SWAP_TYPE_ROBO_PART;
         }
         int uses_slot2 = robo_slot2 == 1;
         if (uses_slot2) {
             slot = 1;
             target = &menuUserParam_ptr2->chara[0]->equip[2];
-            swap.type = 2;
+            swap.type = MENU_SWAP_TYPE_ROBO_PART;
         }
     } else if (chara == 2) {
         if (IsEnableChangeRoboParts(&MenuCommonInfo->have_item) == 1) {
-            swap.type = 2;
+            swap.type = MENU_SWAP_TYPE_ROBO_PART;
             target = &MenuUserParam.robo->parts[slot];
         } else {
             return 0;
@@ -4627,7 +4627,7 @@ int CMenuItemInfo::ItemCmdAfter(int cmd_ret, ITEMCMD_RET_PARA *ret) {
             break;
         case 30: {
             MENU_SWAPITEM_INFO swap;
-            swap.Set(3, MenuCommonInfo->cursor, -1, 0);
+            swap.Set(MENU_SWAP_TYPE_ITEM_BOARD, MenuCommonInfo->cursor, -1, 0);
             MenuSePlay(menu_item_swap_sndtbl[MenuCommonInfo->MenuSwapItem(MenuItemCmdRet.item2, &swap, 1, true)]);
             break;
         }
