@@ -123,10 +123,10 @@ public:
         u32  flag;
         int  event_no;
         int  point_no;
-        int  unk_2c;
-        int  unk_30;
-        int  unk_34;
-        char unk_38[16];
+        int  arg1;
+        int  arg2;
+        int  arg3;
+        char target[16];
     };
 
     struct SoundData {

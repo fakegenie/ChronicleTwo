@@ -140,10 +140,10 @@ int CScene::GetMapEvent(float *position, int map_no, CSceneEventData *event) {
                 event->event.flag = point->event.flag;
                 event->event.event_no = point->event.event_no;
                 event->event.point_no = point->event.point_no;
-                event->event.unk_2c = point->event.unk_2c;
-                event->event.unk_30 = point->event.unk_30;
-                event->event.unk_34 = point->event.unk_34;
-                *(CopyEventName *)event->event.unk_38 = *(CopyEventName *)point->event.unk_38;
+                event->event.arg1 = point->event.arg1;
+                event->event.arg2 = point->event.arg2;
+                event->event.arg3 = point->event.arg3;
+                *(CopyEventName *)event->event.target = *(CopyEventName *)point->event.target;
                 event->map_event.check_type = result.check_type;
                 event->map_event.event_no = result.event_no;
                 *(CopyEventWords *)event->map_event.matrix = *(CopyEventWords *)result.matrix;
