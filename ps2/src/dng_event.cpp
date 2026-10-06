@@ -2019,14 +2019,12 @@ void LoadMonsterFile(int monster_id, int initialize) {
             memory = (mgCMemory *)DngMainScene->GetStack(3);
             if (memory != NULL) {
                 int i = 0;
-                u8 *monster_man = (u8 *)ActiveMonster;
-                int offset = 0;
+                CMonsterMan *monster_man = (CMonsterMan *)ActiveMonster;
                 for (; i < MONSTER_ACTIVE_MAX; i++) {
                     void *buffer = memory->stAlloc64(0xFA0);
-                    mgCMemory *slot = (mgCMemory *)(monster_man + offset + 4);
+                    mgCMemory *slot = &monster_man->memory[i];
                     (slot)->stSetBuffer((u_long128 *)buffer, 0xFA0);
                     slot->stack_used = 0;
-                    offset += 0x30;
                     slot->lock = 0;
                 }
                 sndInitPort(5);
