@@ -606,7 +606,7 @@ int CManualMenu::KeyStep(void) {
                     MenuKeySelectCheck(MenuListSelectKeyCheck(keys, 10), &select, &top, 0, 0x2E,
                                        10, 0);
                     if (prevSelect != select) {
-                        MenuSePlay(0);
+                        MenuSePlay(SYSTEM_SE_CURSOR);
                     }
                     pressed = ConvertCheckPushButton(pushed);
                     if (pressed & 1) {
@@ -618,7 +618,7 @@ int CManualMenu::KeyStep(void) {
                         if (MovieViewFlag != 0 && (unlocked != 0 || viewable != 0)) {
                             key_arg_no = MANUAL_STEP_FADE_OUT;
                             FadeOutMenu(0x3C, 0.0f);
-                            MenuSePlay(1);
+                            MenuSePlay(SYSTEM_SE_DECIDE);
                             MovieBattleBGMPhase = 1;
                         } else {
                             MenuSePlay(5);
@@ -778,7 +778,7 @@ int CManualMenu::KeyStep(void) {
                             turnedPage[0] = pict_page + 1;
                             turnedPage[1] = pict_num;
                             MenuDCMsg[7]->SetMsgVolumeNo(turnedPage, 2);
-                            MenuSePlay(0);
+                            MenuSePlay(SYSTEM_SE_CURSOR);
                         }
                         if ((pushed & 2) != 0) {
                             FadeOutMenu(0x1E, 0.0f);
@@ -1042,7 +1042,7 @@ int CMenuOption::KeyStep(void) {
                 changed = 1;
             }
             if (changed != 0) {
-                MenuSePlay(0);
+                MenuSePlay(SYSTEM_SE_CURSOR);
             }
             switch (ConvertCheckPushButton(pushed)) {
                 case 1:
@@ -1061,10 +1061,10 @@ int CMenuOption::KeyStep(void) {
                         }
                     }
                     UpdateOptionForm();
-                    MenuSePlay(1);
+                    MenuSePlay(SYSTEM_SE_DECIDE);
                     break;
                 case 8:
-                    MenuSePlay(1);
+                    MenuSePlay(SYSTEM_SE_DECIDE);
                     InitSV_CONFIG_OPTION((SV_CONFIG_OPTION *)&config);
                     UpdateOptionForm();
                     break;
@@ -1630,14 +1630,14 @@ int CSaveMenuClass::KeyStep(void) {
                             slot = 1;
                         }
                         if (slot != prevSlot) {
-                            MenuSePlay(0);
+                            MenuSePlay(SYSTEM_SE_CURSOR);
                         }
                         if (cursor_form != NULL) {
                             cursor_form->SetAction(tbl_2023[slot]);
                         }
                         switch (ConvertCheckPushButton(pushed)) {
                             case 1:
-                                MenuSePlay(1);
+                                MenuSePlay(SYSTEM_SE_DECIDE);
                                 MemoryCardPtr->InitPlayDataInfo();
                                 next = SAVE_MENU_PAGE_CARD_INFO;
                                 MemoryCardPtr->port = slot;
@@ -1658,7 +1658,7 @@ int CSaveMenuClass::KeyStep(void) {
                         if (answer == 1) {
                             FadeOutMenu(0x28, 0.0f);
                             CBaseMenuClass::mode = 2;
-                            MenuSePlay(1);
+                            MenuSePlay(SYSTEM_SE_DECIDE);
                         }
                         if (answer == 2) {
                             step = 0;
@@ -1723,7 +1723,7 @@ int CSaveMenuClass::KeyStep(void) {
                                     listMove = moveKey;
                                 }
                                 if (MenuKeySelectCheck(listMove, &select, &top, 0, 0xD, 3, 0) != 0) {
-                                    MenuSePlay(0);
+                                    MenuSePlay(SYSTEM_SE_CURSOR);
                                     input_wait_counter = 4;
                                 }
                                 if (cursor_form != NULL) {
@@ -1742,7 +1742,7 @@ int CSaveMenuClass::KeyStep(void) {
                                             if (McCheckMCPs2(card) == 0) {
                                                 phase = SAVE_LIST_PHASE_SELECT;
                                                 next = SAVE_MENU_PAGE_ERROR;
-                                                MenuSePlay(1);
+                                                MenuSePlay(SYSTEM_SE_DECIDE);
                                             } else {
                                                 fileNo = select + 1;
                                                 if (mode == SAVE_MENU_MODE_SAVE) {
@@ -1750,7 +1750,7 @@ int CSaveMenuClass::KeyStep(void) {
                                                         next = SAVE_MENU_PAGE_FORMAT;
                                                         FormatCase = 1;
                                                         phase = SAVE_LIST_PHASE_SELECT;
-                                                        MenuSePlay(1);
+                                                        MenuSePlay(SYSTEM_SE_DECIDE);
                                                     } else {
                                                         input_wait_counter = 0;
                                                         if (info->state == 1) {
@@ -1773,7 +1773,7 @@ int CSaveMenuClass::KeyStep(void) {
                                                                 phase = SAVE_LIST_PHASE_CONFIRM_SAVE;
                                                             }
                                                         }
-                                                        MenuSePlay(1);
+                                                        MenuSePlay(SYSTEM_SE_DECIDE);
                                                     }
                                                 } else if (info->state == 1) {
                                                     phase = SAVE_LIST_PHASE_CONFIRM_LOAD;
@@ -1789,13 +1789,13 @@ int CSaveMenuClass::KeyStep(void) {
                                                             fileMes->SetMsgCursor(1);
                                                             fileMes->SetMsgVolumeNo(values, 0x10);
                                                             fileMes->MakeMsg(0x13A9);
-                                                            MenuSePlay(1);
+                                                            MenuSePlay(SYSTEM_SE_DECIDE);
                                                         }
                                                     } else {
                                                         fileMes->SetMsgCursor(1);
                                                         fileMes->SetMsgVolumeNoOne(fileNo);
                                                         fileMes->MakeMsg(0xBE0);
-                                                        MenuSePlay(1);
+                                                        MenuSePlay(SYSTEM_SE_DECIDE);
                                                     }
                                                 } else {
                                                     ExeScript(at_2501);
@@ -1825,7 +1825,7 @@ int CSaveMenuClass::KeyStep(void) {
                                         case 1:
                                             if (answer == 0) {
                                                 EnvSetSave(save_kind);
-                                                MenuSePlay(1);
+                                                MenuSePlay(SYSTEM_SE_DECIDE);
                                                 break;
                                             }
                                         case 2:
@@ -1870,7 +1870,7 @@ int CSaveMenuClass::KeyStep(void) {
                                 if (McCheckMCPs2(card) == 0) {
                                     phase = SAVE_LIST_PHASE_SELECT;
                                     next = SAVE_MENU_PAGE_ERROR;
-                                    MenuSePlay(1);
+                                    MenuSePlay(SYSTEM_SE_DECIDE);
                                 } else if (pushed != 0) {
                                     phase = SAVE_LIST_PHASE_SELECT;
                                     refresh = 1;
@@ -1963,7 +1963,7 @@ int CSaveMenuClass::KeyStep(void) {
                             case SAVE_LIST_PHASE_LOAD_NOTICE:
                                 if (pushed != 0) {
                                     phase = SAVE_LIST_PHASE_CONFIRM_LOAD;
-                                    MenuSePlay(1);
+                                    MenuSePlay(SYSTEM_SE_DECIDE);
                                 }
                                 break;
                         }
@@ -1986,7 +1986,7 @@ int CSaveMenuClass::KeyStep(void) {
                                     fileMes->SetMsgVolumeNoOne(slot + 1);
                                     fileMes->MakeMsg(0xBE8);
                                     fileMes->SetAbsPos(5);
-                                    MenuSePlay(1);
+                                    MenuSePlay(SYSTEM_SE_DECIDE);
                                     phase = SAVE_FORMAT_PHASE_FORMATTING;
                                 }
                                 if (answer == 2) {
@@ -2015,7 +2015,7 @@ int CSaveMenuClass::KeyStep(void) {
                                 break;
                             case SAVE_FORMAT_PHASE_DONE:
                                 if (pushed != 0) {
-                                    MenuSePlay(1);
+                                    MenuSePlay(SYSTEM_SE_DECIDE);
                                     next = SAVE_MENU_PAGE_SLOT_SELECT;
                                 }
                                 break;
@@ -2043,7 +2043,7 @@ int CSaveMenuClass::KeyStep(void) {
                             if (pushed != 0) {
                                 next = SAVE_MENU_PAGE_SLOT_SELECT;
                                 MenuMesForm[2]->draw_flag = 0;
-                                MenuSePlay(1);
+                                MenuSePlay(SYSTEM_SE_DECIDE);
                             }
                             break;
                     }
@@ -2072,7 +2072,7 @@ int CSaveMenuClass::KeyStep(void) {
                                 switch (pushed) {
                                     case 1:
                                         if (fileMes->mes_no == 0xBEB && (next = SAVE_MENU_PAGE_FORMAT, answer == 0)) {
-                                            MenuSePlay(1);
+                                            MenuSePlay(SYSTEM_SE_DECIDE);
                                             break;
                                         }
                                     case 2:
@@ -2802,7 +2802,7 @@ int SubGameSaveKey(void) {
             } else {
                 cursor = window->AddMsgCursor2(2, 3, 0);
                 if (pressed & 1) {
-                    MenuSePlay(1);
+                    MenuSePlay(SYSTEM_SE_DECIDE);
                     next = SUB_SAVE_CARD_CHECK;
                     SubGameMCPort = cursor - 2;
                 }
@@ -2854,7 +2854,7 @@ int SubGameSaveKey(void) {
         case SUB_SAVE_QUIT_ASK_LOAD:
             answer = window->YesNoCursor2(0);
             if (answer == 1) {
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
                 MenuArg.end_code = 0;
                 SubGameSaveLoadStatus = 1;
                 MenuArg.result[0] = 0;
@@ -2875,7 +2875,7 @@ int SubGameSaveKey(void) {
                 answer = window->YesNoCursor2(0);
                 if (answer == 1) {
                     next = SUB_SAVE_WRITING;
-                    MenuSePlay(1);
+                    MenuSePlay(SYSTEM_SE_DECIDE);
                 }
                 if (answer == 2) {
                     next = SUB_SAVE_SLOT_SELECT;
@@ -2897,7 +2897,7 @@ int SubGameSaveKey(void) {
         case SUB_SAVE_WRITE_DONE:
             unsigned int was_pushed = pushed != 0;
             if (was_pushed) {
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
                 SubGameSaveLoadStatus = 1;
             }
             break;
@@ -2905,7 +2905,7 @@ int SubGameSaveKey(void) {
         case SUB_SAVE_WRITE_FAILED:
             if (pushed != 0) {
                 next = SUB_SAVE_SLOT_SELECT;
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
             }
             break;
         case SUB_SAVE_SPACE_ASK:
@@ -2915,7 +2915,7 @@ int SubGameSaveKey(void) {
             } else {
                 answer = window->YesNoCursor2(0);
                 if (answer == 1) {
-                    MenuSePlay(1);
+                    MenuSePlay(SYSTEM_SE_DECIDE);
                     if (card->formatted == 0) {
                         next = SUB_SAVE_FORMAT_ASK;
                     } else if (card->free_size < SubCheckTotalSaveFileSize) {
@@ -2949,7 +2949,7 @@ int SubGameSaveKey(void) {
             } else {
                 answer = window->YesNoCursor2(0);
                 if (answer == 1) {
-                    MenuSePlay(1);
+                    MenuSePlay(SYSTEM_SE_DECIDE);
                     next = SUB_SAVE_FORMATTING;
                 }
                 if (answer == 2) {
@@ -2993,7 +2993,7 @@ int SubGameSaveKey(void) {
                 if (answer == 1) {
                     next = SUB_SAVE_LOADING;
                     MemoryCardPtr->SetFuncNo(MC_FUNC_LOAD_OMAKE);
-                    MenuSePlay(1);
+                    MenuSePlay(SYSTEM_SE_DECIDE);
                 }
                 if (answer == 2) {
                     next = SUB_SAVE_SLOT_SELECT;
@@ -3014,7 +3014,7 @@ int SubGameSaveKey(void) {
             break;
         case SUB_SAVE_LOAD_DONE:
             if (pushed != 0) {
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
                 SubGameSaveLoadStatus = 1;
                 MenuArg.end_code = 0x13;
             }
@@ -3022,7 +3022,7 @@ int SubGameSaveKey(void) {
         case SUB_SAVE_LOAD_MISSING:
             answer = window->YesNoCursor2(0);
             if (answer == 1) {
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
                 SubGameSaveLoadStatus = 1;
                 MenuArg.end_code = 0x13;
             }

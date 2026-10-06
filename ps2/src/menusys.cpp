@@ -731,7 +731,7 @@ int CBaseMenuClass::MenuItemCommandSelect(int select_key, int push_button) {
                 } else {
                     user->SetRoboVoiceFlag(0);
                 }
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
             } else if (cmd == 37) {
                 CGameDataUsed *core = MenuUserDataManPtr->SearchItemOnItemBrd(MenuUserDataManPtr->CheckRobotCore(), 1);
                 MenuItemCmdRet.result = MenuItemUse.UseItem(ask_para.item, 1, core);
@@ -1135,7 +1135,7 @@ int CBaseMenuClass::IsSpectolTrans(int select_key, int push_button) {
                             trans_spectol_rgb = 0x80;
                             step = 1;
                             form->draw_flag = 0;
-                            MenuSePlay(1);
+                            MenuSePlay(SYSTEM_SE_DECIDE);
                             if (MenuCommonInfo->cursor_form != NULL) {
                                 MenuCommonInfo->cursor_form->draw_flag = 0;
                             }
@@ -1206,7 +1206,7 @@ int CBaseMenuClass::IsSpectolTrans(int select_key, int push_button) {
                     }
                     message->MakeMsg(0xAE);
                     message->SetMsgCursor(1);
-                    MenuSePlay(1);
+                    MenuSePlay(SYSTEM_SE_DECIDE);
                 }
             } else if (push_button & 2) {
                 cancel = 1;
@@ -1248,7 +1248,7 @@ int CBaseMenuClass::IsSpectolFusion(int key, int command) {
                     if (choice == 0) {
                         step = 1;
                         form->draw_flag = 0;
-                        MenuSePlay(1);
+                        MenuSePlay(SYSTEM_SE_DECIDE);
                         if (MenuCommonInfo->cursor_form != NULL) {
                             MenuCommonInfo->cursor_form->draw_flag = 0;
                         }
@@ -1378,7 +1378,7 @@ int CBaseMenuClass::IsTrush(int key, int command) {
                 message->values[0] = MenuHowHaveMuchNum;
                 message->value_width[0] = 0;
                 message->SetMsgCursor(1);
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
                 break;
             case 2:
                 MenuCommonInfo->how_much_form->draw_flag = 0;
@@ -1425,7 +1425,7 @@ int CBaseMenuClass::SelectInGiftBox(int key, int command) {
         NowGiftBoxSelect = 2;
     }
     if (before != NowGiftBoxSelect) {
-        MenuSePlay(0);
+        MenuSePlay(SYSTEM_SE_CURSOR);
     }
     gift_box = ask_para.item;
     switch (command) {
@@ -1438,13 +1438,13 @@ int CBaseMenuClass::SelectInGiftBox(int key, int command) {
                 if (slot != NULL) {
                     MenuUserDataManPtr->CopyGameData(slot, item_no);
                     gift_box->SetGiftBoxItem(0, NowGiftBoxSelect);
-                    MenuSePlay(1);
+                    MenuSePlay(SYSTEM_SE_DECIDE);
                 } else {
                     slot = MenuUserDataManPtr->SearchSpaceUsedDataPtr();
                     if (slot != NULL) {
                         MenuUserDataManPtr->CopyGameData(slot, item_no);
                         gift_box->SetGiftBoxItem(0, NowGiftBoxSelect);
-                        MenuSePlay(1);
+                        MenuSePlay(SYSTEM_SE_DECIDE);
                     } else {
                         MenuSePlay(5);
                     }
@@ -1573,7 +1573,7 @@ int CBaseMenuClass::SelectMakeObject(int keys) {
         make_cursor = 0;
     }
     if (old_column != make_cursor) {
-        MenuSePlay(0);
+        MenuSePlay(SYSTEM_SE_CURSOR);
     }
     direction = 0;
     if (make_cursor == 0) {
@@ -2208,7 +2208,7 @@ int MenuItemBrdKey(int keys, int *cursor, int *scroll, int board) {
         CalcMenuAdd2(cursor, dy, (row + 1) * 6 - 1);
     }
     if (before != *cursor) {
-        MenuSePlay(0);
+        MenuSePlay(SYSTEM_SE_CURSOR);
     }
     return result;
 }
@@ -4106,7 +4106,7 @@ void CMenuItemInfo::NextModeBuildUpInfo(CGameDataUsed *weapon) {
     if (MenuCommonInfo->cursor_form != NULL) {
         MenuCommonInfo->cursor_form->draw_flag = 1;
     }
-    MenuSePlay(1);
+    MenuSePlay(SYSTEM_SE_DECIDE);
 }
 #ifdef NONMATCHING
 int CMenuItemInfo::EquipDirect(int chara, CGameDataUsed *item, int &slot) {
@@ -4661,7 +4661,7 @@ int CMenuItemInfo::ItemCmdAfter(int cmd_ret, ITEMCMD_RET_PARA *ret) {
         int answer = MenuDCMsg[7]->YesNoCursor2(0);
         if (answer == 1) {
             ask_para.item->DeleteNum(1);
-            MenuSePlay(1);
+            MenuSePlay(SYSTEM_SE_DECIDE);
             mode = MENU_ASK_MODE_CLOSE;
             step = 0;
             item_consumed = 1;
@@ -4818,7 +4818,7 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
                     int select = info->select_no;
                     CDataWeapon *data = info->weapon_data[select];
                     if (old_select != select) {
-                        MenuSePlay(0);
+                        MenuSePlay(SYSTEM_SE_CURSOR);
                     }
                     MenuWeaponStatusInfoFormSet(info->weapon, data);
                     if (push_button == MENU_PUSH_BUTTON_CANCEL) {
@@ -4860,7 +4860,7 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
                             MenuSePlay(5);
                             step = 0;
                         } else {
-                            MenuSePlay(1);
+                            MenuSePlay(SYSTEM_SE_DECIDE);
                             BuildEndFlag_4703 = 0;
                             info->mode = 0;
                             load_stack->stReset();
@@ -4961,7 +4961,7 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
                     if (push_button != 0) {
                         close = 1;
                         mes_form->draw_flag = 0;
-                        MenuSePlay(1);
+                        MenuSePlay(SYSTEM_SE_DECIDE);
                         itemmenu_chr_rotflag = 1;
                     }
                     break;
@@ -6093,7 +6093,7 @@ void MenuItemDebugKey(void) {
             debug_common_data = GetCommonItemData(CMenuItemInfoPt->debug_item_no);
 
             if (GamePad__2.Down(PAD_TRIANGLE)) {
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
                 DebugGetItem(NULL, 0);
                 CheckEnableHaveItemNum();
             }
@@ -6394,7 +6394,7 @@ void MenuItemDebugKey(void) {
             }
             if (buttons & 4) {
                 item->LevelUp();
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
             }
         }
         return;
@@ -7156,7 +7156,7 @@ int CMenuItemInfo::PushKey(int pad, int trigger) {
                         if (form != NULL) {
                             form->draw_flag = 0;
                         }
-                        MenuSePlay(1);
+                        MenuSePlay(SYSTEM_SE_DECIDE);
                         if (target == this->view_weapon) {
                             itemmenu_chr_rotflag = 0;
                         }
@@ -7196,7 +7196,7 @@ int CMenuItemInfo::PushKey(int pad, int trigger) {
                                 break;
                             case 4:
                                 this->SetAskHowMuchItemNum(&swap, target);
-                                MenuSePlay(1);
+                                MenuSePlay(SYSTEM_SE_DECIDE);
                                 break;
                             case 3:
                                 MenuSePlay(0x1C);
@@ -7244,7 +7244,7 @@ int CMenuItemInfo::PushKey(int pad, int trigger) {
                         } while (i < 0x96);
                     }
                     CheckEnableHaveItemNum();
-                    MenuSePlay(1);
+                    MenuSePlay(SYSTEM_SE_DECIDE);
                     break;
                 }
                 case kCmdUseOnChara:
@@ -7293,7 +7293,7 @@ int CMenuItemInfo::PushKey(int pad, int trigger) {
                         if (form != NULL) {
                             form->draw_flag = 0;
                         }
-                        MenuSePlay(1);
+                        MenuSePlay(SYSTEM_SE_DECIDE);
                         itemmenu_chr_rotflag = 0;
                     } else {
                         item_used = MenuItemUse.UseItem(held_item, 1, this->view_weapon);
@@ -7463,7 +7463,7 @@ int CMenuItemInfo::PushKey(int pad, int trigger) {
                 if (form != NULL) {
                     form->draw_flag = 1;
                 }
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
             }
             break;
         case kStateTuneBuildUp: {
@@ -7483,7 +7483,7 @@ int CMenuItemInfo::PushKey(int pad, int trigger) {
                         MenuCommonInfo->select_pos[0] = 4;
                     }
                     if (previous != MenuCommonInfo->select_pos[0]) {
-                        MenuSePlay(0);
+                        MenuSePlay(SYSTEM_SE_CURSOR);
                     }
                     CGameDataUsed *item = this->view_weapon;
                     short *saved_words = (short *)&SpectolInfoStay.data.weapon.whp;
@@ -7498,7 +7498,7 @@ int CMenuItemInfo::PushKey(int pad, int trigger) {
                             if (pad & kPadLeft) {
                                 *stat_slot = value - 1;
                                 words[kSpareWord] += kPointsPerStep;
-                                MenuSePlay(0);
+                                MenuSePlay(SYSTEM_SE_CURSOR);
                             }
                         }
                     }
@@ -7510,7 +7510,7 @@ int CMenuItemInfo::PushKey(int pad, int trigger) {
                             if (words[kSpareWord] < 0) {
                                 words[kSpareWord] = 0;
                             }
-                            MenuSePlay(0);
+                            MenuSePlay(SYSTEM_SE_CURSOR);
                         }
                     }
                     if (trigger & 1) {
@@ -7528,7 +7528,7 @@ int CMenuItemInfo::PushKey(int pad, int trigger) {
                         if (changed != 0) {
                             this->step = kTuneConfirmSave;
                             this->ExeScript(at_7344);
-                            MenuSePlay(1);
+                            MenuSePlay(SYSTEM_SE_DECIDE);
                         } else {
                             MenuSePlay(5);
                         }
@@ -7561,7 +7561,7 @@ int CMenuItemInfo::PushKey(int pad, int trigger) {
                         this->mode = kStateBrowse;
                         this->step = kTuneAdjust;
                         this->ExeScript(at_7346);
-                        MenuSePlay(1);
+                        MenuSePlay(SYSTEM_SE_DECIDE);
                     }
                     if (answer == 2) {
                         this->step = kTuneAdjust;
@@ -8903,7 +8903,7 @@ int CMenuItemInfo::LRCheck(int key) {
         key_arg_no = next_arg_no;
         MenuCommonInfo->key_arg = &item_menu_argtbl[key_arg_no];
         ModelReadStart(view_mode, 1, 1);
-        MenuSePlay(1);
+        MenuSePlay(SYSTEM_SE_DECIDE);
         }
     }
     return 0;
@@ -9145,7 +9145,7 @@ void CMenuItemInfo::KeyStepLocal(int select_key, int push_button, int flag) {
     }
     int cursor = MenuCommonInfo->cursor;
     if (select >= 0 || MenuCommonInfo->save_cursor != cursor) {
-        MenuSePlay(0);
+        MenuSePlay(SYSTEM_SE_CURSOR);
     }
     if (MenuCommonInfo->CheckKeyInput() && key_arg_no == 2) {
         MenuItem_ItemBoardTopLine = MenuCommonInfo->GetTopLine();
@@ -9661,7 +9661,7 @@ int CItemSelect::KeyStep(void) {
         }
         MenuCheckLine(&top_line, cursor / 5, 2);
         if (old_cursor != cursor) {
-            MenuSePlay(0);
+            MenuSePlay(SYSTEM_SE_CURSOR);
         }
         CGameDataUsed *item = GetExistThisPosData(cursor);
         if (push_button & MENU_PUSH_BUTTON_DECIDE) {
@@ -9672,7 +9672,7 @@ int CItemSelect::KeyStep(void) {
                 alpha_step = -8;
                 MenuArg.result[2] = 0;
                 MenuArg.result[3] = 0;
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
                 if (MenuItemSelectMode == 1) {
                     MenuArg.end_code = 0xF;
                     MenuArg.result[0] = item->item_no;

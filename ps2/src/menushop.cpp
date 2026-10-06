@@ -572,10 +572,10 @@ int CShopMenu::KeyStep() {
                     line = 4;
                 }
                 bag_pos = (bag_top + line) * 6;
-                MenuSePlay(0);
+                MenuSePlay(SYSTEM_SE_CURSOR);
             } else {
                 if (moved) {
-                    MenuSePlay(0);
+                    MenuSePlay(SYSTEM_SE_CURSOR);
                 }
                 switch (push) {
                 case 1:
@@ -599,7 +599,7 @@ int CShopMenu::KeyStep() {
                         line = 0;
                     }
                     list_pos = list_top + line;
-                    MenuSePlay(0);
+                    MenuSePlay(SYSTEM_SE_CURSOR);
                 }
             } else {
                 swap.Set(3, bag_pos, -1, 0);
@@ -674,7 +674,7 @@ int CShopMenu::KeyStep() {
                 num = num_max;
             }
             if (old_cursor != num_cursor || old_num != num) {
-                MenuSePlay(0);
+                MenuSePlay(SYSTEM_SE_CURSOR);
                 if (arrow >= 0) {
                     arrow_flash[arrow] = 8;
                     arrow_flash[arrow ^ 1] = 0;
@@ -781,7 +781,7 @@ int CShopMenu::KeyStep() {
                 break;
             case 4:
                 SetAskHowMuchItemNum(&swap, item);
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
                 break;
             default:
                 MenuSePlay(5);
@@ -1704,7 +1704,7 @@ int CMenuQuestView::KeyStep() {
             int old_top = top;
             MenuKeySelectCheck(select_key, &select, &top, 0, max, 7, 0);
             if (old_select != select) {
-                MenuSePlay(0);
+                MenuSePlay(SYSTEM_SE_CURSOR);
                 if (abs(old_top - top) > 1) {
                     jump = 1;
                 }
@@ -1768,7 +1768,7 @@ int CMenuQuestView::KeyStep() {
                     QuestCommentWinX = (int)(mgScreenWidth - width) >> 1;
                     UnderMsg(1);
                 }
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
             } else if (push & 2) {
                 FadeOutMenu(0x28, 0.0f);
                 MenuSePlay(5);

@@ -1123,13 +1123,13 @@ int PauseMenu() {
             }
             PauseMes.select = selected;
             if (previous_select != PauseSel) {
-                sndSePlay(GetSystemSndID(), 0, 0);
+                sndSePlay(GetSystemSndID(), SYSTEM_SE_CURSOR, 0);
             }
             if (PadCtrl.Btn(PAD_BTN_CONFIRM)) {
                 if (PauseSel == 0) {
                     BlackFade = 0.0f;
                     PauseMenuMode = PAUSE_MENU_FADE_OUT;
-                    sndSePlay(GetSystemSndID(), 1, 0);
+                    sndSePlay(GetSystemSndID(), SYSTEM_SE_DECIDE, 0);
                 } else {
                     result = PAUSE_MENU_RESUME;
                 }

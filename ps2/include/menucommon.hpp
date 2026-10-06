@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.h"
+#include "snd_mngr.hpp"
 
 class CCharacter2;
 class CGameDataUsed;

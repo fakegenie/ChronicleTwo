@@ -7517,10 +7517,10 @@ int _MES_SE_PLAY(RS_STACKDATA *stack, int argc) {
             sndSePlay(SystemSND_ID, 0x19, 0);
             return 1;
         case 2:
-            sndSePlay(SystemSND_ID, 0, 0);
+            sndSePlay(SystemSND_ID, SYSTEM_SE_CURSOR, 0);
             return 1;
         case 3:
-            sndSePlay(SystemSND_ID, 1, 0);
+            sndSePlay(SystemSND_ID, SYSTEM_SE_DECIDE, 0);
             return 1;
         default:
             return 0;

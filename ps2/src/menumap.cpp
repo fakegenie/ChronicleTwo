@@ -332,7 +332,7 @@ int CWorldMapMenu::KeyStep() {
         if (view_only != 0) {
             if (push != 0) {
                 close = 1;
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
             }
             break;
         }
@@ -435,7 +435,7 @@ int CWorldMapMenu::KeyStep() {
                     }
                 }
                 if (next != now_area) {
-                    MenuSePlay(0);
+                    MenuSePlay(SYSTEM_SE_CURSOR);
                 }
             }
             switch (push) {
@@ -458,7 +458,7 @@ int CWorldMapMenu::KeyStep() {
                     }
                 }
                 list_mes->SetMsgCursor(0);
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
                 break;
             case 2:
                 MenuSePlay(5);
@@ -489,7 +489,7 @@ int CWorldMapMenu::KeyStep() {
                     MenuSePlay(5);
                 } else {
                     next_step = WORLD_MAP_STEP_ASK;
-                    MenuSePlay(1);
+                    MenuSePlay(SYSTEM_SE_DECIDE);
                 }
                 break;
             }
@@ -534,7 +534,7 @@ int CWorldMapMenu::KeyStep() {
                         MenuArg.result[1] = 11;
                     }
                 }
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
             }
             if (answer == 2) {
                 next_step = WORLD_MAP_STEP_POS;
@@ -557,7 +557,7 @@ int CWorldMapMenu::KeyStep() {
                 ask_view = 0;
                 cursor_view = 1;
                 step = WORLD_MAP_STEP_AREA;
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
             }
             break;
         }
@@ -1130,19 +1130,19 @@ int SphidaMenuKey() {
                     case 0:
                         SphidaMenuPhase = SPHIDA_MENU_NAME_FADE;
                         MenuMainScene->fade.FadeOut(30, 0.0f, 0.0f, 0.0f);
-                        MenuSePlay(1);
+                        MenuSePlay(SYSTEM_SE_DECIDE);
                         break;
                     case 1:
                         SphidaCursorDrawFlag = 1;
                         SphidaMenuPhase = SPHIDA_MENU_PASSWORD;
                         SphidaMenuMes->cursor_on = 0;
-                        MenuSePlay(1);
+                        MenuSePlay(SYSTEM_SE_DECIDE);
                         break;
                     case 2:
                         SphidaCursorDrawFlag = 1;
                         SphidaMenuMes->cursor_on = 0;
                         SphidaMenuPhase = SPHIDA_MENU_CLEAR;
-                        MenuSePlay(1);
+                        MenuSePlay(SYSTEM_SE_DECIDE);
                         break;
                     case 3:
                         SphidaMenuQusDrawFlag = 1;
@@ -1152,7 +1152,7 @@ int SphidaMenuKey() {
                         question->SetMsgCursor(1);
                         SphidaMenuMes->cursor_on = 0;
                         SphidaMenuPhase = SPHIDA_MENU_QUIT_ASK;
-                        MenuSePlay(1);
+                        MenuSePlay(SYSTEM_SE_DECIDE);
                         break;
                 }
             } else if (DebugFlag != 0 && menu_debug_flag != 0 && (push_button & MENU_PUSH_BUTTON_SQUARE)) {
@@ -1190,7 +1190,7 @@ int SphidaMenuKey() {
             break;
         case SPHIDA_MENU_PASSWORD: {
             if (MenuKeySelectCheck(OmakeSfidaSelect(select_key), &SphidaSelect[0], &SphidaSelect[1], 0, 0x40, 8, 0) != 0) {
-                MenuSePlay(0);
+                MenuSePlay(SYSTEM_SE_CURSOR);
                 int new_top = SphidaSelect[1];
                 if (old_top != new_top) {
                     SfidaMakeLine = old_top < new_top ? 1 : 0;
@@ -1220,7 +1220,7 @@ int SphidaMenuKey() {
                     if (encoded == 0) {
                         MenuSePlay(5);
                     } else {
-                        MenuSePlay(1);
+                        MenuSePlay(SYSTEM_SE_DECIDE);
                         SphidaMenuQusDrawFlag = 1;
                         SphidaCursorDrawFlag = 0;
                         question->MsgPreset(0x12);
@@ -1259,7 +1259,7 @@ int SphidaMenuKey() {
             break;
         case SPHIDA_MENU_CLEAR: {
             if (MenuKeySelectCheck(OmakeSfidaSelect(select_key), &SphidaSelect[0], &SphidaSelect[1], 0, 0x40, 8, 0) != 0) {
-                MenuSePlay(0);
+                MenuSePlay(SYSTEM_SE_CURSOR);
                 int new_top = SphidaSelect[1];
                 if (old_top != new_top) {
                     SfidaMakeLine = old_top < new_top ? 1 : 0;
@@ -1279,7 +1279,7 @@ int SphidaMenuKey() {
                     question->SetMsgItemNo(clear_names, 1);
                     question->SetMsgCursor(1);
                     SphidaMenuQusDrawFlag = 1;
-                    MenuSePlay(1);
+                    MenuSePlay(SYSTEM_SE_DECIDE);
                     SphidaMenuPhase = SPHIDA_MENU_CLEAR_ASK;
                 }
             } else if (push_button & MENU_PUSH_BUTTON_CANCEL) {
@@ -1294,7 +1294,7 @@ int SphidaMenuKey() {
         case SPHIDA_MENU_CLEAR_ASK: {
             int answer = question->YesNoCursor2(0);
             if (answer == 1) {
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
                 SubSphidaData->ClearPlayerScore(SphidaSelect[0]);
                 SphidaMenuQusDrawFlag = 0;
                 SphidaMenuPhase = SPHIDA_MENU_CLEAR;
@@ -1314,7 +1314,7 @@ int SphidaMenuKey() {
                 SphidaMenuQusDrawFlag = 0;
                 MenuMainScene->fade.FadeOut(30, 0.0f, 0.0f, 0.0f);
                 SphidaMenuPhase = SPHIDA_MENU_EXIT;
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
             }
             if (answer == 2) {
                 SphidaMenuPhase = SPHIDA_MENU_TOP;
@@ -1508,7 +1508,7 @@ void SphidaScoreViewInit(mgCMemory *memory, int *tex_block, int) {
 
 int SphidaScoreViewKey() {
     if (MenuCommonInfo->CheckPushButton()) {
-        MenuSePlay(1);
+        MenuSePlay(SYSTEM_SE_DECIDE);
         return 1;
     }
     Sfida_NowPlayHorlBlink = Sfida_NowPlayHorlBlink + 1;

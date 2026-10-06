@@ -413,7 +413,7 @@ int CDC2Mes::AddMsgCursor2(int min, int max, int loop) {
         step++;
     }
     if (AddMsgCursor(step, min, max, loop)) {
-        MenuSePlay(0);
+        MenuSePlay(SYSTEM_SE_CURSOR);
     }
     return cursor;
 }
@@ -455,7 +455,7 @@ int CDC2Mes::CommandMsgCursor() {
         choices = 1;
     }
     if (AddMsgCursor(step, 0, choices - 1, 1)) {
-        MenuSePlay(0);
+        MenuSePlay(SYSTEM_SE_CURSOR);
     }
     return cursor;
 }
@@ -468,7 +468,7 @@ int CDC2Mes::YesNoCursor() {
         step++;
     }
     if (AddMsgCursor(step, 0, 1, 0)) {
-        MenuSePlay(0);
+        MenuSePlay(SYSTEM_SE_CURSOR);
     }
     return cursor;
 }
@@ -481,7 +481,7 @@ int CDC2Mes::YesNoCursor2(int alt_button) {
         step++;
     }
     if (AddMsgCursor(step, 0, 1, 0)) {
-        MenuSePlay(0);
+        MenuSePlay(SYSTEM_SE_CURSOR);
     }
     int buttons = MenuCheckPushButton();
     if (buttons & 1) {
