@@ -3272,7 +3272,8 @@ int CAquarium::ColCheck(int no) {
     for (i = 0; i < 6; i++) {
         if (i != no && fish[i] != NULL) {
             CAquaFish *other = fish[i];
-            float reach = radius + 0.26f * other->radius;
+            float other_radius = other->radius;
+            float reach = radius + 0.26f * other_radius;
             float dist;
 
             other->GetPosition(other_pos);
@@ -4346,7 +4347,8 @@ void CAquarium::Draw() {
             fish[i]->FishDraw();
         }
     }
-    mgSetAmbient(ambient);
+    float *light = ambient;
+    mgSetAmbient(light);
     if (ground_frame != NULL) {
         textures->ReloadTexture(ground_tex_block, (sceVif1Packet *)NULL);
         mgDrawDirect(ground_frame);
@@ -4360,7 +4362,7 @@ void CAquarium::Draw() {
         if (naka_frame != NULL) {
             mgDraw(naka_frame);
         }
-        mgSetAmbient(ambient);
+        mgSetAmbient(light);
         mgEndDraw(NULL);
     }
     if (glass_frame != NULL) {
@@ -4369,7 +4371,7 @@ void CAquarium::Draw() {
     }
     if (food != NULL) {
         textures->ReloadTexture(food_tex_block, (sceVif1Packet *)NULL);
-        food->Draw();
+        food->DrawDirect();
     }
     textures->ReloadTexture(menu_tex_block, (sceVif1Packet *)NULL);
     for (i = 0; i < 3; i++) {
@@ -4402,7 +4404,7 @@ void CAquarium::Draw() {
         if (mizu_frame != NULL) {
             mgDrawDirect(mizu_frame);
         }
-        mgSetAmbient(ambient);
+        mgSetAmbient(light);
     }
     if (food != NULL && drop_root_draw != 0) {
         DrawEsaDropRoot(food, 48.0f);
@@ -4410,9 +4412,7 @@ void CAquarium::Draw() {
     if (water != NULL) {
         float camera_pos[4];
         float matrix[4][4];
-        mgCTexture frame_buffer;
         mgRect<int> screen_rect;
-        mgCDrawPrim prim;
         float dir[4];
         float flat_dir[4];
         aqua_vector axis_x;
@@ -4433,10 +4433,12 @@ void CAquarium::Draw() {
         }
         mgUnitMatrix(matrix);
         textures->ReloadTexture(water_tex_block, (sceVif1Packet *)NULL);
+        mgCTexture frame_buffer;
         mgGetFrameBuffer(&frame_buffer);
         screen = textures->GetTexture(at_3162__2, -1);
         screen_rect.Set(0, 0, (mgScreenWidth - 1) * 16, (mgScreenHeight - 1) * 16);
         mgSetPkMoveImage(&frame_buffer, screen_rect, screen, 0, 0, 0);
+        mgCDrawPrim prim;
         prim.Initialize(NULL, NULL);
         prim.DepthTestEnable(0);
         prim.ZMask(-1);
