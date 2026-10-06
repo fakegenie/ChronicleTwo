@@ -8,16 +8,6 @@
 
 extern "C" int vsprintf(char *, const char *, char *);
 
-static inline char *VaStart(char *stack_arguments, int named_arguments) {
-    int register_bytes;
-    if (named_arguments >= 8) {
-        register_bytes = 0;
-    } else {
-        register_bytes = (8 - named_arguments) * 8;
-    }
-    return stack_arguments - register_bytes;
-}
-
 unsigned long SjisToJis(unsigned long sjis) {
     unsigned long hi = (sjis >> 8) & 0xFF;
     unsigned long lo = sjis & 0xFF;
@@ -298,7 +288,7 @@ void dbgCJISFont::PrintDirect(int start_x, int start_y, char *format, ...) {
     x = start_x;
     y = start_y;
     prev_serno = 0;
-    char *args = VaStart((char *)__builtin_next_arg(format), 4);
+    char *args = (char *)__builtin_next_arg(format) - (__builtin_args_info(2) >= 8 ? 0 : (8 - __builtin_args_info(2)) * 8);
     vsprintf(text, format, args);
     while ((ch = *cursor) != 0) {
         long code = ch;
@@ -354,7 +344,8 @@ void dbgCJISFont::PrintDirect(int start_x, int start_y, char *format, ...) {
                 cursor++;
             } else {
                 unsigned long low = (unsigned char)cursor[1];
-                unsigned long sjis = low | (((long)*cursor << 8) & 0xFF00);
+                unsigned long sjis = low;
+                sjis = (((long)*cursor << 8) & 0xFF00) | sjis;
                 cursor += 2;
                 __putc(SjisToSerno(sjis));
             }
