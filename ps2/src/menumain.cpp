@@ -1383,7 +1383,6 @@ void MenuBaseTextureReEnter() {
     ((CMenuPosDataManage *)MenuPosData)->AttachCommonTexInfo();
     MenuPosData->ResetTextureInfoAll();
 }
-#ifdef NONMATCHING
 void CMenuInter::InitEnd() {
     int base_block = MenuCommonInfo->tex_block[1];
     mgCTextureManager *manager = &mgTexManager;
@@ -1406,16 +1405,11 @@ void CMenuInter::InitEnd() {
     MenuCommonInfo->SetWakuType(-1);
     CMenuPosDataForm *board = MenuPosData->GetFormInfo(at_2003);
     if (board != NULL) {
-        {
-            int pos[2] = {0, 0};
-            pos[0] = (int)(board->x - 30.0f);
-            pos[1] = (int)(4.0f + board->y);
-            SetFormPoint(MenuCommonInfo->cursor_form, (int)(board->x - 30.0f), (int)(4.0f + board->y));
-            MenuCommonInfo->cursor_form->SetNextMovePos(pos, 2);
-        }
+        int pos[2] = {(int)(board->x - 30.0f), (int)(4.0f + board->y)};
+        SetFormPoint(MenuCommonInfo->cursor_form, (int)(board->x - 30.0f), (int)(4.0f + board->y));
+        MenuCommonInfo->cursor_form->SetNextMovePos(pos, 2);
         CMenuPosDataForm *next_form = MenuPosData->GetFormInfo(at_2004__2);
         if (next_form != NULL) {
-            int pos[2];
             pos[0] = (int)board->x;
             pos[1] = (int)(4.0f + board->y);
             SetFormPoint(next_form, (int)board->x, (int)(4.0f + board->y));
@@ -1426,9 +1420,6 @@ void CMenuInter::InitEnd() {
     MenuEtcInfo.tex_block = MenuArg.mes_tex_block;
     MenuEtcInfo.tex = manager->GetTexture(at_1028__4, -1);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menumain", InitEnd__10CMenuInterFv);
-#endif
 void CMenuInter::PushOk() {
     int mode = mode_list[select_no];
     MenuCommonInfo->SetWakuType(-1);
