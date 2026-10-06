@@ -363,24 +363,25 @@ CColFrame::CColFrame() {
 
 #ifdef NONMATCHING
 CCollisionMDT *CreateCollisionMDT(u_int *model, mgCMemory *memory) {
+    MDT_MATERIAL_ *material;
     CCollisionMDT *collision;
+    MDT_MATERIAL_ *materials;
+    int           *words;
+    int            j;
+    int            index_count;
+    int polygon_no;
+    int            prim_num;
     MDT_HEADER    *header;
-    MDT_FACES     *faces;
-    FACES_ID      *first_prim;
     FACES_ID      *prim;
     sceVu0FVECTOR *vertices;
-    MDT_MATERIAL_ *materials;
-    MDT_MATERIAL_ *material;
-    CCPoly        *polys;
-    CCPoly        *poly;
-    int polygon_no;
-    int           *index;
-    int            prim_num;
-    int            poly_count;
-    int            index_count;
-    int            material_no;
     int            i;
-    int            j;
+    int            poly_count;
+    int            material_no;
+    FACES_ID      *first_prim;
+    CCPoly        *poly;
+    CCPoly        *polys;
+    int           *index;
+    MDT_FACES     *faces;
 
     collision = new ((u_long128 *)memory->Alloc(sizeof(CCollisionMDT) / 16 + 2)) CCollisionMDT;
 
@@ -391,9 +392,8 @@ CCollisionMDT *CreateCollisionMDT(u_int *model, mgCMemory *memory) {
     prim_num = faces->prim_num;
     first_prim = (FACES_ID *)(faces + 1);
 
-    // Count the triangles, refusing primitive kinds that are not plain triangle lists.
     poly_count = 0;
-    int *words = (int *)first_prim;
+    words = (int *)first_prim;
     for (i = 0; i < prim_num; i++) {
         int type = *words++;
         if ((type & 7) == 4) {
@@ -414,11 +414,12 @@ CCollisionMDT *CreateCollisionMDT(u_int *model, mgCMemory *memory) {
     }
 
     polygon_no = 0;
-    prim = first_prim;
+    words = (int *)first_prim;
     for (i = 0; i < prim_num; i++) {
-        index_count = prim->face_num;
-        material_no = prim->material;
-        index = prim->index;
+        index_count = words[1];
+        words += 2;
+        material_no = *words++;
+        index = words;
 
         for (j = 0; j < index_count; j += 3, index += 3) {
             poly = &polys[polygon_no++];
@@ -439,7 +440,7 @@ CCollisionMDT *CreateCollisionMDT(u_int *model, mgCMemory *memory) {
             mgPlaneNormal(poly->normal, poly->vertex[0], poly->vertex[1], poly->vertex[2]);
         }
 
-        prim = (FACES_ID *)index;
+        words = index;
     }
 
     collision->poly = polys;

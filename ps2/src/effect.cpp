@@ -168,19 +168,36 @@ void CEffect::SetEffect(EFFECT_PARAM *param) {
     tex_count = 0;
     memcpy(&this->param, param, sizeof(EFFECT_PARAM));
 }
+static inline void GravityAbs(float *step) {
+    if (*step < 0.0f) {
+        *step = -*step;
+    }
+}
+static inline void GravityPull(float *pos, float *target, float *step) {
+    if (*pos < *target) {
+        *pos += *step;
+        if (*pos > *target) {
+            *pos = *target;
+        }
+    } else {
+        *pos -= *step;
+        if (*pos < *target) {
+            *pos = *target;
+        }
+    }
+}
 #ifdef NONMATCHING
 void CEffect::Step(int steps) {
+    int                channel;
     sceVu0FVECTOR      gravity_step;
     EFFECT_CHANGE_TYPE change;
     float             *value;
     float              amount;
+    float              life;
     float              timing;
     float              distance;
-    float              life;
-    float              elapsed;
     float              duration;
     float              rate;
-    int                channel;
     int                axis;
 
     if (active == 0) {
@@ -188,7 +205,7 @@ void CEffect::Step(int steps) {
     }
 
     frame++;
-    if (frame > param.life) {
+    if (param.life < frame) {
         active = 0;
         frame = 0;
     }
@@ -206,22 +223,12 @@ void CEffect::Step(int steps) {
         distance = mgDistVector(gravity_step);
         if (distance != 0.0f) {
             sceVu0ScaleVector(gravity_step, gravity_step, (param.gravity_accel * param.gravity_mass) / (distance * distance));
-            for (axis = 0; axis < 3; axis++) {
-                if (gravity_step[axis] < 0.0f) {
-                    gravity_step[axis] = -gravity_step[axis];
-                }
-                if (param.pos[axis] < param.gravity_pos[axis]) {
-                    param.pos[axis] += gravity_step[axis];
-                    if (param.pos[axis] > param.gravity_pos[axis]) {
-                        param.pos[axis] = param.gravity_pos[axis];
-                    }
-                } else {
-                    param.pos[axis] -= gravity_step[axis];
-                    if (param.pos[axis] < param.gravity_pos[axis]) {
-                        param.pos[axis] = param.gravity_pos[axis];
-                    }
-                }
-            }
+            GravityAbs(&gravity_step[0]);
+            GravityAbs(&gravity_step[1]);
+            GravityAbs(&gravity_step[2]);
+            GravityPull(&param.pos[0], &param.gravity_pos[0], &gravity_step[0]);
+            GravityPull(&param.pos[1], &param.gravity_pos[1], &gravity_step[1]);
+            GravityPull(&param.pos[2], &param.gravity_pos[2], &gravity_step[2]);
         }
     }
 
@@ -235,19 +242,34 @@ void CEffect::Step(int steps) {
     for (channel = 0; channel < 6; channel++) {
         switch (channel) {
         case 0:
+            change = param.move_type[0];
+            amount = param.move_p1[0];
+            timing = param.move_p2[0];
+            value = &pos[0];
+            break;
         case 1:
+            change = param.move_type[1];
+            amount = param.move_p1[1];
+            timing = param.move_p2[1];
+            value = &pos[1];
+            break;
         case 2:
-            change = param.move_type[channel];
-            amount = param.move_p1[channel];
-            timing = param.move_p2[channel];
-            value = &pos[channel];
+            change = param.move_type[2];
+            amount = param.move_p1[2];
+            timing = param.move_p2[2];
+            value = &pos[2];
             break;
         case 3:
+            change = param.scale_type[0];
+            amount = param.scale_p1[0];
+            timing = param.scale_p2[0];
+            value = &scale[0];
+            break;
         case 4:
-            change = param.scale_type[channel - 3];
-            amount = param.scale_p1[channel - 3];
-            timing = param.scale_p2[channel - 3];
-            value = &scale[channel - 3];
+            change = param.scale_type[1];
+            amount = param.scale_p1[1];
+            timing = param.scale_p2[1];
+            value = &scale[1];
             break;
         case 5:
             change = param.alpha_type;
@@ -257,53 +279,59 @@ void CEffect::Step(int steps) {
             break;
         }
 
-        life = param.life;
-        elapsed = frame;
         switch (change) {
         case EFFECT_CHANGE_ADD:
+            life = param.life;
             if (life > 0.0f) {
-                *value += timing * (amount / life) * elapsed;
+                float per_frame = timing * (amount / life);
+                *value += per_frame * (float)frame;
             }
             break;
         case EFFECT_CHANGE_SUB:
+            life = param.life;
             if (life > 0.0f) {
-                *value -= timing * (amount / life) * elapsed;
+                float per_frame = timing * (amount / life);
+                *value -= per_frame * (float)frame;
             }
             break;
         case EFFECT_CHANGE_ADD_HEAD:
+            life = param.life;
             if (life > 0.0f) {
                 duration = life * timing;
                 rate = amount / duration;
-                if (elapsed < duration) {
-                    *value += rate * elapsed;
+                if ((float)frame < duration) {
+                    *value += rate * (float)frame;
                 } else {
                     *value += rate * duration;
                 }
             }
             break;
         case EFFECT_CHANGE_SUB_TAIL:
+            life = param.life;
             if (life > 0.0f) {
                 duration = life * timing;
                 rate = amount / duration;
-                if (elapsed > duration) {
-                    *value -= rate * (elapsed - duration);
+                if ((float)frame > duration) {
+                    *value -= rate * ((float)frame - duration);
                 }
             }
             break;
         case EFFECT_CHANGE_ADD_HEAD_TAIL:
+            life = param.life;
             duration = life * timing;
             if (life > 0.0f) {
                 rate = amount / duration;
-                if (elapsed < duration) {
-                    *value += rate * elapsed;
-                } else if (elapsed > life - duration) {
-                    *value += rate * (param.life - frame);
+                if ((float)frame < duration) {
+                    *value += rate * (float)frame;
+                } else if ((float)frame > life - duration) {
+                    *value += rate * (float)(param.life - frame);
                 } else {
                     *value += rate * duration;
                 }
             }
             break;
         case EFFECT_CHANGE_SINE:
+            life = param.life;
             if (life > 0.0f) {
                 *value += (float)(amount * sin((frame * (360.0f / (life * timing))) * 0.017453293005625408));
             }
