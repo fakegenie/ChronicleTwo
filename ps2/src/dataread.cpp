@@ -1003,10 +1003,11 @@ int GetPackFileNum(u_int *pack) {
     int index;
 
     index = 0;
-loop:
-    if (GetPackFile(pack, index, &name, &size) != 0) {
+    for (;;) {
+        if (GetPackFile(pack, index, &name, &size) == 0) {
+            break;
+        }
         index += 1;
-        goto loop;
     }
     return index;
 }
