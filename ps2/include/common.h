@@ -8,4 +8,8 @@
 
 #define STATIC_ASSERT(expr) typedef char _static_assert_##__COUNTER__[(expr) ? 1 : -1]
 
+#ifdef __cplusplus
+extern "C" int fptosi(float value);
+#endif
+
 #endif

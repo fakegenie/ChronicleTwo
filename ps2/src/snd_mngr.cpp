@@ -33,7 +33,6 @@ extern float MicPos[4];
 extern float MicDir[4];
 extern "C" int WaitSema(int id);
 extern "C" int SignalSema(int id);
-extern "C" int fptosi(float value);
 static sndPortInfo *GetPortInfo(int port);
 static sndSeInfo *GetSeInfo(u32 snd_id, int index);
 static sndCSeSeq *GetSeSeq(int seq_id);

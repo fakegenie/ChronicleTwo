@@ -46,7 +46,6 @@ union message_draw_prim {
 extern "C" void
 __ct__11mgCDrawPrimFv(void *self);
 
-extern "C" int fptosi(float value);
 
 extern "C" u8 at_4574[];
 

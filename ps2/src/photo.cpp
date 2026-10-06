@@ -126,7 +126,6 @@ void LoopTakePhoto(CPadControl *pad, CInventUserData *user_data) {
     }
 }
 #ifdef NONMATCHING
-extern "C" int fptosi(float value);
 extern char at_997__5[];
 extern sceVu0FVECTOR at_936__6;
 int DrawTakePhoto(USER_PICTURE_INFO *picture, float *distance) {
