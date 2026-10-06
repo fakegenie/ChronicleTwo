@@ -15,6 +15,9 @@
 #include "funcpoint.hpp"
 #include "snd_mngr.hpp"
 
+extern "C" void *__vt__19CList_10CFuncPoint_[];
+extern "C" void __ct__8mgCFrameFv(mgCFrame *frame);
+
 int CheckTime(float time, float start, float end) {
     int outside;
 
@@ -391,18 +394,19 @@ int CObjAnime::AssignFuncAnime(CFuncPoint *point, CMapParts *map_parts) {
     SetParam(initial_value);
     return 1;
 }
-#ifdef NONMATCHING
 CFuncPoint *CFuncPointMngr::Add(int type, mgCMemory *stack) {
-    CList<CFuncPoint> *node = new ((u_long128 *)stack->Alloc(0x20)) CList<CFuncPoint>;
+    CList<CFuncPoint> *node;
+    if ((node = (CList<CFuncPoint> *)operator new(sizeof(CList<CFuncPoint>), stack->Alloc(0x20))) != NULL) {
+        *(void ***)((u_int)node + 0x1D0) = __vt__19CList_10CFuncPoint_;
+        __ct__8mgCFrameFv(&node->data.frame);
+        node->Initialize();
+    }
     if (node == NULL) {
         return NULL;
     }
     node->data.Initialize();
     return Add(type, node);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/funcpoint", Add__14CFuncPointMngrFiP9mgCMemory);
-#endif
 
 CFuncPoint *CFuncPointMngr::Add(int type, CList<CFuncPoint> *node) {
     if (node == NULL) {
