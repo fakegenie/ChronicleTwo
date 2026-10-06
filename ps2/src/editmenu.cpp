@@ -854,11 +854,11 @@ void MenuGeoramaListDraw(int &tex_block, float *pos, int page, int alpha) {
             prim->Color(0x80, 0x80, 0x80, alpha);
             Menu3DivideTextureDraw(prim, mgRect < int > (bar_x, (int)(bar_y + CMenuGeoPt->scroll_bar_y[page]), 8, (int)CMenuGeoPt->scroll_bar_h[page]), ScrlBarTable_1320, 0);
             prim->End();
+            float clip_top = pos[1];
             float left = pos[0];
-            top = pos[1];
             int screen_right = mgScreenWidth - 1;
             int screen_bottom = mgScreenHeight - 1;
-            mgRect<int> clip((int)(19.0f + left), (int)(45.0f + top), (int)(222.0f + left), (int)(1.0f + (238.0f + top)));
+            mgRect<int> clip((int)(19.0f + left), (int)(45.0f + clip_top), (int)(222.0f + left), (int)(1.0f + (238.0f + clip_top)));
             mgRect<int> under_clip(0, (int)(18.0f + (238.0f + pos[1])), screen_right, screen_bottom);
             if (page == GEORAMA_VIEW_PAINT) {
                 clip.bottom -= 2;
@@ -871,17 +871,22 @@ void MenuGeoramaListDraw(int &tex_block, float *pos, int page, int alpha) {
             mgRect<int> number_tex(0, 0x294, 0xA, 0xE);
             mgRect<int> number_minus_tex(0, 0x286, 0xA, 0xE);
             mgRect<int> times_tex(0x8C, 0x294, 0xA, 0xE);
-            float list_x = CMenuGeoPt->list_pos[data_no][0];
-            float list_y = CMenuGeoPt->list_pos[data_no][1];
-            float line_x = list_x - 14.0f;
-            float line_y = 19.0f + list_y;
-            float check_y = 3.0f + list_y;
+            float check_y;
+            float list_x;
+            float line_x;
+            float line_y;
+            float list_y;
+            list_x = CMenuGeoPt->list_pos[data_no][0];
+            list_y = CMenuGeoPt->list_pos[data_no][1];
+            line_x = list_x - 14.0f;
+            line_y = 19.0f + list_y;
+            check_y = 3.0f + list_y;
             if (page == GEORAMA_VIEW_STOCK) {
                 prim->Bilinear(1);
                 prim->Begin(6);
                 prim->Texture(Tex_Georama);
                 prim->Color(0x80, 0x80, 0x80, alpha);
-                for (int i = 0; i < 99; i++, check_y = check_y + 24.0f, line_y += 24.0f) {
+                for (int i = 0; i < 99; i++, check_y += 24.0f, line_y += 24.0f) {
                     if (line_y < 133.0f) {
                         continue;
                     }
@@ -988,7 +993,9 @@ void MenuGeoramaListDraw(int &tex_block, float *pos, int page, int alpha) {
                         }
                         prim->Color((int)red, (int)green, (int)blue, alpha);
                         prim->Vertex(1.0f + swatch_x, 2.0f + swatch_y, 0.0f);
-                        prim->Vertex(21.0f + swatch_x, 17.0f + swatch_y, 0.0f);
+                        float vx = 21.0f + swatch_x;
+                        float vy = 17.0f + swatch_y;
+                        prim->Vertex(vx, vy, 0.0f);
                         prim->End();
                     }
                     if (mgScreenHeight <= swatch_y) {
@@ -3620,7 +3627,6 @@ int CRemovalMenu::KeyStep() {
     info_mes = MenuDCMsg[3];
     list_mes = MenuDCMsg[4];
     npc_mes = MenuDCMsg[5];
-    __typeof__(MenuUserDataManPtr) menuUserDataManPtr2 = MenuUserDataManPtr;
     reload = 0;
     switch (mode) {
         case 1:
@@ -3669,9 +3675,7 @@ int CRemovalMenu::KeyStep() {
                     } else {
                         ExeScript(at_4258);
                     }
-                    remake = 1;
-                    int temp = special_house == 1;
-                    if (temp) {
+                    if (special_house == 1) {
                         CMenuPosDataForm *form = MenuMesForm[1];
                         form->x = 76.0f;
                         form->y = 160.0f;
@@ -3681,6 +3685,7 @@ int CRemovalMenu::KeyStep() {
                             form->y = 160.0f;
                         }
                     }
+                    remake = 1;
                 }
                 MenuGeoramaStack.Align64();
                 chara_stack.stSetBuffer(MenuGeoramaStack.stGetTop(), 0xFA00);
@@ -3736,7 +3741,7 @@ int CRemovalMenu::KeyStep() {
                                                     model_wait = 0;
                                                     reload = 1;
                                                     model_state = 1;
-                                                    if (select >= npc_num) {
+                                                    if (npc_num <= select) {
                                                         select = npc_num - 1;
                                                     }
                                                     if (npc_num <= top + 8) {
@@ -3758,8 +3763,8 @@ int CRemovalMenu::KeyStep() {
                                     break;
                                 }
                                 case 2:
-                                    MenuSePlay(5);
                                     action = REMOVAL_ACTION_CLOSE;
+                                    MenuSePlay(5);
                                     break;
                             }
                             break;
@@ -3811,8 +3816,8 @@ int CRemovalMenu::KeyStep() {
                                     action = REMOVAL_ACTION_PICK;
                                     break;
                                 case 2:
-                                    MenuSePlay(5);
                                     action = REMOVAL_ACTION_BACK;
+                                    MenuSePlay(5);
                                     break;
                             }
                             break;
@@ -3864,7 +3869,7 @@ int CRemovalMenu::KeyStep() {
                     break;
                 }
                 case REMOVAL_ACTION_MOVE_IN:
-                    menuUserDataManPtr2->SetPartyCharaStatus(select_npc, 4);
+                    MenuUserDataManPtr->SetPartyCharaStatus(select_npc, 4);
                     house->npc_no[0] = select_npc;
                     MakeNPCList();
                     remake = 1;
@@ -3967,9 +3972,12 @@ int CRemovalMenu::KeyStep() {
     }
     CMenuPosDataForm *culture_form = MenuPosData->GetFormInfo(at_3162);
     if (culture_form != NULL) {
-        int cpoint_no = 0;
+        int cpoint_no;
         if (GetSaveData()->GetBitFlag(kBitFlagCulture) == 0 && MenuMainScene->now_map_no == 3) {
+            cpoint_no = 0;
             cpoint_no |= 1;
+        } else {
+            cpoint_no = 0;
         }
         culture_form->SetNumber(at_2986, MenuMainMapInfo->CultureAnalyzeParts(place_no, cpoint_no));
     }
@@ -3996,7 +4004,7 @@ int CRemovalMenu::KeyStep() {
         list_pos[1] = list_y + first * line_h;
         int no = first;
         char *names[9];
-        int line_pos[9][2];
+        int line_pos[12][2];
         int i = 0;
         for (; no < 0; no++, i++) {
             names[i] = NULL;
@@ -4028,7 +4036,13 @@ int CRemovalMenu::KeyStep() {
         LocalFunc_AdjustScrlBar(scroll_parts, bar_pos, bar_size, top, bar_lines[0], bar_lines[1], 0);
     }
     SetMessagePositionNPCForm(npc_win_form, npc_mes);
-    if (mode == 0 && key_arg_no == 1) {
+    if (mode != 0) {
+        return closed;
+    }
+    if (key_arg_no != 1) {
+        return closed;
+    }
+    {
         int cursor_pos[2];
         list_form->GetPutPosXY(at_4272, cursor_pos[0], cursor_pos[1]);
         cursor_pos[0] -= 0x28;
