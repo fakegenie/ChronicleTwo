@@ -1022,12 +1022,13 @@ static void DrawGeoramaMateria(int y, char *title, int materia_num, int *materia
             int name_w;
             font.SetStr(name);
             font.CalcDrawWH(font.str, &name_w, &name_h);
+            int w = name_w;
             int column = i % 2;
             int x;
             if (column == 0) {
-                x = left_column - (name_w >> 1);
+                x = left_column - (w >> 1);
             } else {
-                x = right_column - (name_w >> 1);
+                x = right_column - (w >> 1);
             }
             font.SetPos(x, line_y);
             font.DrawDirect(font.str, font.pos_x, font.pos_y);
@@ -1037,9 +1038,11 @@ static void DrawGeoramaMateria(int y, char *title, int materia_num, int *materia
         }
     }
     char page[0x20];
+    i = left + 0x186;
+    line_y = y + 0xEF;
     sprintf(page, at_1993, GeoramaMateriaInfoDrawPage + 1, GeoramaMateriaNum / 14 + 1);
     font.SetStr(page);
-    font.SetPos(left + 0x186, y + 0xEF);
+    font.SetPos(i, line_y);
     font.DrawDirect(font.str, font.pos_x, font.pos_y);
 }
 #else
