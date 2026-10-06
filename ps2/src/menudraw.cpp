@@ -1295,7 +1295,6 @@ int StepMenuDl2(int progress) {
     }
     return 0;
 }
-#ifdef STATEMATCHING
 void DrawMenuDl(int &tex_block, int x, int y, int w, int alpha) {
     mgCDrawPrim *prim;
     int left;
@@ -1349,9 +1348,6 @@ void DrawMenuDl(int &tex_block, int x, int y, int w, int alpha) {
         prim->End();
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", DrawMenuDl__FRiiiii);
-#endif
 void DrawMenuDl(int alpha) {
     char text[0x80];
     int loaded_tex_no;
