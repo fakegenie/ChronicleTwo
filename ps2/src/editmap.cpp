@@ -1084,9 +1084,9 @@ int CEditMap::GetePlaceParts(float *pos, CEditParts **parts, int num) {
     float overlap_area;
     float radius;
     float best_top;
-    CEditParts *best;
     int i;
     int j;
+    CEditParts *best;
 
     *(u_long128 *)point = *(u_long128 *)pos;
     radius = point[3];
@@ -1116,9 +1116,9 @@ int CEditMap::GetePlaceParts(float *pos, CEditParts **parts, int num) {
     square[1].vertex[2][1] = 0.0f;
     square[1].vertex[2][2] = -1.0f;
     square[1].vertex[2][3] = 1.0f;
-    for (i = 0; i < 3; i++) {
-        sceVu0ScaleVectorXYZ(square[0].vertex[i], square[0].vertex[i], radius);
-        sceVu0ScaleVectorXYZ(square[1].vertex[i], square[1].vertex[i], radius);
+    for (j = 0; j < 3; j++) {
+        sceVu0ScaleVectorXYZ(square[0].vertex[j], square[0].vertex[j], radius);
+        sceVu0ScaleVectorXYZ(square[1].vertex[j], square[1].vertex[j], radius);
     }
     best = NULL;
     for (i = 0; i < num; i++) {
