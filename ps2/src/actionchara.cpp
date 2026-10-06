@@ -97,7 +97,7 @@ void CActionChara::ResetAction() {
         }
         i++;
     } while (i < 3);
-    hold_type = 0;
+    hold_type = ACTION_HOLD_NONE;
     add_speed = 0.0f;
     add_time = 0;
     blow_speed = 0.0f;
@@ -141,7 +141,7 @@ void CActionChara::ResetScript() {
             sword_effect[m]->Clear();
         }
     }
-    hold_type = 0;
+    hold_type = ACTION_HOLD_NONE;
     add_speed = 0.0f;
     add_time = 0;
     blow_speed = 0.0f;
@@ -150,7 +150,7 @@ void CActionChara::ResetScript() {
 }
 s32 CActionChara::CheckRunEvent(void) {
     s32 can_run = menu_flag;
-    if (hold_type != 0) {
+    if (hold_type != ACTION_HOLD_NONE) {
         can_run = 0;
     }
     return can_run;
@@ -448,11 +448,11 @@ int CActionChara::CheckEnemyCatch(char *name) {
     if (object == NULL) {
         return 0;
     }
-    if (hold_type != 0) {
+    if (hold_type != ACTION_HOLD_NONE) {
         return 0;
     }
     if (ActiveMonster->CheckThrowTarget(object) != NULL) {
-        hold_type = 3;
+        hold_type = ACTION_HOLD_ENEMY;
         release_timing = 1;
         other = SearchChara(at_1357);
         if (other != NULL) {
@@ -479,7 +479,7 @@ int CActionChara::CheckEnemyCatch(char *name) {
         release_timing = 1;
         hold_frame = object;
         hold_parts = stone;
-        hold_type = 4;
+        hold_type = ACTION_HOLD_STONE;
         other = SearchChara(at_1357);
         if (other != NULL) {
             other->Show(0, 0);
@@ -499,7 +499,7 @@ void CActionChara::ThrowItemObject() {
     float position[4];
     u8 *item;
 
-    if (hold_type != 0) {
+    if (hold_type != ACTION_HOLD_NONE) {
         if (throw_effect >= 0) {
             effect_man->SetScriptProgNo(0x12C, 0, throw_effect);
             sceVu0CopyVector(target, front_vec);
@@ -507,7 +507,7 @@ void CActionChara::ThrowItemObject() {
             sceVu0ScaleVector(target, target, 120.0f);
             sceVu0AddVector(target, target, position);
             effect_man->SetScriptVect1(target, 0, throw_effect);
-            hold_type = 0;
+            hold_type = ACTION_HOLD_NONE;
 
             item = (u8 *)GetBattleCharaInfo()->GetActiveItemInfo(0);
             item += DngStatus.active_item * sizeof(CGameDataUsed);
@@ -598,19 +598,19 @@ void CActionChara::EntryThrowItem() {
             }
         }
     }
-    hold_type = 1;
+    hold_type = ACTION_HOLD_ITEM;
 }
 void CActionChara::RemoveThrowItem() {
     s8 effect_no;
 
-    if (hold_type != 0) {
+    if (hold_type != ACTION_HOLD_NONE) {
         GetBattleCharaInfo();
-        if (hold_type == 1) {
+        if (hold_type == ACTION_HOLD_ITEM) {
             effect_no = throw_effect;
             if (effect_no >= 0) {
                 effect_man->DeleteEffSpt(0, effect_no);
             }
-            hold_type = 0;
+            hold_type = ACTION_HOLD_NONE;
         }
     }
 }
@@ -943,7 +943,7 @@ int CActionChara::SetRef(CActionChara *other, char *name) {
     other_frame->DeleteReference();
     other_frame->SetReference(object);
     tail = this;
-    other->chara_kind = 1;
+    other->chara_kind = ACTION_KIND_PART;
     for (;;) {
         following = tail->next;
         if (following == NULL) {
@@ -984,7 +984,7 @@ int RockOn_TargetSel(CScene *scene, int index) {
                 index = MONSTER_ACTIVE_MAX;
             }
             target = (CActionChara *)scene->GetCharacter(index);
-            if (target != NULL && target->chara_kind == 2 && ((CActiveMonster *)target)->state == 1 &&
+            if (target != NULL && target->chara_kind == ACTION_KIND_SCRIPT && ((CActiveMonster *)target)->state == 1 &&
                 ((CActiveMonster *)target)->catch_state != 1 &&
                 !(((CActiveMonster *)target)->attrib & 1)) {
                 return index;
@@ -994,7 +994,7 @@ int RockOn_TargetSel(CScene *scene, int index) {
     }
     for (tries = 0; tries < MONSTER_ACTIVE_MAX; tries++) {
         target = (CActionChara *)scene->GetCharacter(tries + MONSTER_ACTIVE_MAX);
-        if (target != NULL && target->chara_kind == 2 && ((CActiveMonster *)target)->state == 1 &&
+        if (target != NULL && target->chara_kind == ACTION_KIND_SCRIPT && ((CActiveMonster *)target)->state == 1 &&
             ((CActiveMonster *)target)->catch_state != 1 &&
             !(((CActiveMonster *)target)->attrib & 1)) {
             return tries + MONSTER_ACTIVE_MAX;
@@ -1035,7 +1035,7 @@ int DistCheck_Action2(CScene *scene, float unused, float range, float *out_dist,
     i = 0;
     do {
         target = (CActionChara *)scene->GetCharacter(i + MONSTER_ACTIVE_MAX);
-        if (target != NULL && target->chara_kind == 2 && ((CActiveMonster *)target)->state == 1 &&
+        if (target != NULL && target->chara_kind == ACTION_KIND_SCRIPT && ((CActiveMonster *)target)->state == 1 &&
             ((CActiveMonster *)target)->catch_state != 1 &&
             !(((CActiveMonster *)target)->attrib & 1)) {
             ((CCharacter2 *)target)->GetEntryObjectPos(0, 0, entry_pos);
@@ -1105,7 +1105,7 @@ int Check_LockOn(CScene *scene, float range, int index) {
     if (target == NULL) {
         return 0;
     }
-    if (target->chara_kind != 2) {
+    if (target->chara_kind != ACTION_KIND_SCRIPT) {
         return 0;
     }
     if (((CActiveMonster *)target)->state != 1) {
@@ -3062,7 +3062,7 @@ void CActionChara::Step() {
             link = link->next;
         } while (link != NULL);
     }
-    if (hold_type == 4 && hold_parts != 0 && hold_frame != 0) {
+    if (hold_type == ACTION_HOLD_STONE && hold_parts != 0 && hold_frame != 0) {
         GetRotation(rotation);
         ((mgCFrame *)hold_frame)->GetWorldPosition0(held_pos);
         held_pos[3] = 1.0f;
@@ -3164,7 +3164,7 @@ void CActionChara::Initialize(mgCMemory *memory) {
     release_timing = 0;
     hold_parts = 0;
     hold_frame = 0;
-    hold_type = 0;
+    hold_type = ACTION_HOLD_NONE;
     unk_72a = -1;
     for (i = 0; i < 9; i++) {
         sw_effect[i].sword_no = 0;

@@ -799,11 +799,11 @@ int _RELEASE_OBJ(RS_STACKDATA *stack, int argc) {
         !(input->pause_flag & 0x2000)) {
         action_info.chara->Show(1, 1);
     }
-    if (action_info.chara->hold_type == 1 && throw_it == 0) {
+    if (action_info.chara->hold_type == ACTION_HOLD_ITEM && throw_it == 0) {
         RemoveThrowItem__12CActionCharaFv(action_info.chara);
     }
     int chara_no = 0x18;
-    if (action_info.chara->hold_type == 3) {
+    if (action_info.chara->hold_type == ACTION_HOLD_ENEMY) {
         do {
             CActionChara *held = (CActionChara *)nowScene__2->GetCharacter(chara_no);
             if (held != NULL && held->catch_state == 1) {
@@ -851,12 +851,12 @@ int _RELEASE_OBJ(RS_STACKDATA *stack, int argc) {
             chara_no++;
         } while (chara_no <= 0x2F);
     }
-    if (action_info.chara->hold_type == 4) {
+    if (action_info.chara->hold_type == ACTION_HOLD_STONE) {
         action_info.chara->hold_parts = 0;
         action_info.chara->hold_frame = 0;
         action_info.chara->release_timing = 3;
     }
-    action_info.chara->hold_type = 0;
+    action_info.chara->hold_type = ACTION_HOLD_NONE;
     return 1;
 }
 void ShotMonicaMagic(float *position, float *direction, float scale) {

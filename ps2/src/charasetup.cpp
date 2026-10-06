@@ -120,7 +120,7 @@ int SetupMainUnit(u_long128 *read_buffer, mgCMemory *memory, mgCMemory *stacks, 
         if (parts[character_index] == NULL) return 0;
         parts[character_index]->Initialize(NULL);
     }
-    if (chara_type == 0) {
+    if (chara_type == USER_CHARA_MAX) {
         char path[32];
         char model_name[32];
         GetCharaMemAllocPtr(memory, stacks, 0, edit_mode);
@@ -172,10 +172,10 @@ int SetupMainUnit(u_long128 *read_buffer, mgCMemory *memory, mgCMemory *stacks, 
             parts[0]->InitScript();
         }
         SetupUnitMan(scene, user_data, 0, NULL);
-        parts[0]->chara_type = 0;
-        parts[0]->move_type = 0;
+        parts[0]->chara_type = ACTION_CHARA_MAX;
+        parts[0]->move_type = ACTION_MOVE_HUMAN;
     }
-    if (chara_type == 1) {
+    if (chara_type == USER_CHARA_MONICA) {
         char path[32];
         char model_name[32];
         GetCharaMemAllocPtr(memory, stacks, 0, edit_mode);
@@ -223,10 +223,10 @@ int SetupMainUnit(u_long128 *read_buffer, mgCMemory *memory, mgCMemory *stacks, 
             parts[0]->InitScript();
         }
         SetupUnitMan(scene, user_data, 1, NULL);
-        parts[0]->chara_type = 1;
-        parts[0]->move_type = 0;
+        parts[0]->chara_type = ACTION_CHARA_MONICA;
+        parts[0]->move_type = ACTION_MOVE_HUMAN;
     }
-    if (chara_type == 2) {
+    if (chara_type == USER_CHARA_ROBO) {
         char path[64];
         GetCharaMemAllocPtr(memory, stacks, 2, edit_mode);
         ROBO_INFO_DATA *robo_info = GetRoboPartsInfo(user_data);
@@ -257,9 +257,9 @@ int SetupMainUnit(u_long128 *read_buffer, mgCMemory *memory, mgCMemory *stacks, 
         parts[0]->InitScript();
         parts[0]->move_type = robo_info->move_type;
         parts[0]->attack_type = robo_info->attack_type;
-        parts[0]->chara_type = 2;
+        parts[0]->chara_type = ACTION_CHARA_ROBO;
     }
-    if (chara_type == 3) {
+    if (chara_type == USER_CHARA_MONSTER) {
         char monster_path[64];
         char monster_info[64];
         char monster_script[64];
@@ -281,8 +281,8 @@ int SetupMainUnit(u_long128 *read_buffer, mgCMemory *memory, mgCMemory *stacks, 
         LoadFile(monster_script, read_buffer, &file_size);
         parts[0]->LoadActionFile((char *)read_buffer, file_size, &stacks[5]);
         parts[0]->InitScript();
-        parts[0]->chara_type = 0;
-        parts[0]->move_type = 3;
+        parts[0]->chara_type = ACTION_CHARA_MAX;
+        parts[0]->move_type = ACTION_MOVE_MONSTER;
     }
     int i = 0;
     do {
@@ -307,17 +307,17 @@ int GetCharaMemAllocPtr(mgCMemory *memory, mgCMemory *stacks, int chara_type, in
     int row;
     int count;
     switch (chara_type) {
-        case 0:
-        case 1:
+        case USER_CHARA_MAX:
+        case USER_CHARA_MONICA:
             row = 0;
             count = 7;
             if (edit_mode != 0) row = 2;
             break;
-        case 2:
+        case USER_CHARA_ROBO:
             row = 1;
             count = 5;
             break;
-        case 3:
+        case USER_CHARA_MONSTER:
             row = 0;
             count = 6;
             break;
@@ -407,9 +407,9 @@ int SetupMints(CScene *scene, CUserDataManager *user_data) {
             }
         }
     }
-    ((CActionChara *)characters[0])->move_type = 0;
+    ((CActionChara *)characters[0])->move_type = ACTION_MOVE_HUMAN;
     ((CActionChara *)characters[0])->attack_type = 0;
-    ((CActionChara *)characters[0])->chara_type = 0;
+    ((CActionChara *)characters[0])->chara_type = ACTION_CHARA_MAX;
     return 1;
 }
 int SetupMonica(CScene *scene, CUserDataManager *user_data) {
@@ -441,7 +441,7 @@ int SetupMonica(CScene *scene, CUserDataManager *user_data) {
             }
         }
     }
-    ((CActionChara *)characters[0])->move_type = 0;
+    ((CActionChara *)characters[0])->move_type = ACTION_MOVE_HUMAN;
     ((CActionChara *)characters[0])->chara_type = ACTION_CHARA_MONICA;
     return 1;
 }
@@ -487,7 +487,7 @@ static int SetupRobo(CScene *scene, CUserDataManager *user_data, ROBO_INFO_DATA 
     parts[0]->move_type = leg_type;
     parts[0]->attack_type = arm_type;
     printf(at_1277, leg_joint, arm_joint);
-    parts[0]->chara_type = 2;
+    parts[0]->chara_type = ACTION_CHARA_ROBO;
     return 1;
 }
 ROBO_INFO_DATA *GetRoboPartsInfo(CUserDataManager *user_data) {
@@ -534,7 +534,7 @@ int SetupMonster(CScene *scene, CUserDataManager *user_data) {
     }
     if (characters[0] != NULL)
         strcpy(characters[0]->name, at_1149);
-    ((CActionChara *)characters[0])->move_type = 3;
+    ((CActionChara *)characters[0])->move_type = ACTION_MOVE_MONSTER;
     ((CActionChara *)characters[0])->chara_type = ACTION_CHARA_MONSTER;
     return 1;
 }
