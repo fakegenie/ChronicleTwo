@@ -154,8 +154,8 @@ void CSaveData::ResetBitCtrl(int bits) {
     bit_ctrl &= ~bits & 0xFF;
 }
 int CSaveData::GetBitCtrl() { return this->bit_ctrl; }
-int CSaveData::GetItem(int a, int b) {
-    return user_data.GetItem(a, b);
+int CSaveData::GetItem(int item_no, int num) {
+    return user_data.GetItem(item_no, num);
 }
 void CSaveData::ForceBootTour(int day, int type) {
     tour.base_day = day;

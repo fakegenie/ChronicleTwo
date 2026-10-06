@@ -1361,9 +1361,9 @@ void sndSePlayPBPrKr(int port, int bank, int prog, int key, int velocity, int vo
     sndSignalSema();
 }
 
-void sndSeStopPBPrKr(int a, int b, int c, int d, int e) {
+void sndSeStopPBPrKr(int port, int bank, int prog, int key, int voice) {
     sndWaitSema();
-    CSnd.SE_Stop(a, b, c, d, e);
+    CSnd.SE_Stop(port, bank, prog, key, voice);
     sndSignalSema();
 }
 
@@ -1376,21 +1376,21 @@ void sndSetSeVolPBPrKr(int port, int bank, int prog, int key, int vol, int voice
     sndSignalSema();
 }
 
-void sndSetSePanPBPrKr(int a, int b, int c, int d, int e, int f) {
+void sndSetSePanPBPrKr(int port, int bank, int prog, int key, int pan, int voice) {
     sndWaitSema();
-    CSnd.SE_SetPan(a, b, c, d, e, f);
+    CSnd.SE_SetPan(port, bank, prog, key, pan, voice);
     sndSignalSema();
 }
 
-void sndSetSePitchPBPrKr(int a, int b, int c, int d, int e, int f) {
+void sndSetSePitchPBPrKr(int port, int bank, int prog, int key, int pitch, int voice) {
     sndWaitSema();
-    CSnd.SE_SetPitch(a, b, c, d, e, f);
+    CSnd.SE_SetPitch(port, bank, prog, key, pitch, voice);
     sndSignalSema();
 }
 
-void sndSqPlay(int a, int b, int c) {
+void sndSqPlay(int port, int sq_no, int vol) {
     sndWaitSema();
-    CSnd.SQ_Play(a, b, c);
+    CSnd.SQ_Play(port, sq_no, vol);
     sndSignalSema();
 }
 

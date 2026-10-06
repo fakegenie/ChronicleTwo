@@ -450,7 +450,7 @@ extern FISH_PRIZE_INFO fish_save_present[4][3];
 
 static int local_aquarium_limmit_check(float *pos, float radius, int checkY, float height);
 
-static int CombineParam(int a, int b);
+static int CombineParam(int first, int second);
 
 CGameDataUsed *GetGyoRaceFish(void);
 
@@ -2780,12 +2780,12 @@ int CalcFishParam(BREEDFISH_USED *fish) {
     sum += body->param[4];
     return sum;
 }
-static int CombineParam(int a, int b) {
+static int CombineParam(int first, int second) {
     int result;
-    if (a >= b) {
-        result = a + b / 7;
+    if (first >= second) {
+        result = first + second / 7;
     } else {
-        result = b + a / 7;
+        result = second + first / 7;
     }
     if (result < 0) {
         result = 0;

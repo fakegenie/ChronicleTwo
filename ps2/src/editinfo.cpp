@@ -35,11 +35,11 @@ extern int emapFixNum__2;
 extern int emapFixIdx__2;
 extern SPI_TAG_PARAM emap_tag__2[];
 
-static inline u32 align16_blocks(u32 n) {
-    if (n & 0xF) {
-        return (n >> 4) + 1;
+static inline u32 align16_blocks(u32 bytes) {
+    if (bytes & 0xF) {
+        return (bytes >> 4) + 1;
     }
-    return n >> 4;
+    return bytes >> 4;
 }
 
 void CEditInfoMngr::Initialize(void) {

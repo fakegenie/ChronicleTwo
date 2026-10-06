@@ -3031,8 +3031,8 @@ int _LOAD_CHARA_sub(int stackNo, char **name, int charaNo, u32 *pack, int mode) 
     EventScene->SetType(1, charaNo, type_loaded);
     return result;
 }
-int _LOAD_CHARA_sub(int a, char **b, int c, u32 *d) {
-    return _LOAD_CHARA_sub(a, b, c, d, 0);
+int _LOAD_CHARA_sub(int stackNo, char **name, int charaNo, u32 *pack) {
+    return _LOAD_CHARA_sub(stackNo, name, charaNo, pack, 0);
 }
 int _LOAD_CHARA(RS_STACKDATA *stack, int argc) {
     char *name[0x20];

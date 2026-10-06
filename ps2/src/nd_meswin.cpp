@@ -353,7 +353,7 @@ void ClsMes::DrawFukidashi_sub(mgCDrawPrim *prim, int dx, int dy, int layer) {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/nd_meswin", DrawFukidashi_sub__6ClsMesFP11mgCDrawPrimiii);
 #endif
-void ClsMes::DrawFukidashi(int a, int b, int c) {
+void ClsMes::DrawFukidashi(int dx, int dy, int mode) {
     message_draw_prim drawer;
     drawer.prim.Initialize(NULL, NULL);
     drawer.prim.ZMask(-1);
@@ -365,9 +365,9 @@ void ClsMes::DrawFukidashi(int a, int b, int c) {
     drawer.prim.TextureMapEnable(0);
     drawer.prim.Bilinear(1);
     drawer.prim.AntiAliasing(1);
-    DrawFukidashi_sub(&drawer.prim, a, b, c);
+    DrawFukidashi_sub(&drawer.prim, dx, dy, mode);
     drawer.prim.AntiAliasing(0);
-    DrawFukidashi_sub(&drawer.prim, a, b, c);
+    DrawFukidashi_sub(&drawer.prim, dx, dy, mode);
 }
 void ClsMes::SetDrawSpeed() {
     if (LanguageCode == 1 || LanguageCode == 2 || LanguageCode == 3 ||
