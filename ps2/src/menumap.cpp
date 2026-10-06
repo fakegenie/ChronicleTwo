@@ -1517,7 +1517,6 @@ int SphidaScoreViewKey() {
     }
     return 0;
 }
-#ifdef NONMATCHING
 void SphidaScoreViewDraw() {
     mgCTextureManager *textures = &mgTexManager;
     mgRect<int> hole_digits;
@@ -1561,11 +1560,13 @@ void SphidaScoreViewDraw() {
         prim->Texture(SphidaTex_Sys);
         prim->Color(128, 128, 128, 128);
         if (LanguageCode == 0) {
+            float left_x = 42.0f;
+            float right_x = 110.0f;
             label_left.Set(0, 0, 0x24, 0x26);
             label_y = mgScreenHeight - 0x4C;
-            PrimQuad(prim, 42.0f, (float)label_y, label_left);
+            PrimQuad(prim, left_x, (float)label_y, label_left);
             label_right.Set(0x24, 0, 0x5A, 0x26);
-            PrimQuad(prim, 110.0f, (float)(mgScreenHeight - 0x4C), label_right);
+            PrimQuad(prim, right_x, mgScreenHeight - 0x4C, label_right);
             PrimDrawNumber(prim, hole_no, 0, 0x6A, mgScreenHeight - 0x4A, hole_digits, -2, 0);
         } else if (LanguageCode > 0) {
             label_wide.Set(0, 0, 0x88, 0x26);
@@ -1611,9 +1612,6 @@ void SphidaScoreViewDraw() {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menumap", SphidaScoreViewDraw__Fv);
-#endif
 
 extern "C" void __sinit_menumap_cpp() {
     WorldMapStack.Init();
