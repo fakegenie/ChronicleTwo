@@ -676,12 +676,18 @@ void mgCFrame::GetBBoardMatrix(int mode, float (*matrix)[4], mgRENDER_INFO *rend
 }
 #pragma global_optimizer reset
 
-#ifdef NONMATCHING
+#pragma global_optimizer off
 void mgCFrame::GetLWMatrix(float (*matrix)[4]) {
     sceVu0FMATRIX parent_matrix;
     sceVu0FMATRIX local;
 
-    if (reference) changed = 1;
+    switch (reference) {
+    case 0:
+        break;
+    default:
+        changed = 1;
+        break;
+    }
     if (!changed) {
         mgCFrame *frame = parent;
         if (frame == NULL) {
@@ -706,9 +712,12 @@ void mgCFrame::GetLWMatrix(float (*matrix)[4]) {
         changed = 0;
     } else {
         parent->GetLWMatrix(parent_matrix);
-        float (*right)[4] = local;
-        float (*left)[4] = parent_matrix;
-        float (*out)[4] = lw_matrix;
+        float (*right)[4];
+        float (*left)[4];
+        float (*out)[4];
+        out = lw_matrix;
+        left = parent_matrix;
+        right = local;
         asm {
             lqc2 vf5, 0x0(right)
             lqc2 vf1, 0x0(left)
@@ -746,9 +755,7 @@ void mgCFrame::GetLWMatrix(float (*matrix)[4]) {
         changed = 0;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_frame", GetLWMatrix__8mgCFrameFPA4_f);
-#endif
+#pragma global_optimizer reset
 
 #pragma global_optimizer off
 void mgCFrame::GetLWMatrixTopBottom(float (*matrix)[4]) {

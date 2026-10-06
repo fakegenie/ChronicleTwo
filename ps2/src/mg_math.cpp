@@ -9,32 +9,255 @@
 int Check_Point_Poly3(float x, float y, float x0, float y0, float x1, float y1, float x2, float y2);
 static void MulMatrix3(float (*matrix)[4], float (*second)[4], float (*third)[4]);
 
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgFotI4__FPiPf);
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgCreateBox8__FPA4_fPfPf);
+asm void mgFotI4(int *out, float *in) {
+    .set noreorder
+    lqc2 vf1, 0x0(a1)
+    vftoi4.xyzw vf1, vf1
+    jr ra
+    sqc2 vf1, 0x0(a0)
+}
+asm void mgCreateBox8(float (*corners)[4], float *max, float *min) {
+    .set noreorder
+    lqc2 vf1, 0x0(a1)
+    lqc2 vf2, 0x0(a2)
+    vaddx.xyzw vf3, vf2, vf0x
+    vaddx.xyzw vf4, vf2, vf0x
+    vaddx.xyzw vf5, vf2, vf0x
+    vaddx.xyzw vf6, vf1, vf0x
+    vaddx.xyzw vf7, vf1, vf0x
+    vaddx.xyzw vf8, vf1, vf0x
+    sqc2 vf2, 0x0(a0)
+    sqc2 vf1, 0x70(a0)
+    vaddx.x vf3, vf1, vf0x
+    vaddx.y vf4, vf1, vf0x
+    vaddx.z vf5, vf1, vf0x
+    vaddx.x vf6, vf2, vf0x
+    vaddx.y vf7, vf2, vf0x
+    vaddx.z vf8, vf2, vf0x
+    sqc2 vf3, 0x10(a0)
+    sqc2 vf4, 0x20(a0)
+    sqc2 vf5, 0x40(a0)
+    sqc2 vf6, 0x60(a0)
+    sqc2 vf7, 0x50(a0)
+    jr ra
+    sqc2 vf8, 0x30(a0)
+}
 void mgZeroVector(float *vector) {
     *(u_long128 *)vector = 0;
 }
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgZeroVectorW__FPf);
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgClipBoxVertex__FPfPfPf);
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgClipBox__FPfPfPfPf);
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgClipBoxW__FPfPfPfPf);
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgClipInBox__FPfPfPfPf);
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgClipInBoxW__FPfPfPfPf);
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgAddVector__FPfPf);
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgSubVector__FPfPf);
+asm void mgZeroVectorW(float *vector) {
+    .set noreorder
+    jr ra
+    sqc2 vf0, 0x0(a0)
+}
+asm int mgClipBoxVertex(float *point, float *max, float *min) {
+    .set noreorder
+    lqc2 vf1, 0x0(a0)
+    lqc2 vf10, 0x0(a1)
+    lqc2 vf11, 0x0(a2)
+    ctc2.ni zero, vi16
+    vsub.xyz vf25, vf10, vf1
+    vsub.xyz vf25, vf1, vf11
+    vnop
+    vnop
+    vnop
+    vnop
+    vnop
+    cfc2.ni v0, vi16
+    andi v0, v0, 0x80
+    xor v0, v0, zero
+    jr ra
+    sltiu v0, v0, 0x1
+}
+asm int mgClipBox(float *max0, float *min0, float *max1, float *min1) {
+    .set noreorder
+    lqc2 vf10, 0x0(a0)
+    lqc2 vf11, 0x0(a1)
+    lqc2 vf1, 0x0(a2)
+    lqc2 vf2, 0x0(a3)
+    ctc2.ni zero, vi16
+    vsub.xyz vf25, vf10, vf2
+    vsub.xyz vf25, vf1, vf11
+    vnop
+    vnop
+    vnop
+    vnop
+    vnop
+    cfc2.ni v0, vi16
+    andi v0, v0, 0x80
+    xor v0, v0, zero
+    jr ra
+    sltiu v0, v0, 0x1
+}
+asm int mgClipBoxW(float *max0, float *min0, float *max1, float *min1) {
+    .set noreorder
+    lqc2 vf10, 0x0(a0)
+    lqc2 vf11, 0x0(a1)
+    lqc2 vf1, 0x0(a2)
+    lqc2 vf2, 0x0(a3)
+    ctc2.ni zero, vi16
+    vsub.xyw vf25, vf10, vf2
+    vsub.xyw vf25, vf1, vf11
+    vnop
+    vnop
+    vnop
+    vnop
+    vnop
+    cfc2.ni v0, vi16
+    andi v0, v0, 0x80
+    xor v0, v0, zero
+    jr ra
+    sltiu v0, v0, 0x1
+}
+asm int mgClipInBox(float *max0, float *min0, float *max1, float *min1) {
+    .set noreorder
+    lqc2 vf10, 0x0(a0)
+    lqc2 vf11, 0x0(a1)
+    lqc2 vf1, 0x0(a2)
+    lqc2 vf2, 0x0(a3)
+    ctc2.ni zero, vi16
+    vsub.xyz vf25, vf1, vf10
+    vsub.xyz vf25, vf11, vf2
+    vnop
+    vnop
+    vnop
+    vnop
+    vnop
+    cfc2.ni v0, vi16
+    andi v0, v0, 0x80
+    xor v0, v0, zero
+    jr ra
+    sltiu v0, v0, 0x1
+}
+asm int mgClipInBoxW(float *max0, float *min0, float *max1, float *min1) {
+    .set noreorder
+    lqc2 vf10, 0x0(a0)
+    lqc2 vf11, 0x0(a1)
+    lqc2 vf1, 0x0(a2)
+    lqc2 vf2, 0x0(a3)
+    ctc2.ni zero, vi16
+    vsub.xyw vf25, vf1, vf10
+    vsub.xyw vf25, vf11, vf2
+    vnop
+    vnop
+    vnop
+    vnop
+    vnop
+    cfc2.ni v0, vi16
+    andi v0, v0, 0x80
+    xor v0, v0, zero
+    jr ra
+    sltiu v0, v0, 0x1
+}
+asm void mgAddVector(float *vector, float *add) {
+    .set noreorder
+    lqc2 vf15, 0x0(a0)
+    lqc2 vf16, 0x0(a1)
+    vadd.xyzw vf15, vf15, vf16
+    jr ra
+    sqc2 vf15, 0x0(a0)
+}
+asm void mgSubVector(float *vector, float *sub) {
+    .set noreorder
+    lqc2 vf15, 0x0(a0)
+    lqc2 vf16, 0x0(a1)
+    vsub.xyzw vf15, vf15, vf16
+    jr ra
+    sqc2 vf15, 0x0(a0)
+}
 void mgNormalizeVector(float *out, float *in, float length) {
     sceVu0FVECTOR unit;
 
     sceVu0Normalize(unit, in);
     sceVu0ScaleVector(out, unit, length);
 }
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgVectorMin__FPfPfPf);
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgVectorMin__FPfPfPfPfPf);
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgVectorMaxMin__FPfPfPfPf);
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgVectorMaxMin__FPfPfPfPfPf);
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgVectorMaxMin__FPfPfPfPfPfPf);
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgBoxMaxMin__FP9mgVu0FBOXP9mgVu0FBOX);
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgPlaneNormal__FPfPfPfPf);
+asm void mgVectorMin(float *min, float *a, float *b) {
+    .set noreorder
+    lqc2 vf15, 0x0(a1)
+    lqc2 vf16, 0x0(a2)
+    vmini.xyzw vf18, vf15, vf16
+    jr ra
+    sqc2 vf18, 0x0(a0)
+}
+asm void mgVectorMin(float *min, float *a, float *b, float *c, float *d) {
+    .set noreorder
+    lqc2 vf15, 0x0(a1)
+    lqc2 vf16, 0x0(a2)
+    lqc2 vf17, 0x0(a3)
+    lqc2 vf18, 0x0(t0)
+    vmini.xyzw vf20, vf15, vf16
+    vmini.xyzw vf20, vf20, vf17
+    vmini.xyzw vf20, vf20, vf18
+    jr ra
+    sqc2 vf20, 0x0(a0)
+}
+asm void mgVectorMaxMin(float *max, float *min, float *a, float *b) {
+    .set noreorder
+    lqc2 vf15, 0x0(a2)
+    lqc2 vf16, 0x0(a3)
+    vmax.xyzw vf18, vf15, vf16
+    vmini.xyzw vf20, vf15, vf16
+    sqc2 vf18, 0x0(a0)
+    jr ra
+    sqc2 vf20, 0x0(a1)
+}
+asm void mgVectorMaxMin(float *max, float *min, float *a, float *b, float *c) {
+    .set noreorder
+    lqc2 vf15, 0x0(a2)
+    lqc2 vf16, 0x0(a3)
+    lqc2 vf17, 0x0(t0)
+    vmax.xyzw vf18, vf15, vf16
+    vmini.xyzw vf20, vf15, vf16
+    vmax.xyzw vf19, vf18, vf17
+    vmini.xyzw vf21, vf20, vf17
+    sqc2 vf19, 0x0(a0)
+    jr ra
+    sqc2 vf21, 0x0(a1)
+}
+asm void mgVectorMaxMin(float *max, float *min, float *a, float *b, float *c, float *d) {
+    .set noreorder
+    lqc2 vf15, 0x0(a2)
+    lqc2 vf16, 0x0(a3)
+    lqc2 vf17, 0x0(t0)
+    lqc2 vf18, 0x0(t1)
+    vmax.xyzw vf20, vf15, vf16
+    vmini.xyzw vf21, vf15, vf16
+    vmax.xyzw vf20, vf20, vf17
+    vmini.xyzw vf21, vf21, vf17
+    vmax.xyzw vf20, vf20, vf18
+    vmini.xyzw vf21, vf21, vf18
+    sqc2 vf20, 0x0(a0)
+    jr ra
+    sqc2 vf21, 0x0(a1)
+}
+asm void mgBoxMaxMin(mgVu0FBOX *box, mgVu0FBOX *other) {
+    .set noreorder
+    lqc2 vf15, 0x0(a0)
+    lqc2 vf16, 0x10(a0)
+    lqc2 vf17, 0x0(a1)
+    lqc2 vf18, 0x10(a1)
+    vmax.xyzw vf20, vf15, vf16
+    vmini.xyzw vf21, vf15, vf16
+    vmax.xyzw vf20, vf20, vf17
+    vmini.xyzw vf21, vf21, vf17
+    vmax.xyzw vf20, vf20, vf18
+    vmini.xyzw vf21, vf21, vf18
+    sqc2 vf20, 0x0(a0)
+    jr ra
+    sqc2 vf21, 0x10(a0)
+}
+asm void mgPlaneNormal(float *normal, float *v0, float *v1, float *v2) {
+    .set noreorder
+    lqc2 vf15, 0x0(a1)
+    lqc2 vf16, 0x0(a2)
+    lqc2 vf17, 0x0(a3)
+    vsub.xyzw vf10, vf16, vf15
+    vsub.xyzw vf11, vf17, vf15
+    vopmula.xyz ACC, vf10, vf11
+    vopmsub.xyz vf12, vf11, vf10
+    jr ra
+    sqc2 vf12, 0x0(a0)
+}
 float mgDistPlanePoint(float *normal, float *on_plane, float *point) {
     sceVu0FVECTOR offset;
 
@@ -256,19 +479,279 @@ int Check_Point_Poly3(float x, float y, float x0, float y0, float x1, float y1, 
     return MG_POINT_POLY3_OUTSIDE;
 }
 
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgDistVector__FPf);
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgDistVectorXZ__FPf);
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgDistVector2__FPf);
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgDistVector__FPfPf);
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgDistVectorXZ__FPfPf);
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgDistVector2__FPfPf);
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgDistVectorXZ2__FPfPf);
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgUnitMatrix__FPA4_f);
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgZeroMatrix__FPA4_f);
+asm float mgDistVector(float *vector) {
+    .set noreorder
+    lqc2 vf4, 0x0(a0)
+    vmul.xyz vf4, vf4, vf4
+    vmr32.xy vf5, vf4
+    vmr32.x vf6, vf5
+    vadd.x vf7, vf4, vf5
+    vadd.x vf5, vf6, vf7
+    vsqrt Q, vf5x
+    vwaitq
+    cfc2.ni v0, vi22
+    mtc1 v0, f0
+    jr ra
+    nop
+}
+asm float mgDistVectorXZ(float *vector) {
+    .set noreorder
+    lqc2 vf4, 0x0(a0)
+    vmul.xyz vf4, vf4, vf4
+    vmr32.xy vf5, vf4
+    vmr32.x vf6, vf5
+    vadd.x vf7, vf4, vf6
+    vsqrt Q, vf7x
+    vwaitq
+    cfc2.ni v0, vi22
+    mtc1 v0, f0
+    jr ra
+    nop
+}
+asm float mgDistVector2(float *vector) {
+    .set noreorder
+    lqc2 vf4, 0x0(a0)
+    vmul.xyz vf4, vf4, vf4
+    vmr32.xy vf5, vf4
+    vmr32.x vf6, vf5
+    vadd.x vf7, vf4, vf5
+    vadd.x vf5, vf6, vf7
+    qmfc2.ni v0, vf5
+    mtc1 v0, f0
+    jr ra
+    nop
+}
+asm float mgDistVector(float *a, float *b) {
+    .set noreorder
+    lqc2 vf2, 0x0(a0)
+    lqc2 vf3, 0x0(a1)
+    vsub.xyz vf4, vf3, vf2
+    vmul.xyz vf4, vf4, vf4
+    vmr32.xy vf5, vf4
+    vmr32.x vf6, vf5
+    vadd.x vf7, vf4, vf5
+    vadd.x vf5, vf6, vf7
+    vsqrt Q, vf5x
+    vwaitq
+    cfc2.ni v0, vi22
+    mtc1 v0, f0
+    jr ra
+    nop
+}
+asm float mgDistVectorXZ(float *a, float *b) {
+    .set noreorder
+    lqc2 vf2, 0x0(a0)
+    lqc2 vf3, 0x0(a1)
+    vsub.xyz vf4, vf3, vf2
+    vmul.xyz vf4, vf4, vf4
+    vmr32.xy vf5, vf4
+    vmr32.x vf6, vf5
+    vadd.x vf7, vf4, vf6
+    vsqrt Q, vf7x
+    vwaitq
+    cfc2.ni v0, vi22
+    mtc1 v0, f0
+    jr ra
+    nop
+}
+asm float mgDistVector2(float *a, float *b) {
+    .set noreorder
+    lqc2 vf2, 0x0(a0)
+    lqc2 vf3, 0x0(a1)
+    vsub.xyz vf4, vf3, vf2
+    vmul.xyz vf4, vf4, vf4
+    vmr32.xy vf5, vf4
+    vmr32.x vf6, vf5
+    vadd.x vf7, vf4, vf5
+    vadd.x vf5, vf6, vf7
+    qmfc2.ni v0, vf5
+    mtc1 v0, f0
+    jr ra
+    nop
+}
+asm float mgDistVectorXZ2(float *a, float *b) {
+    .set noreorder
+    lqc2 vf2, 0x0(a0)
+    lqc2 vf3, 0x0(a1)
+    vsub.xyz vf4, vf3, vf2
+    vmul.xyz vf4, vf4, vf4
+    vmr32.xy vf5, vf4
+    vmr32.x vf6, vf5
+    vadd.x vf7, vf4, vf6
+    qmfc2.ni v0, vf7
+    mtc1 v0, f0
+    jr ra
+    nop
+}
+asm void mgUnitMatrix(float (*matrix)[4]) {
+    .set noreorder
+    vmr32.xyzw vf1, vf0
+    vmr32.xyzw vf2, vf1
+    vmr32.xyzw vf3, vf2
+    sqc2 vf0, 0x30(a0)
+    sqc2 vf1, 0x20(a0)
+    sqc2 vf2, 0x10(a0)
+    jr ra
+    sqc2 vf3, 0x0(a0)
+}
+asm void mgZeroMatrix(float (*matrix)[4]) {
+    .set noreorder
+    vsub.xyzw vf1, vf1, vf1
+    sqc2 vf1, 0x30(a0)
+    sqc2 vf1, 0x20(a0)
+    sqc2 vf1, 0x10(a0)
+    jr ra
+    sqc2 vf1, 0x0(a0)
+}
 
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", MulMatrix3__FPA4_fPA4_fPA4_f);
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgMulMatrix__FPA4_fPA4_fPA4_f);
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgInversMatrix__FPA4_fPA4_f);
+static asm void MulMatrix3(float (*matrix)[4], float (*second)[4], float (*third)[4]) {
+    .set noreorder
+    lqc2 vf1, 0x0(a0)
+    lqc2 vf2, 0x10(a0)
+    lqc2 vf3, 0x20(a0)
+    lqc2 vf4, 0x30(a0)
+    lqc2 vf5, 0x0(a1)
+    lqc2 vf6, 0x10(a1)
+    lqc2 vf7, 0x20(a1)
+    lqc2 vf8, 0x30(a1)
+    lqc2 vf9, 0x0(a2)
+    lqc2 vf10, 0x10(a2)
+    lqc2 vf11, 0x20(a2)
+    lqc2 vf12, 0x30(a2)
+    vmulax.xyzw ACC, vf1, vf5x
+    vmadday.xyzw ACC, vf2, vf5y
+    vmaddaz.xyzw ACC, vf3, vf5z
+    vmaddw.xyzw vf20, vf4, vf5w
+    vmulax.xyzw ACC, vf1, vf6x
+    vmadday.xyzw ACC, vf2, vf6y
+    vmaddaz.xyzw ACC, vf3, vf6z
+    vmaddw.xyzw vf21, vf4, vf6w
+    vmulax.xyzw ACC, vf1, vf7x
+    vmadday.xyzw ACC, vf2, vf7y
+    vmaddaz.xyzw ACC, vf3, vf7z
+    vmaddw.xyzw vf22, vf4, vf7w
+    vmulax.xyzw ACC, vf1, vf8x
+    vmadday.xyzw ACC, vf2, vf8y
+    vmaddaz.xyzw ACC, vf3, vf8z
+    vmaddw.xyzw vf23, vf4, vf8w
+    vmulax.xyzw ACC, vf20, vf9x
+    vmadday.xyzw ACC, vf21, vf9y
+    vmaddaz.xyzw ACC, vf22, vf9z
+    vmaddw.xyzw vf1, vf23, vf9w
+    vmulax.xyzw ACC, vf20, vf10x
+    vmadday.xyzw ACC, vf21, vf10y
+    vmaddaz.xyzw ACC, vf22, vf10z
+    vmaddw.xyzw vf2, vf23, vf10w
+    vmulax.xyzw ACC, vf20, vf11x
+    vmadday.xyzw ACC, vf21, vf11y
+    vmaddaz.xyzw ACC, vf22, vf11z
+    vmaddw.xyzw vf3, vf23, vf11w
+    vmulax.xyzw ACC, vf20, vf12x
+    vmadday.xyzw ACC, vf21, vf12y
+    vmaddaz.xyzw ACC, vf22, vf12z
+    vmaddw.xyzw vf4, vf23, vf12w
+    sqc2 vf1, 0x0(a0)
+    sqc2 vf2, 0x10(a0)
+    sqc2 vf3, 0x20(a0)
+    jr ra
+    sqc2 vf4, 0x30(a0)
+}
+asm void mgMulMatrix(float (*product)[4], float (*left_matrix)[4], float (*right_matrix)[4]) {
+    .set noreorder
+    lqc2 vf1, 0x0(a1)
+    lqc2 vf2, 0x10(a1)
+    lqc2 vf3, 0x20(a1)
+    lqc2 vf4, 0x30(a1)
+    lqc2 vf5, 0x0(a2)
+    lqc2 vf6, 0x10(a2)
+    lqc2 vf7, 0x20(a2)
+    lqc2 vf8, 0x30(a2)
+    vmulax.xyzw ACC, vf1, vf5x
+    vmadday.xyzw ACC, vf2, vf5y
+    vmaddaz.xyzw ACC, vf3, vf5z
+    vmaddw.xyzw vf20, vf4, vf5w
+    vmulax.xyzw ACC, vf1, vf6x
+    vmadday.xyzw ACC, vf2, vf6y
+    vmaddaz.xyzw ACC, vf3, vf6z
+    vmaddw.xyzw vf21, vf4, vf6w
+    vmulax.xyzw ACC, vf1, vf7x
+    vmadday.xyzw ACC, vf2, vf7y
+    vmaddaz.xyzw ACC, vf3, vf7z
+    vmaddw.xyzw vf22, vf4, vf7w
+    vmulax.xyzw ACC, vf1, vf8x
+    vmadday.xyzw ACC, vf2, vf8y
+    vmaddaz.xyzw ACC, vf3, vf8z
+    vmaddw.xyzw vf23, vf4, vf8w
+    sqc2 vf20, 0x0(a0)
+    sqc2 vf21, 0x10(a0)
+    sqc2 vf22, 0x20(a0)
+    jr ra
+    sqc2 vf23, 0x30(a0)
+}
+asm void mgInversMatrix(float (*inverse)[4], float (*matrix)[4]) {
+    .set noreorder
+    lqc2 vf1, 0x0(a1)
+    lqc2 vf2, 0x10(a1)
+    lqc2 vf3, 0x20(a1)
+    lqc2 vf4, 0x30(a1)
+    vmuly.x vf5, vf1, vf2y
+    vmuly.x vf6, vf3, vf1y
+    vmuly.x vf7, vf2, vf3y
+    vmuly.x vf8, vf1, vf3y
+    vmuly.x vf9, vf2, vf1y
+    vmuly.x vf10, vf3, vf2y
+    vmulaz.x ACC, vf5, vf3z
+    vmaddaz.x ACC, vf6, vf2z
+    vmaddaz.x ACC, vf7, vf1z
+    vmsubaz.x ACC, vf8, vf2z
+    vmsubaz.x ACC, vf9, vf3z
+    vmsubz.x vf15, vf10, vf1z
+    vsub.xyzw vf5, vf5, vf5
+    vsub.xyzw vf6, vf6, vf6
+    vsub.xyzw vf7, vf7, vf7
+    vaddx.xyzw vf8, vf0, vf0x
+    vdiv Q, vf0w, vf15x
+    vmulaz.y ACC, vf2, vf3z
+    vmsubz.y vf10, vf3, vf2z
+    vmulaz.y ACC, vf3, vf1z
+    vmsubz.y vf11, vf1, vf3z
+    vmulaz.y ACC, vf1, vf2z
+    vmsubz.y vf12, vf2, vf1z
+    vmulax.z ACC, vf2, vf3x
+    vmsubx.z vf10, vf3, vf2x
+    vmulax.z ACC, vf3, vf1x
+    vmsubx.z vf11, vf1, vf3x
+    vmulax.z ACC, vf1, vf2x
+    vmsubx.z vf12, vf2, vf1x
+    vmulay.x ACC, vf2, vf3y
+    vmsuby.x vf10, vf3, vf2y
+    vmulay.x ACC, vf3, vf1y
+    vmsuby.x vf11, vf1, vf3y
+    vmulay.x ACC, vf1, vf2y
+    vmsuby.x vf12, vf2, vf1y
+    vaddy.x vf5, vf5, vf10y
+    vaddy.y vf5, vf5, vf11y
+    vaddy.z vf5, vf5, vf12y
+    vaddz.x vf6, vf6, vf10z
+    vaddz.y vf6, vf6, vf11z
+    vaddz.z vf6, vf6, vf12z
+    vaddx.x vf7, vf7, vf10x
+    vaddx.y vf7, vf7, vf11x
+    vaddx.z vf7, vf7, vf12x
+    vmulq.xyzw vf5, vf5, Q
+    vmulq.xyzw vf6, vf6, Q
+    vmulq.xyzw vf7, vf7, Q
+    vmulax.xyzw ACC, vf5, vf4x
+    vmadday.xyzw ACC, vf6, vf4y
+    vmaddz.xyzw vf8, vf7, vf4z
+    vsub.xyz vf8, vf0, vf8
+    vaddx.w vf8, vf0, vf0x
+    sqc2 vf5, 0x0(a0)
+    sqc2 vf6, 0x10(a0)
+    sqc2 vf7, 0x20(a0)
+    jr ra
+    sqc2 vf8, 0x30(a0)
+}
 void mgRotMatrixX(float (*matrix)[4], float angle_x) {
     mgUnitMatrix(matrix);
     matrix[2][2] = cosf(angle_x);

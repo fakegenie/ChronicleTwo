@@ -169,20 +169,24 @@ void CChillAfterHit::Step() {
         }
     }
 }
-#ifdef NONMATCHING
 static inline void LocalPrimCorner(int *out, float *corner, float *center, float half_w, float half_h, float angle, float scale) {
-    float reach_x = scale;
-    float reach_y = scale;
+    float shift_x;
+    float reach_y;
+    float reach_x;
+    float shift_y;
+
+    reach_x = scale;
+    reach_y = scale;
     reach_x *= half_w;
     reach_y *= half_h;
-    float shift_x = reach_x * cosf(angle) - reach_y * sinf(angle);
-    float shift_y = reach_x * sinf(angle) + reach_y * cosf(angle);
+    shift_x = reach_x * cosf(angle) - reach_y * sinf(angle);
+    shift_y = reach_x * sinf(angle) + reach_y * cosf(angle);
     *(u_long128 *)corner = *(u_long128 *)center;
     corner[0] += shift_x;
     corner[1] += shift_y;
-    out[0] = fptosi(16.0f * corner[0]);
-    out[1] = fptosi(16.0f * corner[1]);
-    out[2] = fptosi(corner[2]);
+    out[0] = (int)(16.0f * corner[0]);
+    out[1] = (int)(16.0f * corner[1]);
+    out[2] = (int)corner[2];
     out[3] = 0;
 }
 int LocalTransWorldPrimPos(int (*corners)[4], float *pos, float width, float height, float angle) {
@@ -209,8 +213,8 @@ int LocalTransWorldPrimPos(int (*corners)[4], float *pos, float width, float hei
     LocalPrimCorner(corners[1], corner[1], screen, half_w, half_h, angle, 1.0f);
     angle = mgAngleLimit(angle - 1.5707964f);
     LocalPrimCorner(corners[2], corner[2], screen, half_w, half_h, angle, 1.0f);
-    angle = mgAngleLimit(angle - 1.5707964f);
-    LocalPrimCorner(corners[3], corner[3], screen, half_w, half_h, angle, 1.0f);
+    float last = mgAngleLimit(angle - 1.5707964f);
+    LocalPrimCorner(corners[3], corner[3], screen, half_w, half_h, last, 1.0f);
     if (corner[0][0] < 0.0f || !(corner[0][0] <= 4095.0f)) {
         return 0;
     }
@@ -219,9 +223,6 @@ int LocalTransWorldPrimPos(int (*corners)[4], float *pos, float width, float hei
     }
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dng_effect", LocalTransWorldPrimPos__FPA4_iPffff);
-#endif
 void CChillAfterHit::Draw() {
     float vec[4];
     int sprite0[4];
@@ -485,7 +486,7 @@ void CFireAfterHit::Draw(void) {
     prim.AlphaBlend(2);
     prim.Begin(6);
     prim.Texture(TEX_ExFx_FIRE);
-    for (i = 0; i < flame_num; i++, fire++) {
+    for (int i = 0; i < flame_num; i++, fire++) {
         if (fire->alpha > 0 && !(0 < fire->delay)) {
             if (mgTransWorldPrim3DSprite(main0, main1, fire->pos, fire->size, fire->size, 0) != 0) {
                 if (fire->age >= 3) {
@@ -502,10 +503,7 @@ void CFireAfterHit::Draw(void) {
                     if (newest < 0) {
                         newest += FIRE_AFTER_HIT_TRAIL_MAX;
                     }
-                    FIRE_AFTER_HIT_TRAIL *recent[3] = {NULL, NULL, NULL};
-                    recent[0] = &row[oldest];
-                    recent[1] = &row[middle];
-                    recent[2] = &row[newest];
+                    FIRE_AFTER_HIT_TRAIL *recent[3] = {&row[oldest], &row[middle], &row[newest]};
                     for (k = 0; k < 3; k++) {
                         trans_float_to_sceVector(vec, recent[k]->pos, 0);
                         mgTransWorldPrim3DSprite(puff0, puff1, vec, recent[k]->size, recent[k]->size, 0);
@@ -3086,22 +3084,22 @@ int CreatSmoothPass(sceVu0FVECTOR *out, sceVu0FVECTOR *ring, int point_num, int 
     }
     float quarter = 0.25f;
     float half = 0.5f;
+    basis[1][0] = 1.0f;
+    basis[3][0] = 0.0f;
+    basis[2][1] = 0.0f;
     basis[0][0] = -quarter / half;
     basis[0][1] = 1.5f;
-    basis[0][2] = (-half - quarter) / half;
-    basis[0][3] = half;
-    basis[1][0] = 1.0f;
-    basis[1][1] = -(quarter + 1.0f) / half;
-    basis[1][2] = 2.0f;
-    basis[1][3] = -half;
-    basis[2][0] = basis[0][0];
-    basis[2][1] = 0.0f;
-    basis[2][2] = half;
-    basis[2][3] = 0.0f;
-    basis[3][0] = 0.0f;
-    basis[3][1] = 1.0f;
     basis[3][2] = 0.0f;
+    basis[0][2] = (-half - quarter) / half;
+    basis[2][3] = 0.0f;
     basis[3][3] = 0.0f;
+    basis[2][0] = basis[0][0];
+    basis[2][2] = half;
+    basis[1][3] = -half;
+    basis[0][3] = half;
+    basis[1][1] = -(quarter + 1.0f) / half;
+    basis[3][1] = 1.0f;
+    basis[1][2] = 2.0f;
     int written = 0;
     for (int segment = 0; segment < point_num - 1; segment++) {
         if (segment > 0 && segment < point_num - 2) {
@@ -3158,7 +3156,7 @@ int CreatSmoothPass(sceVu0FVECTOR *out, sceVu0FVECTOR *ring, int point_num, int 
         while (t < 1.0f - (step = 1.0f / (division - 1.0f))) {
             powers[3] = 1.0f;
             powers[1] = t * t;
-            powers[0] = t * powers[1];
+            powers[0] = t * (t * t);
             powers[2] = t;
             sceVu0ApplyMatrix(result, coefficients, powers);
             float *entry = out[written];
