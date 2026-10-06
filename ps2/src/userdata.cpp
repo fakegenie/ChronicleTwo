@@ -1728,6 +1728,7 @@ int CFishAquarium::CheckHaigouTankSex(CGameDataUsed *fish) {
 }
 #ifdef NONMATCHING
 void CFishAquarium::RefreshParam() {
+    int i;
     int now = GetSaveData()->play_time;
     s64 elapsed = now - last_time;
     last_time = now;
@@ -1746,14 +1747,14 @@ void CFishAquarium::RefreshParam() {
     if (6.0f <= (float)fptosi(hours + 24.0f * (float)days)) {
         fatigue_step = 1;
     }
-    for (int i = 0; i < 6; i++) {
+    for (i = 0; i < 6; i++) {
         fish_tank[i].TimeCheck(elapsed);
     }
-    bool crowded = false;
-    if (GetAquariumFishNum(1) >= 2) {
+    int crowded = false;
+    if (GetAquariumFishNum(1) > 1) {
         crowded = true;
     }
-    for (int i = 0; i < 4; i++) {
+    for (i = 0; i < 4; i++) {
         if (sub_tank[i].item_no > 0) {
             sub_tank[i].TimeCheck(elapsed);
             float tank_hours = hour - sub_tank[i].data.fish.tank_hour;
