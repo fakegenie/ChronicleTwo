@@ -343,14 +343,14 @@ int _RESET_ACUMU_PAD(RS_STACKDATA *stack, int argc) {
     return 1;
 }
 int _RUN_MAIN_MOVE(RS_STACKDATA *stack, int argc) {
-    int chara_type;
+    int move_type;
 
-    chara_type = action_info.chara->move_type;
-    switch (chara_type) {
-        case 0:
+    move_type = action_info.chara->move_type;
+    switch (move_type) {
+        case ACTION_MOVE_HUMAN:
             action_info.chara->HumanMoveIF();
             break;
-        case 3:
+        case ACTION_MOVE_MONSTER:
             action_info.chara->MonsterMoveIF();
             break;
     }
@@ -375,19 +375,19 @@ int _RUN_HOLD_MOVE(RS_STACKDATA *stack, int argc) {
 int _RUN_ROBO_MOVE(RS_STACKDATA *stack, int argc) {
     int input = GetStackInt(stack);
     switch (action_info.chara->move_type) {
-        case 1:
-        case 4:
+        case ACTION_MOVE_ROBO_WALK:
+        case ACTION_MOVE_ROBO_WALK2:
             action_info.chara->RoboWalkMoveIF(input);
             break;
-        case 2:
-        case 5:
+        case ACTION_MOVE_ROBO_TANK:
+        case ACTION_MOVE_ROBO_TANK2:
             action_info.chara->RoboTankMoveIF(input);
             break;
-        case 3:
+        case ACTION_MOVE_ROBO_BIKE:
             action_info.chara->RoboBikeMoveIF(input);
             break;
-        case 6:
-        case 7:
+        case ACTION_MOVE_ROBO_AIR:
+        case ACTION_MOVE_ROBO_AIR2:
             action_info.chara->RoboAirMoveIF(1, input);
             break;
     }

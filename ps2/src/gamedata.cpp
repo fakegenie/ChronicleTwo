@@ -552,7 +552,7 @@ CDataItem *CGameData::GetItemData(int item_no) {
         return 0;
     }
     type = ConvertUsedItemType(record->type);
-    if (type == 1 || type == 7 || type == 8) {
+    if (type == USED_ITEM_TYPE_ITEM || type == USED_ITEM_TYPE_GIFT_BOX || type == USED_ITEM_TYPE_BOILED) {
         return item_data + record->list_no;
     }
     return 0;
@@ -706,11 +706,11 @@ char *GetItemFilePath(int item_no, int variant) {
             strcpy(name, file_name);
         }
         switch (type) {
-            case 3:
-            case 4:
+            case USED_ITEM_TYPE_WEAPON:
+            case USED_ITEM_TYPE_UNK_4:
                 strcpy(item_file_path_1288, at_1307__2);
                 break;
-            case 5:
+            case USED_ITEM_TYPE_ROBO_PART:
                 strcpy(item_file_path_1288, at_1308__2);
                 break;
             default:
@@ -720,7 +720,7 @@ char *GetItemFilePath(int item_no, int variant) {
         strcat(item_file_path_1288, name);
         strcat(item_file_path_1288, at_1284__3);
         if (variant == 1) {
-            if (type == 3) {
+            if (type == USED_ITEM_TYPE_WEAPON) {
                 sprintf(item_file_path_1288, at_1310__2, name);
             }
         }
@@ -939,15 +939,15 @@ int CheckItemEquip(int chara, int item_no) {
         return 0;
     }
     if (item_no == 0x12A) {
-        if (chara != 0) {
+        if (chara != USER_CHARA_MAX) {
             return 0;
         }
     } else if (item_no == 0x160) {
-        if (chara != 1) {
+        if (chara != USER_CHARA_MONICA) {
             return 0;
         }
     } else if (item_no == 0x171) {
-        if (chara != 0) {
+        if (chara != USER_CHARA_MAX) {
             return 0;
         }
     }
@@ -1004,16 +1004,16 @@ int GetUsedItemAfterEffect(int item_no, USEITEM_EFFECT *effect) {
 void CItemUseTarget::SetPtr(int new_kind, void *new_ptr) {
     type = new_kind;
 
-    if (type == 0) {
+    if (type == ITEM_USE_TARGET_CHARA) {
         target.data = new_ptr;
     }
-    if (type == 1) {
+    if (type == ITEM_USE_TARGET_ITEM) {
         target.data = new_ptr;
     }
-    if (type == 2) {
+    if (type == ITEM_USE_TARGET_ROBO) {
         target.data = new_ptr;
     }
-    if (type == 3) {
+    if (type == ITEM_USE_TARGET_MONSTER) {
         target.data = new_ptr;
     }
 }
