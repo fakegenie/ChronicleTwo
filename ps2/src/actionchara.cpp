@@ -2217,7 +2217,6 @@ int CActionChara::RoboAirMoveIF(int unk, int mode) {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/actionchara", RoboAirMoveIF__12CActionCharaFii);
 #endif
-#ifdef NONMATCHING
 int CActionChara::MonsterMoveIF() {
     sceVu0FVECTOR position;
     sceVu0FVECTOR rotation;
@@ -2352,9 +2351,6 @@ int CActionChara::MonsterMoveIF() {
     RockOn();
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/actionchara", MonsterMoveIF__12CActionCharaFv);
-#endif
 
 #ifdef STATEMATCHING
 void HitEffectSet(CScene *scene, float *point) {

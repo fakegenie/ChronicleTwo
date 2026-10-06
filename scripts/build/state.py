@@ -200,6 +200,19 @@ def view(elf, section_index, pairs, code):
              for offset, kind, index in references(elf, section_index)])
 
 
+def content_key(elf, symbol_index, code):
+    symbol = elf.symtab.symbols[symbol_index]
+    if anonymous(elf, symbol_index) or (symbol.type == STT_SECTION and symbol.st_shndx not in code):
+        return ("bytes", symbol.st_value, contents(elf.sections[symbol.st_shndx]))
+    return target_key(elf, symbol_index, {}, code)
+
+
+def content_view(elf, section_index, code):
+    return (contents(elf.sections[section_index]),
+            [(offset, kind, content_key(elf, index, code))
+             for offset, kind, index in references(elf, section_index)])
+
+
 def pair_data(state, state_text, base, base_text, function):
     state_data = own_data(state, state_text)
     base_data = own_data(base, base_text)
@@ -263,6 +276,9 @@ def splice(base, state, drafts, markers):
             continue
         base_function = base.symtab.symbols[base_functions[name]]
         state_function = state.symtab.symbols[state_functions[name]]
+        if (content_view(state, state_function.st_shndx, state_code)
+                == content_view(base, base_function.st_shndx, base_code)):
+            continue
         pairs = pair_data(state, state_function.st_shndx, base, base_function.st_shndx, name)
         same = {index: index for index in pairs.values()}
         data = [(state_index, base_index) for state_index, base_index in pairs.items()
