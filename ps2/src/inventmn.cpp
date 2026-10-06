@@ -2062,7 +2062,6 @@ void CMenuInvent::GradationSet(int mode) {
             return;
     }
 }
-#ifdef STATEMATCHING
 void CMenuInvent::GradationStep() {
     if (invent_okeff_form == NULL) {
         return;
@@ -2121,9 +2120,6 @@ void CMenuInvent::GradationStep() {
         break;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/inventmn", GradationStep__11CMenuInventFv);
-#endif
 void CMenuInvent::InitEnd() {
     BG_READ_INFO *read_info;
 
