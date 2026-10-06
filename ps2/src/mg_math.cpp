@@ -479,7 +479,21 @@ int Check_Point_Poly3(float x, float y, float x0, float y0, float x1, float y1, 
     return MG_POINT_POLY3_OUTSIDE;
 }
 
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgDistVector__FPf);
+asm float mgDistVector(float *vector) {
+    .set noreorder
+    lqc2 vf4, 0x0(a0)
+    vmul.xyz vf4, vf4, vf4
+    vmr32.xy vf5, vf4
+    vmr32.x vf6, vf5
+    vadd.x vf7, vf4, vf5
+    vadd.x vf5, vf6, vf7
+    vsqrt Q, vf5x
+    vwaitq
+    cfc2.ni v0, vi22
+    mtc1 v0, f0
+    jr ra
+    nop
+}
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgDistVectorXZ__FPf);
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgDistVector2__FPf);
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgDistVector__FPfPf);
