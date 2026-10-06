@@ -3076,12 +3076,10 @@ void PreMesMake(char *source, char *buffer) {
         }
     } while (length < mes_buffer_size);
 }
-#ifdef NONMATCHING
 void ClsMes::MakeMesWin(char *str, int open, int reset_fade) {
     char text[512];
     int  extra_width;
     int  current_page;
-    int  index;
     int  character_count;
 
     if (str != NULL) {
@@ -3096,14 +3094,7 @@ void ClsMes::MakeMesWin(char *str, int open, int reset_fade) {
             extra_width = 0;
             fukidashi_w = text_w + 60;
             for (current_page = 0; current_page < page_num; current_page++) {
-                if (current_page + 1 <= 0) {
-                    character_count = 0;
-                } else {
-                    character_count = 0;
-                    for (index = 0; index < current_page + 1; index++) {
-                        character_count += page_chars[index];
-                    }
-                }
+                character_count = PageCharTotal(this, current_page + 1);
                 if (text_w <= line_w[character_count - 1]) {
                     extra_width = 1;
                 }
@@ -3118,9 +3109,6 @@ void ClsMes::MakeMesWin(char *str, int open, int reset_fade) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/nd_meswin", MakeMesWin__6ClsMesFPcii);
-#endif
 int ClsMes::MakeAnd3DPosSet(char *text, float *world_position, int offset_x, int offset_y) {
     int screen_position[4];
     if (text == NULL) {
