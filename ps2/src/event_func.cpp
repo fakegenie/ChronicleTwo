@@ -118,7 +118,6 @@ extern "C" void *__vt__12CObjectFrame[];
 extern "C" void *__vt__11CCharacter2[];
 extern "C" void *__vt__9mgCVisual[];
 extern "C" void *__vt__11mgC3DSprite[];
-extern "C" int GetNowHorl__11CSphidaDataFv(CSphidaData *);
 
 static int GetStackInt(RS_STACKDATA *);
 static float GetStackFloat(RS_STACKDATA *);
@@ -10995,7 +10994,7 @@ int _SPHIDA_GET_NOW_HOLE(RS_STACKDATA *stack, int argc) {
     if (sphidaData == NULL) {
         return 0;
     }
-    SetStack(stack, GetNowHorl__11CSphidaDataFv(sphidaData));
+    SetStack(stack, sphidaData->GetNowHorl());
     return 1;
 }
 int _SPHIDA_SET_SCORE(RS_STACKDATA *stack, int argc) {
