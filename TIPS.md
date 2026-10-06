@@ -403,3 +403,9 @@ only functions present in both objects can be replaced, the plain build keeps th
 - `sltu; xori 1; andi 0xFF` is `bool b = !x;` (or `int = !x`), tested as `if (b)`. Writing `x == 0` gives `xor; sltiu` instead.
 - `lui/ori K; addu; lw off(base)` instead of one folded offset is an inline accessor that returns a member's address, such as `GetSaveData()->GetConfig()->field`.
 - Running several perm jobs at once on a 12-core machine slows each badly. Keep the total worker count at or below the core count.
+- Float-constant load order (which register gets the `lui`, which `mtc1` comes first) often depends on how constants are introduced, not only on the statement. Named float locals at the top of the block fixed `SphidaScoreViewDraw`; a pointer argument `Gyoracemenu_CursorXY + 1` instead of `&Gyoracemenu_CursorXY[1]` fixed `GyoraceMenuDraw`; permuting the order locals are declared in fixed `CAquarium::Draw`.
+- Compiling one draft can change constant scheduling and register choice in the next matched function (`MenuManualDraw` then `KeyStep`, `Draw` then `MenuAquaInit`). After promoting, check the following function. A named float local in the victim can restore it.
+- A vtable slot off by 4 (`lw t9,56` against `52`) means retail called the next virtual, here `DrawDirect()` instead of `Draw()`.
+- A retail `lui`/`addiu` absolute access to a symbol that our build reaches gp-relative means retail's declaration had no size. Declaring `extern T x[];` before the header that sizes it fixes it.
+- Retail `lq`/`sq` copies of contiguous 64-byte templates, where we produce a word loop, are separate brace-initialised `sceVu0FVECTOR` arrays.
+- A 16-byte object sitting between temporaries, or `sp,N` used four times where retail has two objects, means one variable should be split or should be a temporary passed directly.
