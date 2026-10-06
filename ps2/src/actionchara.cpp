@@ -2716,13 +2716,6 @@ void CActionChara::SetHold() {
 }
 #ifdef NONMATCHING
 void CActionChara::RunScript(CScene *scene, RUN_SCRIPT_ENV *env) {
-    sceVu0FVECTOR     adjusted_velocity = { 0.0f, 0.0f, 0.0f, 0.0f };
-    sceVu0FVECTOR     old_velocity;
-    sceVu0FVECTOR     position;
-    sceVu0FVECTOR     rotation;
-    sceVu0FVECTOR     new_position;
-    CCPoly            polys[128];
-    mgVu0FBOX         box;
     CBattleCharaInfo *battle;
     CTreasureBoxManager *treasure;
     CSphida          *sphida;
@@ -2736,14 +2729,27 @@ void CActionChara::RunScript(CScene *scene, RUN_SCRIPT_ENV *env) {
     int               index;
     int               pallet_no;
     int               target;
+    DNG_BATTLE_AREA  *area;
+    int               history;
+    int               pallet_u;
+    int               pallet_v;
 
     action_info.chara = this;
     nowScene__2 = scene;
     action_info.camera = (mgCCameraFollow *)scene->GetCamera(scene->GetCameraID("MainCam"));
     action_info.env = env;
+    sceVu0FVECTOR adjusted_velocity = { 0.0f, 0.0f, 0.0f, 0.0f };
+    sceVu0FVECTOR old_velocity;
+    sceVu0FVECTOR position;
+    sceVu0FVECTOR rotation;
+    sceVu0FVECTOR new_position;
+    CCPoly polys[128];
+    mgVu0FBOX box;
     menu_flag = 0;
     dir_gun = 0;
-    action_info.chara->pad_history |= PadCtrl.Btn(0x32);
+    history = action_info.chara->pad_history;
+    history |= PadCtrl.Btn(0x32);
+    action_info.chara->pad_history = history;
     if (PadCtrl.Btn(0x38) != 0) {
         action_info.chara->acumu_pad++;
     } else {
@@ -2799,7 +2805,8 @@ void CActionChara::RunScript(CScene *scene, RUN_SCRIPT_ENV *env) {
     box.max[3] = 1.0f;
     box.min[3] = 1.0f;
     count = map->GetColPoly(polys, box, 128);
-    treasure = scene->battle_area.treasure_box;
+    area = &scene->battle_area;
+    treasure = area->treasure_box;
     if (treasure != NULL) {
         count += treasure->PickupCollision(position, &polys[count], box, 128 - count);
     }
@@ -2875,26 +2882,29 @@ void CActionChara::RunScript(CScene *scene, RUN_SCRIPT_ENV *env) {
     }
     pallet_no = battle->GetPalletNo(0);
     if (pallet_no >= 0) {
+        pallet_u = pallet_no % 2;
+        pallet_v = pallet_no / 2;
         for (index = 0; index < 3; index++) {
             if (sword_effect[index] != NULL) {
-                sword_effect[index]->SetTexture((pallet_no % 2) * 64, (pallet_no / 2) * 32, 64, 32);
+                sword_effect[index]->SetTexture(pallet_u * 64, pallet_v * 32, 64, 32);
             }
         }
     }
-    if (scene->battle_area.lock_on_mode == 2) {
+    if (area->lock_on_mode == 2) {
         target_no = RockOn_TargetSel(scene, target_no);
     }
-    if (scene->battle_area.lock_on_mode == 0) {
+    if (area->lock_on_mode == 0) {
         if (lock_on == 0) {
             target_no = DistCheck_Action2(scene, 0.5f, 400.0f, &target_distance, 0, NULL);
         } else {
             lock_on = Check_LockOn(scene, 300.0f, target_no);
             if (lock_on == 0) {
                 target = DistCheck_Action2(scene, 0.5f, 400.0f, &target_distance, 0, NULL);
-                target_no = target;
                 if (target != -1) {
+                    target_no = target;
                     lock_on = 1;
-                    return;
+                } else {
+                    target_no = target;
                 }
             }
         }

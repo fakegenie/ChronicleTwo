@@ -2711,7 +2711,7 @@ public:
      * @address 0x1A08B0
      * @size 0x44
      */
-    s16 GetPalletNo(int weapon);
+    int GetPalletNo(int weapon);
 
     /**
      * Works the character's battle parameters out from its status and equipment.

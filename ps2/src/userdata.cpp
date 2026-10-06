@@ -3784,7 +3784,7 @@ u32 CBattleCharaInfo::GetSpecialStatus(int slot) {
     }
     return 0;
 }
-short CBattleCharaInfo::GetPalletNo(int slot) {
+int CBattleCharaInfo::GetPalletNo(int slot) {
     if (chara_type == 0) {
         if (slot == 0 || slot == 1) {
 
