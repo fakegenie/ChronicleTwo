@@ -259,7 +259,6 @@ struct ScreenPoint { int xy[2];  };
 extern ScreenPoint at_3363;
 extern NetaClipRange at_3379;
 extern CursorPos at_3509;
-extern ScreenPoint at_4493;
 
 struct MenuColor { u8 rgba[4];  };
 extern MenuColor at_4494;
@@ -4535,7 +4534,6 @@ void MakeMsgNetaName(CDC2Mes *message, CMenuPosDataForm *form, USER_PICTURE_INFO
     }
 }
 
-#ifdef NONMATCHING
 void MenuInventCreateCardDraw(int &tex_block, float *pos) {
     int i;
     mgCTexture *texture = Tex_Hatsumei;
@@ -4545,10 +4543,8 @@ void MenuInventCreateCardDraw(int &tex_block, float *pos) {
         mgRect<int> put_rect;
         put_rect.Set(0, 0, 0, 0);
         mgCDrawPrim *prim = GetMenuPrim();
-        ScreenPoint origin = at_4493;
-        origin.xy[0] = (int)pos[0];
-        origin.xy[1] = (int)pos[1];
-        put_rect.Set(origin.xy[0], origin.xy[1], card_rect.right, card_rect.bottom);
+        int origin[2] = {(int)pos[0], (int)pos[1]};
+        put_rect.Set(origin[0], origin[1], card_rect.right, card_rect.bottom);
         MenuColor rgba = at_4494;
         SetSpriteEnv(prim, 0);
         prim->Bilinear(1);
@@ -4568,8 +4564,8 @@ void MenuInventCreateCardDraw(int &tex_block, float *pos) {
         mgCTexture *icon_tex = MenuPosData->item_icon_tex[0][0];
         if (icon_tex != NULL) {
             MenuReloadTexture(tex_block, icon_tex->block);
-            put_rect.left = origin.xy[0] + 35;
-            put_rect.top = origin.xy[1] + 6;
+            put_rect.left = origin[0] + 35;
+            put_rect.top = origin[1] + 6;
             for (i = 0; i < 256; i++) {
                 if (put_rect.top + put_rect.bottom >= 20) {
                     mgRect<float> icon_rect(put_rect.left, put_rect.top, 32.0f, 33.0f);
@@ -4584,9 +4580,6 @@ void MenuInventCreateCardDraw(int &tex_block, float *pos) {
         MenuReloadTexture(tex_block, -1);
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/inventmn", MenuInventCreateCardDraw__FRiPf);
-#endif
 void PictureDraw(mgCTexture *tex, USER_PICTURE_INFO *photo, float x, float y, float scale, int alpha, int red,
                  int blue, int green) {
     float w;
