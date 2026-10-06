@@ -5634,6 +5634,7 @@ int CMenuCostumeSel::KeyStep() {
     }
     return 0;
 }
+#ifdef NONMATCHING
 void CMenuCostumeSel::Draw() {
     sceVu0FMATRIX view;
     sceVu0FVECTOR eye;
@@ -5775,6 +5776,9 @@ void CMenuCostumeSel::Draw() {
         help.DrawDirect(infomsg_5256[LanguageCode], 0x28, mgScreenHeight - 0x28);
     }
 }
+#else
+INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuchr", Draw__15CMenuCostumeSelFv);
+#endif
 extern u_long CostumeOptionEnv;
 extern "C" void *__ct__15mgCCameraFollowFffff(void *camera, float distance, float height, float angle,
                                                float speed);
