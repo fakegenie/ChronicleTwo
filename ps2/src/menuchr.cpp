@@ -5676,14 +5676,19 @@ void CMenuCostumeSel::Draw() {
         prim->Color(0, 0, 0, 0x30);
         PrimQuad(prim, 50.0f, (float)(y + 4), labelRect);
         PrimQuad(prim, 74.0f, (float)(lineY + 4), lineRect);
-        float wave = 6.0f * sinf(line_wave[i]);
+        float wave;
+        float leftX;
+        float rightX;
+        float arrowY;
+        float shadowY;
+        wave = 6.0f * sinf(line_wave[i]);
         if (wave < 0.0f) {
             wave = -wave;
         }
-        float rightX = (float)(0x49 + lineRect.right) + wave;
-        float leftX = 55.0f - wave;
-        float arrowY = (float)(lineY + 3);
-        float shadowY = 4.0f + arrowY;
+        rightX = wave + (float)(lineRect.right + 0x49);
+        leftX = 55.0f - wave;
+        arrowY = (float)(lineY + 3);
+        shadowY = 4.0f + arrowY;
         PrimQuad(prim, 4.0f + leftX, shadowY, leftRect);
         PrimQuad(prim, 4.0f + rightX, 4.0f + arrowY, rightRect);
         if (i == select) {
