@@ -846,6 +846,8 @@ static inline mgCCameraFollow *ActiveSceneCamera(CScene *scene) {
     return (mgCCameraFollow *)scene->GetCamera(scene->active_camera);
 }
 void EditMode(CScene *scene) {
+    CCPoly *next_poly;
+    int i;
     int moving;
     int river;
     int any_height;
@@ -1137,7 +1139,7 @@ void EditMode(CScene *scene) {
             *(u_long128 *)ePartsCurPos = *(u_long128 *)eCurPos;
             ePartsCurRot[1] = map->GetEditAngle(eCurRot);
             int ground_count = 0;
-            CCPoly *next_poly = polys;
+            next_poly = polys;
             *(u_long128 *)box.max = *(u_long128 *)eCurPos;
             *(u_long128 *)box.min = *(u_long128 *)eCurPos;
             *(u_long128 *)new_pos = *(u_long128 *)eCurPos;
@@ -1148,7 +1150,7 @@ void EditMode(CScene *scene) {
             box.min[0] -= 10.0f;
             box.min[1] = -10000.0f;
             box.min[2] -= 10.0f;
-            for (int i = 0; i < map_count; i++) {
+            for (i = 0; i < map_count; i++) {
                 int added = maps[i]->GetColPoly(next_poly, box, poly_rest);
                 ground_count += added;
                 poly_rest -= added;
