@@ -13266,12 +13266,14 @@ int _FUNC_POINT_GET_POS(RS_STACKDATA *stack, int argc) {
     SetStack(stack, pos[2]);
     return 1;
 }
-#ifdef NONMATCHING
+static inline CMap *GetActiveEventMap() {
+    return EventScene->GetMap(EventScene->active_map);
+}
 int _FUNC_POINT_GET_ROT(RS_STACKDATA *stack, int argc) {
     float rot[4];
     CMap *map;
     CFuncPoint *funcPoint;
-    map = EventScene->GetMap(EventScene->active_map);
+    map = GetActiveEventMap();
     if (map == NULL) {
         return 0;
     }
@@ -13319,9 +13321,6 @@ int _FUNC_POINT_GET_ROT(RS_STACKDATA *stack, int argc) {
     }
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/event_func", _FUNC_POINT_GET_ROT__FP12RS_STACKDATAi);
-#endif
 int _ACTCHR_SET_DEF_MOTION(RS_STACKDATA *stack, int argc) {
     int charaNo;
     int motionArg = 0;
