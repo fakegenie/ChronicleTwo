@@ -803,11 +803,11 @@ static void DrawDngRoomInfo(DNGMAP_ROOM_INFO *room) {
             }
         }
         float board_x;
-        float board_y = 92.0f;
         s16 *bottom_tbl = dngboardbrdtbl_1;
         int centre_x = mgScreenWidth >> 1;
-        int alpha = DngInfoDrawAlpha;
+        float board_y = 92.0f;
         board_x = (float)((0x200 - board_w) >> 1);
+        int alpha = DngInfoDrawAlpha;
         int box_alpha = alpha * 7 / 10;
         if (DngInfoRoomInfo != NULL) {
             if (DngInfoRoomInfo->geostone == 0) {
