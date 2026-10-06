@@ -43,7 +43,6 @@ extern "C" mgCDrawPrim *__ct__11mgCDrawPrimFv(mgCDrawPrim *);
 extern int gekirin_anim[16];
 extern "C" const char at_1221__2[];
 
-// Code (.text)
 void CLevelupInfo::SetLevelUpInfo(int screen_x, int screen_y, int source, int value) {
     unk_00 = 0;
     unk_04 = 0;
@@ -64,7 +63,6 @@ void CLevelupInfo::Draw(void) {
     int i;
 
     if (phase != LEVELUP_INFO_PHASE_NONE) {
-
         CPreSprite sprite;
         sprite.Initialize(NULL, NULL);
         sprite.Preset2D();
@@ -471,7 +469,6 @@ void CEnemyLifeGage::Draw(int hide_gekirin) {
         }
     }
 }
-
 
 void CEnemyLifeGage::Step(void) {
     int i;
@@ -915,11 +912,8 @@ void CLockOnModel::Initialize(CScene *scene) {
     name = NULL;
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_hud", gekirin_anim__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_hud", at_1221__2__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_hud", __vt__12CLockOnModel__DATA);

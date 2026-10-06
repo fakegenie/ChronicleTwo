@@ -70,7 +70,6 @@ extern mgCMemory *spi_wmapstack;
 extern short MapEnableNum;
 extern SPI_TAG_PARAM menu_wmap_analyze_tag[];
 
-// Code (.text)
 int _WMAP_POSNUM(SPI_STACK *stack, int) {
     unsigned int bytes;
     unsigned int blocks;
@@ -1616,13 +1615,11 @@ void SphidaScoreViewDraw() {
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/menumap", SphidaScoreViewDraw__Fv);
 #endif
 
-// Static initialiser (.init)
 extern "C" void __sinit_menumap_cpp() {
     WorldMapStack.Init();
     SphidaStack.Init();
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumap", menu_wmap_analyze_tag__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumap", at_1072__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumap", at_1081__3__DATA);
@@ -1631,7 +1628,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumap", geo_table_1183__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumap", at_1342__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumap", at_1383__2__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumap", at_970__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumap", at_971__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumap", at_972__3__DATA);
@@ -1665,16 +1661,12 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumap", at_1677__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumap", at_1937__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumap", at_1938__2__DATA);
 
-// Static initialiser table (.ctor)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumap", D_0037B058__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumap", __vt__13CWorldMapMenu__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumap", at_1343__2__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(spi_wmapstack, 0x4);
 INCLUDE_BSS(spi_wmaparea_tblnum, 0x4);
 INCLUDE_BSS(spi_wmaparea_tbl, 0x4);
@@ -1712,7 +1704,6 @@ INCLUDE_BSS(SfidaMoveInitFlag, 0x8);
 INCLUDE_BSS(at_1764__3, 0x8);
 INCLUDE_BSS(Sfida_NowPlayHorlBlink, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(WorldMapStack, 0x30);
 INCLUDE_BSS(SphidaStack, 0x30);
 INCLUDE_BSS(SphidaMenuTexbk, 0x20);

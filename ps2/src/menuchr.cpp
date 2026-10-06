@@ -57,14 +57,9 @@ static inline CActionChara *NewMenuActionChara(mgCMemory *stack) {
     return chara;
 }
 
-/**
- *
- * Views four worn costume IDs as one quadword.
- *
- */
 union WornCostumes {
-    int id[4]; /**< IDs of the four worn costumes. */
-    u_long128 qw; /**< Combined 128-bit representation. */
+    int id[4];
+    u_long128 qw;
 };
 static inline int stack_free_size(mgCMemory *memory) {
     return memory->stack_size - memory->stack_used;
@@ -135,199 +130,103 @@ struct unkF4_champs_a42004 {
     char pad0[0x18];
       int unk18;
 };
-/**
- *
- * Stores a 64-byte block of monster book data.
- *
- */
+
 struct MonsterBookBlock64 {
-    u_long128 q[4]; /**< Four quadwords of monster book data. */
+    u_long128 q[4];
 };
-/**
- *
- * Stores a 32-byte block of monster book data.
- *
- */
+
 struct MonsterBookBlock32 {
-    u_long128 q[2]; /**< Two quadwords of monster book data. */
+    u_long128 q[2];
 };
-/**
- *
- * Groups the seven memory stacks used by the character menu.
- *
- */
+
 struct MemoryList {
-    mgCMemory *entry[7]; /**< Memory stack for each character slot. */
+    mgCMemory *entry[7];
 };
-/**
- *
- * Groups character instances used by the character menu.
- *
- */
+
 struct SceneCharaList {
-    CActionChara *entry[7]; /**< Character in each scene slot. */
+    CActionChara *entry[7];
 };
-/**
- *
- * Lists the three character targets for loading.
- *
- */
+
 struct LoadTargetList {
-    CActionChara *entry[3]; /**< Character target in each load slot. */
+    CActionChara *entry[3];
 };
-/**
- *
- * Lists the three memory stacks used while loading characters.
- *
- */
+
 struct LoadStackList {
-    mgCMemory *entry[3]; /**< Memory stack in each load slot. */
+    mgCMemory *entry[3];
 };
-/**
- *
- * Stores the path category for each character load.
- *
- */
+
 struct CharaPathKinds {
-    s8 kind[MENU_CHARA_LOAD_MAX]; /**< Path category for each load slot. */
+    s8 kind[MENU_CHARA_LOAD_MAX];
 };
-/**
- *
- * Tracks the character data requested for loading.
- *
- */
+
 struct LoadWantedList {
-    int entry[9]; /**< Requested load entry for each slot. */
+    int entry[9];
 };
-/**
- *
- * Stores the centre of a menu ring.
- *
- */
+
 struct RingCenter {
-    float x; /**< Horizontal centre coordinate. */
-    float y; /**< Vertical centre coordinate. */
+    float x;
+    float y;
 };
-/**
- *
- * Stores texture coordinates for a quadrilateral.
- *
- */
+
 struct QuadTexCoords {
-    float uv[4][2]; /**< Texture coordinates of its four corners. */
+    float uv[4][2];
 };
-/**
- *
- * Stores a four-component camera point.
- *
- */
+
 struct CameraPoint {
-    float xyzw[4]; /**< Camera-space point components. */
+    float xyzw[4];
 };
-/**
- *
- * Lists eight character targets for loading.
- *
- */
+
 struct LoadTargetList8 {
-    CActionChara *entry[8]; /**< Character target in each load slot. */
+    CActionChara *entry[8];
 };
-/**
- *
- * Groups the six robot-part character instances.
- *
- */
+
 struct RoboCharaList {
-    CActionChara *entry[6]; /**< Character instance for each robot part. */
+    CActionChara *entry[6];
 };
-/**
- *
- * Groups the six memory stacks for robot parts.
- *
- */
+
 struct RoboStackList {
-    mgCMemory *entry[6]; /**< Memory stack for each robot part. */
+    mgCMemory *entry[6];
 };
-/**
- *
- * Holds one line of character-menu debug text.
- *
- */
+
 struct DebugLine {
-    char text[0x80]; /**< Debug text line. */
+    char text[0x80];
 };
-/**
- *
- * Holds a character-menu debug text block.
- *
- */
+
 struct DebugText {
-    char text[0x200]; /**< Debug text block. */
+    char text[0x200];
 };
-/**
- *
- * Holds debug text for a non-player character.
- *
- */
+
 struct DebugNpcText {
-    char text[0x100]; /**< Non-player character debug text. */
+    char text[0x100];
 };
-/**
- *
- * Holds a monster name used by the menu.
- *
- */
+
 struct MonsterNameList {
-    char *name[1]; /**< Name of the monster. */
+    char *name[1];
 };
-/**
- *
- * Stores message numbers for menu commands.
- *
- */
+
 struct MenuCommandList {
-    int mes[8]; /**< Message number for each command. */
+    int mes[8];
 };
-/**
- *
- * Stores names shown in the monster menu.
- *
- */
+
 struct MonsterNameTable {
-    char *name[8]; /**< Monster name in each table slot. */
+    char *name[8];
 };
-/**
- *
- * Stores values displayed for badge information.
- *
- */
+
 struct BadgeInfoValues {
-    int value[6]; /**< Badge information values. */
+    int value[6];
 };
-/**
- *
- * Pairs two integer menu values.
- *
- */
+
 struct SmallPair {
-    int v[2]; /**< The two values in the pair. */
+    int v[2];
 };
-/**
- *
- * Holds a file name used while loading menu assets.
- *
- */
+
 struct FileNameBuf {
-    char text[0x40]; /**< Menu asset file name. */
+    char text[0x40];
 };
-/**
- *
- * Pairs two names used by the character menu.
- *
- */
+
 struct NamePair {
-    char *a; /**< First name in the pair. */
-    char *b; /**< Second name in the pair. */
+    char *a;
+    char *b;
 };
 extern "C" char at_2940[];
 extern "C" char at_2941[];
@@ -492,29 +391,17 @@ extern short MenuDebugChangeSelectMode;
 extern short MenuDebugCharaChangeSelect;
 extern s8 menu_debug_npc_decide;
 extern s8 menu_debug_npcselect;
-/**
- *
- * Holds the selected non-player character name.
- *
- */
+
 struct NpcNameList {
-    char *entry[1]; /**< Name of the selected non-player character. */
+    char *entry[1];
 };
-/**
- *
- * Stores message numbers for non-player character commands.
- *
- */
+
 struct NpcCmdMesList {
-    int entry[2]; /**< Message number for each command. */
+    int entry[2];
 };
-/**
- *
- * Stores sound volumes for gift actions.
- *
- */
+
 struct GiftVolumeList {
-    int entry[8]; /**< Sound volume for each gift action. */
+    int entry[8];
 };
 extern s8 SelectedCmdNo_1415;
 extern s8 init_1416;
@@ -636,14 +523,10 @@ extern "C" char at_2915[];
 extern "C" char at_2916[];
 extern "C" char at_2917[];
 extern "C" char at_2918[];
-/**
- *
- * Views a four-component menu position as one quadword.
- *
- */
+
 union MenuPositionVector {
-    float f[4]; /**< Four components of the menu position. */
-    u_long128 qw; /**< Combined 128-bit representation. */
+    float f[4];
+    u_long128 qw;
 };
 extern "C" MenuPositionVector at_1372__2;
 extern "C" char at_1402__3[];
@@ -677,7 +560,6 @@ extern u16 menu_robo_memorytbl[MENU_CHARA_LOAD_MAX];
 extern char at_1078__2[];
 int ReadBGSync(void);
 
-// Code (.text)
 void InitMenuBGReadInfo2(MENU_BGREAD_INFO2 *info) {
     info->reading = 0;
     info->chara = NULL;
@@ -5419,7 +5301,6 @@ int MenuNPCModelLoad(mgCMemory *memory, int charaNo, int background) {
 int MenuNPCLoadCheck(CActionChara *chara, mgCMemory *memory, int texBlock) {
     if (MenuNPCLoadFlag == 1) {
         if (chara != NULL) {
-
             u8 *texManager = (u8 *)&mgTexManager;
             memory->stack_used = 0;
             memory->lock = 0;
@@ -6582,7 +6463,6 @@ extern "C" void Set__9mgRect_s_Fssss(mgRect<short> *rect, short x, short y, shor
     rect->bottom = h;
 }
 
-// Static initialiser (.init)
 extern mgCMemory MenuMosBuildStack;
 extern "C" void *__construct_array(void *array, void *(*constructor)(void *),
                                     void *destructor, unsigned int size, unsigned int count);
@@ -6600,7 +6480,6 @@ extern "C" void __sinit_menuchr_cpp() {
     MosBookStack.Init();
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuchr", monster_progress_tbl__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuchr", tbl_992__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuchr", menu_robo_memorytbl__DATA);
@@ -6647,7 +6526,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuchr", line_5595__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuchr", wakutbl_5600__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuchr", tbl_5848__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuchr", at_1078__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuchr", at_1104__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuchr", at_1131__3__DATA);
@@ -6946,16 +6824,13 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuchr", at_5561__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuchr", at_5839__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuchr", at_5893__DATA);
 
-// Static initialiser table (.ctor)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuchr", D_0037B05C__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuchr", __vt__12CMosBookMenu__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuchr", __vt__15CMenuCostumeSel__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuchr", __vt__14CMenuMosSelect__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuchr", __vt__15CMenuChrCngMenu__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuchr", MenuSoundCharaNo__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuchr", msgtbl1_1732__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuchr", se_sndtbl_1749__DATA);
@@ -6976,7 +6851,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuchr", phasetbl_5119__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuchr", tilergba_5203__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuchr", convtbl_5238__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(MorattaStack, 0x4);
 INCLUDE_BSS(MenuLoadInfo, 0x8);
 INCLUDE_BSS(MenuCharaChangeBase_Tex, 0x4);
@@ -7026,7 +6900,6 @@ INCLUDE_BSS(Tex_MBg, 0x4);
 INCLUDE_BSS(MonsterBookBootMode, 0x4);
 INCLUDE_BSS(MenuMosBookPtr, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(MenuCharaBuild2, 0x1C);
 INCLUDE_BSS(D_01F3C7FC, 0x4);
 INCLUDE_BSS(MenuActionChara, 0x20);

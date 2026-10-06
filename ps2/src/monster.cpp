@@ -75,7 +75,6 @@ int CheckGiftPack(CActiveMonster *monster, CColPrim *prim);
 int _MONSTER_NAME(SPI_STACK *stack, int argument_count);
 void LoadMonsterLanguage(int language);
 
-// Code (.text)
 int CActiveMonster::IsDraw(int view_state) {
     if (chara_kind != 2)
         return 0;
@@ -152,7 +151,6 @@ int CActiveMonster::CheckView(int rank_limit) {
         return view_state;
     }
     if (view_state == MONSTER_VIEW_IN) {
-
         if (!(target_dist <= 30.0f + clip_dist) || rank >= rank_limit) {
             view_state = MONSTER_VIEW_FADE_OUT;
         }
@@ -344,9 +342,6 @@ float CMonsterMan::IsBattleStyleDist() {
     }
     return nearest;
 }
-
-
-
 
 #ifdef NONMATCHING
 int CMonsterMan::CheckMonsterTolk(float *pos) {
@@ -752,7 +747,6 @@ void CMonsterMan::DrawLifeGage(int view, int mode) {
             pos[1] += active[i]->body_height;
             monster = active[i];
             if (monster->tbl->boss == 0) {
-
                 s8 boss = monster->tbl->boss;
                 monster->life_gage.Set(pos, monster->max_life, monster->life,
                                       fptosi(0.9f + monster->gekirin), (s8)boss);
@@ -2139,10 +2133,6 @@ int CMonsterMan::CheckPhoto(CScene::InScreenCharaInfo *info) {
     return -1;
 }
 
-
-
-
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/monster", base_monster_define__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/monster", dung_progtxt_notlift_mons__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/monster", at_1707__DATA);
@@ -2159,7 +2149,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/monster", at_2294__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/monster", at_2699__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/monster", mos_data_anlyze_tag__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/monster", at_1200__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/monster", at_1201__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/monster", at_1202__DATA);
@@ -2188,12 +2177,9 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/monster", at_2589__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/monster", at_2802__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/monster", at_2809__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/monster", __vt__14CActiveMonster__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(dmg_sc_cnt_2104, 0x4);
 INCLUDE_BSS(init_2105, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(at_1704, 0x10);

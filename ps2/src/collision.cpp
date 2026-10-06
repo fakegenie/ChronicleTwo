@@ -13,8 +13,6 @@
 #include "mg_math.hpp"
 #include "mg_memory.hpp"
 
-
-// Code (.text)
 int CCollision::InsidePoint(float *point) {
     return mgClipBoxVertex(point, bbox.max, bbox.min) != 0;
 }
@@ -183,17 +181,9 @@ int CColFrame::InsidePoint(float *point) {
     return collision->InsidePoint(local_point);
 }
 
-/**
- * Loads a matrix into the vector unit's registers vf10-vf13 for the
- * transforms trance_normal makes.
- */
 #pragma force_active on
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/collision", pre_trance_normal__FPA4_f);
 
-/**
- * Transforms a triangle's corners in place by the matrix pre_trance_normal
- * loaded, and writes the unnormalised normal of the transformed triangle.
- */
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/collision", trance_normal__FPfPfPfPf);
 
 #pragma force_active reset
@@ -391,7 +381,6 @@ CCollisionMDT *CreateCollisionMDT(u_int *model, mgCMemory *memory) {
     prim_num = faces->prim_num;
     first_prim = (FACES_ID *)(faces + 1);
 
-    // Count the triangles, refusing primitive kinds that are not plain triangle lists.
     poly_count = 0;
     int *words = (int *)first_prim;
     for (i = 0; i < prim_num; i++) {
@@ -451,24 +440,16 @@ CCollisionMDT *CreateCollisionMDT(u_int *model, mgCMemory *memory) {
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/collision", CreateCollisionMDT__FPUiP9mgCMemory);
 #endif
 
-// Defined in collision.hpp.
-// Defined in collision.hpp.
-// Defined in collision.hpp.
 void CCollisionMDT::Initialize() {
     CCollision::Initialize();
     poly = 0;
     poly_count = 0;
 }
 
-// Defined in collision.hpp.
 void CCollision::Copy(CCollision &dest, mgCMemory *memory) {
     dest.bbox = bbox;
 }
 
-// Defined in collision.hpp.
-// Defined in collision.hpp.
-// Defined in collision.hpp.
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/collision", __vt__9CColFrame__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/collision", __vt__13CCollisionMDT__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/collision", __vt__10CCollision__DATA);

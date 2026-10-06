@@ -57,13 +57,9 @@ extern int stepMainExitFlag;
 extern VoBuf voBuf;
 extern AudioDec audioDec;
 extern u8 _0_buf[2048];
-/**
- *
- * Memory pools used by movie playback.
- *
- */
+
 struct MoviePools {
-    mgCMemory *pool[6]; /**< Movie playback pools. */
+    mgCMemory *pool[6];
 };
 extern MoviePools at_344;
 extern MoviePools at_349;
@@ -97,7 +93,6 @@ extern char at_1109[];
 extern char at_1110__2[];
 extern char at_1270__3[];
 
-// Code (.text)
 static inline void *DmaAddr(void *addr) {
     return (void *)((u32)addr & 0xFFFFFFF);
 }
@@ -1417,11 +1412,9 @@ int isAudioOK(void) {
     return isWithAudio != 0 ? audioDecIsPreset(&audioDec) : 1;
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/movie", at_1276__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/movie", at_1287__2__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/movie", at_318__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/movie", at_319__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/movie", at_320__DATA);
@@ -1445,10 +1438,8 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/movie", at_1109__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/movie", at_1110__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/movie", at_1270__3__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/movie", at_468__2__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(frd, 0x4);
 INCLUDE_BSS(TexName, 0x4);
 INCLUDE_BSS(readBuf, 0x4);
@@ -1468,7 +1459,6 @@ INCLUDE_BSS(stepMainExitFlag, 0x4);
 INCLUDE_BSS(cnt_513, 0x4);
 INCLUDE_BSS(init_514, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(videoDec, 0xC0);
 INCLUDE_BSS(audioDec, 0x60);
 INCLUDE_BSS(voBuf, 0x20);

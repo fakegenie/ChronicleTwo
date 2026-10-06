@@ -38,7 +38,6 @@ extern EditAnalyzeDataSrc *eaAnaData;
 extern mgCMemory *eaStack;
 extern "C" int stSetBuffer__9mgCMemoryFP1i(void *memory, void *buffer, int blocks);
 
-// Code (.text)
 void EditAnalyzeDataSrc::Init(void) {
     message = NULL;
     percent = 0;
@@ -857,10 +856,9 @@ int GetMaxDrawMem(int map_no) {
 EditAnalyzeSrc::EditAnalyzeSrc() {
     Init();
 }
-// Initialised data (.data)
+
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editdata", tag__6__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editdata", at_713__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editdata", at_714__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editdata", at_917__3__DATA);
@@ -877,14 +875,10 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editdata", at_1296__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editdata", at_1297__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editdata", at_1298__3__DATA);
 
-// Static initialiser table (.ctor)
-
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(init_1273, 0x4);
 INCLUDE_BSS(eaAnaSrc, 0x4);
 INCLUDE_BSS(eaAnaData, 0x4);
 INCLUDE_BSS(eaStack, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(buff_1271, 0x3000);
 INCLUDE_BSS(Stack_1272, 0x30);

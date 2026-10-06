@@ -117,7 +117,6 @@ int menu_dtype_init(CMenuPosDataForm *form, SPI_STACK *stack, int argc);
 extern "C" MENU_FORM_ACTION
     *menu_spi_form_action_info;
 
-
 int CompGameData(int itemA, int itemB);
 
 int SeitonItemBoardSub(CGameDataUsed *items, int count);
@@ -300,7 +299,7 @@ static inline unsigned int align16_blocks(unsigned int n) {
 #include "common.h"
 
 #pragma divbyzerocheck on
-// Code (.text)
+
 int GetRandI(int range) {
     return rand() % range;
 }
@@ -864,7 +863,6 @@ int _MENU_ETCINFO(SPI_STACK *stack, int arg_count) {
     entry = MenuPosData->etc_tbl + index;
     name = spiGetStackString(stack++);
     if (entry->name != NULL) {
-
         for (i = 0; i < index; i++) {
             if (strcmp(entry->name, name) == 0) {
                 return 1;
@@ -1148,7 +1146,6 @@ int menu_spi_analyze_func_strcut1(MENU_SPI_ANALYZE_STRUCT1 *table, char *name) {
             break;
         }
         if (strcmp(entry_name, name) == 0) {
-
             return ((MENU_SPI_ANALYZE_STRUCT1 *)((i << 3) + (int)table))->value;
         }
         i++;
@@ -2184,7 +2181,6 @@ void MenuCommandAnalyze(char *script, int size, char *command_name) {
     }
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucommon", sort_table__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucommon", langdirpathTable_1161__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucommon", mes_cord_conv_1193__DATA);
@@ -2201,7 +2197,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucommon", tbl_2422__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucommon", tbl_2516__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucommon", menu_execommand_analyze_tag__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucommon", at_1162__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucommon", at_1163__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucommon", at_1164__DATA);
@@ -2372,11 +2367,9 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucommon", at_2565__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucommon", at_2566__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucommon", at_2567__2__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucommon", sort_top_type__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucommon", at_2092__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(MenuSePlayUsedFlag, 0x4);
 INCLUDE_BSS(SndPortVol_Ob, 0x4);
 INCLUDE_BSS(SndPortVol_Base, 0x4);
@@ -2398,6 +2391,5 @@ INCLUDE_BSS(menu_form_partsno, 0x4);
 INCLUDE_BSS(menu_spi_form_action_info, 0x4);
 INCLUDE_BSS(SpiMenuExeCommandFlag, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(MenuSpiTextureName, 0x20);
 INCLUDE_BSS(MenuCommandAnalyzeInfo, 0x70);

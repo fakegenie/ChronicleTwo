@@ -36,13 +36,8 @@
 #include <cstdlib>
 #include "vtables.hpp"
 
-/**
- *
- * Four floating point components copied as one fishing vector.
- *
- */
 struct Vec4 {
-    float v[4]; /**< Vector components. */
+    float v[4];
 };
 extern FISHING_ROD_DATA RodData;
 extern FISH_DATA FishData;
@@ -301,10 +296,8 @@ static inline u_char *FreeTop(mgCMemory *memory) {
     return (u_char *)(memory->stack + memory->stack_used);
 }
 
-
 extern "C" void __ct__11mgCDrawPrimFv(mgCDrawPrim *prim);
 
-// Code (.text)
 FISH_PARAM *GetFishParam(int index) {
     if (index < 0 || index > kLastFishParam) {
         return NULL;
@@ -985,7 +978,6 @@ int sgDrawFishing(SubGameInfo *info) {
     return 0;
 }
 void DrawNumber(mgCDrawPrim *prim, int digit, int x, int y) {
-
     int tex_u = 0;
     tex_u += digit * 12;
     prim->TextureCrd(tex_u, 0x72);
@@ -2990,7 +2982,6 @@ void LoadFishPlaceData(char *script, int size, mgCMemory *stack) {
     interpreter.Run();
 }
 
-// Static initialiser (.init)
 extern "C" void __sinit_fishing_cpp() {
     EsaStack.Init();
     SndStack.Init();
@@ -3002,7 +2993,6 @@ extern "C" void __sinit_fishing_cpp() {
     FishStack.Init();
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/fishing", lure_file__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/fishing", EsaInfo__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/fishing", FishParam__DATA);
@@ -3014,7 +3004,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/fishing", at_1536__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/fishing", at_1631__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/fishing", tag__8__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/fishing", at_832__6__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/fishing", at_833__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/fishing", at_834__4__DATA);
@@ -3109,13 +3098,10 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/fishing", at_2672__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/fishing", at_2673__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/fishing", at_2674__2__DATA);
 
-// Static initialiser table (.ctor)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/fishing", D_0037B074__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/fishing", at_1444__3__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(EffectMan, 0x4);
 INCLUDE_BSS(FishSnd, 0x4);
 INCLUDE_BSS(FanSnd, 0x4);
@@ -3216,7 +3202,6 @@ INCLUDE_BSS(fpStack, 0x4);
 INCLUDE_BSS(fpNowFishPlaceMap, 0x4);
 INCLUDE_BSS(fpNowFishPlaceMapNum, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(EsaStack, 0x30);
 INCLUDE_BSS(SndStack, 0x30);
 INCLUDE_BSS(CameraInfo, 0x1F0);

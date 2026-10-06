@@ -55,29 +55,20 @@ extern char at_978__4[];
 extern s8 diff_conditiontable_1102[2][7];
 extern u16 check_bittable_1123[3][6];
 extern u16 cbit_1158[4][5];
-/**
- *
- * Room option entries used by the dungeon floor script.
- *
- */
+
 struct RoomOptions {
-    MENU_SPI_ANALYZE_STRUCT1 entries[5]; /**< Room option entries. */
+    MENU_SPI_ANALYZE_STRUCT1 entries[5];
 };
-/**
- *
- * Room direction values viewed as integers or quadwords.
- *
- */
+
 union RoomDirections {
-    int v[4][3]; /**< Direction values. */
-    u_long128 q[3]; /**< The same values as quadwords. */
+    int v[4][3];
+    u_long128 q[3];
 };
 extern RoomOptions at_886__4;
 extern RoomDirections at_1395__4;
 extern SPI_TAG_PARAM tree_map_tag[];
 extern int D_0036178C[];
 
-// Code (.text)
 void CDngFloorManager::Initialize(void) {
     dng_no = 0;
     glid_info = NULL;
@@ -469,7 +460,6 @@ int CDngFloorManager::IsClearPractice(int difficulty) {
                     if ((mask & 0x1) || (mask & 0x20) || (mask & 0x40)) {
                         found = 1;
                     } else {
-
                         r = info->practice_param - 1;
                         for (m = 0; m < 5; m++) {
                             if (mask & cbit_1158[r][m]) {
@@ -879,7 +869,6 @@ int CheckFishingRecord(float size) {
     return 0;
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngfloor", at_886__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngfloor", D_0036178C__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngfloor", offsetTable_911__DATA);
@@ -893,7 +882,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngfloor", search_tbl_1370__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngfloor", search_tbl_1372__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngfloor", at_1395__4__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngfloor", at_882__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngfloor", at_883__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngfloor", at_884__4__DATA);
@@ -916,11 +904,9 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngfloor", at_1200__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngfloor", at_1468__6__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngfloor", at_1469__5__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngfloor", at_938__5__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngfloor", fl_t_1467__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(tree_dngmap, 0x4);
 INCLUDE_BSS(tree_glid_info, 0x4);
 INCLUDE_BSS(tree_spi_stack, 0x4);

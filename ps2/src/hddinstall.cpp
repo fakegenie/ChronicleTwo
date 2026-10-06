@@ -1,7 +1,6 @@
 #include "common.h"
 #include "hddinstall.hpp"
 
-// Code (.text)
 int HddConectCheck(int *state) { return 0; }
 
 int CheckAppInstall() { return 0; }

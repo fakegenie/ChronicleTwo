@@ -20,8 +20,6 @@ static inline char *VaStart(char *stack_arguments, int named_arguments) {
     return stack_arguments - register_bytes;
 }
 
-
-// Code (.text)
 unsigned long SjisToJis(unsigned long sjis) {
     unsigned long hi = (sjis >> 8) & 0xFF;
     unsigned long lo = sjis & 0xFF;
@@ -374,10 +372,8 @@ void dbgCJISFont::PrintDirect(int start_x, int start_y, char *format, ...) {
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/dbg_font", PrintDirect__11dbgCJISFontFiiPce);
 #endif
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dbg_font", at_288__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dbg_font", at_419__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dbg_font", at_420__DATA);
 
-// Uninitialised data (.bss)
 dbgCJISFont JisFont __attribute__((aligned(16)));

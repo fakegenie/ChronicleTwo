@@ -94,7 +94,6 @@ extern CWeaponElement wep_effect[8];
 #include "sysmes.hpp"
 #include "wavetable.hpp"
 
-// Small uninitialised data (.sbss)
 mgCMemory            *MainBuffer;
 u_long128            *BuffReadData;
 static int            debag_param;
@@ -148,7 +147,6 @@ extern int debug_mons_no;
 extern int debug_mons_cur;
 extern int debug_mons_num;
 
-// Uninitialised data (.bss)
 mgCMemory              BuffPaketList[2];
 mgCMemory              BuffPaketData[2];
 mgCMemory              BuffStageMain;
@@ -212,7 +210,6 @@ INCLUDE_BSS(at_1994, 0x10);
 INCLUDE_BSS(at_2001, 0x10);
 INCLUDE_BSS(chk_pos_2870, 0x10);
 
-// Code (.text)
 CWeaponElement *GetWeaponEffect() {
     CWeaponElement *effect = &wep_effect[wep_effect_cnt++];
 
@@ -1655,13 +1652,9 @@ void DngStep() {
         if (BTsuboCol->hit_num) {
             sceVu0FVECTOR hit;
             sceVu0FVECTOR velo;
-            /**
-             *
-             * Four components copied into the hit position.
-             *
-             */
+
             struct VEC4 {
-                float v[4]; /**< Vector components. */
+                float v[4];
             };
             *(VEC4 *) hit = *(VEC4 *) BTsuboCol->hit_vec;
             velo[0] = 0.0f;
@@ -2859,11 +2852,9 @@ void DBGCMD_RunScript(int no) {
     }
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_main", cam_table_3000__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_main", cam_table_dist_3001__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_main", at_1063__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_main", at_1064__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_main", at_1065__2__DATA);
@@ -2886,11 +2877,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_main", at_1940__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_main", at_3589__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_main", at_3602__DATA);
 
-// Virtual tables (.vtables)
-
-// Small initialised data (.sdata)
-
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(init_1107, 0x4);
 INCLUDE_BSS(init_1824, 0x4);
 INCLUDE_BSS(water_cnt_2619, 0x4);

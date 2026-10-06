@@ -12,7 +12,6 @@
 
 #include <cmath>
 
-// Code (.text)
 void mgCCamera::Step(int frames) {
     mgCCamera *self = this;
     float dir[4];
@@ -365,13 +364,7 @@ mgCCameraFollow::mgCCameraFollow(float distance, float height, float angle, floa
     mgZeroVector(follow_offset);
 }
 
-    // Defined in mg_camera.hpp.
-    // Defined in mg_camera.hpp.
-    // Defined in mg_camera.hpp.
-    // Defined in mg_camera.hpp.
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_camera", __vt__15mgCCameraFollow__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_camera", __vt__9mgCCamera__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(StopCamera__9mgCCamera, 0x4);

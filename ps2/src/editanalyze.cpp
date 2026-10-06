@@ -18,19 +18,14 @@ const int parts_list_max = 0x200;
 
 extern float at_964__4[4];
 extern float at_1297__4[4];
-/**
- *
- * Four house information identifiers stored as a quadword.
- *
- */
+
 union HouseInfoIds {
-    int id[4]; /**< House information identifiers. */
-    u_long128 qw; /**< The same identifiers as one quadword. */
+    int id[4];
+    u_long128 qw;
 };
 
 extern "C" HouseInfoIds at_913__6;
 
-// Code (.text)
 void AnalyzeEditMap(int chara_no, CEditMap *map) {
     CEditData *data;
 
@@ -336,7 +331,6 @@ void AnalyzeBenietio(CEditData *data, CEditMap *map) {
                         }
                     }
                     if (slot == 3) {
-
                         CEditHouse *extra = parts->house;
                         if (extra == NULL) {
                             continue;
@@ -743,14 +737,11 @@ void EditMapInitEvent(int map_no, CEditMap *edit_map) {
     }
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editanalyze", at_913__6__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editanalyze", at_964__4__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editanalyze", at_1618__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editanalyze", at_1632__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editanalyze", at_1633__3__DATA);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(at_1297__4, 0x10);

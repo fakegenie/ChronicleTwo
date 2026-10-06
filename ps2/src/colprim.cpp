@@ -13,7 +13,6 @@
 #include "scenesnd.hpp"
 #include <cstring>
 
-// Code (.text)
 int CColPrim::SetDamage(char *name, int owner_id) {
     int index = 0;
     DAMAGE_PARAM *param = Damage_Param_Table;
@@ -306,5 +305,4 @@ void CColPrimMan::Initialize(CScene *new_scene) {
     for (int i = 0; i < COLPRIM_MAX; ++i) { prim[i].Initialize(); prim[i].id = i; }
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/colprim", Damage_Param_Table__DATA);

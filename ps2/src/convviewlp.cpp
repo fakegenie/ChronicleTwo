@@ -42,7 +42,6 @@ extern mgCMemory Stack_ReadBuff__3;
 
 static void InitSaveFileInfoTablePtr();
 
-// Code (.text)
 void SVConvViewInit(INIT_LOOP_ARG arg) {
     MovieScene__2 = GetMainScene();
     MovieScene__2->Initialize();
@@ -345,18 +344,15 @@ int SaveDataConvertLoop() {
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/convviewlp", SaveDataConvertLoop__Fv);
 #endif
 
-// Static initialiser (.init)
 extern "C" void __sinit_convviewlp_cpp() {
     DataBuffer__3.Init();
     Stack_ReadBuff__3.Init();
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/convviewlp", at_1072__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/convviewlp", at_1073__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/convviewlp", at_1074__5__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/convviewlp", at_1016__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/convviewlp", at_1017__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/convviewlp", at_1018__7__DATA);
@@ -385,10 +381,8 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/convviewlp", at_1167__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/convviewlp", at_1168__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/convviewlp", at_1169__DATA);
 
-// Static initialiser table (.ctor)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/convviewlp", D_0037B0A0__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(MovieScene__2, 0x4);
 INCLUDE_BSS(ConvMode, 0x4);
 INCLUDE_BSS(SlotSelect, 0x4);
@@ -404,7 +398,6 @@ INCLUDE_BSS(init_820, 0x4);
 INCLUDE_BSS(init_823, 0x4);
 INCLUDE_BSS(init_826, 0x1);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(DataBuffer__3, 0x30);
 INCLUDE_BSS(Stack_ReadBuff__3, 0x30);
 INCLUDE_BSS(SaveFileInfoTableSizeConvert, 0x200);

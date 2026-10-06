@@ -4,7 +4,6 @@
 #include "editparts.hpp"
 #include "mdslist.hpp"
 
-
 const int kPartsInfoWallValueOffset = 0x1A4;
 const int kFenceEndAOffset = 0xA0;
 const int kFenceEndBOffset = 0xB0;
@@ -14,18 +13,12 @@ const int kTerritoryRadiusOffset = 0x270;
 const int kTerritoryHeightOffset = 0x274;
 const int kNoTerritoryFlags = 0xAC2;
 
-/**
- *
- * Edit part position viewed as four floats or a quadword.
- *
- */
 union EditPartsPosition {
-    float f[4]; /**< Position components. */
-    u_long128 qw; /**< The same position as one quadword. */
+    float f[4];
+    u_long128 qw;
 };
 extern EditPartsPosition at_418;
 
-// Code (.text)
 void CEditPartsInfo::Initialize() {
     id = -999;
     attr = 0;
@@ -369,8 +362,6 @@ int EditPartsCmpColor(float *a, float *b) {
     return 0;
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editparts", at_418__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editparts", __vt__10CEditParts__DATA);

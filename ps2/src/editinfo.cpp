@@ -10,16 +10,12 @@
 
 extern CEditPartsInfo *emapNowInfo__2;
 extern mgCMemory *emapStack__2;
-/**
- *
- * Rectangle of the edit map with its part type and endpoint positions.
- *
- */
+
 struct EditMapRect {
-    int type; /**< Part type assigned to the rectangle. */
+    int type;
     int unk_04[3];
-    float start[4]; /**< First endpoint. */
-    float end[4];   /**< Second endpoint. */
+    float start[4];
+    float end[4];
 };
 
 extern EditMapRect *emapRect__2;
@@ -46,7 +42,6 @@ static inline u32 align16_blocks(u32 n) {
     return n >> 4;
 }
 
-// Code (.text)
 void CEditInfoMngr::Initialize(void) {
     parts_info_num = 0;
     parts_info = NULL;
@@ -415,10 +410,8 @@ CFuncPoint *CEditMap::GetEvent(float *position, int check_type, MapEventInfo *in
     return NULL;
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editinfo", emap_tag__2__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editinfo", at_368__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editinfo", at_369__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editinfo", at_370__3__DATA);
@@ -449,7 +442,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editinfo", at_394__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editinfo", at_395__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editinfo", at_396__2__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(emapInfo__2, 0x4);
 INCLUDE_BSS(emapStack__2, 0x4);
 INCLUDE_BSS(emapIdx__2, 0x4);

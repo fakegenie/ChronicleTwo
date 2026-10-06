@@ -28,7 +28,6 @@ static int _SKY_ANIME(SPI_STACK *stack, int argument_count);
 static int _SKYB_ANIME(SPI_STACK *stack, int argument_count);
 static void LoadSkyPack(MAP_SKY_INFO *info, char *script, int size);
 
-// Code (.text)
 void CMapSky::Initialize(void) {
     for (int band = 0; band < 4; band++) {
         sky[band] = NULL;
@@ -272,11 +271,6 @@ static void LoadSkyPack(MAP_SKY_INFO *info, char *script, int size) {
     interpreter.Run();
 }
 
-/**
- *
- * Checks whether a sky time band index is in range.
- *
- */
 static s32 CheckSkyID(s32 sky_id) {
     s32 valid;
     if (sky_id < 0 || sky_id >= 4) valid = 0; else valid = 1;
@@ -364,11 +358,9 @@ static int _SKYB_ANIME(SPI_STACK *stack, int argument_count) {
     return 1;
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapsky", at_387__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapsky", tag__2__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapsky", at_386__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapsky", at_457__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapsky", at_462__DATA);
@@ -379,7 +371,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapsky", at_466__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapsky", at_467__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapsky", at_468__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(skyInfo, 0x4);
 INCLUDE_BSS(skyAnmNum, 0x4);
 INCLUDE_BSS(skybAnmNum, 0x4);

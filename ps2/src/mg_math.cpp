@@ -6,11 +6,9 @@
 #include <cmath>
 #include <cstdlib>
 
-
 int Check_Point_Poly3(float x, float y, float x0, float y0, float x1, float y1, float x2, float y2);
 static void MulMatrix3(float (*matrix)[4], float (*second)[4], float (*third)[4]);
 
-// Code (.text)
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgFotI4__FPiPf);
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgCreateBox8__FPA4_fPfPf);
 void mgZeroVector(float *vector) {
@@ -96,7 +94,6 @@ int mgIntersectionSphereLine0(float radius, float *from, float *to, float (*hits
     float t2;
     int           count;
 
-    // Solves |from + line * t|^2 = radius^2 for t within the segment.
     sceVu0SubVector(delta, to, from);
     a = mgDistVector2(delta);
     b = sceVu0InnerProduct(delta, from);
@@ -114,7 +111,7 @@ int mgIntersectionSphereLine0(float radius, float *from, float *to, float (*hits
         sceVu0AddVector(hits[0], from, scaled);
         count++;
     }
-    // A grazing line touches the sphere once.
+
     if (discriminant == 0.0f) {
         return 1;
     }
@@ -208,9 +205,7 @@ int mgCheckPointPoly3_XYZ(float *point, float *v0, float *v1, float *v2, float *
 int mgCheckPointPoly3_XZ(float *point, float *v0, float *v1, float *v2) {
     return Check_Point_Poly3(point[0], point[2], v0[0], v0[2], v1[0], v1[2], v2[0], v2[2]);
 }
-/**
- * Returns where a 2D point lies relative to a 2D triangle, as an mgPointPoly3Result.
- */
+
 int Check_Point_Poly3(float x, float y, float x0, float y0, float x1, float y1, float x2, float y2) {
     float edge_20;
     float edge_12;
@@ -270,9 +265,7 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgDistVector2__FPfPf);
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgDistVectorXZ2__FPfPf);
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgUnitMatrix__FPA4_f);
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgZeroMatrix__FPA4_f);
-/**
- * Multiplies a matrix in place by two further matrices.
- */
+
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", MulMatrix3__FPA4_fPA4_fPA4_f);
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgMulMatrix__FPA4_fPA4_fPA4_f);
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgInversMatrix__FPA4_fPA4_f);
@@ -368,7 +361,7 @@ void mgShadowMatrix(float (*matrix)[4], float *light_direction, float *on_plane,
     sceVu0CopyVector(plane_point, on_plane);
     sceVu0CopyVector(normal_copy, plane_normal);
     dot = sceVu0InnerProduct(normal_copy, plane_point);
-    // A plane through the origin cannot be scaled to n.x = 1, so it is moved slightly first.
+
     if (dot == 0.0f) {
         plane_point[0] -= 0.1f * normal_copy[0];
         plane_point[1] -= 0.1f * normal_copy[1];
@@ -492,7 +485,6 @@ float mgAngleInterpolate(float from, float to, float step, int mode) {
     float offset;
     float result;
 
-    // Angles are kept in (-pi, pi]; one whole turn brings a sum or difference back into range.
     delta = to - from;
 
     if (delta > 3.1415927f) {
@@ -593,7 +585,6 @@ float mgRnd() {
     return (float) rand() / 2147483648.0f;
 }
 float mgNRnd() {
-    // The sum of twelve uniform samples has unit variance about six.
     return mgRnd() + mgRnd() + mgRnd() + mgRnd() + mgRnd() + mgRnd() + mgRnd() + mgRnd() + mgRnd() + mgRnd() + mgRnd() + mgRnd() - 6.0f;
 }
 void mgCreateSinTable() {
@@ -617,9 +608,7 @@ float mgCosf(float angle) {
     return mgSinf(1.5707964f + angle);
 }
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_math", sin_table_num__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_math", sin_table_unit_1__DATA);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(SinTable, 0x1000);

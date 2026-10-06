@@ -29,15 +29,10 @@
 #undef sceVu0ApplyMatrix
 extern "C" void sceVu0ApplyMatrix(float *, float *, float *);
 
-/**
- *
- * Race vector viewed as floats, integers or a quadword.
- *
- */
 union RaceVector {
-    float f[4]; /**< Floating point components. */
-    int v[4];   /**< Integer components. */
-    u_long128 q; /**< The same components as a quadword. */
+    float f[4];
+    int v[4];
+    u_long128 q;
 };
 extern RaceVector at_1765__2;
 extern RaceVector at_1766__3;
@@ -47,15 +42,11 @@ extern float ras_off_1762;
 extern signed char init_1763;
 
 struct CHitEffectImage;
-/**
- *
- * Texture flags stored in a race frame's image data.
- *
- */
+
 struct RaceFrameTexture {
     u_char pad_00[0x3C];
     u_char low : 2;
-    u_char swizzled : 1; /**< Whether indexed pixels use swizzled page order. */
+    u_char swizzled : 1;
     u_char high : 5;
     u_char pad_3D[0x33];
 };
@@ -134,7 +125,6 @@ GYORACE_FISH_INF fish_inf[6];
 static int old_cam_no = -1;
 #endif
 
-// Code (.text)
 #ifdef NONMATCHING
 int sgInitGyoRace(SubGameInfo *info) {
     extern short *GetSystemMesBuffer();
@@ -1391,10 +1381,6 @@ int Jikkyou(SubGameInfo *info) {
     return 0;
 }
 
-// Static initialiser (.init)
-
-
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gyorace", fish_name__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gyorace", cam_pos__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gyorace", at_1027__4__DATA);
@@ -1405,7 +1391,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gyorace", at_1547__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gyorace", at_1548__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gyorace", at_1766__3__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gyorace", at_903__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gyorace", at_904__6__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gyorace", at_905__6__DATA);
@@ -1445,13 +1430,8 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gyorace", at_1701__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gyorace", at_1702__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gyorace", at_1703__DATA);
 
-// Static initialiser table (.ctor)
-
-
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gyorace", old_cam_no__DATA);
 
-// Small uninitialised data (.sbss)
 #ifndef NONMATCHING
 INCLUDE_BSS(gyore_snd_id, 0x4);
 INCLUDE_BSS(race_cnt, 0x4);
@@ -1482,7 +1462,6 @@ INCLUDE_BSS(EffectTexb, 0x4);
 INCLUDE_BSS(ras_off_1762, 0x4);
 INCLUDE_BSS(init_1763, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(fish_game_data, 0xE0);
 INCLUDE_BSS(RaceInfo, 0x1E0);
 INCLUDE_BSS(old_prog, 0x90);

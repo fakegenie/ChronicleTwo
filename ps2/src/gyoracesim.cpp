@@ -2,7 +2,6 @@
 #include "gyoracesim.hpp"
 #include <cstring>
 
-
 struct RaceProgressCopy { float pos; int lane; float lane_pos; s8 state; s8 battle; int detail[2]; };
 
 struct FISH_STATS {
@@ -44,7 +43,6 @@ void LaneBattleStep(RACE_FISH_PARAM *fish, int count);
 grFISH_DATA *GetFishData(int fish_no);
 static float nrnd();
 
-// Code (.text)
 int grGyoRaceSimulate(grRACE_INFO *race) {
     RACE_FISH_PARAM fish[6];
     u_int hash = 0;
@@ -728,17 +726,12 @@ int rand_prob(int percent) {
     return ((irnd() >> 12) % 100) < percent;
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gyoracesim", fish_data__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gyoracesim", at_1059__3__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gyoracesim", at_483__2__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(jrand, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(ia, 0xE0);

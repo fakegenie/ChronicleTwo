@@ -10,18 +10,17 @@
 
 extern "C" {
 extern int old_vsync__2;
-extern int TheadID; /**< Identifier of the controller thread. */
+extern int TheadID;
 extern u8 pad_dma_buf[0x400];
-extern u8 /**< First controller port's DMA buffer. */ pad_dma_buf2[0x400];
-extern u8 /**< Second controller port's DMA buffer. */ ThreadStack[0x400]; /**< Stack of the controller thread. */
+extern u8  pad_dma_buf2[0x400];
+extern u8  ThreadStack[0x400];
 }
 extern const char at_248[];
 
-static CGamePad *GamePad; /**< Controller manager the controller thread steps. */
+static CGamePad *GamePad;
 
 static int read_pad(PAD_STATUS *status, int port, int slot);
 
-// Code (.text)
 void CGamePad::Init() {
     key_lock = 0;
     key_lock2 = 0;
@@ -86,10 +85,6 @@ void CGamePad::Close() {
     scePadEnd();
 }
 
-/**
- * Reads one controller's buttons and sticks into its state and gives the
- * controller type the data reports, or 0 when nothing was read.
- */
 static int pad_button_read(PAD_STATUS *status, int port, int slot) {
     static u16  rpad;
     static char init;
@@ -123,10 +118,6 @@ static int pad_button_read(PAD_STATUS *status, int port, int slot) {
     return extended_id;
 }
 
-/**
- * Advances one controller's setup and, once it is ready, reads it; gives
- * nonzero when the controller's buttons and sticks were read.
- */
 static int read_pad(PAD_STATUS *status, int port, int slot) {
     int  valid;
     int  terminal_id;
@@ -423,10 +414,6 @@ void CGamePad::Step(int elapsed) {
     scePadSetActDirect(0, 0, pad[0].vibration);
 }
 
-/**
- * Converts a raw stick position to a signed deflection from -128 to 128,
- * with a dead zone around the centre.
- */
 static int AxisCalibration(int axis) {
     int calibrated = axis - 0x80;
 
@@ -667,7 +654,6 @@ void CGamePad::SetVibration(int motor, int strength, int duration) {
 
     pad[0].vibration_timer[motor] = duration;
 
-    // The small actuator is only on or off.
     if (motor == PAD_MOTOR_SMALL) {
         strength = strength != 0;
     }
@@ -742,10 +728,6 @@ void SwitchGamePadThread() {
     RotateThreadReadyQueue(GAMEPAD_THREAD_PRIORITY);
 }
 
-/**
- * Runs the controller thread: steps the controller manager's vibration by
- * the vertical blanks elapsed since its last turn, then yields.
- */
 static void GamePadStep(void *arg) {
     while (true) {
         int now = mgGetVSyncCount();
@@ -777,13 +759,11 @@ void CreateGamePadThread(CGamePad *game_pad) {
     StartThread(TheadID, NULL);
 }
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gamepad", at_248__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gamepad", at_904__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gamepad", at_909__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gamepad", at_910__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(rpad_256, 0x4);
 INCLUDE_BSS(init_257, 0x4);
 INCLUDE_BSS(cnt_374, 0x4);
@@ -792,7 +772,6 @@ INCLUDE_BSS(TheadID, 0x4);
 INCLUDE_BSS(GamePad, 0x4);
 INCLUDE_BSS(old_vsync__2, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(pad_dma_buf, 0x400);
 INCLUDE_BSS(pad_dma_buf2, 0x400);
 INCLUDE_BSS(ThreadStack, 0x400);

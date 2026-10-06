@@ -101,7 +101,6 @@ extern char at_1403__2[];
 void DrawBox(float (*corners)[4], int r, int g, int b);
 void MoveChara(CCharacter2 *chara, mgCCamera *camera, mgCMemory *memory);
 
-// Code (.text)
 void OutPutFile(void) {
     char text[0x100];
     float chara_pos[4];
@@ -302,7 +301,6 @@ void VectMatMul(float *out, float *vec, float (*mat)[4]) {
     sceVu0CopyVector(out, result);
 }
 void evLoadDebugFont(int texture_id, mgCMemory *memory) {
-
     mgCTextureManager *texManager = &mgTexManager;
     int file_size;
     u8 *buffer;
@@ -1176,13 +1174,10 @@ void DrawEventEdit(void) {
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/eventedit", DrawEventEdit__Fv);
 #endif
 
-
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/eventedit", at_1208__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/eventedit", at_1226__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/eventedit", at_1242__2__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/eventedit", at_809__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/eventedit", at_810__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/eventedit", at_811__2__DATA);
@@ -1242,7 +1237,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/eventedit", at_1401__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/eventedit", at_1402__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/eventedit", at_1403__2__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(g_cp_mode, 0x4);
 INCLUDE_BSS(g_cp_cursor, 0x4);
 INCLUDE_BSS(g_cp_selno, 0x4);
@@ -1250,7 +1244,6 @@ INCLUDE_BSS(g_chara_pas_mode, 0x4);
 INCLUDE_BSS(g_chara_pas_cursor, 0x4);
 INCLUDE_BSS(g_chara_pas_selno, 0x4);
 
-// Uninitialised data (.bss)
 CCameraPas g_cmr_pas;
 CCharaPas g_chara_pas;
 INCLUDE_BSS(g_info, 0x40);

@@ -10,8 +10,6 @@
 #include <sifdev.h>
 #include <sifrpc.h>
 
-/** Vertical blanks counted since start-up, kept non-negative. */
-// Small uninitialised data (.sbss)
 static volatile int vcount__2;
 extern "C" int VSyncCallBack__Fi__2(int);
 extern const unsigned char at_846__DATA[];
@@ -27,11 +25,6 @@ extern const unsigned char at_855__DATA[];
 extern const unsigned char at_856__DATA[];
 extern const unsigned char at_857__DATA[];
 
-// Code (.text)
-/**
- * Vertical-blank interrupt handler: counts the frame and re-enables
- * interrupts before returning.
- */
 #ifdef NONMATCHING
 extern "C" int VSyncCallBack__Fi__2(int) {
     ++vcount__2;
@@ -44,10 +37,6 @@ extern "C" int VSyncCallBack__Fi__2(int) {
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/main", VSyncCallBack__Fi__2);
 #endif
 
-/**
- * Sets up a default double buffer, clears both buffers to the given colour
- * and shows each in turn so the screen starts out blank.
- */
 static void ClearScreen(int r, int g, int b) {
     sceGsDBuff db;
 
@@ -71,10 +60,6 @@ static void ClearScreen(int r, int g, int b) {
     sceGsSyncPath(0, 0);
 }
 
-/**
- * Resets the graphics hardware, reboots the IOP with the game's IOP image,
- * loads every IOP module the game uses and opens the CD file system.
- */
 static void init() {
     sceDmaReset(1);
     sceGsResetPath();
@@ -136,7 +121,6 @@ int main() {
     return 0;
 }
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/main", at_846__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/main", at_847__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/main", at_848__DATA);

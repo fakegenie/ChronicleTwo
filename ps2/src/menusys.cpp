@@ -36,18 +36,12 @@ const int kBagSlotCount = 0x96;
 #include <cstring>
 #undef MenuEffect
 
-
 inline unsigned int QuadwordsFor(int bytes) {
     return ((unsigned int)bytes & 0xF) ? ((unsigned int)bytes >> 4) + 1 : ((unsigned int)bytes >> 4);
 }
 
 enum { kPadUp = 1, kPadDown = 2, kPadLeft = 4, kPadRight = 8 };
 
-/**
- *
- * Identifies the inventory area currently used by the item menu.
- *
- */
 enum ItemArea {
     kAreaHand = 0,
     kAreaEquip = 1,
@@ -57,11 +51,6 @@ enum ItemArea {
     kAreaBait = 0xA
 };
 
-/**
- *
- * Tracks the item menu browsing and transformation states.
- *
- */
 enum ItemMenuState {
     kStateBrowse = 0,
     kStateClosing = 2,
@@ -72,18 +61,8 @@ enum ItemMenuState {
     kStateTuneBuildUp = 0xF
 };
 
-/**
- *
- * Tracks the confirmation stage of weapon build-up tuning.
- *
- */
 enum TuneBuildUpStep { kTuneAdjust = 0, kTuneConfirmSave = 1, kTuneConfirmDiscard = 2 };
 
-/**
- *
- * Defines numeric limits used while tuning a weapon build-up.
- *
- */
 enum BuildUpTuning {
     kStatWord = 11,
     kSpareWord = 22,
@@ -93,11 +72,6 @@ enum BuildUpTuning {
 
 enum { kBlinkPeriod = 0x3C, kBlinkLastOn = 0x19 };
 
-/**
- *
- * Defines the colours used to show a raised fusion value.
- *
- */
 enum FusionColors {
     kColorNormal = 0x80,
     kColorRaisedR = 0x54,
@@ -105,11 +79,6 @@ enum FusionColors {
     kColorRaisedB = 0xA4
 };
 
-/**
- *
- * Identifies an action returned by the item menu.
- *
- */
 enum ItemMenuCommand {
     kCmdNone = 0,
     kCmdDenied = 5,
@@ -149,55 +118,29 @@ extern "C" void MenuBGReadInfo2Malloc__FP9mgCMemoryPi(mgCMemory *, int *);
 void InitSpectol(void);
 void MenuItemDebugKey();
 
-/**
- *
- * Holds a name used by the item menu.
- *
- */
 struct NameList {
-    char *name; /**< Name displayed by the item menu. */
-};
-/**
- *
- * Pairs two names used by the item menu.
- *
- */
-struct NamePair {
-    char *a; /**< First name in the pair. */
-    char *b; /**< Second name in the pair. */
-};
-/**
- *
- * Stores key values for two pairs of item-menu actions.
- *
- */
-struct KeyPairTable {
-    int v[2][2]; /**< Key values for each action pair. */
-};
-/**
- *
- * Stores a position on the menu screen.
- *
- */
-struct ScreenPos {
-    int x; /**< Horizontal screen coordinate. */
-    int y; /**< Vertical screen coordinate. */
-} __attribute__((aligned(8)));
-/**
- *
- * Stores values for the Spectol breakdown display.
- *
- */
-struct SpectolBreakTable {
-    int v[4]; /**< Display values for four Spectol parts. */
+    char *name;
 };
 
-/**
- *
- * Groups the model, skin, and outline data loaded for a menu character.
- *
- */
-struct MenuCharaReadBuffers { u_int *model; /**< Loaded model data. */ u_int *skin; /**< Loaded skin data. */ u_int *outline; /**< Loaded outline data. */ };
+struct NamePair {
+    char *a;
+    char *b;
+};
+
+struct KeyPairTable {
+    int v[2][2];
+};
+
+struct ScreenPos {
+    int x;
+    int y;
+} __attribute__((aligned(8)));
+
+struct SpectolBreakTable {
+    int v[4];
+};
+
+struct MenuCharaReadBuffers { u_int *model;  u_int *skin;  u_int *outline;  };
 extern MenuCharaReadBuffers MainCharaReadBuffer;
 extern CGameDataUsed *NewViewWep;
 extern CGameDataUsed *OldViewWep;
@@ -356,7 +299,6 @@ int CheckFishCondition(void);
 extern s8 menu_camera_reference_id;
 extern s8 menu_camera_reference_no;
 
-// Code (.text)
 void DrawTrushMenuMessage() {
     int i;
     mgTexManager.ReloadTexture(MenuArg.mes_tex_block, (sceVif1Packet *)0);
@@ -393,7 +335,6 @@ extern "C" CBaseMenuClass *__ct__14CBaseMenuClassFv(CBaseMenuClass *self) {
     return self;
 }
 void CBaseMenuClass::SetTexBlock(int *block) {
-
     int *dst = (int *)this;
     int i;
     for (i = 0; i < 16; i++) {
@@ -409,7 +350,6 @@ void CBaseMenuClass::DeleteTexBlock() {
     MenuDeleteTextureBlock(tex_block);
 }
 int CBaseMenuClass::MenuItemCommnadSelectPrepare(CGameDataUsed *item, int slot, int arg) {
-
     u8 param[sizeof(MENU_ASKMODE_PARA)];
     if (item == NULL) {
         return 0;
@@ -1824,7 +1764,6 @@ int IsEnableChangeRoboParts(CGameDataUsed *part) {
         slot = 0;
         offset = 0;
         for (; slot < 4; slot++, offset += sizeof(CGameDataUsed)) {
-
             u8 *equipped = (u8 *)MenuUserParam.robo + offset;
             if (type == *(signed char *)(equipped + 0x34)) {
                 short *equipped_cost =
@@ -6477,7 +6416,6 @@ void MenuItemDebugKey(void) {
             *(u64 *)weapon_status_input = at_6220;
             common->CheckAnalogKey(0, weapon_status_input);
             if (status_index < 2) {
-
                 s16 *field = &item->data.weapon.status[status_index];
 
                 *field += (s16)(s32)weapon_status_input[0];
@@ -7734,7 +7672,6 @@ int CMenuItemInfo::PushKey(int pad, int trigger) {
                                                  save_spectol_fusion_param);
                     }
                     if (this->step == 2) {
-
                         MENUFORMPARTS_TYPE *index_part;
                         int i;
                         int blink_on;
@@ -9643,7 +9580,6 @@ void CItemSelect::CheckUse(CGameDataUsed *item) {
     if (item != NULL) {
         use_nos = &MenuArg.param[1];
         if (MenuArg.param[0] != 0 && MenuArg.param[0] == 1) {
-
             for (i = 0, offset = 0; i < 10; i++, offset += 4) {
                 use_no = *(int *)((u8 *)use_nos + offset);
                 if (use_no <= 0) {
@@ -9793,13 +9729,9 @@ step_alpha:
     DrawMenuWakuStep();
     return end;
 }
-/**
- *
- * Stores the colour used by the item selection display.
- *
- */
+
 struct ItemSelectColor {
-    u8 rgba[4]; /**< Red, green, blue, and alpha channels. */
+    u8 rgba[4];
 };
 extern ItemSelectColor at_9055;
 extern char at_9179[];
@@ -10049,8 +9981,6 @@ void MenuItemSelectDraw(void) {
     }
 }
 
-
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", WepStatusInfoStrTable__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", WepStatusInfoStatusVolStrTable__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", addtbl_2178__DATA);
@@ -10103,7 +10033,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", draw_tbl_8453__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", imgtbl_8945__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", menu_item_swap_sndtbl__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_919__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_920__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_921__3__DATA);
@@ -10381,13 +10310,10 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_9179__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_9215__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_9216__DATA);
 
-
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", __vt__11CItemSelect__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", __vt__13CMenuItemInfo__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", __vt__14CBaseMenuClass__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", MenuRoboEquipTable__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", MenuItemBoardTotalNum__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", MenuItemBoardTotalLine__DATA);
@@ -10421,7 +10347,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", cnttbl_8130__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", SameviewmodeTable_8406__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_9055__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(MainCharaReadStackReadAdr, 0x4);
 INCLUDE_BSS(MenuRepairMan, 0x4);
 INCLUDE_BSS(MenuItem_ItemBoardTopLine, 0x4);
@@ -10524,7 +10449,6 @@ INCLUDE_BSS(MenuItemSelectMode, 0x8);
 INCLUDE_BSS(at_9093, 0x8);
 INCLUDE_BSS(ItemSelectPtr, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(MenuItemCmdRet, 0x20);
 MENU_ASKMODE_PARA MenuAskParam;
 CMENU_USERPARAM MenuUserParam;

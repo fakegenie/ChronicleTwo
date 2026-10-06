@@ -30,51 +30,36 @@ extern char at_713[];
 extern char at_714[];
 
 extern "C" void Exit__2(int);
-/**
- *
- * File path buffer viewed as text or aligned quadwords.
- *
- */
+
 union dataread_path {
-    u_long128 quadwords[16]; /**< Aligned storage for the path. */
-    char text[256];          /**< Path text. */
+    u_long128 quadwords[16];
+    char text[256];
 };
-/**
- *
- * Aligned storage for a file path prefix.
- *
- */
+
 struct dataread_prefix {
-    u_long128 quadword[1]; /**< Prefix bytes. */
+    u_long128 quadword[1];
 };
-/**
- *
- * File path prefix viewed as text or aligned storage.
- *
- */
+
 union dataread_prefix_text {
-    dataread_prefix init; /**< Aligned prefix value. */
-    char text[16];        /**< Prefix text. */
+    dataread_prefix init;
+    char text[16];
 };
 extern dataread_path at_259;
 extern dataread_path at_845;
 extern dataread_path at_583;
 extern dataread_prefix at_554;
 
-// Initialised data (.data)
 static char TopDir[256] = "";
 static char CurrentDir__2[256] = "";
-// Small initialised data (.sdata)
+
 static int  DefaultFileDev = FILE_DEV_CDROM;
 
-// Small uninitialised data (.sbss)
 static int header_num;
 static int data_sector;
 static int (*error_cb)(int);
 static int old_vsync;
 static int start_vsync;
 
-// Uninitialised data (.bss)
 u_char header_buff[0x50000];
 static BG_READ_INFO bg_read_info[32];
 static FILE_CACHE   FileCache[16];
@@ -94,7 +79,6 @@ static FILE_CACHE  *GetNewFileCache();
 static int          EntryFileCache(char *path, u_long128 *address, int size);
 static FILE_CACHE  *SearchFileCache(char *path);
 
-// Code (.text)
 int size_to_sector(int size) {
     int sectors;
 
@@ -175,10 +159,6 @@ void ChangeDir(char *dir) {
     }
 }
 
-/**
- * Finds a file's record in the DATA.DAT index
- * by name, or null when it is not there.
- */
 static DATA_HEADER *SearchFile(char *name) {
     DATA_HEADER *header;
     int          i;
@@ -483,10 +463,6 @@ void InitCDFile() {
     }
 }
 
-/**
- * Identifies the device a path names with its prefix and copies the path
- * without the prefix; a single-letter drive is left to the default device.
- */
 static int GetDevType(char *path, char *out_name) {
     char device[0x40];
     s8 *scan;
@@ -528,10 +504,6 @@ static int GetDevType(char *path, char *out_name) {
     return strcmp(device, at_534) == 0 ? 3 : -1;
 }
 
-/**
- * Converts the upper-case letters of a string
- * to lower case in place.
- */
 static void ConvStr(char *text) {
     char ch;
 
@@ -544,10 +516,6 @@ static void ConvStr(char *text) {
     }
 }
 
-/**
- * Builds the path a file is opened by on its device, with the device's
- * prefix and the current directory; returns the device.
- */
 static int GetFullPath(char *path, char *out_path) {
     char rest[256];
     dataread_prefix_text prefix;
@@ -657,7 +625,6 @@ int LoadFile2(char *path, void *buffer, int *out_size, int mode) {
 
     printf(at_660, full_path.text);
 
-    // Every failing hard-disk operation is reported to the error callback.
     if (dev == FILE_DEV_HDD) {
         result = sceGetstat(full_path.text, &stat);
 
@@ -736,7 +703,6 @@ int LoadFile2(char *path, void *buffer, int *out_size, int mode) {
     if (mode != LOAD_FILE_SIZE) {
         sceLseek(result, 0, SCE_SEEK_SET);
 
-        // The size is learnt through a blocking descriptor; the read itself is left to ReadBG.
         if (mode == LOAD_FILE_OPEN) {
             sceClose(result);
             return sceOpen(full_path.text, SCE_RDONLY | SCE_NOWAIT);
@@ -749,10 +715,6 @@ int LoadFile2(char *path, void *buffer, int *out_size, int mode) {
     return 1;
 }
 
-/**
- * Reads a file inside DATA.DAT from the disc, retrying
- * until the read succeeds; reports whether the file exists.
- */
 static int CDRead(char *path, u_int *buffer, int *out_size) {
     int *entry;
     sceCdRMode mode;
@@ -776,10 +738,6 @@ static int CDRead(char *path, u_int *buffer, int *out_size) {
     return 1;
 }
 
-/**
- * Rounds a size up to the next
- * multiple of an alignment.
- */
 #pragma divbyzerocheck on
 static u_int align_size(u_int size, u_int alignment) {
     u32 rest = size % alignment;
@@ -791,10 +749,6 @@ static u_int align_size(u_int size, u_int alignment) {
 
 #pragma divbyzerocheck reset
 
-/**
- * Gives a free file cache entry,
- * or null when every entry is in use.
- */
 static FILE_CACHE *GetNewFileCache() {
     int i;
 
@@ -832,10 +786,6 @@ void DeleteFileCache() {
     InitFileCache(0, FILE_CACHE_NONE);
 }
 
-/**
- * Records a file as held in the file cache at an address,
- * with one pending use; reports whether an entry was free.
- */
 static int EntryFileCache(char *path, u_long128 *address, int size) {
     FILE_CACHE *entry;
 
@@ -887,10 +837,6 @@ int LoadFileCacheBG(char *path) {
     return EntryFileCache(path, (u_long128 *)buffer, size);
 }
 
-/**
- * Finds the file cache entry held under a path,
- * or null when the file is not cached.
- */
 static FILE_CACHE *SearchFileCache(char *path) {
     int i;
     FILE_CACHE *entry;
@@ -1056,7 +1002,6 @@ int GetPackFileNum(u_int *pack) {
     char *name;
     int index;
 
-
     index = 0;
 loop:
     if (GetPackFile(pack, index, &name, &size) != 0) {
@@ -1107,7 +1052,6 @@ void DivPathNameExt(char *path, char *out_dir, char *out_name, char *out_ext) {
     strcpy(out_ext, (char *)cursor);
 }
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dataread", at_183__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dataread", at_190__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dataread", at_369__2__DATA);

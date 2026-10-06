@@ -77,7 +77,6 @@ extern char at_1348[];
 extern char at_2529[];
 static MapJumpMapInfo MainMapInfo;
 
-// Code (.text)
 #ifdef STATEMATCHING
 void CStartupEpisodeTitle::DrawEpisode(int mes_tex_block, int frame_tex_block) {
     union { CPreSprite prim; };
@@ -2023,7 +2022,6 @@ void LoadMonsterFile(int monster_id, int initialize) {
                 u8 *monster_man = (u8 *)ActiveMonster;
                 int offset = 0;
                 for (; i < MONSTER_ACTIVE_MAX; i++) {
-
                     void *buffer = memory->stAlloc64(0xFA0);
                     mgCMemory *slot = (mgCMemory *)(monster_man + offset + 4);
                     (slot)->stSetBuffer((u_long128 *)buffer, 0xFA0);
@@ -2047,7 +2045,6 @@ void LoadMonsterFile(int monster_id, int initialize) {
     }
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_event", at_1082__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_event", at_1248__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_event", gatekey_index__DATA);
@@ -2057,7 +2054,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_event", tag__5__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_event", at_1936__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_event", tag2__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_event", at_1274__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_event", at_1279__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_event", at_1466__5__DATA);
@@ -2089,16 +2085,13 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_event", at_2455__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_event", at_2456__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_event", at_2529__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_event", __vt__9CGeoStone__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_event", __vt__13CRedMarkModel__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(counter_1489, 0x4);
 INCLUDE_BSS(nowTbFloor, 0x4);
 INCLUDE_BSS(nowTboxGroup, 0x4);
 INCLUDE_BSS(nowTboxItemCnt, 0x4);
 INCLUDE_BSS(FLS_FLOOR_ID, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(at_1348, 0x10);

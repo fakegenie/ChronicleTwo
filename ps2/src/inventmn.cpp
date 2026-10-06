@@ -29,54 +29,21 @@
 #include <cmath>
 #include "vtables.hpp"
 
-/**
- *
- * Stores four grid overlay codes for the inventory display.
- *
- */
-struct GridOverCode { int value[4]; /**< Code for each grid overlay. */ };
-/**
- *
- * Groups three character models used by the inventory menu.
- *
- */
-struct ModelTriple { CActionChara *model[3]; /**< Character model in each slot. */ };
-/**
- *
- * Holds one item name for the inventory display.
- *
- */
-struct ItemNameList1 { char *name[1]; /**< Item name. */ };
-/**
- *
- * Holds five item names for the inventory display.
- *
- */
-struct ItemNameList5 { char *name[5]; /**< Item name in each slot. */ };
-/**
- *
- * Stores an inventory cursor position.
- *
- */
-struct CursorPos { int x; /**< Horizontal cursor coordinate. */ int y; /**< Vertical cursor coordinate. */ };
-/**
- *
- * Stores message types for record board entries.
- *
- */
-struct RecordBoardMsgTypes { int v[5]; /**< Message type for each entry. */ };
-/**
- *
- * Stores three steps of a menu colour gradation.
- *
- */
-struct GradationSteps { int v[3]; /**< Value for each gradation step. */ };
-/**
- *
- * Stores the grade assigned to two rows.
- *
- */
-struct GradeRows { signed char v[2]; /**< Grade for each row. */ };
+struct GridOverCode { int value[4];  };
+
+struct ModelTriple { CActionChara *model[3];  };
+
+struct ItemNameList1 { char *name[1];  };
+
+struct ItemNameList5 { char *name[5];  };
+
+struct CursorPos { int x;  int y;  };
+
+struct RecordBoardMsgTypes { int v[5];  };
+
+struct GradationSteps { int v[3];  };
+
+struct GradeRows { signed char v[2];  };
 extern CMenuInvent *CMenuInventPt;
 extern CInventUserData *InventUserDataPtr;
 extern CDC2AlbumData *InventAlbumPtr;
@@ -131,12 +98,8 @@ enum { K_COMMAND_OPEN_MEMO = 100 };
 enum { K_COMMAND_CLOSE_MEMO = 105 };
 enum { K_COMMAND_QUIT = 110 };
 extern char at_1046__2[];
-/**
- *
- * Tracks whether each of three invention ideas was found.
- *
- */
-struct NetaFoundFlags { s8 flag[3]; /**< Found flag for each idea. */ };
+
+struct NetaFoundFlags { s8 flag[3];  };
 extern NetaFoundFlags at_1965;
 extern char at_2124__2[];
 extern char at_2125__3[];
@@ -200,21 +163,13 @@ extern char at_2734__2[];
 extern char at_2735__2[];
 extern char at_2736[];
 extern char at_2737[];
-/**
- *
- * Marks the three invention idea slots that match a recipe.
- *
- */
-struct FoundSlots { int v[3]; /**< Match flag for each idea slot. */ };
+
+struct FoundSlots { int v[3];  };
 extern FoundSlots at_2776;
 extern CursorPos at_3202;
-/**
- *
- * Stores four inventory cursor coordinates.
- *
- */
+
 struct InventCursorPos {
-    int pos[4]; /**< Coordinates used by the inventory cursor. */
+    int pos[4];
 } __attribute__((aligned(16)));
 extern InventCursorPos at_3201;
 extern s8 wakutype_3203[];
@@ -225,12 +180,8 @@ extern char at_3260__2[];
 extern char at_3261[];
 extern char at_3262__2[];
 extern char at_3263__2[];
-/**
- *
- * Holds two item names for the inventory display.
- *
- */
-struct ItemNameList2 { char *name[2]; /**< Item name in each slot. */ };
+
+struct ItemNameList2 { char *name[2];  };
 extern ItemNameList2 at_3317;
 extern CMemoryCardManager *MCManagerPtr;
 extern s8 ActiveSlot_3949;
@@ -279,11 +230,7 @@ extern char at_3866__2[];
 extern char at_3867__2[];
 extern char at_3868__2[];
 extern char at_3869[];
-/**
- *
- * Selects the confirmation prompt shown for an inventory action.
- *
- */
+
 enum INVENT_ASK_MODE {
     INVENT_ASK_COMMAND = 0,
     INVENT_ASK_ZOOM = 1,
@@ -294,13 +241,9 @@ enum INVENT_ASK_MODE {
     INVENT_ASK_FROM_ALBUM = 6,
     INVENT_ASK_DELETE_ALL = 7
 };
-/**
- *
- * Stores the positions of item board pieces.
- *
- */
+
 struct ItemBoardKoma {
-    int pos[10]; /**< Position for each board piece. */
+    int pos[10];
 };
 extern ItemBoardKoma at_3306;
 extern char at_3348__2[];
@@ -309,35 +252,19 @@ extern char at_3350__2[];
 extern char at_3351[];
 extern char at_3352[];
 extern char at_3353[];
-/**
- *
- * Defines the vertical clipping range for invention ideas.
- *
- */
-struct NetaClipRange { float top; /**< Upper clipping boundary. */ float bottom; /**< Lower clipping boundary. */ };
-/**
- *
- * Stores a point on the inventory screen.
- *
- */
-struct ScreenPoint { int xy[2]; /**< Horizontal and vertical screen coordinates. */ };
+
+struct NetaClipRange { float top;  float bottom;  };
+
+struct ScreenPoint { int xy[2];  };
 extern ScreenPoint at_3363;
 extern NetaClipRange at_3379;
 extern CursorPos at_3509;
 extern ScreenPoint at_4493;
-/**
- *
- * Stores an inventory menu colour.
- *
- */
-struct MenuColor { u8 rgba[4]; /**< Red, green, blue, and alpha channels. */ };
+
+struct MenuColor { u8 rgba[4];  };
 extern MenuColor at_4494;
-/**
- *
- * Stores the target position of an invention effect.
- *
- */
-struct NetaEffectTarget { float x; /**< Horizontal target coordinate. */ float y; /**< Vertical target coordinate. */ };
+
+struct NetaEffectTarget { float x;  float y;  };
 extern NetaEffectTarget at_4638;
 extern char at_4775[];
 extern char at_5066[];
@@ -352,12 +279,8 @@ extern char at_5556[];
 extern char at_5557[];
 extern char at_5558[];
 extern char at_5559[];
-/**
- *
- * Stores the first visible row of two card lists.
- *
- */
-struct CardListTops { int top[2]; /**< First visible row for each list. */ };
+
+struct CardListTops { int top[2];  };
 extern CardListTops at_5642;
 extern char *NewComer_5648[];
 extern int digit_tbl3_5641[];
@@ -366,12 +289,8 @@ extern char at_5743[];
 extern char at_5744[];
 extern char at_5745[];
 extern char at_5746[];
-/**
- *
- * Holds the blank marker used for an invention name.
- *
- */
-struct NetaNameBlank { char text[2]; /**< Blank name marker. */ };
+
+struct NetaNameBlank { char text[2];  };
 extern NetaNameBlank at_4470;
 
 extern signed char pict_seiton_case;
@@ -382,11 +301,7 @@ extern char at_5153[];
 extern char at_5154[];
 extern char at_5155[];
 extern char at_5156[];
-/**
- *
- * Maps inventory commands to their message numbers.
- *
- */
+
 enum INVENT_COMMAND_MSG {
     INVENT_CMD_ZOOM = 0x1518,
     INVENT_CMD_DELETE = 0x1519,
@@ -396,15 +311,11 @@ enum INVENT_COMMAND_MSG {
     INVENT_CMD_SET_BOARD = 0x151D,
     INVENT_CMD_DELETE_ALL = 0x151E
 };
-/**
- *
- * Defines the commands available in an inventory mode.
- *
- */
+
 struct InventCommandList {
-    int enable; /**< Whether the command list is enabled. */
-    int cmd_num; /**< Number of available commands. */
-    int cmd[5]; /**< Command codes for this mode. */
+    int enable;
+    int cmd_num;
+    int cmd[5];
 };
 extern InventCommandList modecmdtbl_3636[12];
 extern InventCommandList *menu_invent_command_info_ptr;
@@ -472,7 +383,6 @@ enum {
     kSceneAttrFlags = 0x18000
 };
 
-// Code (.text)
 CInventUserData *GetInventUserDataPtr() {
     CSaveData *save = GetSaveData();
     if (save == NULL) {
@@ -2311,13 +2221,7 @@ int CMenuInvent::ItemCmdAfter(int command, ITEMCMD_RET_PARA *para) {
     return 1;
 }
 
-
-/**
- *
- * Stores the path prefix used for an inventory asset.
- *
- */
-struct PathPrefix { u_long128 chunk[4]; /**< Four quadwords containing the prefix. */ };
+struct PathPrefix { u_long128 chunk[4];  };
 extern PathPrefix at_2913;
 extern char at_3113[];
 extern char at_3114[];
@@ -6303,8 +6207,6 @@ void MenuInventDraw() {
     }
 }
 
-
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/inventmn", scoop_table__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/inventmn", menu_scoop_str_tag__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/inventmn", pic_tag__DATA);
@@ -6331,7 +6233,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/inventmn", overcode_album_5225__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/inventmn", digit_tbl3_5641__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/inventmn", NewComer_5648__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/inventmn", at_1046__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/inventmn", at_1537__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/inventmn", at_1655__2__DATA);
@@ -6555,10 +6456,8 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/inventmn", at_5745__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/inventmn", at_5746__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/inventmn", at_5747__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/inventmn", __vt__11CMenuInvent__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/inventmn", invent_grade_fff__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/inventmn", at_2562__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/inventmn", gobitbl_2847__DATA);
@@ -6573,7 +6472,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/inventmn", viewnum_5172__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/inventmn", maxtbl_album_5223__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/inventmn", viewnum_album_5224__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(debug_invent_successflag, 0x4);
 INCLUDE_BSS(InventUserDataPtr, 0x4);
 INCLUDE_BSS(InventAlbumPtr, 0x4);
@@ -6618,7 +6516,6 @@ INCLUDE_BSS(at_5448, 0x4);
 INCLUDE_BSS(at_5457, 0x8);
 INCLUDE_BSS(at_5642, 0x8);
 
-// Uninitialised data (.bss)
 static mgCMemory MenuInventStack;
 static mgCMemory MenuInventCharaStack;
 static mgCMemory MenuInventMCStack;

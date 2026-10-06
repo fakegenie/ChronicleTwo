@@ -61,7 +61,6 @@ static inline u_char *movieFreeTop(mgCMemory *memory) {
     return memory->stack_bytes + memory->stack_used * 16;
 }
 
-// Code (.text)
 int _MOVIE(SPI_STACK *stack, int argument_count) {
     MOVIE_LIST_ENTRY *entry = MovieList + MovieListNum;
     if (entry == NULL) {
@@ -336,16 +335,13 @@ int MovieViewLoop(void) {
     return 0;
 }
 
-// Static initialiser (.init)
 extern "C" void __sinit_movieviewlp_cpp() {
     DataBuffer__2.Init();
     Stack_ReadBuff__2.Init();
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/movieviewlp", tag_movie__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/movieviewlp", at_786__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/movieviewlp", at_843__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/movieviewlp", at_844__3__DATA);
@@ -360,10 +356,8 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/movieviewlp", at_1035__5__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/movieviewlp", at_1036__5__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/movieviewlp", at_1037__5__DATA);
 
-// Static initialiser table (.ctor)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/movieviewlp", D_0037B064__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(MovieScene, 0x4);
 INCLUDE_BSS(MovieView, 0x4);
 INCLUDE_BSS(RushWork__2, 0x4);
@@ -381,7 +375,6 @@ INCLUDE_BSS(init_795, 0x4);
 INCLUDE_BSS(init_798, 0x4);
 INCLUDE_BSS(init_801, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(DataBuffer__2, 0x30);
 INCLUDE_BSS(Stack_ReadBuff__2, 0x30);
 INCLUDE_BSS(buf0_791, 0x30);

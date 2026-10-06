@@ -18,7 +18,6 @@ extern "C" void __ct__11mgCDrawPrimFv(void *);
 void DivSpriteScreen(mgCDrawPrim &prim);
 void DivSpriteScreen(mgCDrawPrim &prim, int left, int right, int mode);
 
-// Code (.text)
 void CEffectList::LoadEFPFile(char *name, u_int *pack, int block, mgCMemory *stack) {
     int           sizes[64];
     u_int        *files[64];
@@ -464,17 +463,13 @@ void CFadeInOut::Draw(void) {
     }
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/effectlist", at_393__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/effectlist", at_260__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/effectlist", at_261__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/effectlist", at_589__DATA);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(at_392, 0x10);
 INCLUDE_BSS(at_564__2, 0x10);
 INCLUDE_BSS(at_565, 0x10);

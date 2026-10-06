@@ -46,7 +46,6 @@ extern char at_830__5[];
 extern char at_831__4[];
 extern char at_832__4[];
 
-
 #include "dng_effect.hpp"
 #include "dng_main.hpp"
 #include "effectlist.hpp"
@@ -67,7 +66,6 @@ mgCTexture *TEX_ExFx_ICE;
 mgCTexture *TEX_ExFx_THUN;
 #endif
 
-// Code (.text)
 void GetTextureInfo(CScene *scene) {
     TEX_ShadowTexture = mgTexManager.GetTexture("work", -1);
     TEX_SystenFrame = mgTexManager.GetTexture("frame", -1);
@@ -292,7 +290,6 @@ void SetSwordBlurEffect(CCharacter2 *chara, mgCMemory *stack, int blur_type) {
     chara->sword_effect[0]->SetTexture(0x4A, TEX_SystemEffectSw, u, v, 64, 32);
 }
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/maintex", at_792__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/maintex", at_793__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/maintex", at_794__2__DATA);
@@ -322,7 +319,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/maintex", at_831__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/maintex", at_832__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/maintex", at_936__3__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(TEX_ShadowTexture, 0x4);
 INCLUDE_BSS(TEX_SystenFrame, 0x4);
 INCLUDE_BSS(TEX_SystenFrame2, 0x4);

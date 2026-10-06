@@ -27,21 +27,12 @@ const int kRodTipIndex = 48;
 const int kRodNearTipIndex = 36;
 const int kSaoWeaponFrameIndex = 7;
 
-/**
- *
- * Three integer axis values used by the fishing line.
- *
- */
 struct TriAxis {
-    int v[3]; /**< Axis values. */
+    int v[3];
 };
-/**
- *
- * Four by four transform matrix used by fishing objects.
- *
- */
+
 struct Matrix4 {
-    float m[4][4]; /**< Matrix rows. */
+    float m[4][4];
 };
 
 extern FISH_POINT LinePoint[64];
@@ -120,7 +111,6 @@ static CFishObj UkiObj;
 static CFishObj HariObj;
 static sceVu0FVECTOR ChanceBarPos;
 
-
 static void SetObjectPoint(FISH_POINT &point, float x, float y, float z) {
     point.pos[0] = x;
     point.pos[1] = y;
@@ -136,7 +126,6 @@ static void SetObjectBind(FISH_BIND &bind, FISH_POINT &first, FISH_POINT &second
 }
 #endif
 
-// Code (.text)
 void SetFishingMode(int value) {
     NowMode = value;
 }
@@ -722,7 +711,6 @@ void RodStep(CScene *scene, u_long128 *poly_buffer) {
         uki->MovePoint();
     }
 
-    // Keep the rod's four moving masses spaced between its fixed joints and tip.
     for (int pass = 0; pass < 2; pass++) {
         if (BattleFlag != 0) {
             BindPosition((RodPoint + kRodTipIndex), FishPoint.pos, BattleLineDist, 0.2f);
@@ -799,7 +787,6 @@ void RodStep(CScene *scene, u_long128 *poly_buffer) {
         ((FISH_POINT *)RodPoint)[i].pos[3] = 1.0f;
     }
 
-    // Move the model's seven flexible rod joints along the solved rod curve.
     sceVu0FVECTOR curve[5];
     *(u_long128 *)curve[0] = *(u_long128 *)(RodPoint + 0);
     *(u_long128 *)curve[1] = *(u_long128 *)(RodPoint + 12);
@@ -1424,21 +1411,18 @@ void ParaBlend(float *out, float t, float (*point)[4], int count) {
     sceVu0ApplyMatrix(out, basis.m, powers);
 }
 
-// Static initialiser (.init)
 extern "C" void __sinit_fishingobj_cpp() {
     memset(&LureObj, 0, sizeof(LureObj));
     memset(&UkiObj, 0, sizeof(UkiObj));
     memset(&HariObj, 0, sizeof(HariObj));
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/fishingobj", at_975__5__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/fishingobj", at_985__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/fishingobj", at_986__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/fishingobj", at_1797__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/fishingobj", at_1798__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/fishingobj", at_896__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/fishingobj", at_897__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/fishingobj", at_898__5__DATA);
@@ -1450,10 +1434,8 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/fishingobj", at_903__5__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/fishingobj", at_1503__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/fishingobj", at_1564__DATA);
 
-// Static initialiser table (.ctor)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/fishingobj", D_0037B08C__DATA);
 
-// Small uninitialised data (.sbss)
 #ifndef NONMATCHING
 INCLUDE_BSS(WaterLevel, 0x4);
 INCLUDE_BSS(LineTop, 0x4);
@@ -1473,7 +1455,6 @@ INCLUDE_BSS(ActionChanceCnt, 0x4);
 INCLUDE_BSS(ActionChanceDir, 0x4);
 #endif
 
-// Uninitialised data (.bss)
 #ifndef NONMATCHING
 INCLUDE_BSS(RodPoint, 0xF0);
 INCLUDE_BSS(RodPointDist, 0x50);

@@ -22,7 +22,6 @@ extern int g_eff_entry_flag;
 extern SPI_TAG_PARAM effm_tag[];
 extern char at_848__2[];
 
-// Code (.text)
 float UniformityRand(float center, float range) {
     float value = (float)rand() / 2147483648.0f;
 
@@ -1369,10 +1368,8 @@ void CEffectManager::SetOrigin(float *origin) {
     }
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/effect", effm_tag__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/effect", at_383__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/effect", at_382__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/effect", at_566__2__DATA);
@@ -1424,10 +1421,8 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/effect", at_611__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/effect", at_612__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/effect", at_848__2__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(g_tmp_effm, 0x4);
 INCLUDE_BSS(g_tmp_effc, 0x4);
 INCLUDE_BSS(g_eff_entry_flag, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(g_tmp_eff_name, 0x20);

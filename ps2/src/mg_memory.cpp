@@ -3,7 +3,6 @@
 #include <cstdio>
 #include <cstring>
 
-// Code (.text)
 void *MG_ADDRESS_CHECK(void *address, char *where) {
     if (address == NULL) {
         printf("stack over at %s\n", where);
@@ -39,8 +38,6 @@ void mgCMemory::SetHeapMem(u_long128 *buffer, int size) {
         return;
     }
 
-    // The first header owns no contents; the last quadword of the buffer
-    // is the terminating header.
     heap_top = (mgMEMORY_BLOCK *)buffer;
     heap_top->data = 0;
     heap_top->size = 1;
@@ -101,7 +98,7 @@ u_long128 *mgCMemory::StartStackMode(int mode, int size) {
     mgMEMORY_BLOCK *next;
     for (; (next = block->next) != 0; block = next) {
         gap = block + block->size;
-        // Taken from the last gap examined, not necessarily the chosen one.
+
         count = next - gap;
         spare = count - 1;
         if (mode == 1 && count > 1) {
@@ -251,7 +248,6 @@ char *mgCopyString(char *source, mgCMemory *memory) {
     return copy;
 }
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_memory", at_166__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_memory", at_238__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_memory", at_288__DATA);

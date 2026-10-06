@@ -17,13 +17,8 @@
 #include "mapjump.hpp"
 #include <cstring>
 
-/**
- *
- * Path of a script used when changing maps.
- *
- */
 struct ScriptPathBuffer {
-    char text[0x80]; /**< Script path text. */
+    char text[0x80];
 };
 extern int NowMainMapNo;
 extern int NowSubMapNo;
@@ -74,7 +69,6 @@ void GotoInterior(CScene *scene, int interiorNo);
 void DeleteInterior(CScene *scene);
 int InteriorMapJump(CScene *scene, int interiorNo);
 
-// Code (.text)
 int GetMainMapNo(void) {
     return NowMainMapNo;
 }
@@ -494,10 +488,8 @@ int InteriorMapJump(CScene *scene, int interiorNo) {
     return 0;
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapjump", at_997__4__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapjump", at_863__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapjump", at_890__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapjump", at_891__3__DATA);
@@ -509,7 +501,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapjump", at_950__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapjump", at_1047__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapjump", at_1091__2__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(NowMainMapNo, 0x4);
 INCLUDE_BSS(NowSubMapNo, 0x4);
 INCLUDE_BSS(NowInteriorMapNo, 0x4);
@@ -518,7 +509,6 @@ INCLUDE_BSS(ScriptBuffer, 0x4);
 INCLUDE_BSS(InteriorFlag, 0x4);
 INCLUDE_BSS(old_bgm_no, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(now_script_file, 0x40);
 INCLUDE_BSS(at_912__4, 0x80);
 INCLUDE_BSS(old_mapname, 0x40);

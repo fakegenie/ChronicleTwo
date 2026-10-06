@@ -20,7 +20,6 @@ extern u_char at_1119[];
 
 static mgCFrameAttr dmy_attr;
 
-// Code (.text)
 void mgCFrameAttr::Initialize() {
     memset(this, 0, sizeof(mgCFrameAttr));
     mgCVisualAttr::Initialize();
@@ -41,12 +40,6 @@ void mgCFrameAttr::Initialize() {
     unk_84 = 0;
 }
 
-
-/**
- *
- * Builds a rotation matrix from a quaternion whose scalar part comes first.
- *
- */
 mgCFrameAttr::mgCFrameAttr() {
     Initialize();
 }
@@ -96,24 +89,10 @@ static void QuatToMat(float *quaternion, float (*matrix)[4]) {
     matrix[3][3] = 1.0f;
 }
 
-// clang-format off
-/**
- *
- * Transforms eight corners by the product of two matrices, leaving the results in VU0
- * registers vf10-vf17, and gets the box around them.
- *
- */
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_frame", test1__FPA4_fPA4_fPA4_fPfPf);
-// clang-format on
-// clang-format off
-/**
- *
- * Divides the eight corners that test1 left in vf10-vf17 through by their depth and gets
- * the screen-space box around them.
- *
- */
+
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_frame", test2__FPfPf);
-// clang-format on
+
 int mgInsideScreen(mgVu0FBOX *box) {
     sceVu0FMATRIX matrix;
     sceVu0FVECTOR corners[8];
@@ -247,7 +226,6 @@ mgCFrame::mgCFrame() {
     Initialize();
 }
 
-// Defined inline in mg_frame.hpp.
 void mgCFrame::Initialize() {
     elder = NULL;
     brother = NULL;
@@ -684,11 +662,6 @@ void mgCFrame::SetTransMatrix(float (*matrix)[4]) {
     changed = 1;
 }
 
-/**
- *
- * Compares two frame names up to their "--" flags. Returns 1 when they match, 0 otherwise.
- *
- */
 static int StrCmp(char *left, char *right) {
     if (left == 0 || right == 0) {
         return 0;
@@ -779,7 +752,6 @@ void mgCFrame::GetWorldDir(float *out_dir, float *local_dir) {
     sceVu0FMATRIX lw;
     float         w;
 
-    // A w of zero leaves the translation out of the transform.
     w = local_dir[3];
     local_dir[3] = 0.0f;
     GetLWMatrix(lw);
@@ -954,13 +926,7 @@ void mgCFrame::SetAttrParamDraw(int value, int recurse) {
     }
 }
 
-
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_frame", Draw__8mgCFrameFPUi);
-
-
-
-
-
 
 #pragma global_optimizer off
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_frame", GetDrawRect__8mgCFrameFP9mgVu0FBOXP14mgCDrawManager);
@@ -972,7 +938,6 @@ mgCFrame &mgCFrame::operator=(mgCFrame &other) {
     changed = 1;
     reference = 0;
 
-    // The copy builds its matrix from its parts unless they are all at their defaults.
     use_srt = 0;
     if (position[0] != 0.0f || position[1] != 0.0f || position[2] != 0.0f) {
         use_srt = 1;
@@ -1001,20 +966,12 @@ int mgCObject::Draw() {
     return 0;
 }
 
-// Static initialiser (.init)
-
-
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_frame", at_307__DATA);
 
-// Static initialiser table (.ctor)
-
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_frame", __vt__8mgCFrame__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_frame", __vt__12mgCFrameBase__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_frame", __vt__9mgCObject__DATA);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(at_324, 0x10);
 INCLUDE_BSS(at_341, 0x10);
 INCLUDE_BSS(at_844, 0x10);

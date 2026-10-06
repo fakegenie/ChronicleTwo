@@ -52,20 +52,15 @@ extern int GeyserEffectTexb;
 extern mgCFrame *GeyserFrame;
 extern int GeyserRndSeed;
 
-/**
- *
- * GS TEST register fields used by the edit map effects.
- *
- */
 struct EditGsTest {
-    u_long ATE : 1;   /**< Alpha test enable. */
-    u_long ATST : 3;  /**< Alpha test mode. */
-    u_long AREF : 8;  /**< Alpha reference value. */
-    u_long AFAIL : 2; /**< Action when alpha test fails. */
-    u_long DATE : 1;  /**< Destination alpha test enable. */
-    u_long DATM : 1;  /**< Destination alpha test mode. */
-    u_long ZTE : 1;   /**< Depth test enable. */
-    u_long ZTST : 2;  /**< Depth test mode. */
+    u_long ATE : 1;
+    u_long ATST : 3;
+    u_long AREF : 8;
+    u_long AFAIL : 2;
+    u_long DATE : 1;
+    u_long DATM : 1;
+    u_long ZTE : 1;
+    u_long ZTST : 2;
     u_long rest : 45;
 };
 STATIC_ASSERT(sizeof(EditGsTest) == 8);
@@ -106,7 +101,6 @@ extern s32 GeyserEffectFlag;
 extern s32 GeyserEffectTexb;
 extern s32 GeyserRndSeed;
 
-// Code (.text)
 void EditExceptionStep(int map_no, CScene *scene) {
     int quarter;
     int frame;
@@ -519,7 +513,6 @@ void DrawGeyserEffect(CScene *scene) {
     }
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editexception", at_1175__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editexception", at_1176__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editexception", at_1177__2__DATA);
@@ -529,7 +522,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editexception", at_1327__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editexception", at_1329__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editexception", at_1330__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editexception", at_917__5__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editexception", at_918__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editexception", at_919__6__DATA);
@@ -543,7 +535,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editexception", at_1259__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editexception", at_1385__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editexception", at_1386__3__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(rea_chara_id, 0x4);
 INCLUDE_BSS(rea_mtn_step, 0x4);
 INCLUDE_BSS(thunder_count, 0x4);
@@ -563,5 +554,4 @@ INCLUDE_BSS(GeyserFrame, 0x4);
 INCLUDE_BSS(GeyserRndSeed, 0x4);
 INCLUDE_BSS(GeyserEffect, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(at_1328__2, 0x10);

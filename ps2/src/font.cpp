@@ -11,29 +11,16 @@
 
 extern "C" void __ct__11mgCDrawPrimFv(void *);
 
-/**
- *
- * Character codes for the external glyphs.
- *
- */
 struct GaijiCodeTable {
-    u16 code[24]; /**< External glyph codes. */
+    u16 code[24];
 };
-/**
- *
- * Wide character codes for the half-width kana glyphs.
- *
- */
+
 struct HankakuKanaWideTable {
-    u16 code[63]; /**< Wide kana codes. */
+    u16 code[63];
 };
-/**
- *
- * Single byte character codes for the half-width kana glyphs.
- *
- */
+
 struct HankakuKanaTable {
-    u8 code[63]; /**< Single byte kana codes. */
+    u8 code[63];
 };
 extern mgRect<int> at_784__2;
 extern char at_812__3[];
@@ -70,10 +57,8 @@ extern char at_997__3[];
 extern const unsigned char at_1543[6];
 extern mgRect<int> at_817__4;
 
-// Code (.text)
 int GetGaijiW(int code) {
     if (code >= GAIJI_CODE_TOP && code < GAIJI_CODE_END) {
-
         s16 *first_width = &GaijiDataTbl[0].w;
         return *(s16 *)((u8 *)first_width + (code - 0x8000 - 0x7D00) * sizeof(GAIJI_DATA));
     }
@@ -81,7 +66,6 @@ int GetGaijiW(int code) {
 }
 int GetGaijiH(int code) {
     if (code >= GAIJI_CODE_TOP && code < GAIJI_CODE_END) {
-
         s16 *first_height = &GaijiDataTbl[0].h;
         return *(s16 *)((u8 *)first_height + (code - 0x8000 - 0x7D00) * sizeof(GAIJI_DATA));
     }
@@ -604,7 +588,6 @@ void CFont::DrawChar(mgCDrawPrim *prim, int font_no, int x, int y, int outline, 
         mgRect<int>(texture.x, texture.y, texture.width, texture.height), &glyph_color);
 }
 void CFont::DrawChar(mgCDrawPrim *prim, char *text, int x, int y) {
-
     DrawChar(prim, GetFontNo(text), x, y, 1, color, (int)alpha);
 }
 void MySetTex(char *texture_name, mgCDrawPrim *prim) {
@@ -827,7 +810,6 @@ void CFont::Init() {
     offset_y = 0.0f;
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/font", GaijiDataTbl__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/font", FconvCodeTbl__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/font", FontGaijiConvTbl__DATA);
@@ -839,7 +821,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/font", at_1255__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/font", at_1264__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/font", at_1272__2__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/font", at_812__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/font", at_813__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/font", at_848__4__DATA);
@@ -928,7 +909,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/font", at_1099__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/font", at_1448__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/font", at_1543__DATA);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(FontTblBinBuff, 0x1000);
 INCLUDE_BSS(at_784__2, 0x10);
 INCLUDE_BSS(at_817__4, 0x10);

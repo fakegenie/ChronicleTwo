@@ -33,7 +33,6 @@ extern int now_install;
 extern int error_code;
 extern u_long128 *inst_work;
 
-// Code (.text)
 int FutureMapSelect() {
     if (init_796 == 0) {
         select_795 = 0;
@@ -246,7 +245,6 @@ int EmergencyMessage(int error) {
     }
 }
 
-// Static initialiser (.init)
 extern "C" void __sinit_mainloop3_cpp() {
     buf0__2.Init();
     buf1__2.Init();
@@ -255,10 +253,8 @@ extern "C" void __sinit_mainloop3_cpp() {
     Stack__2.Init();
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop3", at_801__5__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop3", at_802__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop3", at_803__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop3", at_805__3__DATA);
@@ -287,10 +283,8 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop3", at_951__6__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop3", at_952__6__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop3", at_953__5__DATA);
 
-// Static initialiser table (.ctor)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop3", D_0037B09C__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop3", at_804__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop3", at_806__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop3", at_808__4__DATA);
@@ -299,7 +293,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop3", at_883__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop3", at_884__5__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop3", emergency_mes__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(select_795, 0x4);
 INCLUDE_BSS(init_796, 0x4);
 INCLUDE_BSS(sel_map_798, 0x4);
@@ -315,7 +308,6 @@ INCLUDE_BSS(col_962, 0x4);
 INCLUDE_BSS(init_963, 0x4);
 INCLUDE_BSS(txt_965, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(buf0__2, 0x30);
 INCLUDE_BSS(buf1__2, 0x30);
 INCLUDE_BSS(dbuf0, 0x30);

@@ -29,259 +29,119 @@ extern "C" int sprintf(...);
 #include <cstring>
 #include "vtables.hpp"
 
-/**
- *
- * Pairs the textures used when reloading character palettes and copying item icon palettes.
- *
- */
 struct texture_pair {
-    mgCTexture *tex[2]; /**< Textures whose palettes are reloaded or copied. */
+    mgCTexture *tex[2];
 };
 
-/**
- *
- * Stores the four item icon texture pointers selected by a transparent rectangle.
- *
- */
 struct icon_texture_info {
-    int value[4]; /**< Texture pointers represented as integer values. */
+    int value[4];
 };
 
-/**
- *
- * Passes Spectol break and fusion arguments to CMenuEffect::PresetEffect.
- *
- */
 struct menu_effect_preset {
-    int v[10]; /**< Arguments passed to the effect preset. */
+    int v[10];
 };
 
-/**
- *
- * Stores texture coordinates for a menu quadrilateral.
- *
- */
 struct quad_uv {
-    float corner[4][2]; /**< Texture coordinates for its four corners. */
+    float corner[4][2];
 };
 
-/**
- *
- * Stores the three points used to draw a cursor hand.
- *
- */
 struct cursor_hand {
-    float corner[3][2]; /**< Coordinates of the cursor hand points. */
+    float corner[3][2];
 };
 
-/**
- *
- * Stores the widths of the two cursor parts.
- *
- */
 struct cursor_width {
-    float width[2]; /**< Widths of the cursor parts. */
+    float width[2];
 };
 
-/**
- *
- * Stores the position used when moving an icon.
- *
- */
 struct icon_move_pos {
-    int pos[2]; /**< Horizontal and vertical icon coordinates. */
+    int pos[2];
 };
 
-/**
- *
- * Stores the position at which a cursor is placed.
- *
- */
 struct cursor_put_pos {
-    float pos[2]; /**< Horizontal and vertical cursor coordinates. */
+    float pos[2];
 };
 
-/**
- *
- * Stores the position at which a menu element is placed.
- *
- */
 struct menu_put_pos {
-    int pos[2]; /**< Horizontal and vertical placement coordinates. */
+    int pos[2];
 };
 
-/**
- *
- * Stores the position of a menu board.
- *
- */
 struct menu_board_pos {
-    float pos[2]; /**< Horizontal and vertical board coordinates. */
+    float pos[2];
 };
 
-/**
- *
- * Stores the colour of a menu tile.
- *
- */
 struct menu_tile_color {
-    u8 rgba[4]; /**< Red, green, blue, and alpha channels. */
+    u8 rgba[4];
 };
 
-/**
- *
- * Stores the colour channels of a menu effect.
- *
- */
 struct effect_color {
-    int r; /**< Red channel. */
-    int g; /**< Green channel. */
-    int b; /**< Blue channel. */
-    int a; /**< Alpha channel. */
+    int r;
+    int g;
+    int b;
+    int a;
 } __attribute__((aligned(16)));
 
-/**
- *
- * Stores the colour of a menu item.
- *
- */
 struct item_color {
-    u8 rgba[4]; /**< Red, green, blue, and alpha channels. */
+    u8 rgba[4];
 };
 
-/**
- *
- * Groups the rectangles that form a board frame.
- *
- */
 struct board_frame_parts {
-    mgRect<int> *rect[12]; /**< Rectangles used by the board frame. */
+    mgRect<int> *rect[12];
 } __attribute__((aligned(16)));
 
-/**
- *
- * Stores the heights of the scroll bar sections.
- *
- */
 struct scroll_bar_heights {
-    int height[3]; /**< Heights of the three scroll bar sections. */
+    int height[3];
 };
 
-/**
- *
- * Stores layer values for both scroll bar states.
- *
- */
 struct scroll_bar_layers {
-    int layer[2][5]; /**< Layer values for the two states. */
+    int layer[2][5];
 };
 
-/**
- *
- * Groups the rectangles that form a scroll bar.
- *
- */
 struct scroll_bar_parts {
-    mgRect<int> *rect[3]; /**< Rectangles used by the scroll bar. */
+    mgRect<int> *rect[3];
 };
 
-/**
- *
- * Stores texture coordinates for board numbers.
- *
- */
 struct board_number_uv {
-    u8 uv[2][4]; /**< Texture coordinates for the number states. */
+    u8 uv[2][4];
 };
 
-/**
- *
- * Stores texture coordinates for board lines.
- *
- */
 struct board_line_uv {
-    s8 uv[6][3][4]; /**< Texture coordinates for the board line segments. */
+    s8 uv[6][3][4];
 };
 
-/**
- *
- * Stores the heights of board rows.
- *
- */
 struct board_row_height {
-    int height[5]; /**< Heights of the board rows. */
+    int height[5];
 };
 
-/**
- *
- * Stores colours for two board pass states.
- *
- */
 struct board_pass_color {
-    int rgba[2][4]; /**< Colour channels for the two states. */
+    int rgba[2][4];
 };
 
-/**
- *
- * Stores the colour used when a board element blinks.
- *
- */
 struct board_blink_color {
-    int rgba[4]; /**< Red, green, blue, and alpha channels. */
+    int rgba[4];
 };
 
-/**
- *
- * Stores colours for board button states.
- *
- */
 struct board_button_color {
-    int rgba[2][2][4]; /**< Colour channels for both button groups and states. */
+    int rgba[2][2][4];
 };
 
-/**
- *
- * Stores a menu cursor position.
- *
- */
 struct menu_cursor_pos {
-    float pos[2]; /**< Horizontal and vertical cursor coordinates. */
+    float pos[2];
 };
 
-/**
- *
- * Stores the starting point of a menu line.
- *
- */
 struct menu_line_origin {
-    int pos[2]; /**< Horizontal and vertical line coordinates. */
+    int pos[2];
 };
 
-/**
- *
- * Stores the position of a menu memo.
- *
- */
 struct menu_memo_pos {
-    float pos[2]; /**< Horizontal and vertical memo coordinates. */
+    float pos[2];
 };
 
-/**
- *
- * Stores the positions of two frame edges.
- *
- */
 struct waku_edge_pos {
-    int pos[2][2]; /**< Coordinates of the two frame edges. */
+    int pos[2][2];
 } __attribute__((aligned(16)));
 
-/**
- *
- * Stores the widths of board line segments.
- *
- */
 struct board_line_width {
-    int width[4]; /**< Widths of the four line segments. */
+    int width[4];
 } __attribute__((aligned(16)));
 
 extern signed char MenuDrawNumberKeta;
@@ -289,8 +149,6 @@ extern signed char MenuDrawNumberKeta;
 extern u8 MenuMainFrame_ActionEndFlag;
 
 extern "C" char at_873__4[];
-
-
 
 extern icon_texture_info at_900__4;
 
@@ -318,10 +176,6 @@ extern MENUFORM_MAKEBRD_INFO CommonBoardDrawInfo;
 
 extern short use_trans_rect;
 
-
-
-
-
 extern float use_item_enable_alpha_angle;
 
 extern int use_item_enable_alpha;
@@ -330,10 +184,7 @@ extern float *spectol_raster_xtbl;
 
 extern short MenuWindowHelpTable_1346[36];
 
-
 extern "C" texture_pair at_1521__2;
-
-
 
 extern "C" char at_1622__2[];
 
@@ -364,8 +215,6 @@ extern float curpos_1393;
 extern signed char init_1394;
 
 extern int star_color_table[9];
-
-
 
 extern "C" char at_1711[];
 
@@ -506,12 +355,7 @@ extern int MenuItemBrdViewLine;
 
 extern float MenuItemBrdScrlCurLen;
 
-
-
-
 extern "C" unsigned int fptoui(float value);
-
-
 
 extern float DrawItemCounter;
 
@@ -626,7 +470,6 @@ void PrimQuad_i_(mgCDrawPrim *prim, mgRect<int> rect, mgRect<int> texRect);
 
 #include "common.h"
 
-// Code (.text)
 void AttachMessageForm() {
     char name[32];
     for (int i = 0; i < 9; i++) {
@@ -801,7 +644,6 @@ void PrimQuad(mgCDrawPrim *prim, float x, float y, mgRect<int> cell) {
 
 void PrimQuad(mgCTexture *texture, float x, float y, mgRect<int> cell, int alpha, int red, int green,
               int blue) {
-
     mgCDrawPrim prim;
     SetSpriteEnv(&prim, 0);
     prim.Begin(6);
@@ -823,7 +665,6 @@ void PrimQuad(mgCDrawPrim *prim, mgCTexture *texture, float x, float y, mgRect<i
 
 void PrimQuad(mgCTexture *texture, mgRect<int> dest, mgRect<int> source, int alpha, int red, int green,
               int blue) {
-
     mgCDrawPrim prim;
     SetSpriteEnv(&prim, 0);
     prim.Begin(6);
@@ -1259,7 +1100,6 @@ int DrawMenuNumber(mgCDrawPrim *prim, int number, int align, mgRect<int> rect, m
     int x = rect.left;
     int y = rect.top;
     int padding = MenuDrawNumberKeta;
-
 
     if (align == 1) {
         x = (int)((float)x + 0.5f * (float)step_x * (float)(digits - 1));
@@ -4037,7 +3877,6 @@ CMenuPosDataForm *CPosDataManage::GetFormInfo(char *name) {
     return NULL;
 }
 CMenuPosDataForm *CPosDataManage::GetFormInfo(int no) {
-
     if (no < 0 || form_num <= no) {
         return NULL;
     }
@@ -4088,7 +3927,6 @@ void CPosDataManage::InitDrawList() {
     }
 }
 CMenuPosDataForm *CPosDataManage::GetDrawTopList() {
-
     CMenuPosDataForm *next;
     CMenuPosDataForm *form;
 
@@ -4339,7 +4177,6 @@ void Func_MenuItemBrdPrepare(MENUFORMPARTS_TYPE *parts, CGameDataUsed *items, CG
         i = 0;
         if (0 < count) {
             do {
-
                 item = (CGameDataUsed *)((u8 *)items + i * 0x6C);
                 target.SetPtr(target_kind, item);
                 parts->item_flag = CheckItemUseVariable(used, &target);
@@ -4366,7 +4203,6 @@ void Func_MenuItemBrdPrepare2(MENUFORMPARTS_TYPE *parts, CGameDataUsed *items,
     item_no = used->item_no;
     i = 0;
     if (0 < count) {
-
         offset = 0;
         do {
             if (item_no == 0x17D) {
@@ -4458,7 +4294,6 @@ int NowUseNeedItemCheck(CUserDataManager *manager) {
             }
         }
     } else if (active_chara == 2) {
-
         if (((CGameDataUsed *)&((ROBO_DATA *)&manager->robo_data)->parts[0])->GetWHp(NULL) < 0.2f) {
             needs |= 0x8000;
         }
@@ -4634,7 +4469,6 @@ void MenuItemBrdItemIconEffectMalloc(mgCMemory *memory, MENUFORMPARTS_TYPE *part
 
     i = 0;
     if (0 < count) {
-
         offset = 0;
         do {
             part = (MENUFORMPARTS_TYPE *)((u8 *)parts + offset);
@@ -5086,7 +4920,6 @@ void CRepairManager::SetStack(mgCMemory *memory, int mode) {
         }
     }
     if (mode == 0) {
-
         model_stack.stSetBuffer((u_long128 *)((u8 *)top - 0x18000), 0x1800);
     }
 }
@@ -5333,7 +5166,6 @@ void CLevelUpEffect::Step() {
             do {
                 generate_counter = l_levelup_generate_counter + i;
                 if (*generate_counter > 0) {
-
                     spark_pos = (float *)((u8 *)l_levelup_pos + offset);
                     spark_vec = (float *)((u8 *)l_levelup_vec + offset);
                     counter = l_levelup_counter + i;
@@ -6581,7 +6413,6 @@ void PrimQuad_i_(mgCDrawPrim *prim, mgRect<int> rect, mgRect<int> texRect) {
     }
 }
 
-// Static initialiser (.init)
 extern "C" void __sinit_menudraw_cpp() {
     GiftBoxWindowPutPos.Set(0, 0, 0, 0);
     menu_long_hand.Set(62, 1, 40, 24);
@@ -6595,7 +6426,6 @@ extern "C" void __sinit_menudraw_cpp() {
     ItemBoardCursor.Set(118, 128, 8, 30);
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menudraw", spectol_break_pos__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menudraw", spectol_break_angle__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menudraw", item_transtbl__DATA);
@@ -6629,7 +6459,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menudraw", at_5441__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menudraw", at_5450__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menudraw", at_5901__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menudraw", at_873__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menudraw", at_975__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menudraw", at_1622__2__DATA);
@@ -6667,10 +6496,8 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menudraw", at_4933__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menudraw", at_4934__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menudraw", at_4935__DATA);
 
-// Static initialiser table (.ctor)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menudraw", D_0037B02C__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menudraw", rgbatbl_1379__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menudraw", at_1788__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menudraw", get_btntbl_1810__DATA);
@@ -6685,7 +6512,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menudraw", xyoffset_4192__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menudraw", actpos_4193__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menudraw", at_4442__2__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(use_trans_rect, 0x4);
 INCLUDE_BSS(item_board_counter, 0x4);
 INCLUDE_BSS(MenuDrawItemInfoNum, 0x4);
@@ -6756,7 +6582,6 @@ INCLUDE_BSS(fish_boiled_runflag, 0x4);
 INCLUDE_BSS(fish_boiled_effect_tex, 0x4);
 INCLUDE_BSS(at_5917, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(menu_limmit_displayflag, 0xA0);
 INCLUDE_BSS(MenuMesForm, 0x30);
 INCLUDE_BSS(at_900__4, 0x10);

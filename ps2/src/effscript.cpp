@@ -21,14 +21,10 @@ extern "C" void __ct__10CRunScriptFv(void *);
 extern "C" void *Alloc__9mgCMemoryFi(mgCMemory *, int);
 extern "C" void Delete__8CColPrimFi(void *, int);
 extern "C" void Free__9mgCMemoryFP1(void *, void *);
-/**
- *
- * Effect vector viewed as four floats or a quadword.
- *
- */
+
 union EffectVector {
-    u_long128 quad; /**< The vector as a quadword. */
-    float values[4]; /**< Floating point components. */
+    u_long128 quad;
+    float values[4];
 };
 #include <cstdio>
 #include <cmath>
@@ -109,7 +105,6 @@ static inline u_int align16_blocks(u_int size) {
 
 extern char at_3303__2[];
 
-// Code (.text)
 void CEffectScriptMan::Initialize(mgCMemory *memory, int texb_start, int texb_num) {
     int i;
     int j;
@@ -3950,13 +3945,11 @@ void SetEffectScriptFunc() {
     }
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/effscript", eff_spt_base_def__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/effscript", at_2311__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/effscript", at_2498__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/effscript", ext_func_info__4__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/effscript", at_943__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/effscript", at_1099__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/effscript", at_1100__DATA);
@@ -3987,11 +3980,9 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/effscript", at_3536__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/effscript", at_3644__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/effscript", at_3645__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(now_scene, 0x4);
 INCLUDE_BSS(EffScriptMan, 0x4);
 INCLUDE_BSS(now_script, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(ext_func__4, 0x400);
 INCLUDE_BSS(at_2067, 0x10);

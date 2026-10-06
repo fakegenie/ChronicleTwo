@@ -69,7 +69,6 @@ extern SPI_TAG_PARAM menu_shop_tag[];
 extern CShopMenu *CShopMenuPt;
 extern CMenuQuestView *MenuQuestView;
 
-// Code (.text)
 int GetDonyShopLineUp(int *itemList, int *status) {
     CInventUserData *inventData = GetInventUserDataPtr();
     CMenuSystemData *systemData = GetMenuSysData__Fv();
@@ -1201,14 +1200,10 @@ void CShopMenu::CalcTex() {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/menushop", CalcTex__9CShopMenuFv);
 #endif
-/**
- *
- * Position or offset of a shop menu cursor.
- *
- */
+
 struct CursorPoint {
-    int x; /**< Horizontal coordinate. */
-    int y; /**< Vertical coordinate. */
+    int x;
+    int y;
 };
 extern CursorPoint at_1831__2;
 extern CursorPoint t_offxy_1832;
@@ -1536,9 +1531,9 @@ void CMenuQuestView::UnderMsg(int type) {
     QuestMenuMes->SetPutPos(position);
     QuestMenuMes->SetWindowMode(4);
 }
-/** Current request or photo-scoop memo mode. */
+
 extern s8 Menu_Memo_ViewMode;
-/** Request list shown by the quest memo. */
+
 extern CQuestManager *QuestMan;
 int CMenuQuestView::SelectMax() {
     if (Menu_Memo_ViewMode == QUEST_VIEW_MODE_QUEST) {
@@ -2133,7 +2128,6 @@ void MenuNPCQuestViewDraw() {
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/menushop", MenuNPCQuestViewDraw__Fv);
 #endif
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menushop", dony_shoplist__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menushop", menu_shop_tag__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menushop", imglist_1267__DATA);
@@ -2145,7 +2139,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menushop", randam_checktbl__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menushop", tbl_2469__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menushop", at_2470__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menushop", at_1206__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menushop", at_1207__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menushop", at_1221__3__DATA);
@@ -2231,11 +2224,9 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menushop", at_2221__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menushop", at_2222__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menushop", at_2629__2__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menushop", __vt__14CMenuQuestView__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menushop", __vt__9CShopMenu__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menushop", t_offxy_1832__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menushop", cursor_offsetxy_1836__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menushop", cursortbl_1838__DATA);
@@ -2243,7 +2234,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menushop", rgba_1897__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menushop", QuestMoveRate__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menushop", packname_2171__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(NowSellMode, 0x4);
 INCLUDE_BSS(CShopPtr, 0x4);
 INCLUDE_BSS(Tex_Shop, 0x4);
@@ -2279,5 +2269,4 @@ INCLUDE_BSS(menu_debug_questselect, 0x4);
 INCLUDE_BSS(Menu_Memo_ViewMode, 0x4);
 INCLUDE_BSS(MenuQuestView, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(QuestCommentMes, 0x10);

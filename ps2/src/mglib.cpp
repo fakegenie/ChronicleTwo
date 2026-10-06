@@ -123,7 +123,6 @@ extern int frame_buf1;
 extern sceGsDimx mgDIMX;
 #endif
 
-// Code (.text)
 void mgPerformanceMeter(int enable) {
     draw_performance_meter = enable;
 }
@@ -1574,7 +1573,6 @@ extern "C" mgCMemory *__ct__9mgCMemoryFv(mgCMemory *memory) {
     return memory;
 }
 
-// Static initialiser (.init)
 extern "C" void *__construct_array(void *array, void *(*constructor)(void *), void *destructor,
                                    unsigned int element_size, unsigned int count);
 extern "C" void *__ct__10mgCDrawEnvFv(void *);
@@ -1595,27 +1593,22 @@ extern "C" void __sinit_mglib_cpp() {
     __construct_array(fixz_tex, __ct__10mgCTextureFv, NULL, sizeof(mgCTexture), 2);
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mglib", dimx_281__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mglib", at_1389__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mglib", prog_adr__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mglib", at_1538__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mglib", at_715__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mglib", at_716__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mglib", at_1568__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mglib", at_1569__DATA);
 
-// Static initialiser table (.ctor)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mglib", D_0037AFE8__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mglib", font_cons__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mglib", rot_priority__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mglib", now_prog_id__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(mgAntialiasing, 0x4);
 INCLUDE_BSS(mgFrameRate, 0x4);
 INCLUDE_BSS(mgNowFrameRate, 0x4);
@@ -1681,7 +1674,6 @@ INCLUDE_BSS(user_prog_num, 0x4);
 INCLUDE_BSS(image_num_1535, 0x4);
 INCLUDE_BSS(init_1536, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(mgGiftagAD, 0x10);
 INCLUDE_BSS(mgRenderInfo, 0x1020);
 INCLUDE_BSS(mgBackColor, 0x10);

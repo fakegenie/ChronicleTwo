@@ -15,8 +15,6 @@
 #include "funcpoint.hpp"
 #include "snd_mngr.hpp"
 
-
-// Code (.text)
 int CheckTime(float time, float start, float end) {
     int outside;
 
@@ -799,13 +797,9 @@ void CFuncPointMngr::UpdateStatus() {
         GetEnd();
     }
 }
-/**
- *
- * Raw settings copied between function points.
- *
- */
+
 struct FuncPointSettings {
-    int word[0x14]; /**< Settings words. */
+    int word[0x14];
 };
 
 int CFuncPointMngr::Copy(CFuncPointMngr &dest, mgCMemory *stack) {
@@ -1119,11 +1113,9 @@ float GetLightAnimeWeight(CFuncPoint *point, int frame) {
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/funcpoint", GetLightAnimeWeight__FP10CFuncPointi);
 #endif
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/funcpoint", at_475__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/funcpoint", at_1118__3__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/funcpoint", __vt__14CFuncPointMngr__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/funcpoint", __vt__19CList_10CFuncPoint___DATA);
 

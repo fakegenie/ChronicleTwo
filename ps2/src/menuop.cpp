@@ -38,23 +38,14 @@ extern "C" void LocalFunc_AdjustScrlBar__FPP18MENUFORMPARTS_TYPEPiPiiffi(MENUFOR
                                                                          float, int);
 extern "C" void StepMainMenuIconMove__18CMenuPosDataManageFPiii(void *, void *, int, int);
 
-/**
- *
- * Pairs two integer values used by menu operations.
- *
- */
 struct IntPair {
-    int a; /**< First value in the pair. */
-    int b; /**< Second value in the pair. */
+    int a;
+    int b;
 };
-/**
- *
- * Stores a position on the menu screen.
- *
- */
+
 struct ScreenPos {
-    float x; /**< Horizontal screen coordinate. */
-    float y; /**< Vertical screen coordinate. */
+    float x;
+    float y;
 };
 extern signed char MovieViewFlag;
 extern signed char init_1254;
@@ -225,7 +216,6 @@ extern short MenuMapInfoSave_DngNo;
 
 static const int kDungeonNoOffset = 0x1C5B4;
 
-// Code (.text)
 void InitMenuReturnMsg(mgCMemory *stack) {
     CDC2Mes *window;
     short *system_mes;
@@ -3210,7 +3200,6 @@ void SubGameSaveDraw(void) {
     MenuDCMsg[0]->DrawMsg();
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuop", manual_boot_event_no__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuop", submap_table_1022__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuop", fillw_1125__DATA);
@@ -3221,7 +3210,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuop", at_2609__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuop", dngmap_2627__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuop", b_2715__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuop", at_1023__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuop", at_1024__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuop", at_1025__4__DATA);
@@ -3357,12 +3345,10 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuop", at_3205__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuop", at_3206__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuop", at_3207__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuop", __vt__14CSaveMenuClass__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuop", __vt__11CMenuOption__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuop", __vt__11CManualMenu__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuop", manual_list_mesclstbl__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuop", config_option_num_i__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuop", config_option_num_f__DATA);
@@ -3371,7 +3357,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuop", tbl_2023__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuop", at_2335__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuop", at_2342__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(ManualMovie, 0x4);
 INCLUDE_BSS(ManualMovieTex, 0x4);
 INCLUDE_BSS(LocalMenuBGForm, 0x4);
@@ -3428,7 +3413,6 @@ INCLUDE_BSS(SubGameSaveCFGBufferSize, 0x8);
 INCLUDE_BSS(at_3070, 0x8);
 INCLUDE_BSS(at_3091, 0x8);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(MnOnePictTex, 0x20);
 INCLUDE_BSS(SaveFileList, 0x38);
 INCLUDE_BSS(MenuMapInfoSave, 0x18);

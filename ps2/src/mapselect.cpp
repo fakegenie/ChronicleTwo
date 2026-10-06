@@ -18,29 +18,16 @@ extern "C" char *strncat(char *destination, const char *source, size_t count);
 #include "vlgr_info.hpp"
 #include "scenesnd.hpp"
 
-/**
- *
- * Two colours used by the event list.
- *
- */
 struct EventListColors {
-    u32 color[2]; /**< Event list colours. */
+    u32 color[2];
 };
-/**
- *
- * Pair of characters used for a line break.
- *
- */
+
 struct LineBreakPair {
-    char chars[2]; /**< Line break characters. */
+    char chars[2];
 };
-/**
- *
- * Two labels used by the save editor.
- *
- */
+
 struct SaveEditLabels {
-    const char *text[2]; /**< Save editor labels. */
+    const char *text[2];
 };
 extern SaveEditLabels at_1125;
 extern SaveEditLabels at_1128__2;
@@ -157,7 +144,6 @@ extern int SedSelData[SED_ITEM_NUM];
 extern char *config_str[1];
 #endif
 
-// Code (.text)
 int mlMAP_NAME_NUM(SPI_STACK *stack, int argc) {
     pMapNameBuff = 0;
     pCharBuff = 0;
@@ -220,7 +206,6 @@ void LoadMapName(int language, u_long128 *buffer) {
     }
 }
 static MAP_NAME_INFO *GetMapNameInfo(int map_no) {
-
     if (map_no < 0 || map_no >= MapNameNum) {
         return NULL;
     }
@@ -812,7 +797,6 @@ void AtraMiriaOnOff(int mode, CCharacter2 *chara, int enable) {
     }
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapselect", map_sel_type__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapselect", SelectMapName__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapselect", tag__7__DATA);
@@ -820,7 +804,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapselect", select__1049__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapselect", top__1050__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapselect", SedSelData__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapselect", at_792__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapselect", at_793__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapselect", at_794__3__DATA);
@@ -863,14 +846,12 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapselect", at_1469__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapselect", at_1470__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapselect", at_1471__3__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapselect", config_str__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapselect", at_1125__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapselect", at_1128__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapselect", at_1270__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapselect", at_1377__2__DATA);
 
-// Small uninitialised data (.sbss)
 #ifndef NONMATCHING
 INCLUDE_BSS(MapNameNum, 0x4);
 #endif
@@ -926,7 +907,6 @@ INCLUDE_BSS(top_event, 0x4);
 INCLUDE_BSS(BossBattleSelFlag, 0x4);
 #endif
 
-// Uninitialised data (.bss)
 #ifndef NONMATCHING
 INCLUDE_BSS(MapNameBuff, 0x8000);
 #endif

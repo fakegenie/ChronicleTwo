@@ -14,72 +14,39 @@
 
 extern char at_852__4[];
 
-/**
- *
- * Holds a formatted memory-card directory name.
- *
- */
 struct FormatA {
-    char text[0x14]; /**< Directory-name format string. */
+    char text[0x14];
 };
-/**
- *
- * Holds a formatted memory-card file name.
- *
- */
+
 struct FormatB {
-    char text[0x13]; /**< File-name format string. */
+    char text[0x13];
 };
-/**
- *
- * Holds a memory-card file name.
- *
- */
+
 struct McFileName {
-    char text[0x40]; /**< Memory-card file name. */
+    char text[0x40];
 };
-/**
- *
- * Holds the path pattern used to find memory-card save directories.
- *
- */
+
 struct McSaveDirPattern {
-    char text[0x80]; /**< Save-directory path pattern. */
+    char text[0x80];
 };
-/**
- *
- * Holds the memory-card icon background colours.
- *
- */
+
 struct McIconBlock40 {
-    u8 data[0x40]; /**< Icon background-colour data. */
+    u8 data[0x40];
 };
-/**
- *
- * Holds memory-card icon light directions or colours.
- *
- */
+
 struct McIconBlock30 {
-    u8 data[0x30]; /**< Icon light data. */
+    u8 data[0x30];
 };
-/**
- *
- * Holds the memory-card icon ambient colour.
- *
- */
+
 struct McIconBlock10 {
-    u8 data[0x10]; /**< Icon ambient-colour data. */
+    u8 data[0x10];
 };
-/**
- *
- * Holds album data and the check digits written with it.
- *
- */
+
 struct AlbumFile {
-    u8 data[0x64000]; /**< Album payload. */
-    char digit_data[0x4B0]; /**< Album bytes used to calculate the check digits. */
-    int checksum; /**< First album check digit. */
-    int trailer; /**< Second album check digit. */
+    u8 data[0x64000];
+    char digit_data[0x4B0];
+    int checksum;
+    int trailer;
 };
 extern "C" int sceMcFlush(int fd);
 extern "C" int sceMcUnformat(int port, int slot);
@@ -126,7 +93,6 @@ extern char at_1453__3[];
 extern char at_1454__3[];
 extern char at_1455__3[];
 
-// Code (.text)
 void CopyMCBrowserName(int index, char *name, u16 *offset) {
     int region = 0;
     if (CheckNowEurope() != 0) {
@@ -2114,7 +2080,6 @@ COSBIT_INFO *GetCosInfo(int costume_no) {
     return NULL;
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/memcard", cosbit_table__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/memcard", MCBrowsetName__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/memcard", MCBrowserName_Offset__DATA);
@@ -2127,7 +2092,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/memcard", at_1034__6__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/memcard", at_2131__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/memcard", at_2297__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/memcard", at_808__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/memcard", at_809__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/memcard", at_810__4__DATA);
@@ -2163,10 +2127,8 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/memcard", at_1954__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/memcard", at_2083__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/memcard", at_2285__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/memcard", NowProgramLoopNo__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(DngTreeSaveFlag, 0x4);
 INCLUDE_BSS(old_format_1242, 0x4);
 INCLUDE_BSS(iconNo_1323, 0x4);

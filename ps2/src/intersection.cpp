@@ -5,7 +5,6 @@
 
 #include <libvu0.h>
 
-// Code (.text)
 #ifdef NONMATCHING
 int IntersectionPipeYPoly3(float *pipe, float (*poly)[4], float *normal, float (*hits)[4]) {
     sceVu0FVECTOR axis = {0.0f, normal[1], 0.0f, 0.0f};
@@ -236,5 +235,4 @@ int mt_test(RS_STACKDATA *stack, int argc) {
     return 1;
 }
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(at_161, 0x10);

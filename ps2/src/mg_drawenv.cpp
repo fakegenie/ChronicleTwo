@@ -6,7 +6,6 @@
 
 #include "mg_math.hpp"
 
-// Code (.text)
 mgCDrawEnv::mgCDrawEnv() {
     Initialize(0);
 }
@@ -167,7 +166,6 @@ void mgRENDER_INFO::SetRenderInfo(float projection, int width, int height, float
     aspect[1][1] = aspect_y;
     sceVu0CopyMatrix(aspect, aspect);
 
-    // Perspective projection onto the guard area, then onto the whole GS coordinate range.
     sceVu0FMATRIX proj;
     sceVu0UnitMatrix(proj);
     float near_z = clip_min[2];
@@ -209,7 +207,6 @@ void mgRENDER_INFO::SetRenderInfo(float projection, int width, int height, float
     clip_screen_full[0][0] = full_scale;
     clip_screen_full[1][1] = full_scale;
 
-    // Direct projection to GS screen coordinates: the screen centre is added in proportion to depth.
     sceVu0FMATRIX persp;
     sceVu0UnitMatrix(persp);
     persp[0][0] = this->projection;
@@ -243,7 +240,6 @@ void mgRENDER_INFO::SetViewMatrix(float (*view)[4], float *camera_pos) {
     mgMulMatrix(world_screen, screen, world_view);
     mgMulMatrix(view_screen, screen, aspect);
 
-    // The screen projection without the screen centre offset.
     sceVu0FMATRIX screen_rel;
     sceVu0CopyMatrix(screen_rel, screen);
     screen_rel[2][1] = 0.0f;
@@ -355,7 +351,7 @@ void mgRENDER_INFO::SetPlight(int index, mgPOINT_LIGHT *light) {
         slot->point_light[index].power = 0;
         return;
     }
-    // Without a range of its own, the light reaches as far as its brightest colour component allows.
+
     float range = light->range;
     if (range <= 0) {
         float red = light->color[0];
@@ -428,5 +424,4 @@ mgVu0FBOX &mgVu0FBOX::operator=(mgVu0FBOX &source) {
     return *this;
 }
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_drawenv", at_184__DATA);

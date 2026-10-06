@@ -75,7 +75,6 @@ extern char at_1310__2[];
 extern char at_1311__2[];
 extern char at_1501[];
 
-// Code (.text)
 CGameData *GetGameDataPt(void) {
     return &GameItemDataManage;
 }
@@ -382,7 +381,6 @@ int _DATAFISHINIT(SPI_STACK *stack, int arg_count) {
 int _DATAFISH(SPI_STACK *stack, int arg_count) {
     SpiFish = GameItemDataManage.GetFishData(spiGetStackInt(stack++));
     if (SpiFish != NULL) {
-
         SpiFish->size = spiGetStackFloat(stack++);
         SpiFish->unk_4 = spiGetStackInt(stack++);
         SpiFish->unk_6 = spiGetStackInt(stack++);
@@ -477,7 +475,6 @@ int CGameData::LoadItemSystemMes(int language) {
     gamedata_build_stack = (mgCMemory *)memory_storage;
     sprintf(path, at_1079, language);
     if (LoadFile2(path, script, &size, 0) != 0) {
-
         __ct__18CScriptInterpreterFv(interpreter_storage);
     ((CScriptInterpreter *)interpreter_storage)->SetTag(gamedata_tag);
         ((CScriptInterpreter *)interpreter_storage)->SetScript(script, size);
@@ -490,7 +487,6 @@ void CGameData::InitItemMes(int clear, int unused) {
     CDataCommon *records;
 
     if (clear != 0) {
-
         clear = 0;
         offset = 0;
         do {
@@ -1023,13 +1019,11 @@ void CItemUseTarget::SetPtr(int new_kind, void *new_ptr) {
     }
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gamedata", etcitem_spectol_table__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gamedata", gamedata_tag__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gamedata", ItemCmdMsgTbl__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gamedata", table_1553__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gamedata", at_1018__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gamedata", at_1019__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gamedata", at_1020__DATA);
@@ -1072,10 +1066,8 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gamedata", at_1310__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gamedata", at_1311__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gamedata", at_1501__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gamedata", msg_offsettbl_1363__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(gamedata_build_stack, 0x4);
 INCLUDE_BSS(comdatapt, 0x4);
 INCLUDE_BSS(comdatapt_num, 0x4);
@@ -1085,7 +1077,6 @@ INCLUDE_BSS(SpiAttach, 0x4);
 INCLUDE_BSS(SpiRoboPart, 0x4);
 INCLUDE_BSS(SpiFish, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(GameItemDataManage, 0x30);
 INCLUDE_BSS(local_com_itemdata, 0x4A40);
 CDataItem local_itemdata[162];

@@ -136,60 +136,22 @@ s32 cfgWATER_SHAKE(SPI_STACK *stack, int argc);
 int cfgWATER_SURFACE_END(SPI_STACK *stack, int argc);
 int cfgWATER_DRAW(SPI_STACK *stack, int argc);
 
-/** Non-zero when loading an additional map into the current map. */
 extern int mapAddMode;
 
-/**
- *
- * Map the map script is loading into.
- *
- */
-// Small uninitialised data (.sbss)
 static CMap *mapMap;
 
-/**
- *
- * Node of the map part the map script is building, or null outside a part.
- *
- */
 static CList<CMapParts> *mapNowMapParts;
 
-/**
- *
- * Node of the map piece the map script is building, or null outside a piece.
- *
- */
 static CList<CMapPiece> *mapNowMapPiece;
 
-/**
- *
- * Memory that everything the map script builds is taken from.
- *
- */
 static mgCMemory *mapStack;
 
-/**
- *
- * Non-zero while function points of the map script go to the current map part rather than the map.
- *
- */
 static int mapPtsFunc;
 
-/**
- *
- * Next entry of the current piece's materials that the map script fills in.
- *
- */
 static int mapMatIdx;
 
-/**
- *
- * Level of detail that the map script is giving pieces to.
- *
- */
 static int mapLOD_ID;
 
-// Code (.text)
 MAP_TIME_BAND GetTimeBand(float time) {
     MAP_TIME_BAND band = MAP_TIME_BAND_NIGHT;
     if (time >= 6.0f && time < 9.0f) {
@@ -412,7 +374,6 @@ void CMap::GetLightInfo(CMapLightingInfo *out_info) {
     if (time_light_blend) {
         GetLightInfo(out_info, ratio, GetTimeLightingRatio(ratio));
 
-        // The first directional light follows the sun, never lower than a fixed height.
         GetSunPoint(sun);
         sceVu0Normalize(sun, sun);
         if (sun[1] < 0.2f) {
@@ -450,7 +411,6 @@ int CMap::GetActiveLightNo() {
 }
 #pragma inline_depth reset
 
-// Defined in mapinfo.hpp.
 #pragma inline_depth(0)
 void CMap::GetLightInfo(CMapLightingInfo *out_info, float *ratio, int num) {
     sceVu0FMATRIX light_dir;
@@ -484,7 +444,6 @@ void CMap::GetLightInfo(CMapLightingInfo *out_info, float *ratio, int num) {
 
     for (i = 0; i < num; i++) {
         if (!(ratio[i] <= 0.0f)) {
-            
             sceVu0ScaleVector(work, list[i]->ambient, ratio[i]);
             mgAddVector(ambient, work);
             sceVu0ScaleVector(work, list[i]->bg_color, ratio[i]);
@@ -492,7 +451,6 @@ void CMap::GetLightInfo(CMapLightingInfo *out_info, float *ratio, int num) {
             sceVu0ScaleVector(work, list[i]->bg_color2, ratio[i]);
             mgAddVector(bg_color2, work);
 
-            // Only the sets that draw fog weigh in its colour and distances.
             if (list[i]->fog_enable) {
                 work[0] = list[i]->fog.r;
                 work[1] = list[i]->fog.g;
@@ -518,7 +476,6 @@ void CMap::GetLightInfo(CMapLightingInfo *out_info, float *ratio, int num) {
         }
     }
 
-    // Each row now holds one light's direction, normalised unless the blend cancelled it out.
     sceVu0TransposeMatrix(light_dir, light_dir);
     for (i = 0; i < 4; i++) {
         if (!(mgDistVector(light_dir[i]) <= 0.0f)) {
@@ -552,30 +509,14 @@ void CMap::GetLightInfo(CMapLightingInfo *out_info, float *ratio, int num) {
 }
 #pragma inline_depth reset
 
-/**
- *
- * Handles a map script tag that does nothing.
- *
- */
 int mapDummy(SPI_STACK *stack, int argument_count) {
     return 1;
 }
 
-/**
- *
- * Tells whether the map script being loaded adds to a map already loaded.
- *
- */
 static int IsAddMode() {
     return mapAddMode;
 }
 
-// Defined in mapload.hpp.
-/**
- *
- * Starts a map part of the name of the first argument, which the tags up to PARTS_END build.
- *
- */
 #pragma inline_depth(0)
 int mapPARTS(SPI_STACK *stack, int argument_count) {
     mapNowMapParts = new (mapStack->Alloc(algn16_size(sizeof(CList<CMapParts>)) + 2)) CList<CMapParts>;
@@ -589,13 +530,6 @@ int mapPARTS(SPI_STACK *stack, int argument_count) {
 }
 #pragma inline_depth reset
 
-// Defined in mg_tanime.hpp.
-// Defined in mg_tanime.hpp.
-// Defined in mg_tanime.hpp.
-
-
-// Defined in mg_frame.hpp.
-// Defined in mapload.hpp.
 unsigned int algn16_size(unsigned int size) {
     if ((size & 0xF) != 0) {
         return (size >> 4) + 1;
@@ -603,11 +537,6 @@ unsigned int algn16_size(unsigned int size) {
     return size >> 4;
 }
 
-/**
- *
- * Gives the current map part its far clip distance and whether it fades out there.
- *
- */
 #pragma inline_depth(0)
 int mapFAR_CLIP(SPI_STACK *stack, int argc) {
     SPI_STACK *alphaArg = stack + 1;
@@ -620,11 +549,6 @@ int mapFAR_CLIP(SPI_STACK *stack, int argc) {
 }
 #pragma inline_depth reset
 
-/**
- *
- * Sets whether the current map part is drawn without the scene's lights and without point lights.
- *
- */
 #pragma inline_depth(0)
 int mapLIGHT_FLAG(SPI_STACK *stack, int argc) {
     SPI_STACK *secondArg = stack + 1;
@@ -637,11 +561,6 @@ int mapLIGHT_FLAG(SPI_STACK *stack, int argc) {
 }
 #pragma inline_depth reset
 
-/**
- *
- * Sets the four move flags of the current map part, one per argument.
- *
- */
 #pragma inline_depth(0)
 int mapMOVE_FLAG(SPI_STACK *stack, int argc) {
     if (mapNowMapParts == NULL) {
@@ -665,11 +584,6 @@ int mapMOVE_FLAG(SPI_STACK *stack, int argc) {
 }
 #pragma inline_depth reset
 
-/**
- *
- * Gives the current map part four levels of detail at the standard distances.
- *
- */
 #pragma inline_depth(0)
 int mapLOD_START(SPI_STACK *stack, int argc) {
     CMapParts *parts;
@@ -689,12 +603,6 @@ int mapLOD_START(SPI_STACK *stack, int argc) {
 }
 #pragma inline_depth reset
 
-// Defined in mapparts.hpp.
-/**
- *
- * Sets whether the current map part blends between its levels of detail.
- *
- */
 #pragma inline_depth(0)
 int mapLOD_BLEND(SPI_STACK *stack, int argc) {
     if (mapNowMapParts == NULL) {
@@ -706,12 +614,6 @@ int mapLOD_BLEND(SPI_STACK *stack, int argc) {
 }
 #pragma inline_depth reset
 
-// Defined in mapparts.hpp.
-/**
- *
- * Puts a piece of the current map part into a level of detail, hiding it until that level is reached.
- *
- */
 #pragma inline_depth(0)
 int mapLOD_PIECE(SPI_STACK *stack, int argc) {
     if (mapNowMapParts == NULL) {
@@ -733,22 +635,11 @@ int mapLOD_PIECE(SPI_STACK *stack, int argc) {
 }
 #pragma inline_depth reset
 
-// Defined in mapparts.hpp.
-/**
- *
- * Ends a level of detail, so that the next pieces go to the following level.
- *
- */
 int mapLOD_END(SPI_STACK *stack, int argument_count) {
     mapLOD_ID++;
     return 1;
 }
 
-/**
- *
- * Starts a piece of the current map part that uses the model data of the first argument, shown unless the second argument is zero.
- *
- */
 #pragma inline_depth(0)
 int mapPIECE(SPI_STACK *stack, int argument_count) {
     char *name;
@@ -793,18 +684,6 @@ int mapPIECE(SPI_STACK *stack, int argument_count) {
 }
 #pragma inline_depth reset
 
-// Defined in mdslist.hpp.
-// Defined in mg_tanime.hpp.
-// Defined in mg_tanime.hpp.
-// Defined in mg_tanime.hpp.
-// Defined in mdslist.hpp.
-// Defined in object.hpp.
-
-/**
- *
- * Renames the model data that the current piece uses.
- *
- */
 #pragma inline_depth(0)
 int mapPIECE_NAME(SPI_STACK *stack, int argc) {
     CMapPiece *piece;
@@ -825,11 +704,6 @@ int mapPIECE_NAME(SPI_STACK *stack, int argc) {
 }
 #pragma inline_depth reset
 
-/**
- *
- * Moves the current piece to the position of the three arguments.
- *
- */
 #pragma inline_depth(0)
 int mapPIECE_POS(SPI_STACK *stack, int argument_count) {
     if (mapNowMapPiece == NULL) {
@@ -846,11 +720,6 @@ int mapPIECE_POS(SPI_STACK *stack, int argument_count) {
 }
 #pragma inline_depth reset
 
-/**
- *
- * Turns the current piece to the angles of the three arguments.
- *
- */
 #pragma inline_depth(0)
 int mapPIECE_ROT(SPI_STACK *stack, int argument_count) {
     if (mapNowMapPiece == NULL) {
@@ -867,11 +736,6 @@ int mapPIECE_ROT(SPI_STACK *stack, int argument_count) {
 }
 #pragma inline_depth reset
 
-/**
- *
- * Scales the current piece by the three arguments.
- *
- */
 #pragma inline_depth(0)
 int mapPIECE_SCALE(SPI_STACK *stack, int argument_count) {
     if (mapNowMapPiece == NULL) {
@@ -888,11 +752,6 @@ int mapPIECE_SCALE(SPI_STACK *stack, int argument_count) {
 }
 #pragma inline_depth reset
 
-/**
- *
- * Gives the current piece as many material colour entries as the first argument, filled in by the PIECE_MATERIAL tags that follow.
- *
- */
 #pragma inline_depth(0)
 int mapPIECE_MATERIAL_START(SPI_STACK *stack, int argument_count) {
     if (mapNowMapPiece == NULL) {
@@ -911,7 +770,6 @@ int mapPIECE_MATERIAL_START(SPI_STACK *stack, int argument_count) {
 }
 #pragma inline_depth reset
 
-// Defined in mdslist.hpp.
 PieceMaterial::PieceMaterial() { Initialize(); }
 void PieceMaterial::Initialize() { memset(this, 0, sizeof(PieceMaterial)); }
 #pragma inline_depth(0)
@@ -1847,12 +1705,10 @@ void CMap::LoadCfgFile(char *script, int length, mgCMemory *memory) {
     interpreter.Run();
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapload", at_438__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapload", map_tag__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapload", cfg_tag__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapload", at_611__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapload", at_612__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapload", at_613__DATA);
@@ -1939,7 +1795,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapload", at_1438__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapload", at_1439__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapload", at_1544__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapload", __vt__17CList_9CMapPiece___DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapload", __vt__17CList_9CMapParts___DATA);
 
@@ -1955,7 +1810,6 @@ INCLUDE_BSS(ReserveFuncFlag, 0x4);
 INCLUDE_BSS(WaterIndex, 0x4);
 INCLUDE_BSS(cfgWater, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(mapPlacePartsName, 0x100);
 INCLUDE_BSS(mapMapPartsName, 0x100);
 INCLUDE_BSS(mapMapPartsGroupName, 0x100);
