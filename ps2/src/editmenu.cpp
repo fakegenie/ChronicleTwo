@@ -289,7 +289,7 @@ extern mgCMemory *MenuPartsDrawStack;
 extern short GeoramaParts_DrawWaitCnt;
 extern CDC2Mes *GeoramaMes[5];
 extern signed char msgtbl_2587[5];
-extern signed char GeoramaMesForceMakeFlag;
+extern u8 GeoramaMesForceMakeFlag;
 extern u8 GeoramaMesPosForceSetFlag;
 extern unsigned char GeoramaMesForceMakeFlag_PaintVer;
 extern u8 MenuGeoramaCursorForceSetFlag;
@@ -1020,7 +1020,6 @@ void MenuGeoramaListDraw(int &tex_block, float *pos, int page, int alpha) {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/editmenu", MenuGeoramaListDraw__FRiPfii);
 #endif
-#ifdef NONMATCHING
 void MenuGeoramaAnalyzeDraw(int &tex_block, float *pos, int alpha) {
     if (Tex_Georama != NULL && pos[0] >= -300.0f) {
         MenuReloadTexture(tex_block, Tex_Georama->block);
@@ -1041,10 +1040,10 @@ void MenuGeoramaAnalyzeDraw(int &tex_block, float *pos, int alpha) {
         PrimQuad(prim, mgRect<int>(shadow_x, (int)(176.0f + body_y), foot_tex.right, foot_tex.bottom), foot_tex);
         prim->Color(0x80, 0x80, 0x80, alpha);
         float top = pos[1];
-        body_y = (int)(top + head_tex.bottom);
+        int body_y2 = (int)(top + head_tex.bottom);
         PrimQuad(prim, pos[0], top, head_tex);
-        PrimQuad(prim, mgRect<int>((int)pos[0], body_y, body_tex.right, 0xB0), body_tex);
-        PrimQuad(prim, mgRect<int>((int)pos[0], (int)(176.0f + body_y), foot_tex.right, foot_tex.bottom), foot_tex);
+        PrimQuad(prim, mgRect<int>((int)pos[0], body_y2, body_tex.right, 0xB0), body_tex);
+        PrimQuad(prim, mgRect<int>((int)pos[0], (int)(176.0f + body_y2), foot_tex.right, foot_tex.bottom), foot_tex);
         PrimQuad(prim, 329.0f + pos[0], GeoAnalyzeCheckPointScrlBarY, bar_tex);
         Menu3DivideTextureDraw(prim, mgRect<int>((int)(57.0f + pos[0]), (int)(11.0f + pos[1]), 0x73, 0x15),
                                brdtbl_noneactive_1547, 1);
@@ -1066,18 +1065,18 @@ void MenuGeoramaAnalyzeDraw(int &tex_block, float *pos, int alpha) {
                  mgRect<int>((int)GeoRequestBoardCheckPoint[0], (int)GeoRequestBoardCheckPoint[1],
                              (int)GeoRequestBoardCheckPoint[2], (int)GeoRequestBoardCheckPoint[3]));
         prim->End();
+        float clip_top = pos[1];
         float left = pos[0];
-        top = pos[1];
-        mgRect<int> clip((int)left, (int)(42.0f + top), (int)(left + head_tex.right),
-                         (int)(16.0f + (176.0f + (top + head_tex.bottom))));
+        mgRect<int> clip((int)left, (int)(42.0f + clip_top), (int)(left + head_tex.right),
+                         (int)(16.0f + (176.0f + (clip_top + head_tex.bottom))));
         MenuClipRectCheck(clip);
         SetMenuScissor(clip);
         prim->Bilinear(1);
         prim->Begin(6);
         prim->Texture(Tex_Georama);
         prim->Color(0x80, 0x80, 0x80, alpha);
-        int first_hidden = -1;
         float list_pos[2] = {CMenuGeoPt->list_pos[GEORAMA_VIEW_ANALYZE][0], CMenuGeoPt->list_pos[GEORAMA_VIEW_ANALYZE][1]};
+        int first_hidden = -1;
         if (GeoRequestFlag != NULL) {
             if (MenuEditAnalyzeSrc != NULL) {
                 int req_h = 0;
@@ -1092,7 +1091,8 @@ void MenuGeoramaAnalyzeDraw(int &tex_block, float *pos, int alpha) {
                     }
                     PrimQuad(prim, list_pos[0] - 19.0f, 17.0f + y, mgRect<int>(0x160, 0x132, 0x26, 0x1A));
                     short *button = maintopicbtn_1568[GeoRequestFlag->met[no]];
-                    PrimQuad(prim, list_pos[0] - 30.0f, y - 9.0f, mgRect<int>(button[0], button[1], 0x1C, 0x26));
+                    float btn_y = y - 9.0f;
+                    PrimQuad(prim, list_pos[0] - 30.0f, btn_y, mgRect<int>(button[0], button[1], 0x1C, 0x26));
                     y += 30.0f;
                     req_h += GeoramaReqMsgTexH[font_no];
                     font_no++;
@@ -1146,9 +1146,6 @@ void MenuGeoramaAnalyzeDraw(int &tex_block, float *pos, int alpha) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editmenu", MenuGeoramaAnalyzeDraw__FRiPfi);
-#endif
 void InitDownLoadAnaunce(mgCMemory *stack) {
     short *msg_buf = GetMenuMainMessageBuffer();
 
@@ -1367,9 +1364,9 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
     analyze_percent = edit->GetAnalyzePercent(map_no);
     MenuAnalyzeData = &edit->analyze;
     MenuGeoStoneDownLoad_PartsNum = 0;
+    CSaveDataDungeon *dungeon = &save->save_dungeon;
     int floor_num = 0;
     MenuGeoStoneDownLoad_Request = 0;
-    CSaveDataDungeon *dungeon = &save->save_dungeon;
     memset(floors, 0, sizeof(floors));
     PartsMakeOkTableNum = 0;
     int *ok_table = PartsMakeOkTable;
@@ -1878,18 +1875,18 @@ void MenuMapPartsDraw(int &draw_wait) {
 }
 #ifdef NONMATCHING
 void MenuGeoramaMessageMake(int mode) {
+    int first_line;
     int force_pos = GeoramaMesPosForceSetFlag;
     char *name;
     GeoramaMesPosForceSetFlag = 0;
     for (int list_no = 0; list_no < GEORAMA_VIEW_MODE_NUM; list_no++) {
         int data_no = ConvGeoramaDataNo(list_no);
-        if (0 > data_no) {
+        if (data_no < 0) {
             continue;
         }
-        signed char *manner = &GeoramaMesMakeManner[data_no];
         int top_line[2] = { CMenuGeoPt->list_info[list_no].top, CMenuGeoPt->list_info[list_no].top - 1 };
-        GeoramaMesMakeLine[data_no] = top_line[*manner];
-        int first_line = GeoramaMesMakeLine[data_no];
+        GeoramaMesMakeLine[data_no] = top_line[GeoramaMesMakeManner[data_no]];
+        first_line = GeoramaMesMakeLine[data_no];
         CMenuPosDataForm *form = CMenuGeoPt->list_form[list_no];
         CMenuGeoPt->list_target_y[data_no] = 45.0f + form->y - 24.0f * CMenuGeoPt->list_info[list_no].top;
         float *list_pos = CMenuGeoPt->list_pos[data_no];
@@ -1902,15 +1899,15 @@ void MenuGeoramaMessageMake(int mode) {
         } else if (list_pos[0] < -180.0f) {
             continue;
         }
-        int item_mes[13] = { 0 };
-        char *names[13] = { NULL };
-        sceVu0FVECTOR line_color[10];
-        int line_pos[12][2];
         CEditPartsInfo *info[10];
-        int i = 0;
-        int line = first_line;
+        sceVu0FVECTOR line_color[10];
+        int item_mes[13] = { 0 };
+        int line_pos[13][2];
+        char *names[13] = { NULL };
         float x = list_pos[0];
         float y = list_pos[1] + 24.0f * (int)first_line;
+        int i = 0;
+        int line = first_line;
         while (line < 0) {
             item_mes[i] = 0;
             names[i] = NULL;
@@ -1921,27 +1918,29 @@ void MenuGeoramaMessageMake(int mode) {
             ++line;
         }
         for (; i < 10; i++) {
+            int no = first_line + i;
             item_mes[i] = 0;
             names[i] = NULL;
-            int no = first_line + i;
             line_pos[i][0] = (int)x;
             line_pos[i][1] = y;
-            int temp = list_no == GEORAMA_VIEW_PAINT;
-            if (temp) {
+            switch (list_no) {
+            case GEORAMA_VIEW_PAINT:
                 item_mes[i] = i + 0x145A + CMenuGeoPt->list_info[GEORAMA_VIEW_PAINT].top;
-                if (first_line + i == 8 && LanguageCode > 0) {
+                if (no == 8 && LanguageCode > 0) {
                     line_pos[i][0] = (int)(x - 40.0f);
                 }
-            } else {
+                break;
+            default:
                 line_color[i][0] = 107.0f;
                 line_color[i][1] = 106.0f;
                 line_color[i][2] = 104.0f;
-                info[i] = CMenuGeoPt->GetNowSelectEditPartsInfo(data_no, first_line + i);
+                info[i] = CMenuGeoPt->GetNowSelectEditPartsInfo(data_no, no);
                 if (info[i] != NULL) {
                     names[i] = info[i]->edit_name;
                 } else {
                     names[i] = NULL;
                 }
+                break;
             }
             y += 24.0f;
         }
@@ -1971,7 +1970,7 @@ void MenuGeoramaMessageMake(int mode) {
         if (GeoramaMesForceMakeFlag != 0) {
             mes->ClsMes::mes_no = - 1;
         }
-        if ((*manner == 1 && 238.0f + form->y - 9.0f <= line_pos[8][1]) || (*manner == 0 && 238.0f + form->y - 9.0f <= line_pos[8][1])) {
+        if ((GeoramaMesMakeManner[data_no] == 1 && 238.0f + form->y - 9.0f <= line_pos[8][1]) || (GeoramaMesMakeManner[data_no] == 0 && 238.0f + form->y - 9.0f <= line_pos[8][1])) {
             mes->line_pos[8][0] = mgScreenWidth - 20;
             mes->line_pos_on[8] = 1;
         }
@@ -1988,7 +1987,7 @@ void MenuGeoramaMessageMake(int mode) {
     CMenuGeoPt->list_pos[GEORAMA_VIEW_ANALYZE][0] = 54.0f + CMenuGeoPt->analyze_form->x;
     if (GeoramaMesForceMakeFlag != 0) {
         GeoramaMesForceMakeFlag_PaintVer = 0;
-        GeoramaMesForceMakeFlag ^= 1;
+        GeoramaMesForceMakeFlag = (signed char)GeoramaMesForceMakeFlag ^ 1;
     }
 }
 #else
