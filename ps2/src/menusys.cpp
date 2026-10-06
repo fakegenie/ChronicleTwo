@@ -125,11 +125,6 @@ struct KeyPairTable {
     int v[2][2];
 };
 
-struct ScreenPos {
-    int x;
-    int y;
-} __attribute__((aligned(8)));
-
 struct SpectolBreakTable {
     int v[4];
 };
@@ -144,7 +139,6 @@ extern CGameDataUsed SpectolTransBefore;
 extern CMenuEffect *MenuEffect[2];
 extern CGameDataUsed SpectolInfoStay;
 extern NamePair at_1685;
-extern ScreenPos at_2564;
 extern KeyPairTable at_2328;
 extern KeyPairTable at_2333__3;
 extern SpectolBreakTable at_1557;
@@ -2318,27 +2312,27 @@ void CMenuKeyFunc::AttachFuncData() {
 int CMenuKeyFunc::GetActiveCharaNo() {
     return MenuArg.active_chara_no;
 }
-#ifdef NONMATCHING
 int CMenuKeyFunc::MenuPosStep(int *pos, int *offset) {
-    ScreenPos waku_pos;
+    int waku_pos[2];
     if (waku_form != NULL) {
         waku_form->SetNextMovePos(pos, 2);
-        waku_form->GetNextMovePos(&waku_pos.x);
+        waku_form->GetNextMovePos(waku_pos);
     }
-    ScreenPos next = at_2564;
+    int next[2] = {waku_pos[0], waku_pos[1]};
     int put[2];
-    next = waku_pos;
     if (offset != NULL) {
-        next.x += offset[0];
-        next.y += offset[1];
+        next[0] += offset[0];
+        next[1] += offset[1];
     }
-    cursor_form->SetNextMovePos(&next.x, 2);
-    int end = cursor_form->CheckMoveEnd(next.x, next.y);
+    cursor_form->SetNextMovePos(next, 2);
+    int end = cursor_form->CheckMoveEnd(next[0], next[1]);
     cursor_form->GetPutPosXY(at_2545__2, put[0], put[1]);
     CMenuPosDataForm *form = how_much_form;
     if (form != NULL) {
-        form->x = put[0] + 10;
-        form->y = (float)put[1] + 40;
+        int x = put[0] + 10;
+        int y = put[1] + 40;
+        form->x = x;
+        form->y = y;
     }
     if (have_item.item_no > 0) {
         SetHaveItemInfo(1, 0);
@@ -2355,9 +2349,6 @@ int CMenuKeyFunc::MenuPosStep(int *pos, int *offset) {
     }
     return end;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menusys", MenuPosStep__12CMenuKeyFuncFPiPi);
-#endif
 void CMenuKeyFunc::MenuSetPos(int x, int y) {
     CMenuPosDataForm *form = cursor_form;
     float fx = (float)x;
@@ -4110,22 +4101,24 @@ void CMenuItemInfo::NextModeBuildUpInfo(CGameDataUsed *weapon) {
     }
     MenuSePlay(SYSTEM_SE_DECIDE);
 }
-#ifdef NONMATCHING
 int CMenuItemInfo::EquipDirect(int chara, CGameDataUsed *item, int &slot) {
-    CGameDataUsed *target;
+    int who;
+    int robo_slot4;
     s16 item_no = item->item_no;
+    int status;
+    int robo_slot2;
     int data_type = GetItemDataType(item_no);
+    CGameDataUsed *target;
     int chara_no = chara;
     if (item->IsFishingRod() && !CheckFishCondition()) {
         return 0;
     }
-    int who = IsItemtypeWhoisEquip(item_no, &slot);
-    int status = MenuUserDataManPtr->GetCharaStatusAttirbute(chara);
+    who = IsItemtypeWhoisEquip(item_no, &slot);
+    status = MenuUserDataManPtr->GetCharaStatusAttirbute(chara);
     if ((status & CHARA_STATUS_UNK_4) || (status & CHARA_STATUS_UNK_8) || (status & CHARA_STATUS_UNK_20)) {
         return 0;
     }
-    int robo_slot2;
-    int robo_slot4 = 0;
+    robo_slot4 = 0;
     robo_slot2 = 0;
     if (view_mode == 3 && data_type == 5) {
         robo_slot4 = 1;
@@ -4158,33 +4151,28 @@ int CMenuItemInfo::EquipDirect(int chara, CGameDataUsed *item, int &slot) {
     MENU_SWAPITEM_INFO swap;
     swap.Set(MENU_SWAP_TYPE_EQUIP, slot, chara_no, 0);
     if (chara < 2) {
-        __typeof__(&MenuUserParam) menuUserParam_ptr2 = &MenuUserParam;
-        target = &menuUserParam_ptr2->chara[chara_no]->equip[slot];
-        swap.type = MENU_SWAP_TYPE_EQUIP;
+        target = &MenuUserParam.chara[chara_no]->equip[slot];
+        swap.type = 1;
         if (robo_slot4 == 1) {
+            target = &MenuUserParam.chara[0]->equip[4];
             slot = 1;
-            target = &menuUserParam_ptr2->chara[0]->equip[4];
-            swap.type = MENU_SWAP_TYPE_ROBO_PART;
+            swap.type = 2;
         }
-        int second_robo_slot = robo_slot2 == 1;
-        if (second_robo_slot) {
+        if (robo_slot2 == 1) {
+            target = &MenuUserParam.chara[0]->equip[2];
             slot = 1;
-            target = &menuUserParam_ptr2->chara[0]->equip[2];
-            swap.type = MENU_SWAP_TYPE_ROBO_PART;
+            swap.type = 2;
         }
     } else if (chara == 2) {
         if (IsEnableChangeRoboParts(&MenuCommonInfo->have_item) == 1) {
-            swap.type = MENU_SWAP_TYPE_ROBO_PART;
             target = &MenuUserParam.robo->parts[slot];
+            swap.type = 2;
         } else {
             return 0;
         }
     }
     return MenuCommonInfo->MenuSwapItem(target, &swap, 1, true) != 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menusys", EquipDirect__13CMenuItemInfoFiP13CGameDataUsedRi);
-#endif
 void CMenuItemInfo::CheckLoadInfo(int chara) {
     if (CheckEquipListNo(1) && chara == GetActiveCharaNo()) {
         MenuLoadInfo.unk_6[1] = 1;
