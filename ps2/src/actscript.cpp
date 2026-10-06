@@ -1005,40 +1005,48 @@ void ShotLaserGun(float *position, float *direction, int type) {
     sndSePlay(action_info.chara->sound_info.se_bank, 5, 0);
 }
 
-#ifdef NONMATCHING
 int _SET_SHOT(RS_STACKDATA *stack, int argc) {
     float position[4];
     float direction[4];
     int whp[2];
     int magic_whp[2];
+    int object_no;
+    int wait;
+    float scale;
+    CBattleCharaInfo *info;
+    mgCFrame *muzzle;
+    mgCFrame *grip;
+    CGameDataUsed *equip;
+    int attack_type;
+    int laser;
 
     if (argc < 4 || argc > 5) {
         return 0;
     }
-    int object_no = GetStackInt(stack++);
+    object_no = GetStackInt(stack++);
     GetStackString(stack++);
     GetStackInt(stack++);
-    int wait = GetStackInt(stack++);
-    float scale = 1.0f;
+    wait = GetStackInt(stack++);
+    scale = 1.0f;
     if (argc == 5) {
         scale = GetStackFloat(stack);
     }
-    CBattleCharaInfo *info = GetBattleCharaInfo();
-    u_short chara = info->chr_no;
+    info = GetBattleCharaInfo();
+    int chara = info->chr_no;
     sceVu0CopyVector(direction, action_info.chara->front_vec);
     sceVu0CopyVector(position, action_info.chara->object[object_no].pos);
     if (chara == USER_CHARA_MAX) {
         info->GetNowWhp(1, whp);
-        mgCFrame *muzzle = action_info.chara->SearchObject(at_1579);
-        mgCFrame *grip = action_info.chara->SearchObject(at_1580__2);
+        muzzle = action_info.chara->SearchObject(at_1579);
+        grip = action_info.chara->SearchObject(at_1580__2);
         if (muzzle != NULL && grip != NULL) {
             muzzle->GetWorldPosition0(direction);
             grip->GetWorldPosition0(position);
             sceVu0SubVector(direction, direction, position);
             sceVu0Normalize(direction, direction);
         }
-        CGameDataUsed *equip = info->equip;
-        int attack_type = equip[1].GetAttackType();
+        equip = info->equip;
+        attack_type = equip[1].GetAttackType();
         if (whp[0] > 0) {
             if (attack_type == 0 || attack_type == 11) {
                 if (action_info.chara->shot_wait > 0) {
@@ -1054,7 +1062,7 @@ int _SET_SHOT(RS_STACKDATA *stack, int argc) {
                 ShotGrenadGun(position, direction);
             }
             if (attack_type == 20) {
-                int laser = 0;
+                laser = 0;
                 if (equip[1].item_no == 0x1F) {
                     laser = 0;
                 }
@@ -1082,9 +1090,6 @@ int _SET_SHOT(RS_STACKDATA *stack, int argc) {
     }
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/actscript", _SET_SHOT__FP12RS_STACKDATAi);
-#endif
 int _SET_SPECIAL_SHOT(RS_STACKDATA *stack, int argc) {
     float facing[4];
     float position[4];
