@@ -374,11 +374,12 @@ void CAutoMapGen::SetupRoomInfo(char *name, int length, mgCMemory *mem) {
     interpreter.Run();
     room_info_num = nowPrisetNum;
 }
-#ifdef NONMATCHING
 int CAutoMapGen::CreatRoom(int x, int y, int room_no, int info_no) {
-    AUTOMAP_PARTS_INFO *parts_info;
+    int w, h;
+    int pick;
+    s16 *table;
+    AUTOMAP_ROOM_INFO *info;
     if (info_no == -1) {
-        int pick;
         do {
             pick = iRand(room_info_num);
             if (room_info[pick].fixed > 0) {
@@ -387,19 +388,19 @@ int CAutoMapGen::CreatRoom(int x, int y, int room_no, int info_no) {
             if (room_info[pick].rate < iRand(100)) {
                 pick = -1;
             }
-            info_no = pick;
         } while (pick == -1);
+        info_no = pick;
     }
-    s16 *table = room_info[info_no].table;
-    int col, row;
-    if (table == NULL) {
+    info = &room_info[info_no];
+    if (info->table == NULL) {
         return 0;
     }
-    int w = room_info[info_no].w, h = room_info[info_no].h;
+    w = info->w;
+    h = info->h;
     if (x < 0 || y < 0) {
         return 0;
     }
-    if (x + w > grid_w || grid_h < y + h) {
+    if (x + w > grid_w || y + h > grid_h) {
         return 0;
     }
     for (int row = y - 1; row < y + h + 1; row++) {
@@ -409,28 +410,24 @@ int CAutoMapGen::CreatRoom(int x, int y, int room_no, int info_no) {
             }
         }
     }
-    for (row = y; row < y + h; row++) {
-        col = x - 1;
-        if (col < x + w + 1) {
-            do {
-                if ((grid + grid_w * row)[col].kind != 0) {
-                    return 0;
-                }
-                col++;
-            } while (col < x + w + 1);
+    for (int row = y; row < y + h; row++) {
+        for (int col = x - 1; col < x + w + 1; col++) {
+            if ((grid + row * grid_w)[col].kind != 0) {
+                return 0;
+            }
         }
     }
-    for (row = y; row < y + h; row++) {
-        for (col = x; col < x + w; col++) {
+    table = info->table;
+    for (int row = y; row < y + h; row++) {
+        for (int col = x; col < x + w; col++) {
             s16 parts_no = table[0];
             s16 attr = table[1];
             table += 2;
             if (parts_no != -1) {
-                parts_info = &PartsInfoData[parts_no];
                 (grid + row * grid_w)[col].parts_no = parts_no;
                 (grid + row * grid_w)[col].attr = attr;
-                (grid + row * grid_w)[col].kind = parts_info->kind;
-                (grid + row * grid_w)[col].link = parts_info->link;
+                (grid + row * grid_w)[col].kind = PartsInfoData[parts_no].kind;
+                (grid + row * grid_w)[col].link = PartsInfoData[parts_no].link;
                 (grid + row * grid_w)[col].road_link = 0;
                 (grid + row * grid_w)[col].room_no = room_no;
             }
@@ -442,9 +439,6 @@ int CAutoMapGen::CreatRoom(int x, int y, int room_no, int info_no) {
     room[room_no].h = h;
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/automap", CreatRoom__11CAutoMapGenFiiii);
-#endif
 int CAutoMapGen::LinkConnectCheck(int x, int y, int kind, int room_no, int exclude) {
     int sides[4];
     int cell_kind;
