@@ -826,23 +826,36 @@ void viBufFlush(ViBuf *buf) {
     SignalSema(buf->sema);
 }
 #pragma divbyzerocheck on
-#ifdef NONMATCHING
 int viBufModifyPts(ViBuf *buf, TimeStamp *ts) {
-    int size = buf->n << 11;
-    int keep_going = 1;
-    int index = (buf->n_ts + (buf->wt_ts - buf->count_ts)) % buf->n_ts;
+    int remaining;
+    int index;
+    int size;
+    int inside;
+    TimeStamp *entry;
+    int keep_going;
+    int len;
+    int ts_len;
+    int ts_pos;
+    int remaining_ts;
+    int pos;
 
+    index = (buf->n_ts + (buf->wt_ts - buf->count_ts)) % buf->n_ts;
+    size = buf->n << 11;
+    keep_going = 1;
     if (buf->count_ts > 0) {
         do {
-            TimeStamp *entry = &buf->ts[index];
-            int len = entry->len;
-            if (len == 0 || ts->len == 0) {
-                break;
-            }
-            if ((entry->pos + size - ts->pos) % size < ts->len) {
-                int remaining = ts->pos + ts->len - entry->pos;
-                len = (len < remaining) ? len : remaining;
-                entry->pos = (entry->pos + len) % size;
+            entry = &buf->ts[index];
+            len = entry->len;
+            if (len == 0) break;
+            ts_len = ts->len;
+            if (ts_len == 0) break;
+            pos = entry->pos;
+            ts_pos = ts->pos;
+            inside = ts_len > (pos + size - ts_pos) % size;
+            if (inside) {
+                remaining = ts_pos + ts_len - pos;
+                len = (remaining > len) ? len : remaining;
+                entry->pos = (pos + len) % size;
                 entry->len -= len;
                 if (entry->len == 0) {
                     if (entry->pts >= 0) {
@@ -851,11 +864,8 @@ int viBufModifyPts(ViBuf *buf, TimeStamp *ts) {
                         entry->pos = 0;
                         entry->len = 0;
                     }
-                    int remaining_ts = buf->count_ts - 1;
-                    if (remaining_ts < 0) {
-                        remaining_ts = 0;
-                    }
-                    buf->count_ts = remaining_ts;
+                    remaining_ts = buf->count_ts - 1;
+                    buf->count_ts = (remaining_ts < 0) ? 0 : remaining_ts;
                 }
             } else {
                 keep_going = 0;
@@ -865,9 +875,6 @@ int viBufModifyPts(ViBuf *buf, TimeStamp *ts) {
     }
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/movie", viBufModifyPts__FP5ViBufP9TimeStamp);
-#endif
 #pragma divbyzerocheck reset
 #pragma divbyzerocheck on
 int viBufPutTs(ViBuf *buf, TimeStamp *ts) {
