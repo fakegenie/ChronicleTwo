@@ -816,11 +816,9 @@ void InitSpectolRasterTable(mgCMemory *memory) {
         offset += 0x20;
     }
 }
-#ifdef NONMATCHING
 void DrawOneItem(mgCDrawPrim *prim, mgRect<float> rect, int item, int mode, MENU_PARTS_EFFECT_STRUCT1 *effect, u8 *rgba,
                  int item_flag) {
-    float bottom = rect.top + rect.bottom;
-    if (bottom >= 0.0f && mgScreenWidth - 1 >= rect.left) {
+    if (rect.top + rect.bottom >= 0.0f && mgScreenWidth - 1 >= rect.left) {
         mgRect<int> icon_uv(0, 0, 0, 0);
         mgCTextureManager *textures = &mgTexManager;
         GetMenuItemIconTexGetXY(item, icon_uv);
@@ -834,13 +832,12 @@ void DrawOneItem(mgCDrawPrim *prim, mgRect<float> rect, int item, int mode, MENU
                 if (effect->param[0] > 150.0f) {
                     effect->param[0] = 0.0f;
                 }
-                effect[1].param[0] += 1.0f;
+                effect[1].param[0]++;
             }
             mgRect<int> uv(item_transtbl[use_trans_rect].left, item_transtbl[use_trans_rect].top,
                            item_transtbl[use_trans_rect].right, item_transtbl[use_trans_rect].bottom);
-            u_long tex0 = tex->tex0.value;
-            u_int tbp = tex0 & 0x3FFF;
-            u_int tbw = (tex0 >> 14) & 0x3F;
+            u_int tbp = tex->tex0_value & 0x3FFF;
+            u_int tbw = (tex->tex0_value >> 14) & 0x3F;
             prim->Begin(0);
             prim->Direct(SCE_GS_BITBLTBUF, SCE_GS_SET_BITBLTBUF(tbp, tbw, SCE_GS_PSMT8, tbp, tbw, SCE_GS_PSMT8));
             prim->Direct(SCE_GS_TRXPOS, SCE_GS_SET_TRXPOS(icon_uv.left, icon_uv.top, uv.left, uv.top, 0));
@@ -848,6 +845,7 @@ void DrawOneItem(mgCDrawPrim *prim, mgRect<float> rect, int item, int mode, MENU
             prim->Direct(SCE_GS_TRXDIR, SCE_GS_SET_TRXDIR(2));
             prim->End();
             float right = rect.left + rect.right;
+            float bottom = rect.top + rect.bottom;
             int uv_right = uv.left + uv.right;
             int uv_bottom = uv.top + uv.bottom;
             if (mode != 1) {
@@ -916,8 +914,10 @@ void DrawOneItem(mgCDrawPrim *prim, mgRect<float> rect, int item, int mode, MENU
                     int mark_u = mark % 2 * 16 + 0xC0;
                     int mark_v = mark / 2 * 16 + 0x1A0;
                     prim->TextureCrd(mark_u, mark_v);
-                    float mark_y = 20.0f + rect.top;
-                    float mark_x = 16.0f + rect.left;
+                    float mark_y;
+                    float mark_x;
+                    mark_x = rect.left + 16.0f;
+                    mark_y = rect.top + 20.0f;
                     prim->Vertex(mark_x, mark_y, 0.0f);
                     prim->TextureCrd(mark_u + 16, mark_v + 16);
                     prim->Vertex(16.0f + mark_x, 16.0f + mark_y, 0.0f);
@@ -934,16 +934,19 @@ void DrawOneItem(mgCDrawPrim *prim, mgRect<float> rect, int item, int mode, MENU
                 prim->Vertex(right, bottom, 0.0f);
                 prim->Flush();
                 if (effect != NULL) {
+                    u8 blue;
                     int raster = (int)effect->param[0] * 32;
+                    u8 red;
                     float hue = mgAngleLimit(0.017453292f * effect[1].param[0]);
                     int line_v = uv.top;
                     float line_y = rect.top;
+                    u8 green;
                     for (int line = 0; line < 32; line++, line_v++) {
                         float line_x = rect.left + (int)spectol_raster_xtbl[raster + line];
                         float line_h = spectol_y_addtbl_1245[line];
-                        u8 red = 255.0f * sinf(hue);
-                        u8 green = 255.0f * sinf(2.0943952f + hue);
-                        u8 blue = 255.0f * sinf(4.1887903f + hue);
+                        red = 255.0f * sinf(hue);
+                        green = 255.0f * sinf(2.0943952f + hue);
+                        blue = 255.0f * sinf(4.1887903f + hue);
                         prim->Color(red, green, blue, rgba[3] / 3);
                         prim->TextureCrd(uv.left, line_v);
                         prim->Vertex(line_x, line_y, 0.0f);
@@ -956,10 +959,14 @@ void DrawOneItem(mgCDrawPrim *prim, mgRect<float> rect, int item, int mode, MENU
             }
             prim->End();
             if (item_flag & 2) {
-                float mark_x = 23.0f + rect.left;
-                float mark_y = 16.0f + rect.top - DrawItemCounter;
-                float mark_right = 16.0f + mark_x;
-                float mark_bottom = 16.0f + mark_y;
+                float mark_x;
+                float mark_right;
+                float mark_y;
+                float mark_bottom;
+                mark_x = 23.0f + rect.left;
+                mark_y = 16.0f + rect.top - DrawItemCounter;
+                mark_right = 16.0f + mark_x;
+                mark_bottom = 16.0f + mark_y;
                 prim->Bilinear(1);
                 prim->Begin(6);
                 prim->Color(0x80, 0x80, 0x80, 0x80);
@@ -990,9 +997,6 @@ void DrawOneItem(mgCDrawPrim *prim, mgRect<float> rect, int item, int mode, MENU
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", DrawOneItem__FP11mgCDrawPrim9mgRect_f_iiP25MENU_PARTS_EFFECT_STRUCT1PUci);
-#endif
 void MenuWindowHelp(mgCDrawPrim *prim, mgCTexture *texture, float x, float y, float width, float height,
                     short *table) {
     if (texture != 0) {
@@ -1991,17 +1995,14 @@ void MenuMainFrameImgDraw(int &loaded_tex_no) {
     dest.bottom += 1;
     DrawMenuMainFrmImg(loaded_tex_no, dest, source, 0x80, 0x80, 0x80, alpha, 0);
 }
-#ifdef NONMATCHING
 void DrawMenuWakuStep(void) {
     float move[6] = {-0.2f, 0.0f, 18.0f, 0.2f, 18.0f, 0.0f};
     int i;
     for (i = 0; i < 2; i++) {
-        float *axis = &MenuWakuPutXY[i];
-        float *entry = &move[i * 3];
-        float rate = entry[0];
-        *axis += rate;
-        if (CalcMenuAdd(axis, rate, entry[1]) != 0) {
-            *axis = entry[2];
+        int n = i * 3;
+        MenuWakuPutXY[i] += move[n];
+        if (CalcMenuAdd(&MenuWakuPutXY[i], move[n], move[n + 1]) != 0) {
+            MenuWakuPutXY[i] = move[n + 2];
         }
     }
     MenuWakuRotCnt -= 3.1415927f / 220.0f;
@@ -2009,9 +2010,6 @@ void DrawMenuWakuStep(void) {
         MenuWakuRotCnt += 6.2831855f;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", DrawMenuWakuStep__Fv);
-#endif
 void DrawMenuWakuRect(mgCTexture *tex, mgRect<float> rect, mgRect<int> tex_rect, int a, int r, int g, int b) {
     mgCDrawPrim *prim;
     float sign;
@@ -2565,7 +2563,6 @@ void CMenuPosDataForm::MenuPartsStep() {
         }
     }
 }
-#ifdef NONMATCHING
 static void DrawItemIconEffect2(mgCDrawPrim *prim, mgCTexture *tex, MENUFORMPARTS_TYPE *parts, mgRect<float> rect) {
     MENU_PARTS_EFFECT_STRUCT1 *effect;
     int i;
@@ -2609,12 +2606,12 @@ static void DrawItemIconEffect2(mgCDrawPrim *prim, mgCTexture *tex, MENUFORMPART
                 alpha = (int)(64.0f * sinf((3.1415927f / effect->param[1]) * effect->param[0]));
                 color = &star_color_table[(int)(3.0f * effect->param[4])];
                 prim->Color(color[0], color[1], color[2], alpha);
-                n = 0;
-                for (k = 0; k < 4; k++, n += 2) {
+                for (k = 0; k < 4; k++) {
                     dx = scale * ((float)center_x - corners[k][0]);
                     dy = scale * ((float)center_y - corners[k][1]);
                     corners[k][0] = center_x + dx * cos_angle - dy * sin_angle;
                     corners[k][1] = center_y + dx * sin_angle + dy * cos_angle;
+                    n = k * 2;
                     prim->TextureCrd(uv[n], uv[n + 1]);
                     prim->Vertex((int)corners[0][n], (int)corners[0][n + 1], 0);
                 }
@@ -2624,9 +2621,6 @@ static void DrawItemIconEffect2(mgCDrawPrim *prim, mgCTexture *tex, MENUFORMPART
         prim->End();
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", DrawItemIconEffect2__FP11mgCDrawPrimP10mgCTextureP18MENUFORMPARTS_TYPE9mgRect_f_);
-#endif
 void MenuItemBrdSetInfo(int unused, int pos, int max_line, int view_line) {
     float hidden_lines;
     MenuItemBrdMaxLine = max_line;
@@ -3127,12 +3121,12 @@ void CMenuPosDataForm::SetNextMovePos(int *position, int move_type) {
 }
 #ifdef NONMATCHING
 int CMenuPosDataForm::GetNextMovePos(int *pos) {
-    int move_type;
     int i;
+    int move_type;
     int target_pos;
     float rate_now;
-    float diff;
     MENU_FORM_ACTION_MOVE *move;
+    float diff;
     float rate[2];
     int target[2];
 
@@ -3164,11 +3158,11 @@ int CMenuPosDataForm::GetNextMovePos(int *pos) {
     case MENUFORM_MTYPE_L:
         for (i = 0; i < 2; i++) {
             target_pos = target[i];
-            if (target_pos - now[i] < 0) {
+            if (target[i] - now[i] < 0) {
                 rate[i] = -rate[i];
             }
             rate_now = rate[i];
-            now[i] = (int)((float)now[i] + rate_now);
+            now[i] += rate_now;
             if (abs(target_pos - now[i]) <= abs((int)rate_now)) {
                 now[i] = target_pos;
             }
@@ -5861,10 +5855,10 @@ void CMenuEffect::PresetInfo(MENU_EFFECT_INFO *particle, int no, int mode) {
 void CMenuEffect::Step() {
     end = 0;
     if (run != 0) {
-        if (info != NULL) {
-            MENU_EFFECT_INFO *particle = info;
+        MENU_EFFECT_INFO *particle = info;
+        if (particle != NULL) {
+            int prev_type = type;
             int i;
-            s8 prev_type = type;
             int done = 1;
             switch (prev_type) {
                 case 0:
@@ -5904,7 +5898,7 @@ void CMenuEffect::Step() {
                             done = 0;
                             drop->x = base_info[0] + drop->unk_14 * drop->unk_0;
                             drop->y = base_info[1] + drop->unk_18 * drop->unk_0 + 0.25f * (drop->unk_1c * drop->unk_0);
-                            drop->unk_0 += 1.0f;
+                            drop->unk_0++;
                         }
                     }
                     if (done != 0) {
@@ -5951,17 +5945,17 @@ void CMenuEffect::Step() {
                     particle->y = base_info[1] - particle->unk_20;
                     particle->unk_14 = 2.0f * particle->unk_1c;
                     particle->unk_18 = 2.0f * particle->unk_20;
-                    particle->unk_0 += 1.0f;
+                    particle->unk_0++;
                     if (particle->unk_0 < 70.0f && (int)particle->unk_0 % 2 != 0) {
                         particle->unk_1c += 1.0f;
                         particle->unk_20 += 1.0f;
                         particle->unk_28 += 1.0f;
-                    } else if (particle->unk_0 >= 70.0f && particle->unk_0 < 112.0f &&
+                    } else if (70.0f <= particle->unk_0 && particle->unk_0 < 112.0f &&
                                (int)particle->unk_0 % 4 == 0) {
                         particle->unk_1c += 2.0f;
                         particle->unk_20 += 2.0f;
                         particle->unk_28 += 5.0f;
-                    } else if (particle->unk_0 >= 112.0f) {
+                    } else if (112.0f <= particle->unk_0) {
                         particle->unk_1c -= 6.0f;
                         particle->unk_20 -= 6.0f;
                         particle->unk_28 -= 13.0f;
@@ -5992,12 +5986,14 @@ void CMenuEffect::Step() {
                             particle->unk_28 = 0.0f;
                         }
                         if (particle->unk_24 > 0.0f) {
-                            float radius = particle->unk_1c;
                             float angle = 3.1415927f / particle->unk_18 * particle->unk_0;
+                            float radius = particle->unk_1c;
                             particle->x = base_info[0] + radius * cosf(angle);
                             particle->y = base_info[1] + radius * sinf(angle);
-                            particle->x += (int)(particle->unk_30 * sinf(3.1415927f * particle->unk_0 / particle->unk_38));
-                            particle->y += (int)(particle->unk_34 * sinf(3.1415927f * particle->unk_0 / particle->unk_38));
+                            int dx = particle->unk_30 * sinf(3.1415927f * particle->unk_0 / particle->unk_38);
+                            particle->x += dx;
+                            int dy = particle->unk_34 * sinf(3.1415927f * particle->unk_0 / particle->unk_38);
+                            particle->y += dy;
                             particle->unk_1c += particle->unk_20;
                             particle->unk_0 += 1.0f;
                             if (particle->unk_24 > 1.0f && particle->unk_1c < 3.0f) {
@@ -6031,7 +6027,7 @@ void CMenuEffect::Step() {
                     break;
                 case 15:
                     for (i = 0; i < info_num; i++, particle++) {
-                        particle->unk_0 += 1.0f;
+                        particle->unk_0++;
                         if ((int)particle->unk_0 % 2 != 0) {
                             particle->unk_28 += particle->unk_2c;
                         }
@@ -6068,7 +6064,7 @@ void CMenuEffect::Step() {
                         if (particle->unk_24 > 0.0f) {
                             particle->x += particle->unk_14;
                             particle->y += particle->unk_18;
-                            particle->unk_0 += 1.0f;
+                            particle->unk_0++;
                             done = 0;
                             if (particle->unk_24 > 1.0f && particle->unk_28 < 10.0f) {
                                 particle->unk_24 -= 1.0f;
@@ -6101,7 +6097,7 @@ void CMenuEffect::Step() {
                 case 18: {
                     int ended = 0;
                     for (i = 0; i < info_num; i++, particle++) {
-                        particle->unk_0 += 1.0f;
+                        particle->unk_0++;
                         if (particle->unk_0 > 26.0f) {
                             particle->unk_30 -= 2.0f;
                         }
@@ -6164,8 +6160,8 @@ void CMenuEffect::Step() {
                         if (abs((int)(particle->x - base_info[4])) < 9 && abs((int)(particle->y - base_info[5])) < 9) {
                             particle->x = base_info[4] + particle->unk_14 * sinf(0.07853982f * particle->unk_0);
                             particle->y = base_info[5] + particle->unk_14 * cosf(0.07853982f * particle->unk_0);
-                            gathered++;
                             fade = -5;
+                            gathered++;
                         } else {
                             fade = 3;
                             done = 0;
@@ -6178,7 +6174,7 @@ void CMenuEffect::Step() {
                             particle->unk_30 = 128.0f;
                         }
                     }
-                    particle->unk_0 += 1.0f;
+                    particle->unk_0++;
                     particle->x = base_info[4] - particle->unk_18;
                     particle->y = base_info[5] - particle->unk_18;
                     if (gathered < info_num * 14 / 15) {
