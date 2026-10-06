@@ -198,22 +198,16 @@ void CDynamicAnime::ResetFloor(void) {
 }
 #ifdef NONMATCHING
 void CDynamicAnime::FramePose(mgCFrame *frame, DA_FRAME_POSE *pose) {
+    int            across_axis;
     sceVu0FMATRIX  matrix;
-    sceVu0FMATRIX  bone_parent_matrix;
-    sceVu0FMATRIX  corner_parent_matrix;
-    sceVu0FVECTOR  origin;
-    sceVu0FVECTOR  end;
-    sceVu0FVECTOR  across;
-    sceVu0FVECTOR  along;
-    float         *v0;
-    float         *v1;
     float         *v2;
-    float         *v3;
     int            cross_axis;
     int            along_axis;
-    int            across_axis;
     int            first_axis;
     int            second_axis;
+    float         *v3;
+    float         *v0;
+    float         *v1;
 
     if (frame == NULL) {
         return;
@@ -229,8 +223,13 @@ void CDynamicAnime::FramePose(mgCFrame *frame, DA_FRAME_POSE *pose) {
         first_axis = 0;
         along_axis = 1;
         second_axis = 1;
-        
-    case DA_FRAME_POSE_BONE:
+        across_axis = 0;
+    case DA_FRAME_POSE_BONE: {
+        sceVu0FVECTOR origin;
+        sceVu0FVECTOR end;
+        sceVu0FVECTOR across;
+        sceVu0FVECTOR along;
+
         v0 = now_vertex[pose->vertex_id[0]];
         v1 = now_vertex[pose->vertex_id[1]];
         v2 = now_vertex[pose->vertex_id[2]];
@@ -252,17 +251,23 @@ void CDynamicAnime::FramePose(mgCFrame *frame, DA_FRAME_POSE *pose) {
         sceVu0CopyVector(matrix[3], origin);
         matrix[3][3] = 1.0f;
         if (pose->local != 0 && frame->parent != NULL) {
-            frame->parent->GetLWMatrix(bone_parent_matrix);
-            mgInversMatrix(bone_parent_matrix, bone_parent_matrix);
-            mgMulMatrix(matrix, bone_parent_matrix, matrix);
+            sceVu0FMATRIX parent_matrix;
+
+            frame->parent->GetLWMatrix(parent_matrix);
+            mgInversMatrix(parent_matrix, parent_matrix);
+            mgMulMatrix(matrix, parent_matrix, matrix);
         }
         frame->SetTransMatrix(matrix);
         return;
-    case DA_FRAME_POSE_B_CDLR:
+    }
+    }
+    if (pose->type == DA_FRAME_POSE_B_CDLR) {
+        sceVu0FVECTOR along;
+
         v0 = now_vertex[pose->vertex_id[0]];
-        v1 = now_vertex[pose->vertex_id[1]];
         v2 = now_vertex[pose->vertex_id[2]];
         v3 = now_vertex[pose->vertex_id[3]];
+        v1 = now_vertex[pose->vertex_id[1]];
         sceVu0SubVector(matrix[0], v1, v0);
         matrix[0][3] = 0.0f;
         sceVu0Normalize(matrix[0], matrix[0]);
@@ -274,12 +279,13 @@ void CDynamicAnime::FramePose(mgCFrame *frame, DA_FRAME_POSE *pose) {
         sceVu0CopyVector(matrix[3], v0);
         matrix[3][3] = 1.0f;
         if (pose->local != 0 && frame->parent != NULL) {
-            frame->parent->GetLWMatrix(corner_parent_matrix);
-            mgInversMatrix(corner_parent_matrix, corner_parent_matrix);
-            mgMulMatrix(matrix, corner_parent_matrix, matrix);
+            sceVu0FMATRIX parent_matrix;
+
+            frame->parent->GetLWMatrix(parent_matrix);
+            mgInversMatrix(parent_matrix, parent_matrix);
+            mgMulMatrix(matrix, parent_matrix, matrix);
         }
         frame->SetTransMatrix(matrix);
-        break;
     }
 }
 #else
