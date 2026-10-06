@@ -688,7 +688,70 @@ asm void mgMulMatrix(float (*product)[4], float (*left_matrix)[4], float (*right
     jr ra
     sqc2 vf23, 0x30(a0)
 }
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgInversMatrix__FPA4_fPA4_f);
+asm void mgInversMatrix(float (*inverse)[4], float (*matrix)[4]) {
+    .set noreorder
+    lqc2 vf1, 0x0(a1)
+    lqc2 vf2, 0x10(a1)
+    lqc2 vf3, 0x20(a1)
+    lqc2 vf4, 0x30(a1)
+    vmuly.x vf5, vf1, vf2y
+    vmuly.x vf6, vf3, vf1y
+    vmuly.x vf7, vf2, vf3y
+    vmuly.x vf8, vf1, vf3y
+    vmuly.x vf9, vf2, vf1y
+    vmuly.x vf10, vf3, vf2y
+    vmulaz.x ACC, vf5, vf3z
+    vmaddaz.x ACC, vf6, vf2z
+    vmaddaz.x ACC, vf7, vf1z
+    vmsubaz.x ACC, vf8, vf2z
+    vmsubaz.x ACC, vf9, vf3z
+    vmsubz.x vf15, vf10, vf1z
+    vsub.xyzw vf5, vf5, vf5
+    vsub.xyzw vf6, vf6, vf6
+    vsub.xyzw vf7, vf7, vf7
+    vaddx.xyzw vf8, vf0, vf0x
+    vdiv Q, vf0w, vf15x
+    vmulaz.y ACC, vf2, vf3z
+    vmsubz.y vf10, vf3, vf2z
+    vmulaz.y ACC, vf3, vf1z
+    vmsubz.y vf11, vf1, vf3z
+    vmulaz.y ACC, vf1, vf2z
+    vmsubz.y vf12, vf2, vf1z
+    vmulax.z ACC, vf2, vf3x
+    vmsubx.z vf10, vf3, vf2x
+    vmulax.z ACC, vf3, vf1x
+    vmsubx.z vf11, vf1, vf3x
+    vmulax.z ACC, vf1, vf2x
+    vmsubx.z vf12, vf2, vf1x
+    vmulay.x ACC, vf2, vf3y
+    vmsuby.x vf10, vf3, vf2y
+    vmulay.x ACC, vf3, vf1y
+    vmsuby.x vf11, vf1, vf3y
+    vmulay.x ACC, vf1, vf2y
+    vmsuby.x vf12, vf2, vf1y
+    vaddy.x vf5, vf5, vf10y
+    vaddy.y vf5, vf5, vf11y
+    vaddy.z vf5, vf5, vf12y
+    vaddz.x vf6, vf6, vf10z
+    vaddz.y vf6, vf6, vf11z
+    vaddz.z vf6, vf6, vf12z
+    vaddx.x vf7, vf7, vf10x
+    vaddx.y vf7, vf7, vf11x
+    vaddx.z vf7, vf7, vf12x
+    vmulq.xyzw vf5, vf5, Q
+    vmulq.xyzw vf6, vf6, Q
+    vmulq.xyzw vf7, vf7, Q
+    vmulax.xyzw ACC, vf5, vf4x
+    vmadday.xyzw ACC, vf6, vf4y
+    vmaddz.xyzw vf8, vf7, vf4z
+    vsub.xyz vf8, vf0, vf8
+    vaddx.w vf8, vf0, vf0x
+    sqc2 vf5, 0x0(a0)
+    sqc2 vf6, 0x10(a0)
+    sqc2 vf7, 0x20(a0)
+    jr ra
+    sqc2 vf8, 0x30(a0)
+}
 void mgRotMatrixX(float (*matrix)[4], float angle_x) {
     mgUnitMatrix(matrix);
     matrix[2][2] = cosf(angle_x);
