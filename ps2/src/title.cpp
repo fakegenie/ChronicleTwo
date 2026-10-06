@@ -2255,7 +2255,6 @@ int TitleHDDInstallKey() {
     }
     return 0;
 }
-#ifdef STATEMATCHING
 void DrawMenuDl(int x, int y, int width, int alpha, float rate) {
     mgCDrawPrim prim;
     mgRect<int> frame_tex;
@@ -2299,9 +2298,6 @@ void DrawMenuDl(int x, int y, int width, int alpha, float rate) {
     }
     prim.End();
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/title", DrawMenuDl__Fiiiif);
-#endif
 void TitleHDDInstallDraw() {
     union { CMenuFont font; };
     mgCTextureManager *textures = &mgTexManager;
