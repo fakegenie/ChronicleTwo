@@ -704,8 +704,8 @@ ClsMes::ClsMes() {
     abs_text_off_y = -1;
     draw_off_x = 0.0f;
     draw_off_y = 0.0f;
-    CFont::unk_b0 = 0.0f;
-    CFont::unk_b4 = 0.0f;
+    CFont::offset_x = 0.0f;
+    CFont::offset_y = 0.0f;
     point_x = 0;
     point_y = 0;
     win_color.r = 0x27;

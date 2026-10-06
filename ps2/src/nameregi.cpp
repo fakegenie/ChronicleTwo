@@ -396,8 +396,8 @@ inline CNameRegiMenu::CNameRegiMenu() {
     memset(name, 0, sizeof(name));
     name_pos = 0;
     name_font.Init();
-    name_font.unk_b0 = 0.0f;
-    name_font.unk_b4 = 0.0f;
+    name_font.offset_x = 0.0f;
+    name_font.offset_y = 0.0f;
     name_font.SetClearance(0x18, 0x14);
     name_font.SetFuchi(5);
     name_font.SetColor(0x80686A6B);
@@ -1427,8 +1427,8 @@ void CNameRegiMenu::ChangeFontSelectMode(int mode) {
     grid_font[0].SetFuchi(5);
     grid_font[0].SetColor(0x80686A6BU);
     grid_font[0].SetClearance(spacing_x, spacing_y);
-    grid_font[0].unk_b0 = 0.0f;
-    grid_font[0].unk_b4 = 0.0f;
+    grid_font[0].offset_x = 0.0f;
+    grid_font[0].offset_y = 0.0f;
 }
 int ConvertNameRegiBaseBoardTable(int index) {
     int result = convtbl_1792.slot[index];
