@@ -9609,7 +9609,6 @@ int VpkFileNameFromVoiceNo(char *name, int voiceNo) {
     }
     return 0;
 }
-#ifdef NONMATCHING
 int _STREAM_OPEN(RS_STACKDATA *stack, int argc) {
     char voicePack[0x80];
     char voicePath[0x80];
@@ -9629,7 +9628,6 @@ int _STREAM_OPEN(RS_STACKDATA *stack, int argc) {
                 case RS_STR:
                     EdEventInfo.stream_from_fpl = 0;
                     CommandStreamOpen(1, GetStackString(stack));
-                    return 0;
                 default:
                     return 0;
             }
@@ -9640,9 +9638,6 @@ int _STREAM_OPEN(RS_STACKDATA *stack, int argc) {
     }
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/event_func", _STREAM_OPEN__FP12RS_STACKDATAi);
-#endif
 int CommandStreamPlay(int stream, int volume) {
     int reverb = sndGetReverbDepth(1);
     int scaled = (int)((double)volume - 256.0 * (1.5 * (double)reverb));
@@ -13056,7 +13051,6 @@ int _IS_CLEAR_DESTROY(RS_STACKDATA *stack, int argc) {
     SetStack(stack, floorManager->IsClearMostFastDestroy());
     return 1;
 }
-#ifdef NONMATCHING
 int _IS_CLEAR_PRACTICE(RS_STACKDATA *stack, int argc) {
     if (argc != 3) {
         return 0;
@@ -13083,6 +13077,7 @@ int _IS_CLEAR_PRACTICE(RS_STACKDATA *stack, int argc) {
         return 0;
     }
     int bonus = info->practice_type;
+<<<<<<< ours
     if (bonus == 2) {
         int param = info->practice_param;
         switch (param) {
@@ -13092,15 +13087,25 @@ int _IS_CLEAR_PRACTICE(RS_STACKDATA *stack, int argc) {
             case 4:
                 bonus = param + 5;
                 break;
+=======
+    switch (bonus) {
+        case 2: {
+            int param = info->practice_param;
+            switch (param) {
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                    bonus = param + 5;
+                    break;
+            }
+>>>>>>> theirs
         }
     }
     SetStack(stack++, cleared);
     SetStack(stack, bonus);
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/event_func", _IS_CLEAR_PRACTICE__FP12RS_STACKDATAi);
-#endif
 int _IS_PLAY_SUB_GAME(RS_STACKDATA *stack, int argc) {
     CDngFloorManager *floorManager;
     DNG_BATTLE_AREA *dngScene;
