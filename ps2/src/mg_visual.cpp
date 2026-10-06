@@ -126,10 +126,8 @@ int SetPointLight(u_int *packet, float (*first)[4], float (*second)[4]) {
     dst[7] = *(u_long128 *)second[3];
     return 9;
 }
-#ifdef NONMATCHING
 int mgCVisualMDT::SetMaterialRef(u_long128 *packet, mgMaterial *material, int flags) {
     mgCTexture *texture;
-
     texture = material->texture;
     if (texture == NULL) {
         packet[0] = *(u_long128 *)&mat_vif;
@@ -147,8 +145,7 @@ int mgCVisualMDT::SetMaterialRef(u_long128 *packet, mgMaterial *material, int fl
         packet[3] = 0;
         packet[4] = 3;
         packet[5] = *(u_long128 *)&mat_vif_d_tex;
-        *(u_long *)&packet[6] = (u_long)0x30000000 << 32 | 0x8001;
-        ((u_long *)&packet[6])[1] = 0x86E;
+        packet[6] = 0x000000000000086E3000000000008001;
         *(u_long *)&packet[7] = *(u_long *)&texture->tex1;
         ((u_long *)&packet[7])[1] = SCE_GS_TEX1_1;
         *(u_long *)&packet[8] = texture->tex0.value;
@@ -159,8 +156,7 @@ int mgCVisualMDT::SetMaterialRef(u_long128 *packet, mgMaterial *material, int fl
         packet[0] = *(u_long128 *)&mat_vif_dif;
         packet[1] = *(u_long128 *)material->diffuse;
         packet[2] = *(u_long128 *)&mat_vif_d_tex;
-        *(u_long *)&packet[3] = (u_long)0x30000000 << 32 | 0x8001;
-        ((u_long *)&packet[3])[1] = 0x86E;
+        packet[3] = 0x000000000000086E3000000000008001;
         *(u_long *)&packet[4] = *(u_long *)&texture->tex1;
         ((u_long *)&packet[4])[1] = SCE_GS_TEX1_1;
         *(u_long *)&packet[5] = texture->tex0.value;
@@ -169,9 +165,6 @@ int mgCVisualMDT::SetMaterialRef(u_long128 *packet, mgMaterial *material, int fl
         return 7;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_visual", SetMaterialRef__12mgCVisualMDTFP1P10mgMateriali);
-#endif
 int mgCVisualMDT::SetPModeRef(u_long128 *packet, int flags) {
     int prim_mode = prmode;
     if (flags & 0x10) {
