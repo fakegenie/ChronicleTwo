@@ -108,7 +108,6 @@ extern "C" void BuildBase__16CEffectScriptManFPcP1iP1iP9mgCMemoryi(CEffectScript
 extern "C" int DeleteBlock__17mgCTextureManagerFi(void *, int);
 extern "C" int GetPutPosXY__16CMenuPosDataFormFPcRiRi(CMenuPosDataForm *, char *, int *, int *);
 extern "C" void MenuPosStep__12CMenuKeyFuncFPiPi(CMenuKeyFunc *, int *, int *);
-extern "C" void MenuSetPos__12CMenuKeyFuncFii(CMenuKeyFunc *, int, int);
 void SetupUnitMan(CScene *scene, CUserDataManager *userData, int unit, ROBO_INFO_DATA *robo);
 void GetBajjiPosition(CMenuPosDataForm *form, int slot, int unused, int *pos);
 void SetSwordBlurEffect(CCharacter2 *chara, mgCMemory *stack, int blur_type);
@@ -215,7 +214,6 @@ extern "C" char at_2941[];
 extern "C" char at_2942[];
 extern "C" char at_2943[];
 extern "C" char at_2944[];
-extern "C" MENUFORMPARTS_TYPE *GetPartInfo__16CMenuPosDataFormFPc(CMenuPosDataForm *, char *);
 extern MOS_HENGE_PARAM *mos_effect_henge_param;
 extern u8 *mos_effect_readbuff1[4];
 extern int mos_effect_readbuff1_size[4];
@@ -2680,7 +2678,7 @@ int MenuCharaChangeKey(void) {
                         ChrChangMenuPt->star_fade = 0;
                         ChrChangMenuPt->set_cursor = 1;
                         ChrChangMenuPt->form->GetPutPosXY(at_2662__2, pos[0], pos[1]);
-                        MenuSetPos__12CMenuKeyFuncFii(MenuCommonInfo, pos[0], pos[1]);
+                        MenuCommonInfo->MenuSetPos(pos[0], pos[1]);
                         ChrChangMenuPt->form->GetPutPosXY(at_2197__2, pos[0], pos[1]);
                         cursorForm = MenuFormMI2;
                         cursorForm->x = (float)pos[0];
@@ -2978,7 +2976,7 @@ void CMenuMosSelect::AttachForm() {
         do {
             MENUFORMPARTS_TYPE *part;
             sprintf(name, at_2944, i);
-            part = GetPartInfo__16CMenuPosDataFormFPc(badge_form, name);
+            part = badge_form->GetPartInfo(name);
             if (part != NULL) {
                 part->draw_flag = ((MOS_CHANGE_PARAM *)((u8 *)base + offset))->enable != 0;
             }
@@ -3198,7 +3196,7 @@ void CMenuMosSelect::CalcCursorPosition() {
     }
     MenuPosStep__12CMenuKeyFuncFPiPi(MenuCommonInfo, pos, NULL);
     if (set_cursor != 0) {
-        MenuSetPos__12CMenuKeyFuncFii(MenuCommonInfo, pos[0], pos[1]);
+        MenuCommonInfo->MenuSetPos(pos[0], pos[1]);
         set_cursor = 0;
     }
 }

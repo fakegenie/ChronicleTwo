@@ -55,7 +55,6 @@ enum { kGeoramaMaxParts = 384, kRemovalNpcMax = 32 };
 
 extern short penki_item_no[8];
 extern "C" int GetBuildPartsNum__9CSaveDataFi(CSaveData *, int);
-extern "C" int GetMsgCursor__7CDC2MesFv(CDC2Mes *);
 extern "C" short tbl_957[];
 void DrawDownLoadAnaunceSwitch(int value);
 void MenuGeoramaMessageMake(int mode);
@@ -3047,7 +3046,7 @@ int MenuGeoramaPlacePush(CMenuGeorama *menu, int buttons_held, int buttons_press
             break;
         case 1:
             msg->AddMsgCursor2(0, 1, 1);
-            int cursor = GetMsgCursor__7CDC2MesFv(msg);
+            int cursor = msg->GetMsgCursor();
             int flags = edparts_info_3580->attr;
             if (cursor == 1 && !(flags & kPlaceHidden)) {
                 int old_num = DestroyNum_3583;

@@ -98,8 +98,6 @@ enum ItemMenuCommand {
 
 extern "C" void sceVu0AddVector(float *result, float *a, float *b);
 extern "C" void __ct__13CGameDataUsedFv(void *);
-extern "C" void ToSpectolTrans__13CGameDataUsedFP13CGameDataUsedi(CGameDataUsed *item,
-                                                                  CGameDataUsed *out, int count);
 extern "C" MENU_ASKMODE_PARA *__ct__17MENU_ASKMODE_PARAFv(MENU_ASKMODE_PARA *param);
 void MenuAquaInit(mgCMemory *memory, int *data, int arg);
 void NameRegistInit(mgCMemory *memory, int *data, int arg);
@@ -6881,7 +6879,6 @@ void MenuItemDebugDraw(void) {
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/menusys", MenuItemDebugDraw__Fv);
 #endif
 extern "C" int GetActiveCharaIDForItemCmd__13CMenuItemInfoFv(CMenuItemInfo *);
-extern "C" int GetModelNo__13CGameDataUsedFv(CGameDataUsed *);
 int CMenuItemInfo::PushKey(int pad, int trigger) {
     int leaving = 0;
     CHARA_DATA *chara;
@@ -7399,7 +7396,7 @@ int CMenuItemInfo::PushKey(int pad, int trigger) {
                     int chara_no;
                     CHARA_DATA **chr_ptr =
                         &MenuUserParam.chara[chara_no = this->GetActiveCharaNo()];
-                    int model_no = GetModelNo__13CGameDataUsedFv(&(*chr_ptr)->equip[0]);
+                    int model_no = (*chr_ptr)->equip[0].GetModelNo();
                     if (this->equipped_model_no != model_no) {
                         SetMenuEtcFlag(1);
                         MainCharaReadStackReadAdr =
