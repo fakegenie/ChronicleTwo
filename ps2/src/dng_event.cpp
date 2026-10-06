@@ -1731,7 +1731,6 @@ void DungeonFloorInit(void) {
 }
 void DungeonFloorFinish(void) {
 }
-#ifdef NONMATCHING
 extern char at_2446[];
 extern char at_2447[];
 extern char at_2448[];
@@ -1744,12 +1743,25 @@ extern char at_2454[];
 extern char at_2455__2[];
 extern char at_2456[];
 void LoadDungeonMapFile(char *map_name, char *cfg_name, int gen_flag) {
-    char image_path[0x40];
-    char stage_path[0x30];
-    char room_path[0x80];
+    mgCMemory *stack;
+    u_long128 *image;
+    mgCTextureManager *textures;
+    int new_map;
     int image_size;
+    CMap *map;
+    int box;
+    mgCCamera *camera;
+    int map_no;
+    CTreasureBoxManager *boxes;
+    int cell;
+    int snd_id;
     int stage_size;
+    int seal;
+    int step;
+    int bgm_no;
     int room_size;
+    u_long128 *stage_image;
+    int room;
 
     DNG_BATTLE_AREA *area = &DngMainScene->battle_area;
     DngMainScene->battle_area.unk_5c = 1;
@@ -1776,7 +1788,7 @@ void LoadDungeonMapFile(char *map_name, char *cfg_name, int gen_flag) {
     int stage = DngSaveDataDungeon->stage_id;
     int floor = DngSaveDataDungeon->floor_id[stage];
     NowFloorInfoPtr = DngSaveDataDungeon->GetFloorInfoPtr(stage, floor);
-    int seal = area->floor_manager.IsSealFloor(floor);
+    seal = area->floor_manager.IsSealFloor(floor);
     if (0 < seal) {
         area->floor_status |= 1 << (seal - 1);
     }
@@ -1790,10 +1802,10 @@ void LoadDungeonMapFile(char *map_name, char *cfg_name, int gen_flag) {
     DngMainScene->StopSeSrc();
     sndSeAllStop(-1);
     sndStopVoice(1);
-    int snd_id = GetMapSndDataID(SearchMapNo(map_name));
+    snd_id = GetMapSndDataID(SearchMapNo(map_name));
     DngMainScene->LoadSound(snd_id, BuffReadData);
     if (DngMainScene->skip_load_bgm == 0) {
-        int bgm_no = DngMainScene->GetDefBgmNo(snd_id);
+        bgm_no = DngMainScene->GetDefBgmNo(snd_id);
         if (bgm_no == -1) {
             DngMainScene->StopBGM(0);
         }
@@ -1814,7 +1826,6 @@ void LoadDungeonMapFile(char *map_name, char *cfg_name, int gen_flag) {
     } else {
         DngMainScene->skip_load_bgm = 0;
     }
-    int new_map;
     if (strcmp(area->map_name, map_name) == 0) {
         new_map = 0;
     } else {
@@ -1822,7 +1833,7 @@ void LoadDungeonMapFile(char *map_name, char *cfg_name, int gen_flag) {
         new_map = 1;
     }
     if (new_map) {
-        int map_no = SearchMapNo(map_name);
+        map_no = SearchMapNo(map_name);
         if (map_no < 0) {
             printf(at_2446, map_name);
         }
@@ -1835,21 +1846,22 @@ void LoadDungeonMapFile(char *map_name, char *cfg_name, int gen_flag) {
         SetMainMapInfo(&MainMapInfo);
         GetLoadMapInfo(&load_info, map_no);
         load_info.sky_tex_block = 0x4C;
-        load_info.place_parts_max = 400;
         load_info.load_sky = 1;
+        load_info.place_parts_max = 400;
         DngMainScene->DeleteMap(0, 1);
         DngMainScene->LoadMap(0, &load_info, 0);
         DngMainScene->SetNowMapNo(map_no);
         DngMainScene->SetActive(2, 0);
         DngMainMap = DngMainScene->GetMap(DngMainScene->active_map);
-        mgCMemory *stack = DngMainScene->GetStack(1);
+        stack = DngMainScene->GetStack(1);
         if (stack != NULL && cfg_name != NULL) {
             stack->lock = 0;
             stack->Align64();
-            u_long128 *image = (u_long128 *)stack->stAllocTest(1);
+            image = (u_long128 *)stack->stAllocTest(1);
             if (image != NULL) {
-                mgCTextureManager *textures = &mgTexManager;
+                textures = &mgTexManager;
                 textures->DeleteBlock(0x66);
+                char image_path[0x40];
                 sprintf(image_path, at_2447, map_name);
                 if (LoadFile2(image_path, image, &image_size, 0)) {
                     stack->Alloc(image_size / 16 + 1);
@@ -1875,17 +1887,18 @@ void LoadDungeonMapFile(char *map_name, char *cfg_name, int gen_flag) {
         }
         if (map_effect.type >= 0) {
             map_effect.Init_LightBoll(stack, 0x30);
-            mgCCamera *camera = DngMainScene->GetCamera(0);
+            camera = DngMainScene->GetCamera(0);
             if (camera != NULL) {
-                for (int step = 0; step < 16; step++) {
+                for (step = 0; step < 16; step++) {
                     map_effect.Step(camera);
                 }
             }
         }
         stack->lock = 0;
         stack->Align64();
-        u_long128 *stage_image = (u_long128 *)stack->stAllocTest(1);
+        stage_image = (u_long128 *)stack->stAllocTest(1);
         if (stage_image != NULL) {
+            char stage_path[0x30];
             if (stage != 4) {
                 sprintf(stage_path, at_2453, stage + 1);
             } else if (floor < 16) {
@@ -1901,11 +1914,11 @@ void LoadDungeonMapFile(char *map_name, char *cfg_name, int gen_flag) {
         stack->lock = 1;
     }
     if (AutoMapGen.grid != NULL) {
-        for (int cell = 0; cell < AutoMapGen.grid_w * AutoMapGen.grid_h; cell++) {
+        for (cell = 0; cell < AutoMapGen.grid_w * AutoMapGen.grid_h; cell++) {
             AutoMapGen.grid[cell].Initialize();
         }
     }
-    for (int room = 0; room < 8; room++) {
+    for (room = 0; room < 8; room++) {
         AutoMapGen.room[room].unk_0 = 0;
     }
     AutoMapGen.healing_point.enable = 0;
@@ -1924,10 +1937,11 @@ void LoadDungeonMapFile(char *map_name, char *cfg_name, int gen_flag) {
     AutoMapGen.random_map = 0;
     AutoMapGen.minimap_enable = 0;
     if (cfg_name != NULL) {
+        char room_path[0x80];
         sprintf(room_path, at_2456, cfg_name);
         mgCMemory room_stack;
         LoadFile(room_path, BuffReadData, &room_size);
-        room_stack.stSetBuffer(BuffReadData + room_size / 16 + 1, 0x4000);
+        room_stack.stSetBuffer(BuffReadData + room_size / 16 + 1, 0x8000);
         AutoMapGen.SetupRoomInfo((char *)BuffReadData, room_size, &room_stack);
         AutoMapGen.gen_flag |= gen_flag;
         AutoMapGen.Build();
@@ -1940,7 +1954,7 @@ void LoadDungeonMapFile(char *map_name, char *cfg_name, int gen_flag) {
     if (ActiveMonster != NULL) {
         ActiveMonster->Initialize(DngMainScene);
     }
-    CMap *map = DngMainScene->GetMap(DngMainScene->active_map);
+    map = DngMainScene->GetMap(DngMainScene->active_map);
     AutoMapGen.mini_map.map = NULL;
     AutoMapGen.mini_map.parts_table = NULL;
     AutoMapGen.mini_map.grid = NULL;
@@ -1949,7 +1963,10 @@ void LoadDungeonMapFile(char *map_name, char *cfg_name, int gen_flag) {
     AutoMapGen.mini_map.large = 0;
     AutoMapGen.mini_map.SetMapInfo(map, AutoMapGen.grid, AutoMapGen.grid_w, AutoMapGen.grid_h, AutoMapGen.cell_w,
                                    AutoMapGen.cell_d);
-    area->treasure_box->Initialize();
+    boxes = area->treasure_box;
+    for (box = 0; box < TREASURE_BOX_MAX; box++) {
+        boxes->box[box].Initialize();
+    }
     RandomCircle.Clear();
     GeoStone.SetFlag(0);
     PullItemMan.Clear();
@@ -1957,9 +1974,6 @@ void LoadDungeonMapFile(char *map_name, char *cfg_name, int gen_flag) {
     FxScriptMan->AllClearEffSpt();
     InitS51Thunder();
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dng_event", LoadDungeonMapFile__FPcPci);
-#endif
 void MinimapDoorEnable(float *pos) {
     AutoMapGen.MinimapDoorOpen(pos);
     AutoMapGen.UpdateNaviMap(pos, 4);
