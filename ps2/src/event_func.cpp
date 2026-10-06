@@ -2265,7 +2265,7 @@ void EdEventInfoCommandInitialize(void) {
 
     EdEventInfo.request = 0;
     EdEventInfo.command_mode = 0;
-    EdEventInfo.skip_button = 15;
+    EdEventInfo.skip_button = PAD_BTN_START;
     EdEventInfo.env_bgm_volume = 1.0f;
     EdEventInfo.skip_state = 0;
     EdEventInfo.skip_fade_color[0] = 0;
@@ -2729,7 +2729,7 @@ void InitDramaScene(void) {
     EdEventInfo.skip_fade_color[0] = 0;
     EdEventInfo.skip_fade_color[1] = 0;
     EdEventInfo.skip_state = 1;
-    EdEventInfo.skip_button = 15;
+    EdEventInfo.skip_button = PAD_BTN_START;
     EdEventInfo.skip_fade_color[2] = 0;
     EdEventInfo.skip_fade_color[3] = 0;
 }

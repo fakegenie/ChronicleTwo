@@ -16,6 +16,23 @@ enum PadCtrlTrigger {
     PAD_CTRL_BUTTON_MASK  = 0x0FFFF,
 };
 
+enum PadCtrlButton {
+    PAD_BTN_CONFIRM        = 0,
+    PAD_BTN_CANCEL         = 1,
+    PAD_BTN_MENU           = 5,
+    PAD_BTN_RIGHT          = 9,
+    PAD_BTN_LEFT           = 10,
+    PAD_BTN_START          = 0x0F,
+    PAD_BTN_PAUSE          = 0x15,
+    PAD_BTN_EVENT_SKIP     = 0x16,
+    PAD_BTN_QUICK_CHANGE   = 0x17,
+    PAD_BTN_ACTION_CONFIRM = 0x32,
+    PAD_BTN_ACTION_SQUARE  = 0x33,
+    PAD_BTN_ACTION_CANCEL  = 0x34,
+    PAD_BTN_ACTION_HELD    = 0x38,
+    PAD_BTN_EDIT_SWITCH    = 0x6C,
+};
+
 enum PadCtrlAxis {
     PAD_CTRL_AXIS_NONE = 0,
     PAD_CTRL_AXIS_LX   = 1,

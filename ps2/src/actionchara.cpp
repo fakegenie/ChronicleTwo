@@ -1215,7 +1215,7 @@ void CActionChara::RockOn() {
             target_dot = sceVu0InnerProduct(to_target, front_vec);
         }
     }
-    if (PadCtrl.Btn(0x34) != 0) {
+    if (PadCtrl.Btn(PAD_BTN_ACTION_CANCEL) != 0) {
         if (lock_on != 0) {
             if (target_dot < -0.2f) {
                 sndSePlay(SystemSND_ID, 0x1B, 0);
@@ -2747,8 +2747,8 @@ void CActionChara::RunScript(CScene *scene, RUN_SCRIPT_ENV *env) {
     action_info.env = env;
     menu_flag = 0;
     dir_gun = 0;
-    action_info.chara->pad_history |= PadCtrl.Btn(0x32);
-    if (PadCtrl.Btn(0x38) != 0) {
+    action_info.chara->pad_history |= PadCtrl.Btn(PAD_BTN_ACTION_CONFIRM);
+    if (PadCtrl.Btn(PAD_BTN_ACTION_HELD) != 0) {
         action_info.chara->acumu_pad++;
     } else {
         action_info.chara->acumu_pad = 0;

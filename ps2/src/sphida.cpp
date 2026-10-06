@@ -475,7 +475,7 @@ int CSphida::Step() {
         red_mark.SetPosition(character_position);
         red_mark.draw_request = 1;
         red_mark.Step();
-        if (PadCtrl.Btn(0) != 0 && DngStatus.mode == DNG_STATUS_FIELD) {
+        if (PadCtrl.Btn(PAD_BTN_CONFIRM) != 0 && DngStatus.mode == DNG_STATUS_FIELD) {
             memcpy(&EventCamera__2, &MainCamera, sizeof(mgCCameraFollow));
             DngMainScene->active_camera = 1;
             InitEvent(DngMainScene);

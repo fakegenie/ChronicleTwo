@@ -667,7 +667,7 @@ static void CharaControl(CScene *scene, CPadControl *pad) {
             speed_x *= 3.0f;
             speed_z *= 3.0f;
         }
-        if (ViewMode == EDIT_VIEW_MODE_WALK && PadCtrl.Btn(1)) {
+        if (ViewMode == EDIT_VIEW_MODE_WALK && PadCtrl.Btn(PAD_BTN_CANCEL)) {
             velocity[1] = 8.0f * frame_rate;
         }
     } else if (CharaFallFlag) {

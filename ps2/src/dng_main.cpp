@@ -949,7 +949,7 @@ int LoopDungeonMain() {
         if (DngStatus.mode == DNG_STATUS_EVENT && CheckEventSkip()) {
             pause.event_skip = 1;
         }
-        if (PadCtrl.Btn(0x15) || !GamePad__2.Connect()) {
+        if (PadCtrl.Btn(PAD_BTN_PAUSE) || !GamePad__2.Connect()) {
             PauseStart(&pause);
         }
     }
@@ -1919,7 +1919,7 @@ int DngMainKey() {
     CSphida *sphida = GetSphidaPtr();
 
     if (sphida != NULL) {
-        if (OmakeFlag && (PadCtrl.Btn(0x15) || !GamePad__2.Connect())) {
+        if (OmakeFlag && (PadCtrl.Btn(PAD_BTN_PAUSE) || !GamePad__2.Connect())) {
             MenuArg.open_type = 28;
             VoiceUnit.StopVoice(10);
             DngStatus.mode = DNG_STATUS_MENU;
@@ -1985,7 +1985,7 @@ int DngMainKey() {
     CCameraControl *camera = (CCameraControl *) DngMainScene->GetCamera(DngMainScene->active_camera);
 
     if (DngStatus.eye_view) {
-        if (GamePad__2.Down(PAD_R2) || PadCtrl.Btn(1)) {
+        if (GamePad__2.Down(PAD_R2) || PadCtrl.Btn(PAD_BTN_CANCEL)) {
             ResetEyeView(MainChara__2);
             return 0;
         }
@@ -2193,7 +2193,7 @@ int DngMainKey() {
                     reference += 3.0f * -GamePad__2.GetRYf();
                 }
             }
-            if (PadCtrl.Btn(0x34)) {
+            if (PadCtrl.Btn(PAD_BTN_ACTION_CANCEL)) {
                 sceVu0FVECTOR rot;
 
                 MainChara__2->GetRotation(rot);
@@ -2317,7 +2317,7 @@ int DngMainKey() {
 
             param->min_height = param->rest_min_height = -37.0f;
             camera->MoveCamera(&PadCtrl, rot, poly, num);
-            if (PadCtrl.Btn(0x34)) {
+            if (PadCtrl.Btn(PAD_BTN_ACTION_CANCEL)) {
                 sceVu0FVECTOR rot2;
 
                 MainChara__2->GetRotation(rot2);
@@ -2460,10 +2460,10 @@ void IsEventRun() {
         return;
     }
     button = 0;
-    if (PadCtrl.Btn(0)) {
+    if (PadCtrl.Btn(PAD_BTN_CONFIRM)) {
         button = 1;
     }
-    if (PadCtrl.Btn(0x33)) {
+    if (PadCtrl.Btn(PAD_BTN_ACTION_SQUARE)) {
         button = 2;
     }
     near = 0;

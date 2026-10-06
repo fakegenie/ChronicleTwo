@@ -826,7 +826,7 @@ int EditLoop() {
     }
 
     wait_for_map = 0;
-    if (PadCtrl.Btn(0) != 0 || PadCtrl.Btn(5) != 0) {
+    if (PadCtrl.Btn(PAD_BTN_CONFIRM) != 0 || PadCtrl.Btn(PAD_BTN_MENU) != 0) {
         wait_for_map = 1;
     }
     map_name = MainScene__2->GetMapName(MainScene__2->active_map);
@@ -974,7 +974,7 @@ int EditLoop() {
     if (LoopMode == EDIT_LOOP_WALK_MENU || LoopMode == EDIT_LOOP_EDIT_MENU) {
         menu_pause.scene = MainScene__2;
         menu_pause.event_skip = 0;
-        if (PadCtrl.Btn(21) != 0) {
+        if (PadCtrl.Btn(PAD_BTN_PAUSE) != 0) {
             PauseStart(&menu_pause);
         }
         if (MenuMainLoop() != 0) {
@@ -1143,7 +1143,7 @@ int EditLoop() {
                         }
                         GamePad__2.AutoRepeatOff();
                         MainScene__2->EyeViewDrawOnOff(IsWalkMode() == 0);
-                        if (LockChara == 0 && MainScene__2->event_run == 0 && PadCtrl.Btn(0) != 0 && IsWalkMode() != 0) {
+                        if (LockChara == 0 && MainScene__2->event_run == 0 && PadCtrl.Btn(PAD_BTN_CONFIRM) != 0 && IsWalkMode() != 0) {
                             chara = MainScene__2->GetCharacter(MainScene__2->player_chara);
                             chara->GetPosition(talk_position);
                             chara->GetPosition(talk_height);
@@ -1234,7 +1234,7 @@ int EditLoop() {
                 }
                 break;
         }
-        if (pause_enabled != 0 && (PadCtrl.Btn(21) != 0 || GamePad__2.Connect() == 0)) {
+        if (pause_enabled != 0 && (PadCtrl.Btn(PAD_BTN_PAUSE) != 0 || GamePad__2.Connect() == 0)) {
             PauseStart(&pause);
         }
         WalkChara = MainScene__2->GetCharacter(MainScene__2->player_chara);
@@ -1253,9 +1253,9 @@ int EditLoop() {
         MainScene__2->CancelStayVillager(stay);
         sgLoopSubGame2();
         if (open_menu == 0 && LockChara == 0 && sgMenuOpenEnable() != 0 && change_mode == 0) {
-            menu_requested = PadCtrl.Btn(5) != 0 || sgGetItemOver() != 0;
-            menu_button = PadCtrl.Btn(5);
-            quick_change = EditOnGround() != 0 && PadCtrl.Btn(23) != 0 && SubGameRunning() == 0;
+            menu_requested = PadCtrl.Btn(PAD_BTN_MENU) != 0 || sgGetItemOver() != 0;
+            menu_button = PadCtrl.Btn(PAD_BTN_MENU);
+            quick_change = EditOnGround() != 0 && PadCtrl.Btn(PAD_BTN_QUICK_CHANGE) != 0 && SubGameRunning() == 0;
             if (MainScene__2->fade.NowFade() != 0 && MainScene__2->fade.cross != 0) {
                 quick_change = 0;
             }
@@ -1346,7 +1346,7 @@ int EditLoop() {
                     edit_enabled = 0;
                 }
             }
-            if (PadCtrl.Btn(108) != 0) {
+            if (PadCtrl.Btn(PAD_BTN_EDIT_SWITCH) != 0) {
                 change_mode = 1;
             }
             if (open_menu != 0) {
