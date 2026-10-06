@@ -625,24 +625,24 @@ void CDngFreeMap::DrawRoomOne(mgRect<float> rect, DNGMAP_ROOM_INFO *room, unsign
             if (room->tex_no >= 3) {
                 uv.bottom = 0x5A;
             }
-            put.right = (float)uv.right;
-            put.bottom = (float)uv.bottom;
+            put.right = (float)special_uv.right;
+            put.bottom = (float)special_uv.bottom;
         }
         put.left += (float)room->offset_x;
         put.top += (float)room->offset_y;
     }
-    int level = fptosi(128.0f * bright);
-    float shade = 1.0f;
-    float shadow_alpha = 0.25f * (float)alpha;
     s16 draw_mode = mode;
+    int level = (int)(128.0f * bright);
+    float shadow_alpha = 0.25f * (float)alpha;
+    float shade = 1.0f;
     if (draw_mode == DNGMAP_MODE_EVENT && user_glid != NULL && &user_glid->room != room) {
-        level = fptosi(64.0f * bright);
+        level = (int)(64.0f * bright);
         shade = 0.5f;
     }
     if (draw_mode == DNGMAP_MODE_MENU) {
         prim->Begin(6);
         prim->Texture(map_tex);
-        prim->Color(0, 0, 0, fptosi(shadow_alpha));
+        prim->Color(0, 0, 0, (int)(shadow_alpha));
         PrimQuad(prim, 8.0f + put.left, 8.0f + put.top, uv);
         prim->End();
     }
@@ -663,7 +663,7 @@ void CDngFreeMap::DrawRoomOne(mgRect<float> rect, DNGMAP_ROOM_INFO *room, unsign
             phase += 6.2831855f;
         }
         if (!(phase <= 0.0f)) {
-            red = green = blue = fptosi(7.0f * (float)level / 8.0f);
+            red = green = blue = (int)(7.0f * (float)level / 8.0f);
         }
     } else {
         red = green = blue = level;
@@ -697,6 +697,7 @@ void CDngFreeMap::DrawRoomOne(mgRect<float> rect, DNGMAP_ROOM_INFO *room, unsign
         mark_rect[mark_num].bottom = 46.0f + bob;
         mark_num++;
     }
+    shade = 128.0f * shade;
     if (name_tex != NULL && room->visited == 1) {
         for (int i = 0; i < 3; i++) {
             if (room->flag & (1 << (i + 1))) {
@@ -707,7 +708,7 @@ void CDngFreeMap::DrawRoomOne(mgRect<float> rect, DNGMAP_ROOM_INFO *room, unsign
                     prim->TextureMapEnable(1);
                     prim->Begin(6);
                     prim->Texture(name_tex);
-                    int letter_level = fptosi(128.0f * shade);
+                    int letter_level = fptosi(shade);
                     prim->Color(letter_level, letter_level, letter_level, alpha);
                     mgRect<int> letter_uv(letter[0], letter[1], letter[2], letter[3]);
                     PrimQuad(prim, letter_put.left, letter_put.top, letter_uv);
