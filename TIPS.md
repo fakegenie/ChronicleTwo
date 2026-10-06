@@ -376,3 +376,9 @@ only functions present in both objects can be replaced, the plain build keeps th
 - In movie.cpp the `and` mask followed by the dsll32/dsrl32 pair appears with the global optimizer on, and both calls become shifts under `global_optimizer off`.
 - MWCC `asm void` bodies accept `vsqrt Q, vfNx`, `ctc2.ni zero, vi16`, `cfc2.ni v0, vi22` and `qmfc2.ni`. Keep the explicit `nop` after `jr ra` where retail leaves the slot empty. A parameter named `v0` or `v1` collides with the register names inside `asm {}`.
 - The worktree bash sandbox refuses compound commands with loops or globs that call `./dev.sh`. Put loops in a Python file and call that.
+- Unused float locals change the order in which MWCC materialises float constants for call arguments (`CMenuInvent::IsCreateObject`: an extra local declared before the `if` plus named locals inside it, one still unused). When only the constant load order differs, run a perm search with declare/omit choices for named argument locals at a few scope levels.
+- Retail's `sll sN,line,1` in the loop preheader, then `sll v0,sN,2` at each use, means a named local `int pos = line * 2;` indexing flat `int` arrays. Writing `arr[line * 2]` directly, or using 2D arrays, folds the arithmetic to `line * 8`.
+- Reading a global array element at each use (`MenuMesForm[3]` in both the test and the call) instead of caching it in a local can fix an a0/a1 swap with another value.
+- perm.py `@tag` choices (the first occurrence sets the choice and later ones follow it) keep hoisted declarations and in-place declarations consistent, so every variant compiles during a hoisting search.
+- To stop a background perm run, run `docker kill <container>` (find it with `docker ps`). Stopping the host task, or running `./dev.sh pkill`, does not reach a container that is already running.
+- `./decompile.sh` does not work in a fresh worktree because the `tools/m2c` submodule is empty.
