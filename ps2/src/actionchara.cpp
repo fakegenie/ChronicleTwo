@@ -1861,31 +1861,18 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/actionchara", RoboTankMoveIF__12CActionCha
 int CActionChara::RoboBikeMoveIF(int mode) {
     sceVu0FVECTOR position;
     sceVu0FVECTOR leg_rotation;
-    sceVu0FVECTOR rotation;
     sceVu0FVECTOR movement;
-    sceVu0FVECTOR target_position;
-    sceVu0FVECTOR direction = { 0.0f, 0.0f, 1.0f, 1.0f };
-    sceVu0FMATRIX matrix;
-    CActionChara *leg;
+    sceVu0FVECTOR rotation;
+    int           poly_count;
     CActionChara *arm;
     CActionChara *target;
     CMap         *map;
     float         stick_x;
     float         stick_y;
-    float         steering;
     float         target_angle;
-    int           poly_count;
-    CCPoly        polys[128];
-    mgVu0FBOX     box;
-    sceVu0FVECTOR wheel_rotation;
-    sceVu0FVECTOR front_wheel_position;
-    sceVu0FVECTOR back_wheel_position;
-    sceVu0FVECTOR front_hit;
-    sceVu0FVECTOR back_hit;
-    sceVu0FVECTOR slope_rotation = { 0.0f, 0.0f, 0.0f, 1.0f };
-    sceVu0FVECTOR old_velocity;
-    mgCFrame     *wheel;
+    CActionChara *leg;
     float         slope_angle;
+    mgCFrame     *wheel;
 
     leg = SearchChara("leg");
     if (leg == NULL) {
@@ -1929,15 +1916,16 @@ int CActionChara::RoboBikeMoveIF(int mode) {
         sound_info.loop_se->SeLoopPlayStop(sound_info.se_bank, 16, 3, 12);
     }
     if (GamePad__2.On(PAD_L1) != 0) {
-        steering = leg_rotation[1] + 0.8f * (0.034906585f * -stick_x * accele.speed);
+        leg_rotation[1] += 0.8f * (0.034906585f * -stick_x * accele.speed);
     } else {
-        steering = leg_rotation[1] + 0.2f * (0.034906585f * -stick_x * accele.speed);
+        leg_rotation[1] += 0.2f * (0.034906585f * -stick_x * accele.speed);
     }
-    leg_rotation[1] = steering;
     leg_rotation[1] = mgAngleLimit(leg_rotation[1]);
     leg->SetRotation(leg_rotation);
     if (leg != NULL) {
         leg->GetRotation(rotation);
+        sceVu0FVECTOR direction = { 0.0f, 0.0f, 1.0f, 1.0f };
+        sceVu0FMATRIX matrix;
         sceVu0UnitMatrix(matrix);
         sceVu0RotMatrixY(matrix, matrix, rotation[1]);
         sceVu0ApplyMatrix(movement, matrix, direction);
@@ -1959,10 +1947,12 @@ int CActionChara::RoboBikeMoveIF(int mode) {
     if (lock_on != 0) {
         target = (CActionChara *)nowScene__2->GetCharacter(target_no);
         if (target != NULL && target->chara_kind == ACTION_KIND_SCRIPT) {
+            sceVu0FVECTOR target_position;
+            sceVu0FVECTOR target_rotation;
             target->GetPosition(target_position);
             target_angle = atan2f(target_position[0] - position[0], target_position[2] - position[2]);
-            GetRotation(rotation);
-            target_angle -= rotation[1];
+            GetRotation(target_rotation);
+            target_angle -= target_rotation[1];
             if (target_angle < -3.1415927f) {
                 target_angle += 6.2831855f;
             }
@@ -1971,16 +1961,25 @@ int CActionChara::RoboBikeMoveIF(int mode) {
             }
             arm = SearchChara("arm");
             if (arm != NULL) {
-                arm->SetRotation(0.0f, unitRotation(arm->CObjectFrame::frame, target_angle, 3.0f), 0.0f);
+                target_angle = unitRotation(arm->CObjectFrame::frame, target_angle, 3.0f);
+                arm->SetRotation(0.0f, target_angle, 0.0f);
             }
         }
     } else {
         arm = SearchChara("arm");
         if (arm != NULL) {
-            arm->SetRotation(0.0f, unitRotation(arm->CObjectFrame::frame, 0.0f, 8.0f), 0.0f);
+            float arm_angle = unitRotation(arm->CObjectFrame::frame, 0.0f, 8.0f);
+            arm->SetRotation(0.0f, arm_angle, 0.0f);
         }
     }
     map = nowScene__2->GetMap(nowScene__2->active_map);
+    CCPoly        polys[128];
+    mgVu0FBOX     box;
+    sceVu0FVECTOR wheel_rotation;
+    sceVu0FVECTOR front_hit;
+    sceVu0FVECTOR back_hit;
+    sceVu0FVECTOR front_wheel_position;
+    sceVu0FVECTOR back_wheel_position;
 
     box.max[0] = 50.0f + position[0];
     box.min[0] = position[0] - 50.0f;
@@ -2032,10 +2031,11 @@ int CActionChara::RoboBikeMoveIF(int mode) {
     slope_angle = atan2f(front_hit[1], mgDistVector(back_hit));
     wheel = SearchObject("katamuki");
     if (wheel != NULL) {
-        slope_rotation[0] = slope_angle;
+        sceVu0FVECTOR slope_rotation = { slope_angle, 0.0f, 0.0f, 1.0f };
         wheel->SetRotType(2);
         wheel->SetRotation(slope_rotation);
     }
+    sceVu0FVECTOR old_velocity;
     sceVu0CopyVector(old_velocity, velocity);
     movement[1] = old_velocity[1];
     sceVu0CopyVector(velocity, movement);
