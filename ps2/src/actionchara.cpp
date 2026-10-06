@@ -2311,7 +2311,6 @@ int CActionChara::MonsterMoveIF() {
     return 1;
 }
 
-#ifdef STATEMATCHING
 void HitEffectSet(CScene *scene, float *point) {
     float pos[4];
     float to_camera[4];
@@ -2390,9 +2389,6 @@ void HitEffectSet(CScene *scene, float *point) {
         hit->sprite_size = 2.0f;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/actionchara", HitEffectSet__FP6CScenePf);
-#endif
 int CheckAmuletAvoid(int item_no) {
     CBattleCharaInfo *info;
     CGameDataUsed *item;
