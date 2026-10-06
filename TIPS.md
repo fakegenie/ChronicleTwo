@@ -272,3 +272,16 @@ only functions present in both objects can be replaced, the plain build keeps th
   `PROGRESS.md`. It compiles each unit's drafts live (and `STATEMATCHING` bodies
   the way `state.py` does), runs objdiff against retail, and lists every gated
   function with its match percent, differing instruction rows and size.
+
+## Additions from parallel matching
+
+- A `pcpyld` in retail can come from a 128-bit integer literal such as `packet[6] = 0x000000000000086E3000000000008001;`. MWCC accepts these literals, while 128-bit shifts fail with "illegal data size".
+- `mgAbs` from `mapload.hpp` is the inline behind a bool-to-unsigned-to-float chain. Including it fixed `OverlapPoly3XZ` and `HumanShrowMoveIF`, and `mgAbs(a) > mgAbs(b)` matched where `!(a <= b)` did not.
+- Retail inlines `sync; ei` where a draft calls `EIntr()`. Write `asm { sync ei }` on each exit path.
+- A named local for a call argument (`SetRotation`'s rotation) stops a constant staying in a saved register across the call.
+- Moving a null check before the first dereference changed scheduling in `CheckInventItem`.
+- `diff.sh` diffs the last object that compiled. When a draft fails to compile or the gate edit is off by a line, it reports the old score silently. Run `./dev.sh scripts/build/cmake.sh objdiff` and check the exit code.
+- `check_objects.py` does not recompile. Run `./build.sh` first.
+- objdiff scores a function with jump tables near zero because it splits at the case labels. Compare against the concatenated retail pieces instead.
+- `#pragma optimization_level 2` is needed for `mgCTextureManager::ReloadTexture(int, u_int *)`.
+- Declaring a parameter as `sceVu0FVECTOR ground` instead of `float *` fixed a stack slot in `GetFootPoly` with the same mangled name.
