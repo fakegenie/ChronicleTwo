@@ -483,20 +483,19 @@ float GetCourseR(float pos, float unused) {
     }
     return 1.0f;
 }
-#ifdef NONMATCHING
 void FishModifyParam(grFISH_PARAM *source, float *output, float average) {
     int i;
     output[0] = (float)source->stamina;
     for (i = 0; i < 3; ++i) output[i + 1] = (float)source->speed[i];
     output[4] = (float)source->power;
-    output[5] = 0.5f;
+    output[5] = float(0.5);
     grFISH_DATA *kind = GetFishData(source->fish_no);
     if (kind != NULL) {
         output[0] *= kind->stamina / 100.0f;
-        for (i = 0; i < 3; ++i) output[i + 1] *= kind->speed[i] / 100.0f;
+        for (i = 0; i < 3; ++i) output[i + 1] *= kind->speed[i] / float(100.0);
         output[4] *= kind->power / 100.0f;
         if (kind->affinity == source->affinity) {
-            for (i = 0; i < 5; ++i) output[i] *= 1.1f;
+            for (i = 0; i < 5; ++i) output[i] *= float(1.1);
         }
     }
     float ratios[5];
@@ -514,15 +513,22 @@ void FishModifyParam(grFISH_PARAM *source, float *output, float average) {
     if (seed == 0) seed = 1;
     random.seed = seed;
     for (i = 0; i < 1000; ++i) random.seed = random.seed * 0x5D588B65 + 1;
-    for(i=0;i<5;++i){float scale=float(.03);float one=float(1.0);float number=random.nget();float product=number*scale;float factor=one+product;ratios[i]=factor;}
+    for (i = 0; i < 5; ++i) {
+        float scale = float(.03);
+        float one = float(1.0);
+        float number = random.nget();
+        float product = number * scale;
+        float factor = one + product;
+        ratios[i] = factor;
+    }
     for (i = 0; i < 5; ++i) output[i] *= ratios[i];
-    float noise = 25.0f * average / 100.0f;
-    if (noise < 6.25f) noise = 6.25f;
+    float noise = float(25.0) * average / float(100.0);
+    if (noise < float(6.25)) noise = 6.25f;
     for (i = 0; i < 4; ++i) {
         float variation = noise * nrnd();
         if (variation < 0.0f) variation = -variation;
         output[i] += variation;
-        if (output[i] < 0.0f) output[i] = 0.0f;
+        if (output[i] < float(0.0)) output[i] = float(0.0);
     }
     output[5] = GetRandomNumber(float(0.5), float(0.5));
     switch (source->tactics) {
@@ -564,9 +570,6 @@ void FishModifyParam(grFISH_PARAM *source, float *output, float average) {
     }
     for (i = 0; i < 4; ++i) if (output[i] < 0.0f) output[i] = 0.0f;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/gyoracesim", FishModifyParam__FP12grFISH_PARAMPff);
-#endif
 void CharacterBonus(grFISH_PARAM *source, RACE_FISH_PARAM *fish, int count) {
     int type = source->bonus_type;
     fish->rank_ratio[0] = 1.0f;
@@ -586,7 +589,7 @@ void CharacterBonus(grFISH_PARAM *source, RACE_FISH_PARAM *fish, int count) {
         break;
     }
     case GR_CHARA_BONUS_BACK: {
-        float amount = GetRandomNumber(0.0f, float(0.01));
+        float amount = GetRandomNumber(0.0f, 0.01f);
         if (amount < 0.0f) amount = -amount;
         front = 1.0f - 0.2f * amount;
         back = 1.0f + amount;
