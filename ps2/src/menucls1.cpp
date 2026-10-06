@@ -873,7 +873,6 @@ int CheckRoboShieldKit(CUserDataManager *manager, CGameDataUsed *item, int apply
 }
 extern u32 st_bittable_1654[7];
 
-#ifdef STATEMATCHING
 int MenuUseItemCheckFunc(CGameDataUsed *item, CItemUseTarget *target, int apply) {
     if (item == NULL || target == NULL) {
         return 0;
@@ -1167,9 +1166,6 @@ int MenuUseItemCheckFunc(CGameDataUsed *item, CItemUseTarget *target, int apply)
     }
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menucls1", MenuUseItemCheckFunc__FP13CGameDataUsedP14CItemUseTargeti);
-#endif
 int CMenuItemUse::CheckItemUseEnable(CGameDataUsed *item, int kind, void *ptr) {
     int target_data[2];
     if (item == NULL || ptr == NULL) {
