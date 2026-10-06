@@ -1992,7 +1992,6 @@ void CMapEffect_Sprite::Step(mgCCamera *camera) {
         life -= 1;
     }
 }
-#ifdef STATEMATCHING
 void CMapEffect_Sprite::Draw(mgCCamera *camera, CPreSprite *sprite) {
     float world[4];
     int corner0[4];
@@ -2068,9 +2067,6 @@ void CMapEffect_Sprite::Draw(mgCCamera *camera, CPreSprite *sprite) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dng_effect", Draw__17CMapEffect_SpriteFP9mgCCameraP10CPreSprite);
-#endif
 void CMapEffectsManeger::Init_LightBoll(mgCMemory *memory, int count) {
     sprite_num = count;
     u32 blocks;
