@@ -2,7 +2,7 @@ dng_debug primer=u64div
 dng_effect drafts primer=u64div
 dngmenu primer=u64div
 fishingobj primer=u64div
-gyoracesim drafts
+gyoracesim drafts primer=u64div
 menusys drafts primer=u64div
 monster drafts
 nd_meswin drafts
