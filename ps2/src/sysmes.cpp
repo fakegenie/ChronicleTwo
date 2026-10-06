@@ -1,7 +1,5 @@
 #include "sound.hpp"
 #include "dataread.hpp"
-#include "prespr.hpp"
-#include "mg_drawprim.hpp"
 #include <cstdio>
 #include <cstring>
 #include "font.hpp"
@@ -10,12 +8,9 @@
 #include "userdata.hpp"
 #include "gamedata.hpp"
 #include "scriptinterpreter.hpp"
-#include "mg_math.hpp"
 #include "mg_texture.hpp"
 #include "mglib.hpp"
 #include "mainloop.hpp"
-#include "menucls1.hpp"
-#include "menucommon.hpp"
 #include "menudraw.hpp"
 #include "menusys.hpp"
 #include "menumain.hpp"

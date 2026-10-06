@@ -13,7 +13,6 @@
 #include "scene.hpp"
 #include "sound.hpp"
 #include "dng_main.hpp"
-#include "dng_status.hpp"
 #include "savedata.hpp"
 #include "actscript.hpp"
 #include <cstring>

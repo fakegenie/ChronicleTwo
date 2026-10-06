@@ -18,7 +18,6 @@
 #include "snd_mngr.hpp"
 #include "dbg_font.hpp"
 #include "character.hpp"
-#include "gamepad.hpp"
 #include <cstdio>
 #include <cstring>
 #include <cmath>

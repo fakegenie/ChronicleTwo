@@ -23,7 +23,6 @@
 #include "mg_drawenv.hpp"
 #include "mg_math.hpp"
 #include "dng_effect.hpp"
-#include "dng_debug.hpp"
 #include "dng_main.hpp"
 #include "mg_tanime.hpp"
 #include "mg_texture.hpp"

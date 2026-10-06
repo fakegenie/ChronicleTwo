@@ -26,7 +26,6 @@
 #include "mg_texture.hpp"
 #include "mg_math.hpp"
 #include "dng_effect.hpp"
-#include "dng_status.hpp"
 #include "dng_debug.hpp"
 #include "dng_main.hpp"
 #include "actionchara.hpp"

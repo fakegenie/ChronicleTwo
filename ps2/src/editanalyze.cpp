@@ -1,5 +1,4 @@
 #include "common.h"
-#include "vlgr_info.hpp"
 #include "savedata.hpp"
 #include "mainloop.hpp"
 #include "mg_math.hpp"

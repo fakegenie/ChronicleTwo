@@ -1,6 +1,4 @@
 #include "common.h"
-#include "mg_memory.hpp"
-#include "mg_drawprim.hpp"
 #include "mg_texture.hpp"
 #include "mg_frame.hpp"
 #include "mg_drawenv.hpp"

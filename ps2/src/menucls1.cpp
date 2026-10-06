@@ -11,7 +11,6 @@
 #include "userdata.hpp"
 #include "gamedata.hpp"
 #include "scriptinterpreter.hpp"
-#include "mg_math.hpp"
 #include "mg_texture.hpp"
 #include "menudraw.hpp"
 #include "menusys.hpp"
