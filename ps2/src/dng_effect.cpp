@@ -2753,7 +2753,6 @@ void CWeaponElement::Draw_Wind(void) {
     }
     prim.End();
 }
-#ifdef STATEMATCHING
 void CWeaponElement::Init_Fire(float *center) {
     int i;
     int j;
@@ -2785,9 +2784,6 @@ void CWeaponElement::Init_Fire(float *center) {
         frame[j] = fptosi((5.0f * (float)rand()) / 2.1474836e9f) * 0x30;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dng_effect", Init_Fire__14CWeaponElementFPf);
-#endif
 void CWeaponElement::Step_Fire(void) {
     int dead;
     int i;
