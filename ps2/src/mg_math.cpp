@@ -604,7 +604,58 @@ asm void mgZeroMatrix(float (*matrix)[4]) {
     sqc2 vf1, 0x0(a0)
 }
 
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", MulMatrix3__FPA4_fPA4_fPA4_f);
+static asm void MulMatrix3(float (*matrix)[4], float (*second)[4], float (*third)[4]) {
+    .set noreorder
+    lqc2 vf1, 0x0(a0)
+    lqc2 vf2, 0x10(a0)
+    lqc2 vf3, 0x20(a0)
+    lqc2 vf4, 0x30(a0)
+    lqc2 vf5, 0x0(a1)
+    lqc2 vf6, 0x10(a1)
+    lqc2 vf7, 0x20(a1)
+    lqc2 vf8, 0x30(a1)
+    lqc2 vf9, 0x0(a2)
+    lqc2 vf10, 0x10(a2)
+    lqc2 vf11, 0x20(a2)
+    lqc2 vf12, 0x30(a2)
+    vmulax.xyzw ACC, vf1, vf5x
+    vmadday.xyzw ACC, vf2, vf5y
+    vmaddaz.xyzw ACC, vf3, vf5z
+    vmaddw.xyzw vf20, vf4, vf5w
+    vmulax.xyzw ACC, vf1, vf6x
+    vmadday.xyzw ACC, vf2, vf6y
+    vmaddaz.xyzw ACC, vf3, vf6z
+    vmaddw.xyzw vf21, vf4, vf6w
+    vmulax.xyzw ACC, vf1, vf7x
+    vmadday.xyzw ACC, vf2, vf7y
+    vmaddaz.xyzw ACC, vf3, vf7z
+    vmaddw.xyzw vf22, vf4, vf7w
+    vmulax.xyzw ACC, vf1, vf8x
+    vmadday.xyzw ACC, vf2, vf8y
+    vmaddaz.xyzw ACC, vf3, vf8z
+    vmaddw.xyzw vf23, vf4, vf8w
+    vmulax.xyzw ACC, vf20, vf9x
+    vmadday.xyzw ACC, vf21, vf9y
+    vmaddaz.xyzw ACC, vf22, vf9z
+    vmaddw.xyzw vf1, vf23, vf9w
+    vmulax.xyzw ACC, vf20, vf10x
+    vmadday.xyzw ACC, vf21, vf10y
+    vmaddaz.xyzw ACC, vf22, vf10z
+    vmaddw.xyzw vf2, vf23, vf10w
+    vmulax.xyzw ACC, vf20, vf11x
+    vmadday.xyzw ACC, vf21, vf11y
+    vmaddaz.xyzw ACC, vf22, vf11z
+    vmaddw.xyzw vf3, vf23, vf11w
+    vmulax.xyzw ACC, vf20, vf12x
+    vmadday.xyzw ACC, vf21, vf12y
+    vmaddaz.xyzw ACC, vf22, vf12z
+    vmaddw.xyzw vf4, vf23, vf12w
+    sqc2 vf1, 0x0(a0)
+    sqc2 vf2, 0x10(a0)
+    sqc2 vf3, 0x20(a0)
+    jr ra
+    sqc2 vf4, 0x30(a0)
+}
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgMulMatrix__FPA4_fPA4_fPA4_f);
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgInversMatrix__FPA4_fPA4_f);
 void mgRotMatrixX(float (*matrix)[4], float angle_x) {
