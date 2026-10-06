@@ -12909,9 +12909,7 @@ int _IS_CLEAR_DESTROY(RS_STACKDATA *stack, int argc) {
     SetStack(stack, floorManager->IsClearMostFastDestroy());
     return 1;
 }
-#ifdef NONMATCHING
 int _IS_CLEAR_PRACTICE(RS_STACKDATA *stack, int argc) {
-    int bonus;
     if (argc != 3) {
         return 0;
     }
@@ -12936,24 +12934,24 @@ int _IS_CLEAR_PRACTICE(RS_STACKDATA *stack, int argc) {
     if (info == NULL) {
         return 0;
     }
-    if (info->practice_type == 2) {
-        int param = info->practice_param;
-        switch (param) {
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-                bonus = param + 5;
-                break;
+    int bonus = info->practice_type;
+    switch (bonus) {
+        case 2: {
+            int param = info->practice_param;
+            switch (param) {
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                    bonus = param + 5;
+                    break;
+            }
         }
     }
     SetStack(stack++, cleared);
     SetStack(stack, bonus);
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/event_func", _IS_CLEAR_PRACTICE__FP12RS_STACKDATAi);
-#endif
 int _IS_PLAY_SUB_GAME(RS_STACKDATA *stack, int argc) {
     CDngFloorManager *floorManager;
     DNG_BATTLE_AREA *dngScene;
