@@ -2472,16 +2472,16 @@ void CMenuKeyFunc::CursorFadeOut(float speed, int steps) {
         waku_form->FormFadeOut((int)speed, steps);
     }
 }
-#ifdef NONMATCHING
 int CMenuKeyFunc::EnableSwapNowPos(MENU_SWAPITEM_INFO *swap) {
     int result = 0;
     s32 used_type;
     CHARA_DATA *chara = NULL;
     u32 held_no = have_item.item_no;
     ROBO_DATA *robo = NULL;
-    CDataCommon *common = GameItemDataManage.GetCommonData(held_no);
-    int data_type = GetItemDataType(held_no);
+    CDataCommon *common;
     int held_used = have_item.used_type;
+    common = GameItemDataManage.GetCommonData(held_no);
+    int data_type = GetItemDataType(held_no);
     switch (swap->chara) {
         case 0:
         case 1:
@@ -2517,20 +2517,17 @@ int CMenuKeyFunc::EnableSwapNowPos(MENU_SWAPITEM_INFO *swap) {
                     result = 4;
                 }
             } else if (held_no != active->item_no) {
-                result = 0;
-                if (held_used == 1) {
-                    if (active->used_type == USED_ITEM_TYPE_GIFT_BOX) {
-                        result = 0;
-                    } else {
-                        result = 0;
-                    }
+                if (held_used == 1 && active->used_type == USED_ITEM_TYPE_GIFT_BOX) {
+                    result = 0;
+                } else {
+                    result = 0;
                 }
             }
             break;
         }
         case MENU_SWAP_TYPE_EQUIP:
             if (held_used != 0) {
-                if (held_used == 2 || (u32)(held_used - 5) < 3 || held_used == 4) {
+                if (held_used == 2 || (u32)(held_used - 5) <= 2 || held_used == 4) {
                     result = 1;
                     break;
                 }
@@ -2541,11 +2538,21 @@ int CMenuKeyFunc::EnableSwapNowPos(MENU_SWAPITEM_INFO *swap) {
             }
             if (chara->status_attr & CHARA_STATUS_UNK_4) {
                 result = 8;
-            } else if (chara->status_attr & CHARA_STATUS_UNK_8) {
+                break;
+            }
+            if (chara->status_attr & CHARA_STATUS_UNK_8) {
                 result = 8;
-            } else if (!(chara->status_attr & CHARA_STATUS_UNK_20)) {
-                result = 9;
-                if (held_used != 0) {
+                break;
+            }
+            if (chara->status_attr & CHARA_STATUS_UNK_20) {
+                result = 8;
+                break;
+            }
+            switch (held_used) {
+                case 0:
+                    result = 9;
+                    break;
+                default:
                     if (data_type == SearchEquipType(swap->chara, swap->no)) {
                         result = 0;
                         if (have_item.IsFishingRod()) {
@@ -2554,21 +2561,19 @@ int CMenuKeyFunc::EnableSwapNowPos(MENU_SWAPITEM_INFO *swap) {
                                 result = 9;
                             }
                         }
+                    } else if (MenuItemUse.CheckItemUseEnable(&have_item, 1, &chara->equip[swap->no])) {
+                        result = 5;
                     } else {
                         result = 1;
-                        if (MenuItemUse.CheckItemUseEnable(&have_item, 1, &chara->equip[swap->no])) {
-                            result = 5;
-                        }
                     }
-                }
-            } else {
-                result = 8;
+                    break;
             }
             break;
         case MENU_SWAP_TYPE_ROBO_PART:
             if (held_used != 0 && held_used != 5) {
                 result = 1;
                 if (held_used != 1) {
+                    result = 1;
                     break;
                 }
             }
@@ -2576,23 +2581,27 @@ int CMenuKeyFunc::EnableSwapNowPos(MENU_SWAPITEM_INFO *swap) {
                 result = 9;
                 break;
             }
-            if (held_used == 1) {
-                result = 1;
-                if (MenuItemUse.CheckItemUseEnable(&have_item, 1, &robo->parts[swap->no])) {
-                    result = 5;
-                }
-            } else {
-                result = 9;
-                if (held_used != 0) {
-                    int equip_type = SearchEquipType(2, swap->no);
-                    result = 3;
-                    if (data_type == equip_type) {
+            switch (held_used) {
+                case 0:
+                    result = 9;
+                    break;
+                case 1:
+                    if (MenuItemUse.CheckItemUseEnable(&have_item, 1, &robo->parts[swap->no])) {
+                        result = 5;
+                    } else {
+                        result = 1;
+                    }
+                    break;
+                default:
+                    if (data_type == SearchEquipType(2, swap->no)) {
                         result = 0;
                         if (!IsEnableChangeRoboParts(&have_item)) {
                             result = 3;
                         }
+                    } else {
+                        result = 3;
                     }
-                }
+                    break;
             }
             break;
         case MENU_SWAP_TYPE_ITEM_BOARD:
@@ -2610,6 +2619,7 @@ int CMenuKeyFunc::EnableSwapNowPos(MENU_SWAPITEM_INFO *swap) {
             } else {
                 if (used_type == USED_ITEM_TYPE_GIFT_BOX) {
                     if (held_used == 1) {
+                        result = 0;
                     }
                 } else if (used->CheckTypeEnableStack()) {
                     num = used->GetNum();
@@ -2618,7 +2628,11 @@ int CMenuKeyFunc::EnableSwapNowPos(MENU_SWAPITEM_INFO *swap) {
                             result = 4;
                         }
                     } else if (have_item.CheckTypeEnableStack()) {
-                    } else if (used->item_no == held_no) {
+                        result = 0;
+                    } else if (held_no != used->item_no) {
+                        result = 0;
+                    } else {
+                        result = 0;
                     }
                 }
             }
@@ -2634,19 +2648,19 @@ int CMenuKeyFunc::EnableSwapNowPos(MENU_SWAPITEM_INFO *swap) {
                 result = 0;
                 break;
             }
-            if (common->type != 0x20 && !(common->attribute & 4)) {
-                result = 9;
-                break;
-            }
-            result = 0;
-            if (have_item.GetNum() >= 2 && 0 < esa->GetNum() && have_item.item_no != esa->item_no) {
-                result = 9;
-            }
-            int rod_no = GetUserDataMan()->GetFishingRodNo();
-            if (rod_no == 0x12F && (common->attribute & 4)) {
-                result = 9;
-            }
-            if (rod_no == 0x12E && common->type == 0x20) {
+            if (common->type == 0x20 || (common->attribute & 4)) {
+                result = 0;
+                if (have_item.GetNum() > 1 && 0 < esa->GetNum() && have_item.item_no != esa->item_no) {
+                    result = 9;
+                }
+                int rod_no = GetUserDataMan()->GetFishingRodNo();
+                if (rod_no == 0x12F && (common->attribute & 4)) {
+                    result = 9;
+                }
+                if (rod_no == 0x12E && common->type == 0x20) {
+                    result = 9;
+                }
+            } else {
                 result = 9;
             }
             break;
@@ -2654,9 +2668,6 @@ int CMenuKeyFunc::EnableSwapNowPos(MENU_SWAPITEM_INFO *swap) {
     }
     return result;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menusys", EnableSwapNowPos__12CMenuKeyFuncFP18MENU_SWAPITEM_INFO);
-#endif
 int CMenuKeyFunc::GetItemAll(CGameDataUsed *item, MENU_SWAPITEM_INFO *info) {
     int slot;
     if (item == NULL || info == NULL) {
