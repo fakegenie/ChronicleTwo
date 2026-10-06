@@ -873,6 +873,7 @@ static void DrawDngRoomInfo(DNGMAP_ROOM_INFO *room) {
             mgRect<int> *seal_uv = &seal_name_uv;
             prim->Color(0x80, 0x80, 0x80, fptosi(seal_alpha));
             float seal_x;
+            float seal_y = 35.0f + board_y;
             if (language > 0) {
                 seal_uv->top += (room->seal - 1) * 0x18;
                 seal_x = board_x + (float)board_w - 56.0f;
@@ -881,7 +882,7 @@ static void DrawDngRoomInfo(DNGMAP_ROOM_INFO *room) {
                 seal_uv->left += (room->seal - 1) * 0x18;
                 seal_x = board_x + (float)board_w - 40.0f;
             }
-            PrimQuad(prim, seal_x, 35.0f + board_y, *seal_uv);
+            PrimQuad(prim, seal_x, seal_y, *seal_uv);
             prim->Color(0x80, 0x80, 0x80, alpha);
         }
         int mark_x = fptosi(20.0f + board_x);
