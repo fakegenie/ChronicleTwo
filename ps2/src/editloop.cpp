@@ -468,7 +468,7 @@ void EditInit(INIT_LOOP_ARG arg) {
     MainScene__2->villager_texb_num = 56;
     MainScene__2->event_texb = 160;
     MainScene__2->event_texb_num = 2;
-    MainScene__2->GetActiveBgmInfo()->unk_c = 1.0f;
+    MainScene__2->GetActiveBgmInfo()->master_vol = 1.0f;
     MainScene__2->SetVolfBGM(MainScene__2->GetActiveBgmInfo()->volf);
     MainScene__2->tex_block_base = 185;
     MainScene__2->tex_block_count = 21;

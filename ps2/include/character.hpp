@@ -267,7 +267,7 @@ public:
     s32                   seq_advance;
     tagMOTION_TYPE        motion[CHARA_MOTION_SET_MAX];
     tagMOTION_TYPE        shadow_motion[CHARA_MOTION_SET_MAX];
-    s32                   unk_500;
+    s32                   main_frame_info;
     tagFRAME_INF         *shadow_frame_info;
     float                 blend;
     float                 blend_speed;

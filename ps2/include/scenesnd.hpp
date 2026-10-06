@@ -159,7 +159,7 @@ public:
         s32       port;
         s32       snd_id;
         s32       load_no;
-        float     unk_c;
+        float     master_vol;
         s32       vol;
         float     volf;
         float     fade_volf;
@@ -177,7 +177,7 @@ public:
         s32   state;
         s32   load_no;
         s32   play_no;
-        float unk_c;
+        float master_vol;
         s32   vol;
         float volf;
         s32   time_vol;

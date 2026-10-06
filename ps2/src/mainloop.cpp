@@ -1405,7 +1405,7 @@ int gcSTEVE(SPI_STACK *stack, int mode) {
     return 1;
 }
 int gcMONSTER(SPI_STACK *stack, int arg_count) {
-    int sp7C;
+    int class_level;
     CUserDataManager *manager;
     int i;
     int monster_id;
@@ -1420,13 +1420,13 @@ int gcMONSTER(SPI_STACK *stack, int arg_count) {
     manager->GetItemNotOver(0x134, 1);
     for (i = 0; i < arg_count; i++) {
         monster_id = spiGetStackInt(stack++);
-        badge_no = get_gajji_id_from_monster_progress_table(monster_id, &sp7C) + 1;
+        badge_no = get_gajji_id_from_monster_progress_table(monster_id, &class_level) + 1;
         manager->monster_box.EnableChange(badge_no);
         badge = manager->monster_box.GetMonsterBajjiData(badge_no);
         if (badge != NULL) {
-            badge->class_level = sp7C;
+            badge->class_level = class_level;
             badge->monster_id = monster_id;
-            badge->progress = GetMonsterProgressTableNo(sp7C, monster_id);
+            badge->progress = GetMonsterProgressTableNo(class_level, monster_id);
         }
         manager->monster_id = monster_id;
     }

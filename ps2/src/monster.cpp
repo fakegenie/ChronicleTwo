@@ -595,7 +595,7 @@ CActiveMonster *CMonsterMan::SetActiveMonster(int refer_no, float *pos, float *r
         source->chara.Copy(*monster, &memory[slot]);
     } else {
         *monster = source->chara;
-        monster->unk_500 = (s32)monster->motion[0].frame_info;
+        monster->main_frame_info = (s32)monster->motion[0].frame_info;
         monster->shadow_frame_info = monster->shadow_motion[0].frame_info;
         monster->now_key = 0;
     }

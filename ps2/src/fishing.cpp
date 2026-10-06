@@ -2681,8 +2681,8 @@ int GetUkiWaitTime(FISH_DATA *fish, CScene *scene, float *position, int rod_no, 
         }
     }
     int rod_power = RodData.status[2] - 10;
-    int temp2 = rod_power < 0;
-    if (temp2) {
+    int rod_underpowered = rod_power < 0;
+    if (rod_underpowered) {
         rod_power = 0;
     }
     fish->fish_no = fish_no;

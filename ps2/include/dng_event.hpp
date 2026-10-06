@@ -301,7 +301,7 @@ void AutoSetTreasureBox();
 
 void AutoSetMonster();
 
-void AutoSetMonster(int monster_no, float *pos, float *rot, int param);
+void AutoSetMonster(int monster_no, float *pos, float *rot, int option);
 
 void DungeonFloorInit();
 
