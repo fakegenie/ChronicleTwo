@@ -779,22 +779,17 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/menusys", MenuItemCommandSelect__14CBaseMe
 #endif
 extern s8 wakutbl_1411[2];
 extern s8 tartbl_1412[2];
-#ifdef NONMATCHING
 void CBaseMenuClass::SetItemCmdMsgPos(int *item_pos) {
-    int pos[2] = { 0, 0 };
+    int pos[2] = {item_pos[0] + 4, item_pos[1] + 0x2A};
+    int cmd_num = ask_para.cmd_num;
     int width = 0;
     int lines = 0;
-    int i;
-
-    pos[0] = item_pos[0] + 4;
-    pos[1] = item_pos[1] + 0x2A;
-    int cmd_num = ask_para.cmd_num;
     MenuItemCommandDir = 1;
     CDC2Mes *message = MenuDCMsg[ask_para.mes_no];
     if (message == NULL) {
         return;
     }
-    for (i = 0; i < cmd_num; i++) {
+    for (int i = 0; i < cmd_num; i++, lines++) {
         if (message->item_mes[i] < 0) {
             break;
         }
@@ -802,7 +797,6 @@ void CBaseMenuClass::SetItemCmdMsgPos(int *item_pos) {
         if (width < line_width) {
             width = line_width;
         }
-        lines++;
     }
     int height = message->font_h * lines;
     CMenuPosDataForm *form = ask_para.form;
@@ -831,9 +825,11 @@ void CBaseMenuClass::SetItemCmdMsgPos(int *item_pos) {
         case 1:
         case 2:
             pos[1] = item_pos[1] - height - 0x14;
-            __typeof__(MenuCommonInfo) menuCommonInfo2 = MenuCommonInfo;
-            message->point_x = wakutbl_1411[menuCommonInfo2->cursor];
-            pos[0] += tartbl_1412[menuCommonInfo2->cursor];
+            {
+                int cursor = MenuCommonInfo->cursor;
+                message->point_x = wakutbl_1411[cursor];
+                pos[0] += tartbl_1412[cursor];
+            }
             message->point_y = height * 2;
             break;
         case 3:
@@ -867,7 +863,7 @@ void CBaseMenuClass::SetItemCmdMsgPos(int *item_pos) {
                     message->point_x = width + 0x1E;
                     message->point_y = height - 0xE;
                     while (*pos_y < 0x14) {
-                        *pos_y++;
+                        (*pos_y)++;
                         message->point_y--;
                     }
                     MenuItemCommandDir = 2;
@@ -877,6 +873,12 @@ void CBaseMenuClass::SetItemCmdMsgPos(int *item_pos) {
                     message->point_x = item_pos[0] + 0x1A - pos[0];
                 }
             }
+            break;
+        case 7:
+            message->point_x = 0x14;
+            message->point_y = 0x3C;
+            pos[0] += 0x3C;
+            pos[1] -= 0x78;
             break;
         case 5:
         case 6:
@@ -888,12 +890,6 @@ void CBaseMenuClass::SetItemCmdMsgPos(int *item_pos) {
                 pos[0] -= width + 0x6A;
                 message->point_x += width + 0x6C;
             }
-            break;
-        case 7:
-            message->point_x = 0x14;
-            message->point_y = 0x3C;
-            pos[0] += 0x3C;
-            pos[1] -= 0x78;
             break;
         case 8:
             break;
@@ -908,9 +904,6 @@ void CBaseMenuClass::SetItemCmdMsgPos(int *item_pos) {
         form->y = pos[1];
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menusys", SetItemCmdMsgPos__14CBaseMenuClassFPi);
-#endif
 int MenuHowMuchNumSelect(int key, CGameDataUsed *item, int limit) {
     short step = 0;
     int max_num;
@@ -10045,7 +10038,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_935__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_936__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_937__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_938__3__DATA);
-INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_1462__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_1493__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_2545__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_2546__2__DATA);
