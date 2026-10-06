@@ -5686,12 +5686,9 @@ void CMenuCostumeSel::Draw() {
         if (wave < 0.0f) {
             wave = -wave;
         }
-        float leftX;
-        leftX = 55.0f - wave;
-        float rightX;
-        float arrowY;
-        arrowY = (float)(lineY + 3);
-        rightX = (float)(0x49 + lineRect.right) + wave;
+        float rightX = (float)(0x49 + lineRect.right) + wave;
+        float leftX = 55.0f - wave;
+        float arrowY = (float)(lineY + 3);
         float shadowY = 4.0f + arrowY;
         PrimQuad(prim, 4.0f + leftX, shadowY, leftRect);
         PrimQuad(prim, 4.0f + rightX, 4.0f + arrowY, rightRect);
@@ -5779,8 +5776,8 @@ void CMenuCostumeSel::Draw() {
         MenuDCMsg[7]->DrawMsg();
     }
     if (show_help && !loading && !wait_load) {
-        DrawMenuFillBox(36.0f, (float)mgScreenHeight - 40.0f - 8.0f, putw_5262[LanguageCode], 32.0f, 0x40, 0, 0,
-                        0);
+        float help_x = 36.0f;
+        DrawMenuFillBox(help_x, (float)mgScreenHeight - 40.0f - 8.0f, putw_5262[LanguageCode], 32.0f, 0x40, 0, 0, 0);
         CMenuFont help;
         help.DrawDirect(infomsg_5256[LanguageCode], 0x28, mgScreenHeight - 0x28);
     }
