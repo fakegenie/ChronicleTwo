@@ -130,11 +130,10 @@ int mgGetPerformanceMeterFlag(void) {
     return draw_performance_meter;
 }
 #pragma global_optimizer off
-#ifdef NONMATCHING
 extern "C" int VSyncCallBack__Fi(int field) {
     call_back_active = 1;
     u_long csr = *(volatile u_long *)gs_csr;
-    VSyncField = (((csr >> 13) & 1) == 0);
+    VSyncField = !(bool)((csr >> 13) & 1);
     if (VSyncCallBack2 != 0) {
         ((int (*)(int))VSyncCallBack2)(field);
     }
@@ -143,11 +142,12 @@ extern "C" int VSyncCallBack__Fi(int field) {
         vcount = 0;
     }
     call_back_active = 0;
+    asm {
+        sync
+        ei
+    }
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mglib", VSyncCallBack__Fi);
-#endif
 #pragma global_optimizer reset
 void mgInitVSyncCallBack(int (*callback)(int)) {
     VSyncCallBack2 = (unsigned int)callback;
