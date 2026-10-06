@@ -1590,7 +1590,7 @@ int CActionChara::HumanTameMoveIF() {
     return 1;
 }
 
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 int CActionChara::HumanGunMoveIF(char *stand_motion, char *move_motion) {
     sceVu0FVECTOR position;
     sceVu0FVECTOR move_velocity;
@@ -1641,7 +1641,7 @@ int CActionChara::HumanGunMoveIF(char *stand_motion, char *move_motion) {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/actionchara", HumanGunMoveIF__12CActionCharaFPcPc);
 #endif
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 int CActionChara::RoboWalkMoveIF(int mode) {
     sceVu0FVECTOR position;
     sceVu0FVECTOR move_velocity;
@@ -1737,7 +1737,7 @@ int CActionChara::RoboWalkMoveIF(int mode) {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/actionchara", RoboWalkMoveIF__12CActionCharaFi);
 #endif
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 int CActionChara::RoboTankMoveIF(int mode) {
     sceVu0FVECTOR position;
     sceVu0FVECTOR move_velocity;
@@ -1881,7 +1881,6 @@ int CActionChara::RoboTankMoveIF(int mode) {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/actionchara", RoboTankMoveIF__12CActionCharaFi);
 #endif
-#ifdef NONMATCHING
 #ifdef NONMATCHING
 int CActionChara::RoboBikeMoveIF(int mode) {
     sceVu0FVECTOR position;
@@ -2071,10 +2070,6 @@ int CActionChara::RoboBikeMoveIF(int mode) {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/actionchara", RoboBikeMoveIF__12CActionCharaFi);
 #endif
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/actionchara", RoboBikeMoveIF__12CActionCharaFi);
-#endif
-#ifdef NONMATCHING
 #ifdef NONMATCHING
 int CActionChara::RoboAirMoveIF(int unk, int mode) {
     sceVu0FVECTOR position;
@@ -2219,9 +2214,6 @@ int CActionChara::RoboAirMoveIF(int unk, int mode) {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/actionchara", RoboAirMoveIF__12CActionCharaFii);
 #endif
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/actionchara", RoboAirMoveIF__12CActionCharaFii);
-#endif
 #ifdef NONMATCHING
 int CActionChara::MonsterMoveIF() {
     sceVu0FVECTOR position;
@@ -2361,6 +2353,7 @@ int CActionChara::MonsterMoveIF() {
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/actionchara", MonsterMoveIF__12CActionCharaFv);
 #endif
 
+#ifdef STATEMATCHING
 void HitEffectSet(CScene *scene, float *point) {
     float pos[4];
     float to_camera[4];
@@ -2370,7 +2363,7 @@ void HitEffectSet(CScene *scene, float *point) {
     CCameraControl *camera;
     CHitEffectImage *hit;
     CFlushEffect *flush;
-    float speed = 50.0f;
+    ActionVector copy;
 
     camera = (CCameraControl *)scene->GetCamera(scene->active_camera);
     if (camera == NULL) {
@@ -2393,7 +2386,7 @@ void HitEffectSet(CScene *scene, float *point) {
         }
     }
     if (hit != NULL) {
-        SethitEffect__15CHitEffectImageFPfPfffffii(hit, pos, dir, 30.0f, speed, 0.4f, 0.1f, 30, 32);
+        SethitEffect__15CHitEffectImageFPfPfffffii(hit, pos, dir, 30.0f, 50.0f, 0.4f, 0.1f, 30, 32);
         hit->kind = 0;
     }
     if (BattleFX.flush == NULL) {
@@ -2431,7 +2424,7 @@ void HitEffectSet(CScene *scene, float *point) {
                                                    32);
         hit->kind = 0;
         ((mgRect<int> *)&rect)->Set(0, 80, 16, 16);
-        ActionVector copy = rect;
+        copy = rect;
         hit->tex_rect.left = copy.i[0];
         hit->tex_rect.top = copy.i[1];
         hit->tex_rect.right = copy.i[2];
@@ -2439,6 +2432,9 @@ void HitEffectSet(CScene *scene, float *point) {
         hit->sprite_size = 2.0f;
     }
 }
+#else
+INCLUDE_ASM("ps2/asm/pal/nonmatchings/actionchara", HitEffectSet__FP6CScenePf);
+#endif
 int CheckAmuletAvoid(int item_no) {
     CBattleCharaInfo *info;
     CGameDataUsed *item;

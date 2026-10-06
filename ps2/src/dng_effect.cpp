@@ -1981,7 +1981,7 @@ void CMapEffect_Sprite::Step(mgCCamera *camera) {
         life -= 1;
     }
 }
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void CMapEffect_Sprite::Draw(mgCCamera *camera, CPreSprite *sprite) {
     float world[4];
     int corner0[4];
@@ -2446,7 +2446,7 @@ void CWeaponElement::Draw(void) {
         }
     }
 }
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void CWeaponElement::Init_Cold(float *center) {
     int j;
     int i;
@@ -2589,7 +2589,7 @@ void CWeaponElement::Draw_Cold(void) {
     }
     prim.End();
 }
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void CWeaponElement::Init_Wind(float *center) {
     int i;
     int j;
@@ -2746,7 +2746,7 @@ void CWeaponElement::Draw_Wind(void) {
     }
     prim.End();
 }
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void CWeaponElement::Init_Fire(float *center) {
     int i;
     int j;
@@ -2890,7 +2890,7 @@ void CWeaponElement::Draw_Fire(void) {
     }
     prim.End();
 }
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void CWeaponElement::Init_Thunder(float *center) {
     float scaled[4];
     float dir[4];

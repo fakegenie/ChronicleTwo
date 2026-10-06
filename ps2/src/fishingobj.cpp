@@ -284,7 +284,7 @@ void InitRodPoint(mgCFrame *reference, mgCFrame *rod) {
     ShowHari = 1;
 }
 static void GetTriPose(sceVu0FMATRIX pose, sceVu0FVECTOR points[3], int axes[3]);
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 static void GetTriPose(sceVu0FMATRIX pose, sceVu0FVECTOR points[3], int axes[3]) {
     float first[4];
     float second[4];

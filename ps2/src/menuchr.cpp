@@ -880,7 +880,7 @@ void CMenuChrCngMenu::AttachForm() {
         cmd_part[j] = form->GetPartInfo(name);
     }
 }
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void CMenuChrCngMenu::EnterDataMenu(u8 *pack) {
     char name[0x20];
     int size;
@@ -5952,7 +5952,7 @@ extern void *__vt__15CMenuCostumeSel[];
 extern u_long CostumeOptionEnv;
 extern "C" void *__ct__15mgCCameraFollowFffff(void *camera, float distance, float height, float angle,
                                                float speed);
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void MenuCostumeInit(mgCMemory *stack, int *tex_block, int mode) {
     int i;
     CMenuCostumeSel *menu;
@@ -6174,7 +6174,7 @@ void CMosBookMenu::InitEnd(void) {
     this->SetMonsterInfo(this->monster_info);
     FadeInMenu(0x32, 0.0f);
 }
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void CMosBookMenu::Draw() {
     sceVu0FMATRIX view;
     sceVu0FVECTOR eye;

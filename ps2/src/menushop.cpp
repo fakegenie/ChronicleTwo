@@ -1644,7 +1644,7 @@ extern float QuestListTopY;
 extern float QuestCommentWinX;
 extern s16 QuestReactionCommentGyouNum;
 extern int menu_debug_questselect;
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 int CMenuQuestView::KeyStep() {
     MenuCommonInfo->CheckSelectKey();
     int lr_key = MenuCommonInfo->CheckLRKey();
@@ -1856,7 +1856,7 @@ extern s8 randam_checktbl[];
 extern short tbl_2469[7][12];
 extern short at_2470[12];
 extern char at_2629__2[];
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void MenuNPCQuestViewDraw() {
     int mark_u;
     if (Tex_QuestMemo == NULL) {

@@ -1021,6 +1021,7 @@ void BuggyControl(CScene *scene) {
 }
 extern float StarbullPos[4];
 extern char at_1316__3[];
+#ifdef STATEMATCHING
 void InitBomb(CScene *scene) {
     BombStatus = 3;
     scene->SetActive(1, 67);
@@ -1029,10 +1030,12 @@ void InitBomb(CScene *scene) {
     StarbullPos[1] = 113.0f;
     StarbullPos[2] = -300.0f;
     StarbullChara->SetPosition(StarbullPos);
-    float tilt = 0.0f;
-    StarbullChara->SetRotation(tilt, 3.1415927f, tilt);
+    StarbullChara->SetRotation(0.0f, 3.1415927f, 0.0f);
     StarbullChara->SetMotion(at_1316__3, 0);
 }
+#else
+INCLUDE_ASM("ps2/asm/pal/nonmatchings/pbuggy", InitBomb__FP6CScene);
+#endif
 int TakeBombCheck(void) {
 
     return (BombStatus != 3) ^ 1;

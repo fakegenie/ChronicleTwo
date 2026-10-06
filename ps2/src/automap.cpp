@@ -134,7 +134,7 @@ void CMiniMapSymbol::DrawSymbolClose() {
         blink_cnt = 0;
     }
 }
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void CMiniMapSymbol::DrawSymbol(float *pos, int symbol) {
     float delta[4];
 
@@ -168,7 +168,7 @@ void CMiniMapSymbol::DrawSymbol(float *pos, int symbol) {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/automap", DrawSymbol__14CMiniMapSymbolFPfi);
 #endif
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void CMiniMapSymbol::DrawSymbol_Chara(CCharacter2 *chara) {
     float pos[4];
     float rot[4];

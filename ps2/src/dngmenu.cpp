@@ -214,7 +214,7 @@ void CDngFreeMap::CalcGlidPutPos(GLID_INFO *glid, float &x, float &y, int ignore
         }
     }
 }
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void CDngFreeMap::CheckIsViewMove(int x, int y, float &moveX, float &moveY) {
     int clampedX = x;
     int clampedY = y;

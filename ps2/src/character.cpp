@@ -874,7 +874,7 @@ void CCharacter2::ResetFloor() {
     }
 }
 
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void CCharacter2::NormalDrive() {
     float  frame_step;
     float  motion_speed = 1.2f;

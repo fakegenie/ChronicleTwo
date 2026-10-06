@@ -361,7 +361,7 @@ static void CollisionFish(RACE_FISH_PARAM *fish, int count) {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/gyoracesim", CollisionFish__FP15RACE_FISH_PARAMi);
 #endif
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 int StepGyoRace(RACE_FISH_PARAM *fish, grRACE_INFO *info) {
     int i;
     int step;

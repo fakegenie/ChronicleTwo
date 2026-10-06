@@ -2671,7 +2671,7 @@ int CMenuGeorama::IsMakeObject(int buttons_held, int buttons_pressed) {
     }
     return 0;
 }
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void CMenuGeorama::CalcCursorPosition() {
     char name[32];
 
@@ -3453,7 +3453,7 @@ int MenuGeoramaCheckPointPush(CMenuGeorama *menu, int keys, int pushed) {
     }
     return 0;
 }
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 int MenuGeoramaAnalyzeSelect(CMenuGeorama *menu, int keys, int pushed) {
     int old_top = menu->top;
     int max = menu->GetNowViewModeMax(GEORAMA_VIEW_ANALYZE);
@@ -4043,7 +4043,7 @@ int CRemovalMenu::KeyStep() {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/editmenu", KeyStep__12CRemovalMenuFv);
 #endif
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void MenuRemovalInit(mgCMemory *stack, int *arg) {
     int size;
 

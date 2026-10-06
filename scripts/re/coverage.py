@@ -19,12 +19,12 @@ MATCHINGS = ROOT / "ps2/asm/pal/matchings"
 ASM = re.compile(r"\bINCLUDE_ASM\([^,]+,\s*([A-Za-z_][A-Za-z_0-9]*)\s*\)")
 
 
-def guarded_symbols(source: str) -> set[str]:
+def guarded_symbols(source: str, flag: str = "NONMATCHING") -> set[str]:
     guards: list[dict[str, bool]] = []
     symbols: set[str] = set()
     for line in source.splitlines():
         directive = line.strip()
-        if directive == "#ifdef NONMATCHING":
+        if directive == f"#ifdef {flag}":
             guards.append({"nonmatching": True, "fallback": False})
         elif directive.startswith(("#if ", "#ifdef ", "#ifndef ")):
             guards.append({"nonmatching": False, "fallback": False})
@@ -45,6 +45,7 @@ def rows(report: dict) -> list[tuple[str, str, str]]:
         source = SOURCES / f"{name}.cpp"
         source_text = source.read_text() if source.exists() else ""
         guarded = guarded_symbols(source_text)
+        state_matched = guarded_symbols(source_text, "STATEMATCHING")
         for function in unit["functions"]:
             symbol = function["name"]
             # Progress also lists internal branch targets emitted as local labels.
@@ -55,6 +56,8 @@ def rows(report: dict) -> list[tuple[str, str, str]]:
             # A switch jump table can split a matching function into local
             # label rows, leaving the function's report row without a score.
             if match == 100.0 or (MATCHINGS / name / f"{symbol}.s").is_file():
+                status = "matched"
+            elif symbol in state_matched and match is None:
                 status = "matched"
             elif symbol.startswith("__sinit_") and re.search(
                 rf'extern\s+"C"\s+void\s+{re.escape(symbol)}\s*\(', source_text

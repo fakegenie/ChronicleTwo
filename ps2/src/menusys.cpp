@@ -8089,7 +8089,7 @@ int CheckBuildUp(CGameDataUsed *weapon, int *result0, int *result1, int *result2
     }
     return 0;
 }
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 int BuildUpWeaponTrans(CGameDataUsed *item, int item_no) {
     CDataWeapon *data = GameItemDataManage.GetWeaponData(item_no);
     if (item == NULL) {
@@ -9062,7 +9062,7 @@ void MenuCharaStatusDraw(int &tex_block) {
         }
     }
 }
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void MenuItemInfoCursorDraw(int &tex_block) {
     if (MenuItemCursorInfo.enable == 0) {
         return;

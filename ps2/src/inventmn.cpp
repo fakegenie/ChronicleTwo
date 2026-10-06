@@ -2171,7 +2171,7 @@ void CMenuInvent::GradationSet(int mode) {
             return;
     }
 }
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void CMenuInvent::GradationStep() {
     if (invent_okeff_form == NULL) {
         return;
@@ -2918,7 +2918,7 @@ int CMenuInvent::EnableSelectMaxCardList() {
     return count;
 }
 
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void CMenuInvent::CalcCursorPosition() {
     if (mode == 2) {
         MenuCommonInfo->SetWakuType(-1);

@@ -24,6 +24,16 @@ def suffixed_names(lay, unit, rows):
             if re.fullmatch(r".+__\d+", name) and any(lo <= address < hi for lo, hi in ranges)}
 
 
+def template_names(lay, unit, rows):
+    ranges = [(lo, hi) for _s, lo, hi in lay.sections(unit)]
+    found = {}
+    for address, name, _size, _func in rows:
+        compiled = re.sub(r"PrimQuad_([fi])___", r"PrimQuad<\1>__", re.sub(r"mgRect_([fi])_", r"mgRect<\1>", name))
+        if compiled != name and any(lo <= address < hi for lo, hi in ranges):
+            found[name] = compiled
+    return found
+
+
 def config(build_dir):
     lay = layout.Layout()
     rows = layout.read_symbols(layout.SYMBOLS)
@@ -34,7 +44,8 @@ def config(build_dir):
             "target_path": f"{build_dir}/objdiff/target/{unit}.s.o",
             "base_path": f"{build_dir}/objdiff/base/{unit}.cpp.o",
             "symbol_mappings": {f"__sinit_{unit}_cpp": f"__sinit_{unit}.cpp",
-                                **suffixed_names(lay, unit, rows)},
+                                **suffixed_names(lay, unit, rows),
+                                **template_names(lay, unit, rows)},
             "metadata": {
                 "source_path": lay.source(unit),
             },

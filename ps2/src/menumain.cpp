@@ -1595,7 +1595,7 @@ int CMenuInter::ReadBGTexture(int bgNo, int restart) {
     }
     return bg_read_step == 2;
 }
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 int MenuInternSelectKey(void) {
     int result = 0;
     int select_key = MenuCommonInfo->CheckSelectKey();

@@ -801,7 +801,7 @@ int scsMoveAHD(_SEN_CMR_SEQ *node, CSceneCmrSeq *owner) {
     owner->ahd_cnt++;
     return 1;
 }
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 int scsMoveAHD2(_SEN_CMR_SEQ *node, CSceneCmrSeq *owner) {
     float angle_delta;
     int ended;

@@ -879,7 +879,7 @@ int CheckRoboShieldKit(CUserDataManager *manager, CGameDataUsed *item, int apply
 }
 extern u32 st_bittable_1654[7];
 
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 int MenuUseItemCheckFunc(CGameDataUsed *item, CItemUseTarget *target, int apply) {
     if (item == NULL || target == NULL) {
         return 0;

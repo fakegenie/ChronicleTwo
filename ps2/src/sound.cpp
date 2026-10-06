@@ -377,7 +377,7 @@ void CSound::DEL_PORT(int port) {
     }
 }
 
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void CSound::SQ_Play(int port, int seq_no, int volume) {
     void *sequence;
 
@@ -518,7 +518,7 @@ void CSound::SE_Stop(int port, int bank, int program, int key, int id) {
     }
 }
 
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void CSound::Step() {
     int port;
 

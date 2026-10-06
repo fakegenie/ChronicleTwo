@@ -65,6 +65,9 @@ python3 "$MWCCGAP_DIR/mwccgap.py" "$src" "$obj" \
     "$@" \
     --as-flags -mno-pdr -non_shared -G0 -Ips2/include < /dev/null
 
+MWCIncludes=$LIB_INCLUDE_DIRS \
+python3 scripts/build/state.py "$obj" "$src" -lang "$lang" "$@"
+
 python3 scripts/build/postprocess_object.py "$obj"
 
 # MWCC writes its dependency map to `<stem>.d` in the working directory. The

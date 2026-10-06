@@ -2257,7 +2257,7 @@ int TitleHDDInstallKey() {
     }
     return 0;
 }
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void DrawMenuDl(int x, int y, int width, int alpha, float rate) {
     mgCDrawPrim prim;
     mgRect<int> frame_tex;

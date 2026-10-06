@@ -1981,7 +1981,7 @@ int ClsMes::MakeMesWinTbl_item(int ref_code, int *x, int *y) {
         }
     }
 }
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 int ClsMes::GetMesWidth_system(int mes_no) {
     int inserted_width;
     unsigned short *text;
@@ -2034,7 +2034,7 @@ int ClsMes::GetMesWidth_system(int mes_no) {
         } else if (code >= MES_CODE_MOVE_X && code < 0xFA00) {
             width += code - MES_CODE_MOVE_X;
         } else if (CheckHalfFont(code) != 0) {
-            if (code == GetHalfFontNo__Fc(' ')) {
+            if (code == GetHalfFontNo(' ')) {
                 width += font_w / 2;
             } else {
                 width += (int)(font_w * half_font_w_percent);
@@ -2411,19 +2411,18 @@ void ClsMes::AddPage(int end, int page) {
         }
     }
 }
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void ClsMes::NeedMesWinWH(int mes_no) {
-    char            number[128];
     unsigned short *text;
-    unsigned short  code;
     int             y;
     int             line;
     int             page_index;
-    int             value_no;
-    int             number_value;
-    int             width;
+    unsigned short  code;
+    int             index;
     int             item_no;
     int             message;
+    int             width;
+    int             digits;
     int             i;
 
     if (buff == NULL) {
@@ -2443,85 +2442,149 @@ void ClsMes::NeedMesWinWH(int mes_no) {
             space_w = -1;
             justify_w = -1;
         }
-        if (code == MES_CODE_PAGE) {
+        switch (code) {
+        case MES_CODE_END:
             AddPage(line, page_index);
-            line++;
-            SetYokoHaba(line, 0);
-            y = 0;
-            page_index++;
-        } else if (code == MES_CODE_NEWLINE) {
+            text_h += font_h;
+            text_w = 0;
+            for (i = 0; i < MES_LINE_MAX; i++) {
+                if (line_w[i] >= 0 && text_w < line_w[i]) {
+                    text_w = line_w[i];
+                }
+            }
+            for (int n = 0; n < MES_LINE_MAX; n++) {
+                line_indent[n] = (text_w - line_w[n]) / 2;
+            }
+            page_num = page_index + 1;
+            return;
+        case MES_CODE_SPACE:
+            if (justify_w >= 0 || space_w >= 0) {
+                AddYokoHaba(line, space_w);
+            } else {
+                AddYokoHaba(line, font_w / 2);
+            }
+            continue;
+        case MES_CODE_NEWLINE:
             line++;
             SetYokoHaba(line, 0);
             y += font_h;
             if (text_h < y) {
                 text_h = y;
             }
-        } else if (code == MES_CODE_SPACE) {
-            if (justify_w >= 0 || space_w >= 0) {
-                AddYokoHaba(line, space_w);
-            } else {
-                AddYokoHaba(line, font_w / 2);
-            }
-        } else if (code == MES_CODE_END) {
-            break;
-        } else if ((code < MES_CODE_WAIT || code >= MES_CODE_NEWLINE) &&
-                   (code < MES_CODE_COLOR_DEFAULT || code >= MES_CODE_GAIJI) &&
-                   (code < MES_CODE_COLOR_A || code >= MES_CODE_JUSTIFY) &&
-                   code != MES_CODE_VOICE_1 && code != MES_CODE_VOICE_0 && code != MES_CODE_VOICE_2) {
+            continue;
+        case MES_CODE_PAGE:
+            AddPage(line, page_index);
+            line++;
+            SetYokoHaba(line, 0);
+            y = 0;
+            page_index++;
+            continue;
+        }
+        if ((code < MES_CODE_WAIT || code > 0xFEFF) &&
+            (code < MES_CODE_COLOR_DEFAULT || code > 0xFCFF) &&
+            (code < MES_CODE_COLOR_R || code > 0xF5FF) &&
+            (code < MES_CODE_COLOR_G || code > 0xF4FF) &&
+            (code < MES_CODE_COLOR_B || code > 0xF3FF) &&
+            (code < MES_CODE_COLOR_A || code > 0xF2FF) &&
+            (code < 0xF600 || code > 0xF6FF) &&
+            code != MES_CODE_VOICE_1 && code != MES_CODE_VOICE_0 && code != MES_CODE_VOICE_2) {
             if (code >= MES_CODE_JUSTIFY && code < MES_CODE_SPACE_W) {
                 justify_w = (code - MES_CODE_JUSTIFY) * 4;
                 space_w = CalcSpaceW(justify_w, font_w, text - 1);
-            } else if (code >= MES_CODE_SPACE_W && code < MES_CODE_MOVE_X) {
+                continue;
+            }
+            if (code >= MES_CODE_SPACE_W && code < MES_CODE_MOVE_X) {
                 space_w = code - MES_CODE_SPACE_W;
-            } else if (code >= MES_CODE_MOVE_X && code < 0xFA00) {
+                continue;
+            }
+            if (code >= MES_CODE_MOVE_X && code < 0xFA00) {
                 AddYokoHaba(line, code - MES_CODE_MOVE_X);
-            } else if (code == 0xFBFF || (code >= 0xFBF3 && code < 0xFBFB) ||
-                       (code >= 0xFBDF && code < MES_CODE_ITEM_LAST)) {
-                if (code == 0xFBFF) {
-                    number_value = value;
-                } else {
-                    if (code >= 0xFBF3 && code < 0xFBFB) {
-                        value_no = 0xFBFA - code;
+                continue;
+            }
+            index = code - 0xFB00;
+            if (index == 0xFF) {
+                char number[0x80];
+                if (value_zero != 0 || value != 0) {
+                    if (value_sign != 0 && value > 0) {
+                        sprintf(number, at_2109, value);
                     } else {
-                        value_no = 0xFBEE - code;
+                        sprintf(number, at_2110, value);
                     }
-                    number_value = values[value_no];
-                }
-                if (value_zero != 0 || number_value != 0) {
-                    if (value_sign != 0 && number_value > 0) {
-                        sprintf(number, "+%d\n", number_value);
-                    } else {
-                        sprintf(number, "%d\n", number_value);
-                    }
-                    width = (strlen(number) - 1) * font_w;
+                    digits = strlen(number) - 1;
                     if (value_half != 0) {
-                        width /= 2;
+                        AddYokoHaba(line, digits * font_w / 2);
+                    } else {
+                        AddYokoHaba(line, digits * font_w);
                     }
-                    AddYokoHaba(line, width);
                 }
-            } else if (code == MES_CODE_ITEM_FIRST || code == 0xFBFD || code == 0xFBFC ||
-                       code == 0xFBFB || code == 0xFBF2 || code == 0xFBF1 ||
-                       code == 0xFBF0 || code == 0xFBEF || code == 0xFBEE ||
-                       code == 0xFBED || code == 0xFBEC || code == 0xFBEB ||
-                       code == 0xFBEA || code == 0xFBE9 || code == 0xFBE8 ||
-                       code == MES_CODE_ITEM_LAST) {
+                continue;
+            }
+            if (index >= 0xF3 && index < 0xFB) {
+                char number[0x80];
+                index = 0xFA - index;
+                if (value_zero != 0 || values[index] != 0) {
+                    if (value_sign != 0 && values[index] > 0) {
+                        sprintf(number, at_2109, values[index]);
+                    } else {
+                        sprintf(number, at_2110, values[index]);
+                    }
+                    digits = strlen(number) - 1;
+                    if (value_half != 0) {
+                        AddYokoHaba(line, digits * font_w / 2);
+                    } else {
+                        AddYokoHaba(line, digits * font_w);
+                    }
+                }
+                continue;
+            }
+            if (code >= 0xFBDF && code < MES_CODE_ITEM_LAST) {
+                char number[0x80];
+                index = 0xEE - index;
+                if (value_zero != 0 || values[index] != 0) {
+                    if (value_sign != 0 && values[index] > 0) {
+                        sprintf(number, at_2109, values[index]);
+                    } else {
+                        sprintf(number, at_2110, values[index]);
+                    }
+                    digits = strlen(number) - 1;
+                    if (value_half != 0) {
+                        AddYokoHaba(line, digits * font_w / 2);
+                    } else {
+                        AddYokoHaba(line, digits * font_w);
+                    }
+                }
+                continue;
+            }
+            if (code == MES_CODE_ITEM_LAST || code == 0xFBE8 || code == 0xFBE9 || code == 0xFBEA ||
+                code == 0xFBEB || code == 0xFBEC || code == 0xFBED || code == 0xFBEE ||
+                code == 0xFBEF || code == 0xFBF0 || code == 0xFBF1 || code == 0xFBF2 ||
+                code == 0xFBFB || code == 0xFBFC || code == 0xFBFD || code == MES_CODE_ITEM_FIRST) {
                 item_no = GetItemNoFromFontNo(code);
-                message = -1;
-                if (item_no > 0 && item_no < 17) {
+                if (item_no <= 0) {
+                    message = -1;
+                } else if (item_no > 16) {
+                    message = -1;
+                } else {
                     message = item_mes[item_no - 1];
                 }
                 width = GetMesWidth_system(message);
                 if (width != -1) {
                     AddYokoHaba(line, width);
                 }
-            } else if (code >= 0xFAEA && code <= 0xFAF9) {
+                continue;
+            }
+            if (code >= 0xFAEA && code <= 0xFAF9) {
                 width = GetStrWidth(0xFAF9 - code);
                 if (width != -1) {
                     AddYokoHaba(line, width);
                 }
-            } else if (code >= 0xFFA0) {
+                continue;
+            }
+            if (code >= 0xFFA0 && code < 0x10000) {
                 AddYokoHaba(line, (int)(font_w * half_font_w_percent));
-            } else if (code >= 0xFDE0 && code < 0xFDF8) {
+                continue;
+            }
+            if (code >= 0xFDE0 && code < 0xFDF8) {
                 if (code == 0xFDF3) {
                     AddYokoHaba(line, (int)(2.0f * (font_w * half_font_w_percent)));
                 } else if (GetFontGaijiHankaku(code) != 0) {
@@ -2529,9 +2592,13 @@ void ClsMes::NeedMesWinWH(int mes_no) {
                 } else {
                     AddYokoHaba(line, (int)(2.0f * (font_w * half_font_w_percent)));
                 }
-            } else if (code >= MES_CODE_GAIJI && code < 0xFD32) {
+                continue;
+            }
+            if (code >= MES_CODE_GAIJI && code < 0xFD32) {
                 AddYokoHaba(line, GetGaijiW(code));
-            } else if (CheckHalfFont(code) != 0) {
+                continue;
+            }
+            if (CheckHalfFont(code) != 0) {
                 if (code == GetHalfFontNo(' ')) {
                     AddYokoHaba(line, font_w / 2);
                 } else {
@@ -2546,18 +2613,6 @@ void ClsMes::NeedMesWinWH(int mes_no) {
             }
         }
     }
-    AddPage(line, page_index);
-    text_h += font_h;
-    text_w = 0;
-    for (i = 0; i < MES_LINE_MAX; i++) {
-        if (line_w[i] >= 0 && text_w < line_w[i]) {
-            text_w = line_w[i];
-        }
-    }
-    for (i = 0; i < MES_LINE_MAX; i++) {
-        line_indent[i] = (text_w - line_w[i]) / 2;
-    }
-    page_num = page_index + 1;
 }
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/nd_meswin", NeedMesWinWH__6ClsMesFi);
@@ -3389,7 +3444,7 @@ void ClsMes::DrawFont() {
     prim.End();
 }
 #pragma divbyzerocheck reset
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void ClsMes::SetGoalCursorXY() {
     int dx;
     int dy;

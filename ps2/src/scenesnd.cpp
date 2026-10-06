@@ -139,7 +139,7 @@ void CScene::InitLooSeMngr() {
 CScene::BGM_INFO *CScene::GetActiveBgmInfo() {
     return &bgm[bgm_no];
 }
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void CScene::PlayBGM(int bgm_no, int vol, float volf) {
     if (skip_play_bgm != 0) {
         skip_play_bgm = 0;

@@ -79,7 +79,7 @@ extern char at_2529[];
 static MapJumpMapInfo MainMapInfo;
 
 // Code (.text)
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void CStartupEpisodeTitle::DrawEpisode(int mes_tex_block, int frame_tex_block) {
     union { CPreSprite prim; };
 
@@ -1490,138 +1490,207 @@ void AutoSetTreasureBox(int id, float *position, float power) {
     (DngMainScene->battle_area.treasure_box)->PutTreasureBox(-1, position, power, 0x41, id, 1, -1, 0);
 }
 extern char at_2159[];
-#ifdef NONMATCHING
-void AutoSetTreasureBox() {
-    CTreasureBoxManager *boxes = DngMainScene->battle_area.treasure_box;
+#ifdef STATEMATCHING
+void AutoSetTreasureBox(void) {
+    DNG_BATTLE_AREA *area = &DngMainScene->battle_area;
+    CTreasureBoxManager *manager = DngMainScene->battle_area.treasure_box;
     int stage = DngSaveDataDungeon->stage_id;
-    int floor = DngSaveDataDungeon->floor_id[stage];
-    sceVu0FVECTOR event_pos;
-    float event_extra;
-    GetDungeonEventPoint(event_pos, &event_extra, DUNGEON_EVENT_POINT_WAY_20);
+    u32 floor = DngSaveDataDungeon->floor_id[stage];
+    float event_pos[4];
+    float event_rot;
+    float angle;
+    int box;
+    int i;
+
+    GetDungeonEventPoint(event_pos, &event_rot, 2);
     event_pos[3] = 1.0f;
-    mgCMemory memory;
-    memory.Init();
+    mgCMemory stack;
     char path[0x40];
+    float pos[4];
+    float mimic_pos[4];
     int size;
     sprintf(path, at_2159, stage + 1);
     LoadFile(path, BuffReadData, &size);
-    memory.stSetBuffer(&BuffReadData[(size + 15) / 16 + 1], 0x4000);
-    TRESURE_BOX_FLOOR_INFO *table =
-        (TRESURE_BOX_FLOOR_INFO *)operator new(sizeof(TRESURE_BOX_FLOOR_INFO), memory.Alloc(0x1A43));
-    CreatTresuarBoxInfo(table, (char *)BuffReadData, size);
-    PickupRandomItemCheckMax(table, floor);
-    for (int i = 0; i < 8; ++i) {
-        sceVu0FVECTOR pos;
-        while (1) {
-            if (SearchMapFlatPosition(pos, &AutoMapGen) == 0 ||
-                mgDistVector(event_pos, pos) <= 320.0f || boxes->CheckArea(pos, 60.0f) == 0) {
-                continue;
-            }
-            int item0 = 0;
-            int num0 = 1;
-            int item1 = -1;
-            int num1 = 1;
-            int flags;
-            float rot = 2.0f * 3.1415927f * (float)rand() / 2.1474836e9f - 3.1415927f;
-            if (i < 2) {
-                item0 = i == 0 ? 0x132 : 0x131;
-                flags = 0x41;
-            } else {
-                int roll = iRand(100);
-                flags = roll >= 97 ? 4 : roll >= 93 ? 2 : 1;
-                int appearance = iRand(3);
-                flags |= appearance == 2 ? 0x20 : appearance == 1 ? 0x10 : 8;
-                roll = iRand(100);
-                flags |= roll >= 97 ? 0x80 : roll >= 95 ? 0x200 : 0x40;
-                TRESURE_BOX_ITEM *item;
-                if (flags & TREASURE_BOX_FLAG_TWO_ITEMS) {
-                    item = PickupRandomItem(table, floor, 60);
-                    item0 = item->item_no;
-                    num0 = item->num;
-                    item = PickupRandomItem(table, floor, -50);
-                    item1 = item->item_no;
-                    num1 = item->num;
-                    rot = ScanEyePoint(pos);
+    stack.stSetBuffer(BuffReadData + size / 16 + 1, 0x4000);
+    TRESURE_BOX_FLOOR_INFO *info = new (stack.Alloc(0x1A43)) TRESURE_BOX_FLOOR_INFO;
+    CreatTresuarBoxInfo(info, (char *)BuffReadData, size);
+    PickupRandomItemCheckMax(info, floor);
+
+    for (box = 0; box < 8; box++) {
+        int searching = 1;
+        while (searching) {
+            if (SearchMapFlatPosition(pos, &AutoMapGen) && !(mgDistVector(event_pos, pos) <= 320.0f) &&
+                manager->CheckArea(pos, 60.0f)) {
+                angle = (2.0f * (3.1415927f * (float)rand())) / 2.1474836e9f - 3.1415927f;
+                int flags;
+                int num0 = 1;
+                int item0 = 0;
+                int item1 = -1;
+                int num1 = 1;
+                if (box < 2) {
+                    if (box == 0) {
+                        item0 = 0x132;
+                    }
+                    if (box == 1) {
+                        item0 = 0x131;
+                    }
+                    flags = 0x41;
                 } else {
-                    int rank = flags & 2 ? -30 : (iRand(100) + iRand(100)) / 2;
-                    item = PickupRandomItem(table, floor, rank);
-                    item0 = item->item_no;
-                    num0 = item->num;
+                    int roll = iRand(100);
+                    flags = 1;
+                    if (roll > 92) {
+                        flags = 2;
+                    }
+                    if (roll > 96) {
+                        flags = 4;
+                    }
+                    switch (iRand(3)) {
+                    default:
+                        flags |= 8;
+                        break;
+                    case 1:
+                        flags |= 0x10;
+                        break;
+                    case 2:
+                        flags |= 0x20;
+                        break;
+                    }
+                    roll = iRand(100);
+                    int kind = 0x40;
+                    if (roll > 94) {
+                        kind = 0x200;
+                    }
+                    if (roll > 96) {
+                        kind = 0x80;
+                    }
+                    flags |= kind;
+                    if (flags & 0x80) {
+                        TRESURE_BOX_ITEM *item = PickupRandomItem(info, floor, 60);
+                        item0 = item->item_no;
+                        num0 = item->num;
+                        item = PickupRandomItem(info, floor, -50);
+                        item1 = item->item_no;
+                        num1 = item->num;
+                        angle = ScanEyePoint(pos);
+                    } else {
+                        TRESURE_BOX_ITEM *item;
+                        if (flags & 2) {
+                            item = PickupRandomItem(info, floor, -30);
+                        } else {
+                            item = PickupRandomItem(info, floor, (iRand(100) + iRand(100)) / 2);
+                        }
+                        item0 = item->item_no;
+                        num0 = item->num;
+                    }
                 }
+                if (num0 >= 3 && num0 < 10) {
+                    num0 += iRand(3) - 1;
+                }
+                if (num0 >= 10) {
+                    num0 = (int)(0.8f * (float)num0 + fRand(0.4f * (float)num0) + 0.5f);
+                }
+                if (num1 >= 3 && num1 < 10) {
+                    num1 += iRand(3) - 1;
+                }
+                if (num1 >= 10) {
+                    num1 = (int)(0.8f * (float)num1 + fRand(0.4f * (float)num1) + 0.5f);
+                }
+                manager->PutTreasureBox(-1, pos, angle, flags, item0, num0, item1, num1);
+                searching = 0;
             }
-            if (num0 >= 3 && num0 < 10) num0 += iRand(3) - 1;
-            if (num0 >= 10) num0 = fptosi(0.5f + 0.8f * (float)num0 + fRand(0.4f * (float)num0));
-            if (num1 >= 3 && num1 < 10) num1 += iRand(3) - 1;
-            if (num1 >= 10) num1 = fptosi(0.5f + 0.8f * (float)num1 + fRand(0.4f * (float)num1));
-            boxes->PutTreasureBox(-1, pos, rot, flags, item0, num0, item1, num1);
-            break;
         }
     }
-    for (int i = 0; i < ActiveMonster->locate.num; ++i) {
-        int monster = ActiveMonster->locate.monster_id[i];
-        if (monster < 0xF5 || monster >= 0x10D) continue;
-        sceVu0FVECTOR pos;
-        while (SearchMapFlatPosition(pos, &AutoMapGen) == 0 ||
-               mgDistVector(event_pos, pos) <= 320.0f || CheckObjectPutArea(pos) == 0) {}
-        float rot = 2.0f * 3.1415927f * (float)rand() / 2.1474836e9f - 3.1415927f;
-        boxes->PutTreasureBox(-1, pos, rot, 0x101, monster,
-                              ActiveMonster->locate.param[i], -1, 0);
+
+    for (i = 0; i < ActiveMonster->locate.num; i++) {
+        int monster_id = ActiveMonster->locate.monster_id[i];
+        if (monster_id >= 0xF5 && monster_id < 0x10D) {
+            int placed = 0;
+            int param = ActiveMonster->locate.param[i];
+            do {
+                if (SearchMapFlatPosition(mimic_pos, &AutoMapGen) && !(mgDistVector(event_pos, mimic_pos) <= 320.0f) &&
+                    CheckObjectPutArea(mimic_pos)) {
+                    manager->PutTreasureBox(-1, mimic_pos,
+                                            (2.0f * (3.1415927f * (float)rand())) / 2.1474836e9f - 3.1415927f,
+                                            0x101, monster_id, param, -1, 0);
+                    placed = 1;
+                }
+            } while (placed == 0);
+        }
     }
-    int circles = iRand(100) >= 76 ? 1 : 0;
-    if (iRand(100) >= 81) ++circles;
-    if (iRand(100) >= 91) ++circles;
-    for (int i = 0; i < circles; ++i) {
-        sceVu0FVECTOR pos;
-        int failed = 0;
+
+    int circle_num = 0;
+    if (iRand(100) > 75) {
+        circle_num++;
+    }
+    if (iRand(100) > 80) {
+        circle_num++;
+    }
+    if (iRand(100) > 90) {
+        circle_num++;
+    }
+    for (int circle = 0; circle < circle_num; circle++) {
+        int retry = 0;
         while (1) {
-            if (SearchMapFlatPosition(pos, &AutoMapGen) == 0) break;
-            if (mgDistVector(event_pos, pos) <= 320.0f) continue;
-            if (CheckObjectPutArea(pos) != 0) {
+            if (!SearchMapFlatPosition(pos, &AutoMapGen)) {
+                break;
+            }
+            if (mgDistVector(event_pos, pos) <= 320.0f) {
+                continue;
+            }
+            if (CheckObjectPutArea(pos)) {
                 RandomCircle.SetCircle(pos);
                 break;
             }
-            if (++failed >= 101) break;
-        }
-    }
-    int geostone = DngMainScene->battle_area.floor_manager.IsGeoStone(floor);
-    if (geostone != 0 &&
-        (DngSaveDataDungeon->GetFloorInfoPtr(stage, floor)->flag & DNG_FLOOR_FLAG_GEOSTONE_FOUND)) {
-        geostone = 0;
-    }
-    if (geostone != 0) {
-        sceVu0FVECTOR pos;
-        while (SearchMapFlatPosition(pos, &AutoMapGen) != 0) {
-            if (CheckObjectPutArea(pos) != 0 && mgDistVector(event_pos, pos) > 320.0f) {
-                pos[3] = 1.0f;
-                pos[1] += 20.0f;
-                GeoStone.SetPosition(pos);
-                GeoStone.angle = 0.0f;
-                GeoStone.flag = 1;
-                GeoStone.anime = 1;
-                if (AutoMapGen.gio_parts != NULL) AutoMapGen.gio_parts->SetPosition(pos);
+            retry++;
+            if (retry > 100) {
                 break;
             }
         }
     }
-    for (int i = 0; i < 12 && AutoMapGen.random_stone[i] != NULL; ++i) {
-        sceVu0FVECTOR pos;
-        while (SearchMapFlatPosition(pos, &AutoMapGen) != 0) {
-            if (CheckObjectPutArea(pos) != 0 && mgDistVector(event_pos, pos) > 320.0f) {
-                AutoMapGen.random_stone[i]->SetPosition(pos);
-                break;
+
+    int geo_stone = area->floor_manager.IsGeoStone(floor);
+    if (geo_stone && (DngSaveDataDungeon->GetFloorInfoPtr(stage, floor)->flag & DNG_FLOOR_FLAG_GEOSTONE_FOUND)) {
+        geo_stone = 0;
+    }
+    while (geo_stone) {
+        if (!SearchMapFlatPosition(pos, &AutoMapGen)) {
+            break;
+        }
+        if (CheckObjectPutArea(pos) && !(mgDistVector(event_pos, pos) <= 320.0f)) {
+            pos[1] += 20.0f;
+            pos[3] = 1.0f;
+            CGeoStone *stone = &GeoStone;
+            stone->SetPosition(pos);
+            stone->angle = 0.0f;
+            stone->flag = 1;
+            stone->anime = 1;
+            if (AutoMapGen.gio_parts != NULL) {
+                AutoMapGen.gio_parts->SetPosition(pos);
             }
+            break;
         }
     }
-    if (AutoMapGen.door_room >= 0) {
-        sceVu0FVECTOR pos;
-        while (SearchMapFlatPosition(pos, &AutoMapGen) != 0) {
-            if (CheckObjectPutArea(pos) == 0 || mgDistVector(event_pos, pos) <= 320.0f) continue;
-            int col = fptosi((pos[0] + 0.5f * AutoMapGen.cell_w) / AutoMapGen.cell_w);
-            int row = fptosi((pos[2] + 0.5f * AutoMapGen.cell_d) / AutoMapGen.cell_d);
+
+    for (int stone_no = 0; stone_no < 12 && AutoMapGen.random_stone[stone_no] != NULL;) {
+        if (!SearchMapFlatPosition(pos, &AutoMapGen)) {
+            break;
+        }
+        if (CheckObjectPutArea(pos) && !(mgDistVector(event_pos, pos) <= 320.0f)) {
+            AutoMapGen.random_stone[stone_no]->SetPosition(pos);
+            stone_no++;
+        }
+    }
+
+    while (AutoMapGen.door_room >= 0) {
+        if (!SearchMapFlatPosition(pos, &AutoMapGen)) {
+            break;
+        }
+        if (CheckObjectPutArea(pos) && !(mgDistVector(event_pos, pos) <= 320.0f)) {
             AUTOMAP_ROOM *room = &AutoMapGen.room[AutoMapGen.door_room];
-            if (col < room->x || col >= room->x + room->w ||
-                row < room->y || row >= room->y + room->h) {
-                boxes->PutTreasureBox(-1, pos, 0.0f, 1, GetKeyDoorIndex(stage, floor), 1, -1, 0);
+            int x = (int)((pos[0] + 0.5f * AutoMapGen.cell_w) / AutoMapGen.cell_w);
+            int y = (int)((pos[2] + 0.5f * AutoMapGen.cell_d) / AutoMapGen.cell_d);
+            if (room->x > x || x >= room->x + room->w || room->y > y || room->y + room->h <= y) {
+                manager->PutTreasureBox(-1, pos, 0.0f, 1, GetKeyDoorIndex(stage, floor), 1, -1, 0);
                 break;
             }
         }

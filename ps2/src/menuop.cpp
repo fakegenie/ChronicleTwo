@@ -1457,23 +1457,23 @@ int MenuOptionKey() {
 void MenuOptionDraw() {
     MenuPosData->FormDraw();
 }
-#ifdef NONMATCHING
-void LocalFunc_AdjustScrlBar(MENUFORMPARTS_TYPE **parts, int *pos, int *size,
-                             int top, float line_num, float show_num, int jump) {
-    if (parts[0] == NULL || parts[1] == NULL || parts[2] == NULL) {
-        return;
+#ifdef STATEMATCHING
+void LocalFunc_AdjustScrlBar(MENUFORMPARTS_TYPE **parts, int *pos, int *size, int top,
+                             float line_num, float show_num, int jump) {
+    if (parts[0] != NULL && parts[1] != NULL && parts[2] != NULL) {
+        float visible_ratio = (float)size[1] / line_num;
+        float bar_height = visible_ratio * show_num;
+        parts[1]->h = (bar_height - parts[0]->h) - parts[2]->h;
+        size[1] -= bar_height;
+        float travel_lines = line_num - show_num;
+        if (travel_lines < 1.0f) {
+            travel_lines = 1.0f;
+        }
+        float pixels_per_line = (float)size[1] / travel_lines;
+        CalcMenu1((float)pos[1] + pixels_per_line * (float)top, &parts[0]->y, 4.0f, 0.0f, jump);
+        parts[1]->y = parts[0]->y + parts[0]->h;
+        parts[2]->y = parts[1]->y + parts[1]->h;
     }
-    float visible = ((float)size[1] / line_num) * show_num;
-    parts[1]->h = visible - parts[0]->h - parts[2]->h;
-    size[1] = fptosi((float)size[1] - visible);
-    float remaining = line_num - show_num;
-    if (remaining < 1.0f) {
-        remaining = 1.0f;
-    }
-    CalcMenu1((float)pos[1] + ((float)size[1] / remaining) * (float)top,
-              &parts[0]->y, 4.0f, 0.0f, jump);
-    parts[1]->y = parts[0]->y + parts[0]->h;
-    parts[2]->y = parts[1]->y + parts[1]->h;
 }
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuop", LocalFunc_AdjustScrlBar__FPP18MENUFORMPARTS_TYPEPiPiiffi);
@@ -2291,7 +2291,7 @@ int CSaveMenuClass::KeyStep(void) {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuop", KeyStep__14CSaveMenuClassFv);
 #endif
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void SaveFileListDraw(int &tex_block, float *pos, int alpha) {
     ScreenPos linePos[13];
     SAVEDATA_INFO *info[13];

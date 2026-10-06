@@ -423,7 +423,7 @@ int sgInitFishing(SubGameInfo *info) {
     info->record_check = info->dungeon;
     return 1;
 }
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 int sgRestartFishing(SubGameInfo *info) {
     CScene *scene = info->scene;
     u_long128 *buffer = ReadBuffer;

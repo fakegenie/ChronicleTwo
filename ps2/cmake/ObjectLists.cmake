@@ -59,10 +59,45 @@ function(add_asm_object obj src fixup_args)
         VERBATIM)
 endfunction()
 
+function(state_options src stamp_var inputs_var row_var)
+    set(config ${CMAKE_SOURCE_DIR}/${CONFIG_DIR}/state_units.txt)
+    string(REGEX REPLACE "^${SRC_DIR}/" "" unit "${src}")
+    string(REGEX REPLACE "\\.cpp$" "" unit "${unit}")
+    set(row "")
+    set(inputs "")
+    if(EXISTS ${config})
+        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${config})
+        file(STRINGS ${config} rows)
+        foreach(candidate IN LISTS rows)
+            separate_arguments(words UNIX_COMMAND "${candidate}")
+            list(LENGTH words count)
+            if(count EQUAL 0)
+                continue()
+            endif()
+            list(GET words 0 name)
+            if(name STREQUAL unit)
+                set(row "${candidate}")
+                foreach(word IN LISTS words)
+                    if(word MATCHES "^primer=(.+)$")
+                        list(APPEND inputs ${CMAKE_SOURCE_DIR}/${CONFIG_DIR}/primers/${CMAKE_MATCH_1}.cpp)
+                    endif()
+                endforeach()
+            endif()
+        endforeach()
+    endif()
+    string(MAKE_C_IDENTIFIER "${unit}" stamp_name)
+    set(stamp ${CMAKE_SOURCE_DIR}/${BUILD_DIR}/state/${stamp_name}.txt)
+    file(CONFIGURE OUTPUT ${stamp} CONTENT "${row}\n")
+    set(${stamp_var} ${stamp} PARENT_SCOPE)
+    set(${inputs_var} "${inputs}" PARENT_SCOPE)
+    set(${row_var} "${row}" PARENT_SCOPE)
+endfunction()
+
 # Compile one game unit. tools/mwccgap puts retail's assembly wherever the
 # source has an INCLUDE_ASM or INCLUDE_RODATA marker, reading the per-symbol
 # files the split wrote, so every object depends on the split.
 function(add_cpp_object obj src)
+    state_options(${src} state_stamp state_inputs state_row)
     add_custom_command(
         OUTPUT ${CMAKE_SOURCE_DIR}/${obj}
         COMMAND ${CMAKE_COMMAND} -E env
@@ -75,6 +110,9 @@ function(add_cpp_object obj src)
                 ${CMAKE_SOURCE_DIR}/${SCRIPTS_DIR}/build/mwccgap.sh
                 ${CMAKE_SOURCE_DIR}/${SCRIPTS_DIR}/build/postprocess_object.py
                 ${CMAKE_SOURCE_DIR}/${SCRIPTS_DIR}/build/fixup_sections.sh
+                ${CMAKE_SOURCE_DIR}/${SCRIPTS_DIR}/build/state.py
+                ${state_stamp}
+                ${state_inputs}
                 ${MWCCGAP_SOURCES}
         DEPFILE ${CMAKE_SOURCE_DIR}/${obj}.d
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}

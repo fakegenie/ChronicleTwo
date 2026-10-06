@@ -2112,7 +2112,7 @@ void CScreenEffect::SetSepiaTexture(mgCTexture *texture, u_long128 *image) {
         sepia_texture->image[0] = image;
     }
 }
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void CScreenEffect::CaptureSepiaScreen(void) {
     if (sepia_texture == NULL) {
         return;
@@ -13854,7 +13854,7 @@ int _GET_FLOOR_STATUS(RS_STACKDATA *stack, int argc) {
     if (info == NULL) {
         return 0;
     }
-    SetStack(stack, (u_long)(u_int) info->floor_status);
+    SetStack(stack, (int)(u_int) info->floor_status);
     return 1;
 }
 #else

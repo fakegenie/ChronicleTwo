@@ -1312,7 +1312,7 @@ void PrimDrawNumber2(mgCDrawPrim *prim, int number, int digit_count, int x, int 
     mgRect<int> rect(x, y, texture_rect.right, texture_rect.bottom);
     DrawMenuNumber(prim, number, 0, rect, texture_rect, texture_rect.right + spacing, mode);
 }
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void PrimFillRect4(mgCDrawPrim *prim, mgRect<float> rect, float *rgba0, float *rgba1, float *rgba2, float *rgba3) {
     float right;
     float bottom;
@@ -1467,48 +1467,59 @@ int StepMenuDl2(int progress) {
     }
     return 0;
 }
-#ifdef NONMATCHING
-void DrawMenuDl(int &loaded_tex, int unused, int y, int width, int alpha) {
-    if (Tex_MenuDl == NULL) {
-        return;
-    }
-    MenuReloadTexture(loaded_tex, Tex_MenuDl->block);
-    int x = (mgScreenWidth - width) >> 1;
-    mgCDrawPrim *prim = GetMenuPrim();
-    SetSpriteEnv(prim, 0);
-    prim->Begin(6);
-    prim->Texture(Tex_MenuDl);
-    prim->Color(0x80, 0x80, 0x80, alpha);
-    mgRect<int> bar_uv(0x74, 0, 0xC, 0xC);
-    mgRect<int> progress_uv(0x6D, 1, 6, 0xA);
-    mgRect<int> bar(x + 4, y + 0x40, width - 0xA, 0xE);
-    PrimQuad(prim, bar, bar_uv);
-    prim->End();
-    prim->Begin(6);
-    float progress = (float)MenuDl_ProcessSize / (float)MenuDl_TotalSize;
-    int bar_width = fptosi(((float)width - (float)(table_1650[0][0].right - 0x14 + table_1650[1][1].left) - 2.0f) * progress);
-    if (progress < 1.0f) {
+#ifdef STATEMATCHING
+void DrawMenuDl(int &tex_block, int x, int y, int w, int alpha) {
+    mgCDrawPrim *prim;
+    int left;
+    float rate;
+    float bar_len;
+    int bar_w;
+    int i;
+    mgRect<int> frame_tex;
+    mgRect<int> bar_tex;
+    mgRect<int> frame_rect;
+    mgRect<int> bar_rect;
+    mgRect<int> shadow_rect;
+    mgRect<int> window_rect;
+
+    if (Tex_MenuDl != NULL) {
+        MenuReloadTexture(tex_block, Tex_MenuDl->block);
+        left = (mgScreenWidth - w) >> 1;
+        prim = GetMenuPrim();
+        SetSpriteEnv(prim, 0);
+        prim->Begin(6);
+        prim->Texture(Tex_MenuDl);
         prim->Color(0x80, 0x80, 0x80, alpha);
-    } else {
-        prim->Color(0x40, 0x94, 0x40, alpha);
+        frame_tex.Set(0x74, 0, 0xC, 0xC);
+        bar_tex.Set(0x6D, 1, 6, 0xA);
+        frame_rect.Set(left + 4, y + 0x40, w - 10, 0xE);
+        PrimQuad(prim, frame_rect, frame_tex);
+        prim->End();
+        prim->Begin(6);
+        bar_len = (float)w - (float)(table_1650[0][0].right - 20 + table_1650[1][1].left) - 2.0f;
+        rate = (float)MenuDl_ProcessSize / (float)MenuDl_TotalSize;
+        bar_w = (int)(bar_len * rate);
+        if (rate < 1.0f) {
+            prim->Color(0x80, 0x80, 0x80, alpha);
+        } else {
+            prim->Color(0x40, 0x94, 0x40, alpha);
+        }
+        bar_rect.Set(left + 0x17, y + 0x41, bar_w, 0xA);
+        PrimQuad(prim, bar_rect, bar_tex);
+        prim->End();
+        prim->Bilinear(0);
+        prim->Begin(6);
+        for (i = 0; i < 3; i++) {
+            prim->Color(0, 0, 0, alpha >> 2);
+            shadow_rect.Set(left + 4, y + 4, w, table_1650[i][0].bottom);
+            Menu3DivideTextureDraw(prim, shadow_rect, &table_1650[i][0].left, 1);
+            prim->Color(0x80, 0x80, 0x80, alpha);
+            window_rect.Set(left, y, w, table_1650[i][0].bottom);
+            Menu3DivideTextureDraw(prim, window_rect, &table_1650[i][0].left, 1);
+            y += table_1650[i][0].bottom;
+        }
+        prim->End();
     }
-    mgRect<int> fill(x + 0x17, y + 0x41, bar_width, 0xA);
-    PrimQuad(prim, fill, progress_uv);
-    prim->End();
-    prim->Bilinear(0);
-    prim->Begin(6);
-    for (int i = 0; i < 3; ++i) {
-        short *row = (short *)table_1650[i];
-        int height = row[3];
-        prim->Color(0, 0, 0, alpha >> 2);
-        mgRect<int> shadow(x + 4, y + 4, width, height);
-        Menu3DivideTextureDraw(prim, shadow, row, 1);
-        prim->Color(0x80, 0x80, 0x80, alpha);
-        mgRect<int> panel(x, y, width, height);
-        Menu3DivideTextureDraw(prim, panel, row, 1);
-        y += height;
-    }
-    prim->End();
 }
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", DrawMenuDl__FRiiiii);
@@ -1544,7 +1555,7 @@ void DrawMenuDl(int alpha) {
         }
     }
 }
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void CalcCommonBrdDrawInfo(float *pos, MENUFORM_MAKEBRD_INFO *info, ClsMes *mes) {
     float board_w;
     int i;
@@ -1819,25 +1830,34 @@ void MenuCursorDraw(mgCTexture *tex, float *pos, float rot, int reverse, int alp
 void MenuCursorDraw(mgCTexture *texture, float *position, float value, int flag) {
     MenuCursorDraw(texture, position, value, 0, flag, 1.0f);
 }
-#ifdef NONMATCHING
-void DrawMenuTilePattern(mgCDrawPrim *prim, mgCTexture *texture, float x, float y,
-                         mgRect<int> tile, int unused, u_char *rgba) {
+#ifdef STATEMATCHING
+void DrawMenuTilePattern(mgCDrawPrim *prim, mgCTexture *tex, float x, float y, mgRect<int> tex_rect, int unused,
+                         u8 *rgba) {
     mgRect<int> dest(0, 0, 0, 0);
-    float start_y = y - (float)tile.bottom;
+    int column;
+    int row;
+    y -= tex_rect.bottom;
     SetSpriteEnv(prim, 0);
     prim->Begin(6);
-    prim->Texture(texture);
+    prim->Texture(tex);
     if (rgba != NULL) {
         prim->Color(rgba[0], rgba[1], rgba[2], rgba[3]);
     } else {
         prim->Color(0x80, 0x80, 0x80, 0x80);
     }
-    for (int col = 0; col < 16 && x <= (float)(mgScreenWidth + 4); ++col, x += tile.right) {
-        dest.Set(fptosi(x), fptosi(start_y), tile.right, tile.bottom);
-        for (int row = 0; row < 12 && dest.top <= mgScreenHeight + 0x28; ++row) {
-            PrimQuad(prim, dest, tile);
+    for (column = 0; column < 16; column++) {
+        if (!(x <= mgScreenWidth + 4)) {
+            break;
+        }
+        dest.Set((int)x, (int)y, tex_rect.right, tex_rect.bottom);
+        for (row = 0; row < 12; row++) {
+            if (dest.top > mgScreenHeight + 40) {
+                break;
+            }
+            PrimQuad(prim, dest, tex_rect);
             dest.top += dest.bottom;
         }
+        x += dest.right;
     }
     prim->End();
 }
@@ -1894,7 +1914,7 @@ void MenuMainFrameModeSet(int mode, int restart) {
         MenuMainFrame_MoveRate_Cnt = 0.2617994f;
     }
 }
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void MenuMainFrameStep(void) {
     mgRect<int> screen;
     MenuMainFrame_PutRect.Set(0, 0, 0x2C0, 0x1E0);

@@ -1206,7 +1206,7 @@ void sndSetSeVolf(unsigned int snd_id, int se_no, float vol, int voice) {
     sndSetSeVol(snd_id, se_no, volume, voice);
 }
 
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void sndSetSePanf(unsigned int snd_id, int se_no, float pan, int voice) {
     int driver_pan;
 

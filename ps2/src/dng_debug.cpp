@@ -106,7 +106,7 @@ void dngDebugInit() {
     dbFont.Init();
     dbFont.SetClearance(20, 20);
 }
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void dngDebugStart() {
     dbinfo.active = 1;
     dbinfo.command = -1;

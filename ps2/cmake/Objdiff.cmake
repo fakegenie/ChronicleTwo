@@ -40,12 +40,25 @@ foreach(row IN LISTS unit_rows)
     # `-lang` is given because the linked object's compile gives it too
     # (scripts/build/mwccgap.sh).
     set(base ${OBJDIFF_DIR}/base/${unit}.cpp.o)
+    set(base_compiler ${WIBO} ${MW_CC_DIR}/mwccps2.exe ${CC_FLAGS} -lang c++)
+    set(base_environment "MWCIncludes=${INCLUDE_DIR}/std\;${INCLUDE_DIR}/sce")
+    set(base_output -o ${base} ${source})
+    state_options(${source} state_stamp state_inputs state_row)
+    if(NOT state_row STREQUAL "")
+        set(base_compiler ${PYTHON} ${SCRIPTS_DIR}/build/state.py --objdiff-base ${base} ${source}
+                          ${CC_FLAGS} -lang c++)
+        list(APPEND base_environment MW_DIR=${MW_CC_DIR})
+        set(base_output "")
+        list(APPEND state_inputs ${CMAKE_SOURCE_DIR}/${SCRIPTS_DIR}/build/state.py)
+    endif()
     add_custom_command(
         OUTPUT ${CMAKE_SOURCE_DIR}/${base}
-        COMMAND ${CMAKE_COMMAND} -E env "MWCIncludes=${INCLUDE_DIR}/std;${INCLUDE_DIR}/sce"
-                ${WIBO} ${MW_CC_DIR}/mwccps2.exe ${CC_FLAGS} -lang c++
-                -o ${base} ${source}
+        COMMAND ${CMAKE_COMMAND} -E env ${base_environment}
+                ${base_compiler}
+                ${base_output}
         DEPENDS ${CMAKE_SOURCE_DIR}/${source} ${PROJECT_HEADERS}
+                ${state_stamp}
+                ${state_inputs}
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         COMMENT "CC (objdiff base) ${source}"
         VERBATIM)

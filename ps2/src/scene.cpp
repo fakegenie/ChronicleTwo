@@ -230,7 +230,7 @@ int CParticle::Step(void) {
     pos[2] += speed[2];
     return 1;
 }
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 void CParticle::Draw(void) {
     if (active != 0) {
         mgCDrawPrim prim;
