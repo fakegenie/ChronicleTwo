@@ -441,11 +441,14 @@ void CFireAfterHit::Step() {
 #ifdef NONMATCHING
 extern int gb_tbl_1052[3];
 void CFireAfterHit::Draw(void) {
+    int i;
     float vec[4];
     int puff0[4];
     int puff1[4];
     int main0[4];
     int main1[4];
+    FIRE_AFTER_HIT_FLAME *fire;
+    int k;
 
     if (active == 0) {
         return;
@@ -466,7 +469,7 @@ void CFireAfterHit::Draw(void) {
     prim.Begin(6);
     prim.Texture(TEX_ExFx_FIRE);
     int puff_num = flame_num * FIRE_AFTER_HIT_TRAIL_MAX;
-    for (int i = 0; i < puff_num; i++) {
+    for (i = 0; i < puff_num; i++) {
         if (puff->alpha > 0) {
             trans_float_to_sceVector(vec, puff->pos, 0);
             mgTransWorldPrim3DSprite(puff0, puff1, vec, puff->size, puff->size, 0);
@@ -479,18 +482,18 @@ void CFireAfterHit::Draw(void) {
         puff++;
     }
     prim.End();
-    FIRE_AFTER_HIT_FLAME *fire = flame;
+    fire = flame;
     prim.AlphaBlend(2);
     prim.Begin(6);
     prim.Texture(TEX_ExFx_FIRE);
-    for (int i = 0; i < flame_num; i++) {
-        if (fire->alpha > 0 && fire->delay <= 0) {
+    for (i = 0; i < flame_num; i++, fire++) {
+        if (fire->alpha > 0 && !(0 < fire->delay)) {
             if (mgTransWorldPrim3DSprite(main0, main1, fire->pos, fire->size, fire->size, 0) != 0) {
                 if (fire->age >= 3) {
                     FIRE_AFTER_HIT_TRAIL *row = trail[i];
-                    int newest = fire->trail_head - 1;
-                    int middle = fire->trail_head - 2;
                     int oldest = fire->trail_head - 3;
+                    int middle = fire->trail_head - 2;
+                    int newest = fire->trail_head - 1;
                     if (oldest < 0) {
                         oldest += FIRE_AFTER_HIT_TRAIL_MAX;
                     }
@@ -504,7 +507,7 @@ void CFireAfterHit::Draw(void) {
                     recent[0] = &row[oldest];
                     recent[1] = &row[middle];
                     recent[2] = &row[newest];
-                    for (int k = 0; k < 3; k++) {
+                    for (k = 0; k < 3; k++) {
                         trans_float_to_sceVector(vec, recent[k]->pos, 0);
                         mgTransWorldPrim3DSprite(puff0, puff1, vec, recent[k]->size, recent[k]->size, 0);
                         prim.Color(0x80, gb_tbl_1052[k], gb_tbl_1052[k], fire->alpha);
@@ -524,7 +527,7 @@ void CFireAfterHit::Draw(void) {
                 vec[3] = 1.0f;
                 mgTransWorldPrim3DSprite(puff0, puff1, vec, 1.75f * fire->size, 1.75f * fire->size, 0);
                 int tail_alpha = fire->alpha * 2;
-                if (tail_alpha >= 0x100) {
+                if (tail_alpha > 0xFF) {
                     tail_alpha = 0xFF;
                 }
                 prim.Color(0x80, 0x80, 0x80, tail_alpha);
@@ -534,7 +537,6 @@ void CFireAfterHit::Draw(void) {
                 prim.Vertex4(puff1);
             }
         }
-        fire++;
     }
     prim.End();
 }
@@ -2985,15 +2987,9 @@ void CWeaponElement::Step_Thunder(void) {
 }
 #ifdef NONMATCHING
 void CWeaponElement::Draw_Thunder(void) {
+    int head_quad[2][4];
+    int tail_quad[2][4];
     float base[4];
-    float head[4];
-    float tail[4];
-    int quad_a[4];
-    int quad_b[4];
-    int top_head[4];
-    int bottom_head[4];
-    int top_tail[4];
-    int bottom_tail[4];
     mgCTexture *tex;
     int i;
     int j;
@@ -3001,6 +2997,8 @@ void CWeaponElement::Draw_Thunder(void) {
     tex = mgTexManager.GetTexture(at_2882, -1);
     sceVu0CopyVector(base, *origin);
     CPreSprite prim;
+    int quad_a[4];
+    int quad_b[4];
     prim.Initialize(NULL, NULL);
     prim.Preset2D();
     prim.Coord(1);
@@ -3025,6 +3023,8 @@ void CWeaponElement::Draw_Thunder(void) {
     }
     prim.End();
     int bolt_uv[4][2] = {{0, 0x30}, {0x18, 0x30}, {0, 0x98}, {0, 0x98}};
+    float head[4];
+    float tail[4];
     prim.Preset2D();
     prim.Coord(1);
     prim.DepthTestEnable(1);
@@ -3037,41 +3037,41 @@ void CWeaponElement::Draw_Thunder(void) {
     for (j = 0; j < bolt_count; j++) {
         sceVu0CopyVector(head, offset[bolt_head[j]]);
         head[1] += 1.0f;
-        mgTransWorldPrim(top_head, head);
+        mgTransWorldPrim(head_quad[0], head);
         head[1] -= 2.0f;
-        mgTransWorldPrim(bottom_head, head);
+        mgTransWorldPrim(head_quad[1], head);
         sceVu0CopyVector(tail, offset[bolt_tail[j]]);
         head[1] += 1.0f;
-        mgTransWorldPrim(top_tail, head);
+        mgTransWorldPrim(tail_quad[0], head);
         head[1] -= 2.0f;
-        mgTransWorldPrim(bottom_tail, head);
+        mgTransWorldPrim(tail_quad[1], head);
         int u = bolt_uv[bolt_frame[j]][0];
         int v = bolt_uv[bolt_frame[j]][1];
         prim.Color(0x80, 0x80, 0x80, fptosi(1.6f * alpha[bolt_head[j]]));
         prim.TextureCrd(u, v);
-        prim.Vertex4(top_head);
+        prim.Vertex4(head_quad[0]);
         prim.TextureCrd(u + 0x18, v);
-        prim.Vertex4(bottom_head);
+        prim.Vertex4(head_quad[1]);
         prim.TextureCrd(u, v + 0x68);
-        prim.Vertex4(top_tail);
+        prim.Vertex4(tail_quad[0]);
         prim.TextureCrd(u + 0x18, v + 0x68);
-        prim.Vertex4(bottom_tail);
+        prim.Vertex4(tail_quad[1]);
         sceVu0SubVector(tail, head, base);
         sceVu0Normalize(tail, tail);
         sceVu0ScaleVector(tail, tail, fRand(15.0f));
         sceVu0AddVector(tail, tail, offset[j]);
         tail[1] += 1.0f;
-        mgTransWorldPrim(top_head, tail);
+        mgTransWorldPrim(head_quad[0], tail);
         tail[1] -= 2.0f;
-        mgTransWorldPrim(bottom_head, tail);
+        mgTransWorldPrim(head_quad[1], tail);
         prim.TextureCrd(u, v);
-        prim.Vertex4(top_head);
+        prim.Vertex4(head_quad[0]);
         prim.TextureCrd(u + 0x18, v);
-        prim.Vertex4(bottom_head);
+        prim.Vertex4(head_quad[1]);
         prim.TextureCrd(u, v + 0x68);
-        prim.Vertex4(top_tail);
+        prim.Vertex4(tail_quad[0]);
         prim.TextureCrd(u + 0x18, v + 0x68);
-        prim.Vertex4(bottom_tail);
+        prim.Vertex4(tail_quad[1]);
     }
     prim.End();
 }
@@ -3094,14 +3094,14 @@ int CreatSmoothPass(sceVu0FVECTOR *out, sceVu0FVECTOR *ring, int point_num, int 
     basis[0][0] = -quarter / half;
     basis[0][1] = 1.5f;
     basis[0][2] = (-half - quarter) / half;
-    basis[0][3] = 0.5f;
+    basis[0][3] = half;
     basis[1][0] = 1.0f;
-    basis[1][1] = -1.25f / half;
+    basis[1][1] = -(quarter + 1.0f) / half;
     basis[1][2] = 2.0f;
     basis[1][3] = -half;
     basis[2][0] = basis[0][0];
     basis[2][1] = 0.0f;
-    basis[2][2] = 0.5f;
+    basis[2][2] = half;
     basis[2][3] = 0.0f;
     basis[3][0] = 0.0f;
     basis[3][1] = 1.0f;
@@ -3162,9 +3162,9 @@ int CreatSmoothPass(sceVu0FVECTOR *out, sceVu0FVECTOR *ring, int point_num, int 
         float step;
         while (t < 1.0f - (step = 1.0f / (division - 1.0f))) {
             powers[3] = 1.0f;
-            powers[2] = t;
             powers[1] = t * t;
             powers[0] = t * powers[1];
+            powers[2] = t;
             sceVu0ApplyMatrix(result, coefficients, powers);
             float *entry = out[written];
             entry[0] = result[0];
