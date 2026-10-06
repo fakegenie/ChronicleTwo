@@ -1383,7 +1383,6 @@ void DrawMenuDl(int alpha) {
         }
     }
 }
-#ifdef STATEMATCHING
 void CalcCommonBrdDrawInfo(float *pos, MENUFORM_MAKEBRD_INFO *info, ClsMes *mes) {
     float board_w;
     int i;
@@ -1434,9 +1433,6 @@ void CalcCommonBrdDrawInfo(float *pos, MENUFORM_MAKEBRD_INFO *info, ClsMes *mes)
     }
     memcpy(&CommonBoardDrawInfo, info, sizeof(MENUFORM_MAKEBRD_INFO));
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", CalcCommonBrdDrawInfo__FPfP21MENUFORM_MAKEBRD_INFOP6ClsMes);
-#endif
 #ifdef NONMATCHING
 void CommonBoardDraw(float *pos, int &tex_block) {
     mgCTexture *board_tex = Tex_CommonBoard;
