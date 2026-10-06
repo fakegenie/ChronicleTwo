@@ -358,8 +358,8 @@ public:
     CVillagerMngr      villager_mngr;             /**< Villagers placed in the town. */
     s32                villager_time;             /**< Time band the villagers were loaded for, or -1. */
     s32                sub_villager_time;         /**< Time band the sub villagers were loaded for, or -1. */
-    s32                unk_3e68;
-    s32                unk_3e6c;
+    s32                tex_block_base;
+    s32                tex_block_count;
     CThunderEffect     thunder;                   /**< Thunder effect. */
     u8                 unk_3f0c[0x154];
     s32                snd_file_num;              /**< Number of rows in snd_file. */
