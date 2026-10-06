@@ -235,7 +235,7 @@ int CColFrame::InsidePoint(float *point) {
 
 #pragma force_active on
 #pragma global_optimizer off
-asm void pre_trance_normal(float (*matrix)[4]) {
+static asm void pre_trance_normal(float (*matrix)[4]) {
     .set noreorder
     lqc2 vf10, 0(a0)
     lqc2 vf11, 0x10(a0)
@@ -246,7 +246,7 @@ asm void pre_trance_normal(float (*matrix)[4]) {
 #pragma global_optimizer reset
 
 #pragma global_optimizer off
-asm void trance_normal(float *v0, float *v1, float *v2, float *normal) {
+static asm void trance_normal(float *v0, float *v1, float *v2, float *normal) {
     .set noreorder
     lqc2 vf16, 0(a0)
     lqc2 vf17, 0x10(a0)
@@ -276,60 +276,94 @@ asm void trance_normal(float *v0, float *v1, float *v2, float *normal) {
 }
 #pragma global_optimizer reset
 #pragma force_active reset
-#ifdef NONMATCHING
 int CColFrame::PickUpNearPoly(CCPoly *out, const mgVu0FBOX &box, int max) {
+    sceVu0FVECTOR corners[8];
+    sceVu0FVECTOR transformed[8];
+    sceVu0FVECTOR max0;
+    sceVu0FVECTOR min0;
+    sceVu0FVECTOR max1;
+    sceVu0FVECTOR min1;
+    sceVu0FVECTOR bmin;
+    sceVu0FVECTOR bmax;
+    sceVu0FMATRIX world;
+    sceVu0FMATRIX inverse;
+    mgVu0FBOX local_box;
+    int count;
+    int i;
+    CColFrame *node;
+    int added;
+
+    count = 0;
     if (flags == COL_FRAME_FLAG_NO_CHILDREN) {
         return 0;
     }
-    int count = 0;
     if (collision != NULL && (flags & COL_FRAME_FLAG_SELF)) {
-        sceVu0FMATRIX world;
-        sceVu0FMATRIX inverse;
         GetLWMatrix(world);
         GetInverseMatrix(inverse);
-        sceVu0FVECTOR corners[8];
-        for (int i = 0; i < 8; i++) {
-            corners[i][0] = (i & 1) ? box.max[0] : box.min[0];
-            corners[i][1] = (i & 2) ? box.max[1] : box.min[1];
-            corners[i][2] = (i & 4) ? box.max[2] : box.min[2];
-            corners[i][3] = 1.0f;
-        }
-        sceVu0FVECTOR transformed[8];
+        *(u_long128 *)bmin = *(u_long128 *)box.min;
+        *(u_long128 *)bmax = *(u_long128 *)box.max;
+        corners[0][0] = bmin[0];
+        corners[0][1] = bmin[1];
+        corners[0][2] = bmin[2];
+        corners[0][3] = 1.0f;
+        corners[1][0] = bmax[0];
+        corners[1][1] = bmin[1];
+        corners[1][2] = bmin[2];
+        corners[1][3] = 1.0f;
+        corners[2][0] = bmin[0];
+        corners[2][1] = bmax[1];
+        corners[2][2] = bmin[2];
+        corners[2][3] = 1.0f;
+        corners[3][0] = bmax[0];
+        corners[3][1] = bmax[1];
+        corners[3][2] = bmin[2];
+        corners[3][3] = 1.0f;
+        corners[4][0] = bmin[0];
+        corners[4][1] = bmin[1];
+        corners[4][2] = bmax[2];
+        corners[4][3] = 1.0f;
+        corners[5][0] = bmax[0];
+        corners[5][1] = bmin[1];
+        corners[5][2] = bmax[2];
+        corners[5][3] = 1.0f;
+        corners[6][0] = bmin[0];
+        corners[6][1] = bmax[1];
+        corners[6][2] = bmax[2];
+        corners[6][3] = 1.0f;
+        corners[7][0] = bmax[0];
+        corners[7][1] = bmax[1];
+        corners[7][2] = bmax[2];
+        corners[7][3] = 1.0f;
         mgApplyMatrixN(transformed, inverse, corners, 8);
-        mgVu0FBOX local_box;
-        sceVu0FVECTOR max0, min0, max1, min1;
         mgVectorMaxMin(max0, min0, transformed[0], transformed[1], transformed[2], transformed[3]);
         mgVectorMaxMin(max1, min1, transformed[4], transformed[5], transformed[6], transformed[7]);
         mgVectorMaxMin(local_box.max, local_box.min, max0, max1, min0, min1);
         count = collision->PickUpNearPoly(out, local_box, max);
         pre_trance_normal(world);
-        for (int i = 0; i < count; i++) {
-            trance_normal(out[i].vertex[0], out[i].vertex[1], out[i].vertex[2], out[i].normal);
+        for (i = 0; i < count; i++) {
+            trance_normal(out->vertex[0], out->vertex[1], out->vertex[2], out->normal);
+            out++;
         }
     }
-    int rest = max - count;
-    if (rest <= 0) {
+    max -= count;
+    if (max <= 0) {
         return count;
     }
-    if ((flags & COL_FRAME_FLAG_NO_CHILDREN) == 0) {
-        CColFrame *node = (CColFrame *)child;
-        while (node != NULL) {
-            if ((flags & COL_FRAME_FLAG_UNK_4) == 0) {
-                int added = node->PickUpNearPoly(out + count, box, rest);
+    if (!(flags & COL_FRAME_FLAG_NO_CHILDREN)) {
+        for (node = (CColFrame *)child; node != NULL; node = (CColFrame *)node->brother) {
+            if (!(flags & COL_FRAME_FLAG_UNK_4)) {
+                added = node->PickUpNearPoly(out, box, max);
+                out += added;
                 count += added;
-                rest -= added;
-                if (rest <= 0) {
+                max -= added;
+                if (max <= 0) {
                     break;
                 }
             }
-            node = (CColFrame *)node->brother;
         }
     }
     return count;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/collision", PickUpNearPoly__9CColFrameFP6CCPolyRC9mgVu0FBOXi);
-#endif
 
 int CCollision::PickUpNearPoly(CCPoly *poly, const mgVu0FBOX &box, int max) {
     return 0;
