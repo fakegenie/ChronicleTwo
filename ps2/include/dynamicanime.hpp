@@ -42,8 +42,8 @@ struct DA_BIND_VERTEX {
 STATIC_ASSERT(sizeof(DA_BIND_VERTEX) == 0x10);
 
 struct DA_BOUNDING_BOX {
-    sceVu0FVECTOR unk_0;
-    sceVu0FVECTOR unk_10;
+    sceVu0FVECTOR min;
+    sceVu0FVECTOR max;
     int           frame_id;
 };
 

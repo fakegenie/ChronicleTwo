@@ -2891,10 +2891,10 @@ void CMenuInvent::CalcCursorPosition() {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/inventmn", CalcCursorPosition__11CMenuInventFv);
 #endif
-int CMenuInvent::IsMakeObject(int keys, int button) {
+int CMenuInvent::IsMakeObject(int select_key, int push_button) {
     switch (step) {
     case 0: {
-        int select = SelectMakeObject(keys);
+        int select = SelectMakeObject(select_key);
         if (select == -1) {
             make_board.unk_24 = 6;
             make_board.unk_28 = 0;
@@ -2902,7 +2902,7 @@ int CMenuInvent::IsMakeObject(int keys, int button) {
             make_board.unk_24 = 0;
             make_board.unk_28 = 6;
         }
-        switch (button) {
+        switch (push_button) {
         case 1:
             if (make_cursor == 0) {
                 int enough = InventManagePt->CheckMakeItem(make_item_no, make_num, MenuUserParam.used_data);
@@ -2996,7 +2996,7 @@ int CMenuInvent::IsMakeObject(int keys, int button) {
         }
         break;
     case 2:
-        if (button != 0) {
+        if (push_button != 0) {
             CreateModeSwapForm(0);
             ExeScript(at_3353);
             MenuSePlay(SYSTEM_SE_DECIDE);
@@ -3006,7 +3006,7 @@ int CMenuInvent::IsMakeObject(int keys, int button) {
         }
         break;
     case 3:
-        if (button != 0) {
+        if (push_button != 0) {
             ExeScript(at_3353);
             MenuCommonInfo->SetVibeR(6, 4);
             MenuSePlay(5);
@@ -3443,7 +3443,7 @@ void CMenuInvent::BootExtendCommand() {
         menu_invent_command_info_pict_info->is_new = 0;
     }
 }
-int CMenuInvent::IsAskExtend(int keys, int button) {
+int CMenuInvent::IsAskExtend(int select_key, int push_button) {
     CMenuPosDataForm *command_form;
     CMenuPosDataForm *yesno_form = MenuMesForm[5];
     CDC2Mes *yesno_message = MenuDCMsg[5];
@@ -3461,7 +3461,7 @@ int CMenuInvent::IsAskExtend(int keys, int button) {
     switch (ask_para.ask_mode) {
     case INVENT_ASK_COMMAND: {
         int line = command_message->CommandMsgCursor();
-        if (button & 1) {
+        if (push_button & 1) {
             if (command_message->line_shade[line] == MES_SHADE_FAINT) {
                 MenuSePlay(5);
                 break;
@@ -3540,7 +3540,7 @@ int CMenuInvent::IsAskExtend(int keys, int button) {
             }
             }
             MenuSePlay(se);
-        } else if (button & 2) {
+        } else if (push_button & 2) {
             command_form->draw_flag = 0;
             IsAskEnd(5, command_form);
             if (kakudai_pic_form != NULL) {
@@ -3550,7 +3550,7 @@ int CMenuInvent::IsAskExtend(int keys, int button) {
         break;
     }
     case INVENT_ASK_ZOOM:
-        if (button != 0) {
+        if (push_button != 0) {
             ask->ask_mode = INVENT_ASK_COMMAND;
             MenuSePlay(5);
             command_form->draw_flag = 1;
@@ -3559,7 +3559,7 @@ int CMenuInvent::IsAskExtend(int keys, int button) {
     case INVENT_ASK_DELETE:
         if (step == 0) {
             int answer = yesno_message->YesNoCursor();
-            switch (button) {
+            switch (push_button) {
             case 1:
                 if (answer == 0) {
                     ExeScript(at_3865__2);
@@ -3586,7 +3586,7 @@ int CMenuInvent::IsAskExtend(int keys, int button) {
                 yesno_form->draw_flag = 0;
                 break;
             }
-        } else if (step == 1 && button != 0) {
+        } else if (step == 1 && push_button != 0) {
             IsAskEnd(1, command_form);
             yesno_form->draw_flag = 0;
         }
@@ -3595,7 +3595,7 @@ int CMenuInvent::IsAskExtend(int keys, int button) {
     case INVENT_ASK_FROM_ALBUM:
         if (step == 0) {
             int answer = yesno_message->YesNoCursor();
-            switch (button) {
+            switch (push_button) {
             case 1:
                 if (answer == 0) {
                     MenuSePlay(12);
@@ -3630,7 +3630,7 @@ int CMenuInvent::IsAskExtend(int keys, int button) {
     case INVENT_ASK_DELETE_UNUSED:
         if (step == 0) {
             int answer = yesno_message->YesNoCursor();
-            switch (button) {
+            switch (push_button) {
             case 1:
                 if (answer == 0) {
                     num = 0;
@@ -3654,7 +3654,7 @@ int CMenuInvent::IsAskExtend(int keys, int button) {
                 yesno_form->draw_flag = 0;
                 break;
             }
-        } else if (button != 0) {
+        } else if (push_button != 0) {
             IsAskEnd(1, yesno_form);
             yesno_form->draw_flag = 0;
         }
@@ -3663,7 +3663,7 @@ int CMenuInvent::IsAskExtend(int keys, int button) {
         switch (step) {
         case 0: {
             int answer = yesno_message->YesNoCursor();
-            switch (button) {
+            switch (push_button) {
             case 1:
                 if (answer == 0) {
                     all_num = 0;
@@ -3689,7 +3689,7 @@ int CMenuInvent::IsAskExtend(int keys, int button) {
             break;
         }
         case 1:
-            if (button != 0) {
+            if (push_button != 0) {
                 IsAskEnd(1, command_form);
                 yesno_form->draw_flag = 0;
             }

@@ -5886,7 +5886,7 @@ int _SET_SAVEDATA_ETC(RS_STACKDATA *stack, int argc) {
             if (save == NULL) {
                 return 0;
             }
-            save->unk_643C9 = GetStackInt(stack);
+            save->skip_load_bgm = GetStackInt(stack);
             break;
         case 4:
             DeleteErekiFish();
@@ -12593,8 +12593,8 @@ int _CHECK_MC_LOAD(RS_STACKDATA *stack, int argCount) {
     if (arg == NULL) {
         return 0;
     }
-    SetStack(stack, arg->unk_4c);
-    arg->unk_4c = 0;
+    SetStack(stack, arg->mc_load);
+    arg->mc_load = 0;
     return 1;
 }
 int _SET_NOW_MAP_NO(RS_STACKDATA *stack, int argc) {

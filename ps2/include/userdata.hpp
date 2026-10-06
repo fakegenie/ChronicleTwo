@@ -825,7 +825,7 @@ STATIC_ASSERT(sizeof(BATTLE_WEAPON_PARAM) == 0x1C);
 class CBattleCharaInfo {
 public:
     s16                 chr_no;
-    s16                 unk_2;
+    s16                 user_mons_id;
     s16                 now_npc;
     s16                 chara_type;
     void               *chara_data;

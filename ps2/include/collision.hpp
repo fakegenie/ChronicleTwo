@@ -26,8 +26,8 @@ struct CCPoly {
     short           area_kind;
     short           ignore_mask;
     u_short           parts_no;
-    short           unk_4a;
-    float         unk_4c;
+    short           attr;
+    float         attr_value;
 };
 
 STATIC_ASSERT(sizeof(CCPoly) == 0x50);

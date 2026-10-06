@@ -1743,8 +1743,8 @@ int GetFootPoly(float *pos, float depth, CCPoly *found, sceVu0FVECTOR ground, CC
         area_kind = found->area_kind;
         poly_ignore_mask = found->ignore_mask;
         parts_no = found->parts_no;
-        attribute = found->unk_4a;
-        *(float *)&attribute_value[3] = found->unk_4c;
+        attribute = found->attr;
+        *(float *)&attribute_value[3] = found->attr_value;
         break;
     }
     for (i = 0; i < hits; i++) {
@@ -1764,8 +1764,8 @@ int GetFootPoly(float *pos, float depth, CCPoly *found, sceVu0FVECTOR ground, CC
     found->area_kind = area_kind;
     found->ignore_mask = poly_ignore_mask;
     found->parts_no = parts_no;
-    found->unk_4a = attribute;
-    found->unk_4c = *(float *)&attribute_value[3];
+    found->attr = attribute;
+    found->attr_value = *(float *)&attribute_value[3];
     return found_ground;
 }
 void GetCPolyAttr(MoveCheckInfo *info, float *from, float *to, float dy, CCPoly *polys, int count,
