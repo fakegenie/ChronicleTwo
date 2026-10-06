@@ -771,7 +771,6 @@ void MenuGeoramaTitleDraw(int &tex_block, float *pos, int alpha) {
         }
     }
 }
-#ifdef NONMATCHING
 void MenuGeoramaListDraw(int &tex_block, float *pos, int page, int alpha) {
     if (Tex_Georama != NULL && pos[0] >= -260.0f) {
         int data_no = ConvGeoramaDataNo(page);
@@ -833,9 +832,11 @@ void MenuGeoramaListDraw(int &tex_block, float *pos, int page, int alpha) {
             mgRect<int> times_tex(0x8C, 0x294, 0xA, 0xE);
             float check_y;
             float list_x;
+            int i;
             float line_x;
             float line_y;
             float list_y;
+            float *color;
             list_x = CMenuGeoPt->list_pos[data_no][0];
             list_y = CMenuGeoPt->list_pos[data_no][1];
             line_x = list_x - 14.0f;
@@ -858,8 +859,9 @@ void MenuGeoramaListDraw(int &tex_block, float *pos, int page, int alpha) {
                         continue;
                     }
                     PrimQuad(prim, line_x, check_y, potti1);
-                    PrimQuad(prim, 150.0f + line_x, (int)(line_y - 16.0f), times_tex);
-                    PrimDrawNumber(prim, CMenuGeoPt->stock_list[i].num, 1, (int)(180.0f + line_x), (int)(line_y - 16.0f), number_tex, -2, 0);
+                    int number_y = (int)(line_y - 16.0f);
+                    PrimQuad(prim, 150.0f + line_x, number_y, times_tex);
+                    PrimDrawNumber(prim, CMenuGeoPt->stock_list[i].num, 1, (int)(180.0f + line_x), number_y, number_tex, -2, 0);
                     if (mgScreenHeight <= check_y) {
                         break;
                     }
@@ -870,7 +872,7 @@ void MenuGeoramaListDraw(int &tex_block, float *pos, int page, int alpha) {
                 prim->Begin(6);
                 prim->Texture(Tex_Georama);
                 prim->Color(0x80, 0x80, 0x80, alpha);
-                for (int i = 0; i < 99; i++, check_y += 24.0f, line_y += 24.0f) {
+                for (i = 0; i < 99; i++, check_y += 24.0f, line_y += 24.0f) {
                     if (line_y < 133.0f) {
                         continue;
                     }
@@ -911,7 +913,7 @@ void MenuGeoramaListDraw(int &tex_block, float *pos, int page, int alpha) {
             if (page == GEORAMA_VIEW_PAINT) {
                 float swatch_x = 4.0f + list_x;
                 float swatch_y = 2.0f + list_y;
-                for (int i = 0; i < 16; i++, line_y += 24.0f, swatch_y += 24.0f) {
+                for (i = 0; i < 16; i++, line_y += 24.0f, swatch_y += 24.0f) {
                     if (line_y < 133.0f) {
                         continue;
                     }
@@ -939,9 +941,10 @@ void MenuGeoramaListDraw(int &tex_block, float *pos, int page, int alpha) {
                         prim->Color(200, 200, 200, alpha);
                         prim->Vertex(swatch_x, swatch_y, 0.0f);
                         prim->Vertex((int)(22.0f + swatch_x), (int)(19.0f + swatch_y), 0);
-                        float red = 1.6f * GeoramaColorList[i][0];
-                        float green = 1.6f * GeoramaColorList[i][1];
-                        float blue = 1.6f * GeoramaColorList[i][2];
+                        color = GeoramaColorList[i];
+                        float red = 1.6f * color[0];
+                        float green = 1.6f * color[1];
+                        float blue = 1.6f * color[2];
                         if (255.0f < red) {
                             red = 255.0f;
                         }
@@ -952,7 +955,9 @@ void MenuGeoramaListDraw(int &tex_block, float *pos, int page, int alpha) {
                             blue = 255.0f;
                         }
                         prim->Color((int)red, (int)green, (int)blue, alpha);
-                        prim->Vertex(1.0f + swatch_x, 2.0f + swatch_y, 0.0f);
+                        float ux = 1.0f + swatch_x;
+                        float uy = 2.0f + swatch_y;
+                        prim->Vertex(ux, uy, 0.0f);
                         float vx = 21.0f + swatch_x;
                         float vy = 17.0f + swatch_y;
                         prim->Vertex(vx, vy, 0.0f);
@@ -970,12 +975,12 @@ void MenuGeoramaListDraw(int &tex_block, float *pos, int page, int alpha) {
                     mes->SetMsgAlpha(alpha);
                     mes->DrawMesWin();
                     int line;
-                    for (line = 0; line < 9; line++) {
+                    for (int line = 0; line < 9; line++) {
                         mes->line_pos[line][1] -= 3;
                     }
                     SetMenuScissor(under_clip);
                     mes->DrawMesWin();
-                    for (line = 0; line < 9; line++) {
+                    for (int line = 0; line < 9; line++) {
                         mes->line_pos[line][1] += 3;
                     }
                 }
@@ -984,9 +989,6 @@ void MenuGeoramaListDraw(int &tex_block, float *pos, int page, int alpha) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editmenu", MenuGeoramaListDraw__FRiPfii);
-#endif
 void MenuGeoramaAnalyzeDraw(int &tex_block, float *pos, int alpha) {
     if (Tex_Georama != NULL && pos[0] >= -300.0f) {
         MenuReloadTexture(tex_block, Tex_Georama->block);
