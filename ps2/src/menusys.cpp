@@ -8095,11 +8095,13 @@ void MenuWeaponBuildUpDraw(int &tex_block) {
     int row;
     for (row = 0; row < 3; row++) {
         for (int n = 0; n < backboard_y_repeat_drawnum_7629[row]; n++) {
+            int col;
+            int k;
             int x = 20;
-            for (int col = 0; col < 5; col++) {
+            for (col = 0; col < 5; col++) {
                 mgRect<int> tile(backboard_table_x_7625[col], backboard_table_y_7626[row],
                                  backboard_table_w_7627[col], 28);
-                for (int k = 0; k < backboard_x_repeat_drawnum_7628[col]; k++) {
+                for (k = 0; k < backboard_x_repeat_drawnum_7628[col]; k++) {
                     PrimQuad(prim, x, y, tile);
                     x += tile.right;
                 }
@@ -8127,7 +8129,8 @@ void MenuWeaponBuildUpDraw(int &tex_block) {
     int list_name_x = list_x - 20;
     int step = (height - 40) / num;
     float center = 0.5f * (num - 1.0f);
-    for (int i = 0; i < num; i++) {
+    int i;
+    for (i = 0; i < num; i++) {
         list_y[i] = center_y - step * (center - i);
     }
     int name_y;
@@ -8158,7 +8161,6 @@ void MenuWeaponBuildUpDraw(int &tex_block) {
         PrimQuad(prim, 48.0f, title_y, title_rect);
     }
     BuildUpWeaponNameBoardDraw(prim, name_x, name_y, name_w);
-    int i;
     for (i = 0; i < BuildUpWeaponInfo.select_num; i++) {
         BuildUpWeaponNameBoardDraw(prim, list_x, list_y[i], name_w);
     }
@@ -8191,11 +8193,15 @@ void MenuWeaponBuildUpDraw(int &tex_block) {
     PrimQuad(prim, 256.0f, line_y, line_right_rect);
     prim->End();
     if (BuildUpWeaponInfo.unk_0 == 0) {
-        int mos_name_x = 0x11E;
-        int mark_x = 0x10A;
-        CDataWeapon *data = BuildUpWeaponInfo.weapon_data[BuildUpWeaponInfo.select_no];
+        CDataWeapon *data;
+        int mos_y;
+        int mos_name_x;
+        int mark_x;
+        data = BuildUpWeaponInfo.weapon_data[BuildUpWeaponInfo.select_no];
         char *mos_names[3] = {NULL};
-        int mos_y = mgScreenHeight - 180;
+        mos_name_x = 0x11E;
+        mark_x = 0x10A;
+        mos_y = mgScreenHeight - 180;
         int board_y = mos_y - 30;
         if (LanguageCode > 0) {
             mos_name_x = 0x114;
