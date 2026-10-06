@@ -234,7 +234,7 @@ void InitFirePowder(int map_no, CScene *scene, int texb, mgCMemory *memory) {
     u_char *image;
     FirePowderFlag = 0;
     if (map_no != 3 && map_no != 0x57 && map_no != 0x55) return;
-    if (GetSaveData()->GetBitFlag(0x208) != 0) return;
+    if (GetSaveData()->GetBitFlag(SAVE_FLAG_EDIT_BLOCKED) != 0) return;
     u_char *buffer = (u_char *)scene->read_buff;
     if (LoadFile2(at_1143__2, buffer, &size, 0) == 0) return;
     image = (u_char *)memory->Alloc(align16_blocks(size));

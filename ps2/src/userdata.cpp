@@ -2503,7 +2503,7 @@ MOS_CHANGE_PARAM *CUserDataManager::GetMonsterBajjiDataPtrMosId(int monster_id) 
     return monster_box.GetMonsterBajjiDataByMonsterID(monster_id);
 }
 int CUserDataManager::GetItemBoardOverNum() {
-    if (GetSaveData()->GetBitFlag(254) != 0) {
+    if (GetSaveData()->GetBitFlag(SAVE_FLAG_ITEM_BOARD_EXPANDED) != 0) {
         return 6;
     }
     return 12;
@@ -2513,7 +2513,7 @@ int CUserDataManager::GetItemBoardMaxNum(int board) {
     if (board == 0) {
         size = 0x8A;
     }
-    if (GetSaveData()->GetBitFlag(254) == 1) {
+    if (GetSaveData()->GetBitFlag(SAVE_FLAG_ITEM_BOARD_EXPANDED) == 1) {
         if (board == 0) {
             size = 0x90;
         }

@@ -2479,9 +2479,9 @@ void IsEventRun() {
     if (DngMainScene->map_event_no) {
         RedMarkModel->draw_request = 1;
     }
-    if (!DngSaveData->GetBitFlag(0x35) && info->chr_no == USER_CHARA_ROBO && MainChara__2->move_type == ACTION_MOVE_ROBO_BIKE) {
+    if (!DngSaveData->GetBitFlag(SAVE_FLAG_ROBO_BIKE_EVENT_SEEN) && info->chr_no == USER_CHARA_ROBO && MainChara__2->move_type == ACTION_MOVE_ROBO_BIKE) {
         *event_no = 2530;
-        DngSaveData->SetBitFlag(0x35, 1);
+        DngSaveData->SetBitFlag(SAVE_FLAG_ROBO_BIKE_EVENT_SEEN, 1);
     }
     if (!DngSaveData->GetBitFlag(0x32) && (info->chr_no == USER_CHARA_MAX || info->chr_no == USER_CHARA_MONICA)) {
         if (AutoMapGen.SearchRandomStone(pos, 30.0f)) {

@@ -683,7 +683,7 @@ char *GetItemFileName(int item_no, int variant) {
     strcpy(filename_1267, name);
     CSaveData *save_data = GetSaveData();
     u8 type = record->type;
-    if ((type == 5 || type == 8) && save_data->GetBitFlag(0x31F) != 0) {
+    if ((type == 5 || type == 8) && save_data->GetBitFlag(SAVE_FLAG_COSTUME_UNLOCK) != 0) {
         strcat(filename_1267, at_1283__3);
     }
     if (variant != 0 && variant == 1) {

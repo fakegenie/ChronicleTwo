@@ -199,13 +199,13 @@ void CSaveData::CheckTourBoot(int day) {
             tour.now_event = 1;
             tour.count = 0;
             next_type = tour.type + 1;
-            if (GetBitFlag(0x1A8) != 0) {
+            if (GetBitFlag(SAVE_FLAG_TOURNAMENT_CYCLE) != 0) {
                 if (next_type >= 3) {
                     next_type = 1;
                 }
             } else {
                 next_type = 1;
-                if (GetBitFlag(0x158) == 0) {
+                if (GetBitFlag(SAVE_FLAG_TOURNAMENT_STARTED) == 0) {
                     next_type = 0;
                 }
             }

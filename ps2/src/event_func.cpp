@@ -5576,9 +5576,9 @@ int _GET_LANGUAGE(RS_STACKDATA *stack, int argc) {
     SetStack(stack, LanguageCode);
     return 1;
 }
-static int _CHECK_INVENT_ITEM(RS_STACKDATA *arg0, int arg1) {
-    int item = GetStackInt(arg0++);
-    SetStack(arg0, CheckInventItem__Fi(item));
+static int _CHECK_INVENT_ITEM(RS_STACKDATA *stack, int argc) {
+    int item = GetStackInt(stack++);
+    SetStack(stack, CheckInventItem__Fi(item));
     return 1;
 }
 int _SET_AI(RS_STACKDATA *stack, int argc) {

@@ -1682,8 +1682,8 @@ int MenuInternSelectKey(void) {
             }
             if (GamePad__2.Down(0x10) != 0) {
                 MenuActiveSaveData->SetBitFlag(0x36, 1);
-                MenuActiveSaveData->SetBitFlag(0x158, 1);
-                MenuActiveSaveData->SetBitFlag(0x1A8, 1);
+                MenuActiveSaveData->SetBitFlag(SAVE_FLAG_TOURNAMENT_STARTED, 1);
+                MenuActiveSaveData->SetBitFlag(SAVE_FLAG_TOURNAMENT_CYCLE, 1);
                 MenuActiveSaveData->ForceBootTour(MenuActiveSaveData->day, 1);
             }
             GamePad__2.Down(0x80);
