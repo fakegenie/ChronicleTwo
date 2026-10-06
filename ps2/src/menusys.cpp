@@ -131,11 +131,6 @@ struct KeyPairTable {
     int v[2][2];
 };
 
-struct ScreenPos {
-    int x;
-    int y;
-} __attribute__((aligned(8)));
-
 struct SpectolBreakTable {
     int v[4];
 };
@@ -150,7 +145,6 @@ extern CGameDataUsed SpectolTransBefore;
 extern CMenuEffect *MenuEffect[2];
 extern CGameDataUsed SpectolInfoStay;
 extern NamePair at_1685;
-extern ScreenPos at_2564;
 extern KeyPairTable at_2328;
 extern KeyPairTable at_2333__3;
 extern SpectolBreakTable at_1557;
@@ -2327,27 +2321,27 @@ void CMenuKeyFunc::AttachFuncData() {
 int CMenuKeyFunc::GetActiveCharaNo() {
     return MenuArg.active_chara_no;
 }
-#ifdef NONMATCHING
 int CMenuKeyFunc::MenuPosStep(int *pos, int *offset) {
-    ScreenPos waku_pos;
+    int waku_pos[2];
     if (waku_form != NULL) {
         waku_form->SetNextMovePos(pos, 2);
-        waku_form->GetNextMovePos(&waku_pos.x);
+        waku_form->GetNextMovePos(waku_pos);
     }
-    ScreenPos next = at_2564;
+    int next[2] = {waku_pos[0], waku_pos[1]};
     int put[2];
-    next = waku_pos;
     if (offset != NULL) {
-        next.x += offset[0];
-        next.y += offset[1];
+        next[0] += offset[0];
+        next[1] += offset[1];
     }
-    cursor_form->SetNextMovePos(&next.x, 2);
-    int end = cursor_form->CheckMoveEnd(next.x, next.y);
+    cursor_form->SetNextMovePos(next, 2);
+    int end = cursor_form->CheckMoveEnd(next[0], next[1]);
     cursor_form->GetPutPosXY(at_2545__2, put[0], put[1]);
     CMenuPosDataForm *form = how_much_form;
     if (form != NULL) {
-        form->x = put[0] + 10;
-        form->y = (float)put[1] + 40;
+        int x = put[0] + 10;
+        int y = put[1] + 40;
+        form->x = x;
+        form->y = y;
     }
     if (have_item.item_no > 0) {
         SetHaveItemInfo(1, 0);
@@ -2364,9 +2358,6 @@ int CMenuKeyFunc::MenuPosStep(int *pos, int *offset) {
     }
     return end;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menusys", MenuPosStep__12CMenuKeyFuncFPiPi);
-#endif
 void CMenuKeyFunc::MenuSetPos(int x, int y) {
     CMenuPosDataForm *form = cursor_form;
     float fx = (float)x;
