@@ -171,7 +171,6 @@ int  EventScriptSetup(SYSTEM_SCRIPT_INFO *script);
 int  ChangeSetUnit(int dir);
 void InitEyeCamera(CActionChara *chara);
 int  IsRunDeadEvent(CActionChara *chara);
-extern CGamePad GamePad__2;
 extern int debug_cursor;
 extern int debug_mons_no;
 extern int debug_mons_cur;

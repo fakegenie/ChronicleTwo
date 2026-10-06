@@ -51,7 +51,6 @@ extern char at_888__3[];
 extern char at_1175__2[];
 
 extern "C" float mgGetProjection__Fv();
-extern mgCTextureManager mgTexManager;
 #include <cstdio>
 #include <cmath>
 

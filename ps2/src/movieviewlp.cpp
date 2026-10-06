@@ -63,7 +63,6 @@ extern mgCMemory *spi_MovieStack;
 #include "scriptinterpreter.hpp"
 #include "snd_mngr.hpp"
 
-extern CGamePad GamePad__2;
 extern CScene *MovieScene;
 extern CMovie *MovieView;
 extern mgCTexture *RushWork__2;

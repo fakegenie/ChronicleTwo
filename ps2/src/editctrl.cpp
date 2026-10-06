@@ -57,7 +57,6 @@ extern "C" float GetHeight__15mgCCameraFollowFv(CCameraControl *camera);
 extern "C" void EyeCamera__FP9mgCCameraP11CCharacter2i(mgCCameraFollow *, CCharacter2 *, int);
 extern "C" void InitEyeCamera__FP11CCharacter2P14CCameraControl(CCharacter2 *chara,
                                                                 CCameraControl *camera);
-extern DEBUG_INFO DebugInfo;
 extern "C" void GetPos__9mgCCameraFPf(CCameraControl *camera, float *out);
 extern "C" void SetPos__9mgCCameraFPf(mgCCameraFollow *camera, float *pos);
 extern "C" void SetNextPos__9mgCCameraFPf(mgCCameraFollow *camera, float *pos);
@@ -83,7 +82,6 @@ extern int CharaMotionMode;
 extern int CharaMotionModeCnt;
 extern int FixCameraChgCnt;
 extern int ViewMode;
-extern CGamePad GamePad__2;
 
 #include <cmath>
 #include <cstring>

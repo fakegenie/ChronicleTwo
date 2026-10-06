@@ -40,8 +40,6 @@ extern char at_1310__4[];
 extern char at_1676[];
 extern int D_01F3C7FC[4];
 extern float SfidaBGXY;
-extern int DebugFlag;
-extern int menu_debug_flag;
 extern CDC2Mes *SphidaMenuMes;
 extern CDC2Mes *SphidaMenuQus;
 extern CDC2Mes *SphidaScore;
@@ -57,9 +55,7 @@ extern char at_1556__2[];
 extern char at_1557__2[];
 extern int SphidaSelect[2];
 extern short SfidaMakeLine;
-extern int LanguageCode;
 
-extern CDC2Mes *MenuDCMsg[9];
 extern signed char WorldMapMenuType;
 extern CWorldMapMenu *WorldMapPtr;
 extern short Sfida_NowPlayHorlBlink;

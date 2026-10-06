@@ -328,7 +328,6 @@ extern float v4orig_4376[4];
 extern short t_4408[];
 extern "C" char at_4519[];
 extern float ambient[4];
-extern int menu_debug_flag;
 extern s16 menu_debug_select;
 extern int langTbl_3630[2][2];
 extern s8 menu_max_tbl_3720[3];

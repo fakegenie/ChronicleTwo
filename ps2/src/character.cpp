@@ -52,7 +52,6 @@ extern CHRINFO_SEQ *now_seq_ptr;
 extern CHRINFO_SEQ_HEADER *now_seqhd_ptr;
 extern unsigned int *eff_pack_ptr;
 extern int eff_pack_size;
-extern mgCTextureManager mgTexManager;
 extern int alloc_vertex_num;
 extern char alloc_vertex[25][16];
 extern char at_1395[14];

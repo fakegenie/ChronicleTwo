@@ -37,7 +37,6 @@ extern u32 EffectState;
 extern CPaintEffect *PaintEffect;
 extern CStarEffect _StarEffect[star_effect_count];
 extern mgCMemory CurPartsBuff;
-extern mgCTextureManager mgTexManager;
 extern CPlaceAnime PlaceAnime[place_anime_count];
 
 // Code (.text)

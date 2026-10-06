@@ -50,7 +50,6 @@ extern int thunder_count;
 extern CGeyserEffect *GeyserEffect;
 extern int FirePowderFlag;
 extern FirePowder *fire_powder;
-extern mgCTextureManager mgTexManager;
 extern int GeyserEffectTexb;
 extern mgCFrame *GeyserFrame;
 extern int GeyserRndSeed;

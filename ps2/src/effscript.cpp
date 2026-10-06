@@ -46,7 +46,6 @@ union EffectVector {
 
 extern "C" _EFF_SCRIPT *now_script;
 extern "C" int (*ext_func__4[256])(RS_STACKDATA *, int);
-extern CColPrimMan ColPrimMan;
 EFF_SPT_BASE_DEF *GetEffSptBaseDefPtr(int index);
 int SetEffectScript(CRunScript *script, char *program, mgCMemory *memory);
 void SetEffectScriptFunc();

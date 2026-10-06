@@ -27,7 +27,6 @@ extern HELP_MES_INFO HelpMesInfo;
 extern int ShowOffOnce;
 extern int WindowMode;
 extern ClsMes HelpMes;
-extern int LanguageCode;
 extern char HelpMesBuff[0x1000];
 extern int InitFlag__2;
 

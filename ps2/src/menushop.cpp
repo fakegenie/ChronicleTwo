@@ -1851,7 +1851,6 @@ void MenuNPCQuestViewInit(mgCMemory *stack, int *tex_block, int view_mode) {
 int MenuNPCQuestViewKey() {
     return MenuQuestView->KeyStep();
 }
-extern int menu_debug_flag;
 extern s8 randam_checktbl[];
 extern short tbl_2469[7][12];
 extern short at_2470[12];

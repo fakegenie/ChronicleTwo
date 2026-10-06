@@ -37,7 +37,6 @@ extern int Select;
 extern int LEditFlag;
 #include <cstring>
 
-extern CGamePad GamePad__2;
 extern int EditDebugFlag, EditDebugTexb, Select, SelTAG, sg_type, map_jump;
 extern int save_no, load_no, condition, map_flag_no, LEditFlag, LightType, DirLightNo, fish_num;
 extern int EventNo;

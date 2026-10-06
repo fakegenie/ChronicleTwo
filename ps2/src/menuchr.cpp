@@ -402,7 +402,6 @@ extern char at_5839[];
 extern char at_5893[];
 extern int tbl_5848[];
 extern void *__vt__12CMosBookMenu[];
-extern CDC2Mes *MenuDCMsg[9];
 extern MemoryList at_1083__2;
 extern char at_1104__4[];
 extern char at_1131__3[];
@@ -5831,7 +5830,6 @@ void CMenuCostumeSel::Draw() {
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuchr", Draw__15CMenuCostumeSelFv);
 #endif
 extern void *__vt__15CMenuCostumeSel[];
-extern u_long CostumeOptionEnv;
 extern "C" void *__ct__15mgCCameraFollowFffff(void *camera, float distance, float height, float angle,
                                                float speed);
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuchr", MenuCostumeInit__FP9mgCMemoryPii);
