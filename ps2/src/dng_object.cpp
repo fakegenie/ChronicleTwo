@@ -229,6 +229,14 @@ static char **mons_attr_list[8] = {
     mons_attr_tbl6,
     mons_attr_tbl6,
 };
+#else
+extern char **mons_attr_list[8];
+extern char *dung_progtxt_badge_already[8];
+extern char *dung_progtxt_badge_get[8];
+extern char *dung_progtxt_gkey_get[8];
+extern char *dung_progtxt_steal[8];
+extern char *dung_progtxt_getitem_overnum[8][2];
+extern char *dung_progtxt_getitem[8][2];
 #endif
 
 void CRocketLauncher::SetPos(float *pos, float *muzzle_vec, float *direction_vec) {

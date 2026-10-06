@@ -609,9 +609,9 @@ void CSphida::DrawStatusSprite() {
             landing[1] += 3.0f;
             velocity[0] = (float)((double)(club->power - club->power * carry) * cos((double)carry));
             velocity[1] = (float)((double)(club->power - club->power * carry) * sin((double)carry));
-            for (int step = 0; step < 600; step++) {
+            for (index = 0; index < 600; index++) {
                 velocity[0] *= 0.999f;
-                velocity[1] += -0.0045f * (float)(step + 1);
+                velocity[1] += -0.0045f * (float)(index + 1);
                 sceVu0AddVector(landing, landing, velocity);
                 if (landing[1] <= 3.0f) {
                     break;
@@ -634,7 +634,7 @@ void CSphida::DrawStatusSprite() {
             if (carry_digits[index] != 0 || carry_shown == 1 || index == 2) {
                 carry_shown = 1;
                 DPrimEnterSprite(&prim, carry_digits[index] * 16 + 352, 192, 16, 20,
-                                 438.0f + 14.0f * (float)index, 406.4f, 16.0f, 20.0f);
+                                 438.0f + 14.0f * (float)index, 406.4f, float(16.0), 20.0f);
             }
         }
         DPrimEnterSprite(&prim, 234, 20, 22, 22, 482.0f, 406.4f, 22.0f, 22.0f);
@@ -668,12 +668,12 @@ void CSphida::DrawStatusSprite() {
         DPrimEnterSprite(&prim, 0, 50, 80, 80, 60.0f, 344.0f, 80.0f, 80.0f);
         DPrimEnterSprite(&prim, 330, 88, 54, 16, 60.0f, 304.0f, 54.0f, 16.0f);
         DPrimEnterSprite(&prim, 454, 88, 58, 16, 60.0f, 384.0f, 58.0f, 16.0f);
-        DPrimEnterSprite(&prim, 384, 88, 34, 16, 40.0f, 336.0f, 34.0f, 16.0f);
+        DPrimEnterSprite(&prim, 384, 88, 34, 16, 40.0f, 336.0f, float(34.0), 16.0f);
         DPrimEnterSprite(&prim, 418, 88, 36, 16, 85.0f, 336.0f, 36.0f, 16.0f);
         DPrimEnterSprite(&prim, 68, 130, 10, 10, 60.0f + 32.0f * spin_mark_pos_x, 344.0f + 32.0f * spin_mark_pos_y,
                          10.0f, 10.0f);
         DPrimEnterSprite(&prim, 264, 88, 66, 16, 460.0f, 382.4f, 66.0f, 16.0f);
-        DPrimEnterSprite(&prim, 0, 130, 68, 28, 460.0f, 406.4f, 68.0f, 28.0f);
+        DPrimEnterSprite(&prim, 0, 130, 68, 28, 460.0f, 406.4f, float(68.0), float(28.0));
         int carry_distance = 0;
         GOLF_CLUB_DEF *club = GetSphidaClubDef(club_no);
         if (club != NULL) {
@@ -684,9 +684,9 @@ void CSphida::DrawStatusSprite() {
             landing[1] += 3.0f;
             velocity[0] = (float)((double)(club->power - club->power * carry) * cos((double)carry));
             velocity[1] = (float)((double)(club->power - club->power * carry) * sin((double)carry));
-            for (int step = 0; step < 600; step++) {
+            for (index = 0; index < 600; index++) {
                 velocity[0] *= 0.999f;
-                velocity[1] += -0.0045f * (float)(step + 1);
+                velocity[1] += -0.0045f * (float)(index + 1);
                 sceVu0AddVector(landing, landing, velocity);
                 if (landing[1] <= 3.0f) {
                     break;
@@ -712,7 +712,7 @@ void CSphida::DrawStatusSprite() {
                                  438.0f + 14.0f * (float)index, 406.4f, 16.0f, 20.0f);
             }
         }
-        DPrimEnterSprite(&prim, 178, 74, 22, 22, 482.0f, 406.4f, 22.0f, 22.0f);
+        DPrimEnterSprite(&prim, 178, 74, 22, 22, 482.0f, 406.4f, 22.0f, float(22.0));
     }
     prim.End();
 }
