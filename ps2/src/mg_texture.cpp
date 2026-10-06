@@ -34,6 +34,7 @@ extern char at_868[];
 extern u_char lut_1246[128];
 extern int block_table8_1266[32];
 extern int block_table32_1267[32];
+extern u_char conv_work_1306[0x10000];
 extern "C" void *__construct_new_array(void *, void *(*)(void *), void *, u_int, int);
 extern "C" void *__ct__10mgCTextureFv(void *);
 extern "C" void *__ct__15mgCTextureBlockFv(void *);
@@ -1483,23 +1484,22 @@ static int PageConv32to8(int width, int height, u_char *src, u_char *dst) {
 #pragma schedule reset
 #pragma schedule off
 #pragma optimization_level 1
-#ifdef NONMATCHING
 
 static int Conv32To8(int width, int height, u_char *image) {
-    static u_char conv_work[0x10000];
     u_char work8[0x2000];
     u_char work32[0x2000];
-    u_char *source_cursor;
-    u_char *work_cursor;
-    u_char *destination_cursor;
-    int size;
-    int pages_x;
-    int pages_y;
-    int row_bytes;
-    int row_count;
-    int i;
-    int j;
     int k;
+    int pages_x;
+    int row_count;
+    int row_bytes;
+    int j;
+    int i;
+    int pages_y;
+    u_char *source_cursor;
+    int size;
+    u_char *work_cursor;
+    int page_width;
+    u_char *destination_cursor;
 
     size = width * height;
 
@@ -1512,11 +1512,12 @@ static int Conv32To8(int width, int height, u_char *image) {
     pages_x = (width - 1) / 128 + 1;
     pages_y = (height - 1) / 64 + 1;
 
+    page_width = 128;
+    row_bytes = 256;
     if (pages_x == 1) {
         row_bytes = width * 2;
     } else {
-        width = 128;
-        row_bytes = 256;
+        width = page_width;
     }
 
     if (pages_y == 1) {
@@ -1528,7 +1529,7 @@ static int Conv32To8(int width, int height, u_char *image) {
 
     for (i = 0; i < pages_y; i++) {
         for (j = 0; j < pages_x; j++) {
-            source_cursor = image + row_bytes * j + i * pages_x * row_bytes * row_count;
+            source_cursor = image + i * (pages_x * (row_bytes * row_count)) + row_bytes * j;
             work_cursor = work32;
 
             for (k = 0; k < row_count; k++) {
@@ -1538,7 +1539,7 @@ static int Conv32To8(int width, int height, u_char *image) {
             }
 
             PageConv32to8(128, 64, work32, work8);
-            destination_cursor = conv_work + width * j + i * pages_x * width * 64;
+            destination_cursor = conv_work_1306 + i * (pages_x * (width * 64)) + width * j;
             work_cursor = work8;
 
             for (k = 0; k < height; k++) {
@@ -1549,12 +1550,9 @@ static int Conv32To8(int width, int height, u_char *image) {
         }
     }
 
-    memcpy(image, conv_work, size);
+    memcpy(image, conv_work_1306, size);
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_texture", Conv32To8__FiiPUc);
-#endif
 #pragma optimization_level reset
 #pragma schedule reset
 
