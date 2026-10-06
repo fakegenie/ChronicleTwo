@@ -358,10 +358,10 @@ int GetFontGaijiHankaku(u16 code) {
     }
     return 0;
 }
-#ifdef NONMATCHING
 static inline u16 GetYoyakuCode(u8 *table, int no) {
     u8 *pair = &table[no * 2];
-    return pair[1] + (pair[0] << 8);
+    int hi = *pair++;
+    return *pair + (hi << 8);
 }
 int GetFontNo(char *text) {
     if (text[0] == '\n') {
@@ -398,9 +398,6 @@ int GetFontNo(char *text) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/font", GetFontNo__FPc);
-#endif
 extern "C" int GetHalfFontNo__Fc(int ch) {
     char buf[8];
     u16 no = GetAlphabeticalFontNo_uc(ch & 0xFF);
