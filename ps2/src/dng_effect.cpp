@@ -486,7 +486,7 @@ void CFireAfterHit::Draw(void) {
     prim.AlphaBlend(2);
     prim.Begin(6);
     prim.Texture(TEX_ExFx_FIRE);
-    for (i = 0; i < flame_num; i++, fire++) {
+    for (int i = 0; i < flame_num; i++, fire++) {
         if (fire->alpha > 0 && !(0 < fire->delay)) {
             if (mgTransWorldPrim3DSprite(main0, main1, fire->pos, fire->size, fire->size, 0) != 0) {
                 if (fire->age >= 3) {
@@ -503,10 +503,7 @@ void CFireAfterHit::Draw(void) {
                     if (newest < 0) {
                         newest += FIRE_AFTER_HIT_TRAIL_MAX;
                     }
-                    FIRE_AFTER_HIT_TRAIL *recent[3] = {NULL, NULL, NULL};
-                    recent[0] = &row[oldest];
-                    recent[1] = &row[middle];
-                    recent[2] = &row[newest];
+                    FIRE_AFTER_HIT_TRAIL *recent[3] = {&row[oldest], &row[middle], &row[newest]};
                     for (k = 0; k < 3; k++) {
                         trans_float_to_sceVector(vec, recent[k]->pos, 0);
                         mgTransWorldPrim3DSprite(puff0, puff1, vec, recent[k]->size, recent[k]->size, 0);
@@ -3087,22 +3084,22 @@ int CreatSmoothPass(sceVu0FVECTOR *out, sceVu0FVECTOR *ring, int point_num, int 
     }
     float quarter = 0.25f;
     float half = 0.5f;
+    basis[1][0] = 1.0f;
+    basis[3][0] = 0.0f;
+    basis[2][1] = 0.0f;
     basis[0][0] = -quarter / half;
     basis[0][1] = 1.5f;
-    basis[0][2] = (-half - quarter) / half;
-    basis[0][3] = half;
-    basis[1][0] = 1.0f;
-    basis[1][1] = -(quarter + 1.0f) / half;
-    basis[1][2] = 2.0f;
-    basis[1][3] = -half;
-    basis[2][0] = basis[0][0];
-    basis[2][1] = 0.0f;
-    basis[2][2] = half;
-    basis[2][3] = 0.0f;
-    basis[3][0] = 0.0f;
-    basis[3][1] = 1.0f;
     basis[3][2] = 0.0f;
+    basis[0][2] = (-half - quarter) / half;
+    basis[2][3] = 0.0f;
     basis[3][3] = 0.0f;
+    basis[2][0] = basis[0][0];
+    basis[2][2] = half;
+    basis[1][3] = -half;
+    basis[0][3] = half;
+    basis[1][1] = -(quarter + 1.0f) / half;
+    basis[3][1] = 1.0f;
+    basis[1][2] = 2.0f;
     int written = 0;
     for (int segment = 0; segment < point_num - 1; segment++) {
         if (segment > 0 && segment < point_num - 2) {
@@ -3159,7 +3156,7 @@ int CreatSmoothPass(sceVu0FVECTOR *out, sceVu0FVECTOR *ring, int point_num, int 
         while (t < 1.0f - (step = 1.0f / (division - 1.0f))) {
             powers[3] = 1.0f;
             powers[1] = t * t;
-            powers[0] = t * powers[1];
+            powers[0] = t * (t * t);
             powers[2] = t;
             sceVu0ApplyMatrix(result, coefficients, powers);
             float *entry = out[written];
