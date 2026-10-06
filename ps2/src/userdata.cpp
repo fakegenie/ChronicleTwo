@@ -4709,7 +4709,7 @@ int CheckGetItemRemainNum(int item_no) {
         return 0;
     }
     held = manager->GetNumSameItem(item_no);
-    return *(u16 *)((u8 *)GetCommonItemData(item_no) + 0xA) - held;
+    return GetCommonItemData(item_no)->max_num - held;
 }
 void CheckItemDngKey(void) {
     CUserDataManager *user_data = GetUserDataMan();
