@@ -13,6 +13,9 @@
 #include "vtables.hpp"
 
 extern u_char texflush_dma__2[0x30];
+extern u_int prog_vif_730[4];
+extern u_int progf_vif_731[4];
+extern u_long128 *(*set_data_func__2[8])(int, int, int **, u_long128 *, u_long128 *, u_long128 *, u_long128 *, u_long128 *);
 
 struct VisualScratchMemory {
     u_char pad_00[0x1C];
@@ -50,10 +53,6 @@ struct mgVISUAL_SETUP_PACKET {
     sceVu0FVECTOR  object_color;
 };
 STATIC_ASSERT(sizeof(mgVISUAL_SETUP_PACKET) == 0x140);
-
-static u_long128 *(*set_data_func[8])(int, int, int **, u_long128 *, u_long128 *, u_long128 *, u_long128 *, u_long128 *) = {
-    SetData0, SetData1, SetData2, SetData3, SetData4, SetData5, SetData6, SetData7
-};
 
 #endif
 
@@ -868,44 +867,40 @@ u_long128 *SetData7(int count, int type, int **index, u_long128 *packet, u_long1
     *index = cursor;
     return colour_out;
 }
-#ifdef NONMATCHING
 int mgCVisualMDT::CreateFacePacket(u_int *packet, mgCFace *face) {
-    static u_int prog_vif[4] __attribute__((aligned(16))) = {0, 0, 0, MG_VIF_MSCAL | 0x2};
-    static u_int progf_vif[4] __attribute__((aligned(16))) = {0, 0, 0, MG_VIF_MSCNT};
-    sceGifTag  batch_tag;
-    sceGifTag  end_tag;
-    int       *indices;
     u_int     *start;
+    sceGifTag  batch_tag;
+    u_long128 *end;
+    int        use_scratchpad;
     u_int     *write;
+    int        primitive;
+    int        count;
+    int        batch_limit;
+    sceGifTag  end_tag;
+    int        started;
     u_int     *buffer_start;
     u_int     *unpack;
     u_int     *payload;
-    u_long128 *end;
+    int       *indices;
     int        remaining;
-    int        batch_limit;
-    int        count;
-    int        variant;
-    int        primitive;
-    int        use_scratchpad;
-    int        started;
     int        words;
-
+    int        variant;
     if (face == NULL) {
         return 0;
     }
-    start = packet;
     use_scratchpad = 0;
     if (((u_int)packet & 0xF0000000) == MG_UNCACHED) {
         use_scratchpad = 1;
     }
-    remaining = face->vertex_num;
+    start = packet;
     primitive = face->type & MG_FACE_PRIM_MASK;
+    started = 0;
+    remaining = face->vertex_num;
+    batch_limit = (vu1_offset - 2) / 3 / 3 * 3;
     indices = face->index;
     variant = 0;
-    started = 0;
-    batch_limit = (vu1_offset - 2) / 3 / 3 * 3;
     if (face->type & MG_FACE_COLOUR) {
-        variant = 1;
+        variant += 1;
         batch_limit = (vu1_offset - 2) / 4 / 3 * 3;
     }
     if (face->type & MG_FACE_NO_TEXTURE) {
@@ -950,19 +945,22 @@ int mgCVisualMDT::CreateFacePacket(u_int *packet, mgCFace *face) {
         write[2] = 0;
         write[3] = 0;
         unpack = write + 3;
-        payload = write + 4;
+        write += 4;
+        payload = write;
         batch_tag.NLOOP = count | 0x8000;
-        *(u_long128 *)&write[4] = *(u_long128 *)&batch_tag;
-        end = set_data_func[variant](count, face->type, &indices, (u_long128 *)&write[8],
+        *(u_long128 *)write = *(u_long128 *)&batch_tag;
+        write += 4;
+        end = set_data_func__2[variant](count, face->type, &indices, (u_long128 *)write,
                                     (u_long128 *)vertex, (u_long128 *)normal, (u_long128 *)uv, (u_long128 *)colour);
-        *unpack = (((u_int *)end - payload) / 4 << MG_VIF_NUM_SHIFT) | MG_VIF_UNPACK_V4_32 | MG_VIF_UNPACK_FLG;
+        *unpack = ((u_int)((u_int *)end - payload) / 4 << MG_VIF_NUM_SHIFT) | MG_VIF_UNPACK_V4_32 | MG_VIF_UNPACK_FLG;
         if (started == 0) {
+            *end = *(u_long128 *)prog_vif_730;
             started = 1;
-            *end = *(u_long128 *)prog_vif;
+            write = (u_int *)(end + 1);
         } else {
-            *end = *(u_long128 *)progf_vif;
+            *end = *(u_long128 *)progf_vif_731;
+            write = (u_int *)(end + 1);
         }
-        write = (u_int *)(end + 1);
         if (primitive == MG_PRIM_TRIANGLE_STRIP && batch_limit < remaining) {
             remaining += 2;
             indices -= face->index_stride * 2;
@@ -988,9 +986,6 @@ int mgCVisualMDT::CreateFacePacket(u_int *packet, mgCFace *face) {
     packet += 4;
     return (packet - start) / 4;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_visual", CreateFacePacket__12mgCVisualMDTFPUiP7mgCFace);
-#endif
 #ifdef NONMATCHING
 int mgCVisualMDT::CreateRenderInfoPacket(u_int *packet, float (*matrix)[4], mgRENDER_INFO *info) {
     mgVISUAL_SETUP_PACKET *setup;
@@ -1367,7 +1362,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_visual", mat_vif_d_tex__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_visual", set_data_func__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_visual", prog_vif_730__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_visual", progf_vif_731__DATA);
-INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_visual", at_769__DATA);
 
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_visual", __vt__13mgCVisualPrim__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_visual", __vt__15mgCVisualFixMDT__DATA);
