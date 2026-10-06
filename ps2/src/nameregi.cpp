@@ -1518,11 +1518,9 @@ void CNameRegiMenu::DrawBaseBoard() {
         }
     }
 }
-#ifdef NONMATCHING
 void CNameRegiMenu::DrawActiveFont() {
     struct KanjiMark { int x; int y; };
     KanjiMark marks[20];
-    FontTables *tables;
     char glyphs[20][3];
     char line[0x40];
     int mark_num;
@@ -1530,6 +1528,7 @@ void CNameRegiMenu::DrawActiveFont() {
     int font_mode;
     CFont *font;
     mgRect<int> mark_rect;
+    FontTables *tables;
     y = 0x104;
     font_mode = GetActiveFontMode();
     if (NameregiGaiji != NULL) {
@@ -1566,13 +1565,11 @@ void CNameRegiMenu::DrawActiveFont() {
             break;
         case NAMEREGI_FONT_MODE_KANJI: {
             mark_num = 0;
-            line[0x26] = 0;
             int cell = select.row * 0x13;
+            line[0x26] = 0;
             int column = 0;
             line[0x27] = 0;
             if (cell < 0x672) {
-                int mark_offset = 0;
-                int glyph_offset = 0;
                 do {
                     char *glyph = &line[column];
                     int kind = GetNameRegistFontKanjiList(cell, glyph);
@@ -1621,16 +1618,17 @@ void CNameRegiMenu::DrawActiveFont() {
             }
             if (NameregiGaiji != NULL) {
                 MenuReloadTexture(OldReloadTexNumber, NameregiGaiji->block);
-                mark = 0;
+                int i = 0;
+                int glyph_x;
                 if (0 < mark_num) {
                     do {
-                        int glyph_y = marks[mark].y + 3;
-                        int glyph_x = marks[mark].x + 6;
-                        font->SetStr(glyphs[mark]);
+                        int glyph_y = marks[i].y + 3;
+                        glyph_x = marks[i].x + 6;
+                        font->SetStr(glyphs[i]);
                         font->SetPos(glyph_x, glyph_y);
                         font->DrawDirect(font->str, font->pos_x, font->pos_y);
-                        mark++;
-                    } while (mark < mark_num);
+                        i++;
+                    } while (i < mark_num);
                 }
             }
             break;
@@ -1645,9 +1643,6 @@ void CNameRegiMenu::DrawActiveFont() {
             break;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/nameregi", DrawActiveFont__13CNameRegiMenuFv);
-#endif
 #pragma divbyzerocheck on
 void CNameRegiMenu::StepMarkCursor() {
     float target_x = 0.0f;
