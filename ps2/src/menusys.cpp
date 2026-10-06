@@ -9746,12 +9746,13 @@ void CItemSelect::Draw(void) {
     mgRect<int> cell_rect;
     cell_rect.Set(0x111, 0, 0x2C, 0x37);
     int line;
+    int column;
     int drawn = 0;
     for (line = 0; line < 50; line++) {
         float y = item_rect.top + 55.0f * line;
         if (!(y <= 90.0f)) {
             float x = item_rect.left;
-            for (int column = 0; column < 5; column++) {
+            for (column = 0; column < 5; column++) {
                 PrimQuad(prim, x, y, cell_rect);
                 x += 44.0f;
             }
@@ -9771,9 +9772,9 @@ void CItemSelect::Draw(void) {
     mgRect<int> number_rect;
     number_rect.Set(0, 0xF4, 0xA, 0xD);
     int index = 0;
-    for (int line = 0; line < item_num && item_list[line] != NULL; line++) {
+    for (line = 0; line < item_num && item_list[line] != NULL; line++) {
         icon_rect.left = 4.0f + item_rect.left;
-        for (int column = 0; column < 5; column++, index++) {
+        for (column = 0; column < 5; column++, index++) {
             if (icon_rect.top <= 0.0f) {
                 continue;
             }
@@ -9781,8 +9782,10 @@ void CItemSelect::Draw(void) {
                 break;
             }
             DrawOneItem(prim, icon_rect, item_list[index]->item_no, 0, NULL, color.rgba, 0);
-            int num = item_list[index]->GetNum();
-            s16 item_no = item_list[index]->item_no;
+            int num;
+            s16 item_no;
+            num = item_list[index]->GetNum();
+            item_no = item_list[index]->item_no;
             if (item_no == 0x137) {
                 num = GetUserDataMan()->yarikomi_medal;
             }
@@ -9833,11 +9836,10 @@ void CItemSelect::Draw(void) {
     float bar_x = 250.0f + list->left;
     prim->Bilinear(1);
     prim->Begin(6);
-    int x;
-    PrimQuad(prim, mgRect<int>(x = (int)bar_x, (int)scroll_y, 6, 4), mgRect<int>(0x13E, 0, 6, 4));
+    PrimQuad(prim, mgRect<int>((int)bar_x, (int)scroll_y, 6, 4), mgRect<int>(0x13E, 0, 6, 4));
     float body_y;
-    PrimQuad(prim, mgRect<int>(x, (int)(body_y = 4.0f + scroll_y), 6, (int)(bar_h - 8.0f)), mgRect<int>(0x13E, 4, 6, 0x12));
-    PrimQuad(prim, mgRect<int>(x, (int)(body_y + bar_h - 8.0f), 6, 4), mgRect<int>(0x13E, 0x18, 6, 4));
+    PrimQuad(prim, mgRect<int>((int)bar_x, (int)(body_y = 4.0f + scroll_y), 6, (int)(bar_h - 8.0f)), mgRect<int>(0x13E, 4, 6, 0x12));
+    PrimQuad(prim, mgRect<int>((int)bar_x, (int)(body_y + bar_h - 8.0f), 6, 4), mgRect<int>(0x13E, 0x18, 6, 4));
     prim->End();
     mgRect<float> cursor_rect;
     cursor_rect.Set(item_rect.left, 40.0f + list->top, item_rect.right, item_rect.bottom);
