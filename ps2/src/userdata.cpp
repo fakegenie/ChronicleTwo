@@ -3420,9 +3420,9 @@ int CUserDataManager::GetOverItem(int item_no, int count) {
 int CUserDataManager::CheckItemLimmitOver() {
     u16 item_count[0x200];
     u16 item_count2[0x200];
-    int bag_size;
     int i;
     CGameDataUsed *inventory;
+    int bag_size;
 
     memset(item_count, 0, sizeof(item_count));
     memset(item_count2, 0, sizeof(item_count2));
@@ -3430,14 +3430,12 @@ int CUserDataManager::CheckItemLimmitOver() {
     bag_size = GetNowBagMax(1);
     for (i = 0; i < bag_size; i++) {
         int owned_no;
-        CGameDataUsed *used;
-        used = &inventory[i];
-        owned_no = used->item_no;
+        owned_no = inventory[i].item_no;
         if (0 < owned_no) {
-            item_count[owned_no] += used->GetNum();
-            if (0 < used->GetGiftBoxItemNum()) {
+            item_count[owned_no] += inventory[i].GetNum();
+            if (0 < inventory[i].GetGiftBoxItemNum()) {
                 for (int k = 0; k < 3; k++) {
-                    int gift = used->GetGiftBoxItemNo(k);
+                    int gift = inventory[i].GetGiftBoxItemNo(k);
                     if (gift > 0) {
                         item_count[gift]++;
                     }
