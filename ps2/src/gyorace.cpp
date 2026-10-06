@@ -294,7 +294,7 @@ int sgInitGyoRace(SubGameInfo *info) {
         char *name = entry->fish[0].name;
         strcpy(name, (*item)->data.fish.name);
         CGameDataUsed *fish_item = *item;
-        entry->fish[0].bonus_type = fish_item->data.fish.unk_16;
+        entry->fish[0].bonus_type = fish_item->data.fish.kind;
         entry->fish[0].power = fish_item->data.fish.param[4];
         BREEDFISH_USED *data = &fish_item->data.fish;
         if (OmakeFlag == 0 && racer == 0) {
@@ -312,7 +312,7 @@ int sgInitGyoRace(SubGameInfo *info) {
         entry->fish[0].speed[0] = fish_item->data.fish.param[0];
         entry->fish[0].speed[1] = fish_item->data.fish.param[1];
         entry->fish[0].speed[2] = fish_item->data.fish.param[2];
-        entry->fish[0].affinity = fish_item->data.fish.unk_3a;
+        entry->fish[0].affinity = fish_item->data.fish.color;
         entry->fish[0].fish_no = fish_item->item_no;
         entry->fish[0].lane = lane;
         ((GYORACE_FISH_INF *)((unsigned char *)fish_inf + info_offset))->lane = lane;

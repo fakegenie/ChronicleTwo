@@ -112,7 +112,7 @@ struct ROBOPART_USED {
 struct BREEDFISH_USED {
     char  name[0x15];
     u8    sex;
-    u8    unk_16;
+    u8    kind;
     u8    unk_17;
     u16   size;
     u16   weight;
@@ -123,9 +123,9 @@ struct BREEDFISH_USED {
     u16   timer;
     u8    unk_32[3];
     s8    unk_35;
-    u16   unk_36;
+    u16   life;
     u16   flags;
-    u8    unk_3a;
+    u8    color;
     s8    grow_count;
     u8    unk_3c;
     u8    unk_3d;
