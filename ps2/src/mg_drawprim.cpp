@@ -222,31 +222,25 @@ void mgCDrawPrim::End2() {
     }
 }
 
-#ifdef NONMATCHING
 void mgCDrawPrim::Data0(float *data) {
-    int converted[4];
-    for (int i = 0; i < 4; i++) {
-        converted[i] = (int)data[i];
-    }
-    *(u_long128 *)command_write = *(u_long128 *)converted;
+    u_long *packet = command_write;
     command_write += 2;
+    asm {
+        lqc2 vf1, 0(data)
+        vftoi0.xyzw vf1, vf1
+        sqc2 vf1, 0(packet)
+    }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_drawprim", Data0__11mgCDrawPrimFPf);
-#endif
 
-#ifdef NONMATCHING
 void mgCDrawPrim::Data4(float *data) {
-    int converted[4];
-    for (int i = 0; i < 4; i++) {
-        converted[i] = (int)(data[i] * 16.0f);
-    }
-    *(u_long128 *)command_write = *(u_long128 *)converted;
+    u_long *packet = command_write;
     command_write += 2;
+    asm {
+        lqc2 vf1, 0(data)
+        vftoi4.xyzw vf1, vf1
+        sqc2 vf1, 0(packet)
+    }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_drawprim", Data4__11mgCDrawPrimFPf);
-#endif
 
 void mgCDrawPrim::Data(int *data) {
     u_long128 quad = *(u_long128 *)data;
@@ -276,13 +270,17 @@ void mgCDrawPrim::Vertex(float x, float y, float z) {
 }
 
 #pragma global_optimizer off
-#ifdef NONMATCHING
 void mgCDrawPrim::Vertex(float *pos) {
-    Vertex4((int)(pos[0] * 16.0f), (int)(pos[1] * 16.0f), (int)pos[2]);
+    int converted[4];
+    int *out = converted;
+    asm {
+        lqc2 vf10, 0(pos)
+        vftoi4.xy vf10, vf10
+        vftoi0.z vf10, vf10
+        sqc2 vf10, 0(out)
+    }
+    Vertex4(converted[0], converted[1], converted[2]);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_drawprim", Vertex__11mgCDrawPrimFPf);
-#endif
 #pragma global_optimizer reset
 
 void mgCDrawPrim::Vertex4(int x, int y, int z) {
@@ -308,13 +306,16 @@ void mgCDrawPrim::Color(int r, int g, int b, int a) {
 }
 
 #pragma global_optimizer off
-#ifdef NONMATCHING
 void mgCDrawPrim::Color(float *color) {
-    Color((int)color[0], (int)color[1], (int)color[2], (int)color[3]);
+    int converted[4];
+    int *out = converted;
+    asm {
+        lqc2 vf10, 0(color)
+        vftoi0.xyzw vf10, vf10
+        sqc2 vf10, 0(out)
+    }
+    Color(converted[0], converted[1], converted[2], converted[3]);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_drawprim", Color__11mgCDrawPrimFPf);
-#endif
 #pragma global_optimizer reset
 
 void mgCDrawPrim::TextureCrd4(int u, int v) {
