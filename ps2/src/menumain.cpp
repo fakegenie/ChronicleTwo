@@ -677,7 +677,7 @@ int MenuMainExit(void) {
         activeChara = MenuArg.result[0];
         SetMenuEtcFlag(1);
     }
-    (*(CUserDataManager **)((u8 *)MenuCommonInfo + 0xA0))->SetActiveChrNo(activeChara);
+    MenuCommonInfo->user_data->SetActiveChrNo(activeChara);
     if (MenuMainScene != NULL) {
         chara = (CCharacter2 *)MenuMainScene->GetCharacter(0);
         if (chara != NULL) {
