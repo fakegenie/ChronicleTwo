@@ -1440,7 +1440,6 @@ int MenuOptionKey() {
 void MenuOptionDraw() {
     MenuPosData->FormDraw();
 }
-#ifdef STATEMATCHING
 void LocalFunc_AdjustScrlBar(MENUFORMPARTS_TYPE **parts, int *pos, int *size, int top,
                              float line_num, float show_num, int jump) {
     if (parts[0] != NULL && parts[1] != NULL && parts[2] != NULL) {
@@ -1458,9 +1457,6 @@ void LocalFunc_AdjustScrlBar(MENUFORMPARTS_TYPE **parts, int *pos, int *size, in
         parts[2]->y = parts[1]->y + parts[1]->h;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuop", LocalFunc_AdjustScrlBar__FPP18MENUFORMPARTS_TYPEPiPiiffi);
-#endif
 void CSaveMenuClass::SetDlInfoMsg(int load, int show) {
     int message_no = 0xC08;
     if (load == 1) {
