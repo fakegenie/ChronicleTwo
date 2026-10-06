@@ -858,20 +858,20 @@ void CMapParts::Copy(CMapParts &dest, mgCMemory *memory) {
                 if ((new_node = (PartsPieceNode *)operator new(0xD0, (u_long128 *)memory->Alloc(15))) != NULL) {
                     new_node->vptr = __vt__17CList_9CMapPiece_;
                     new_node->piece_vptr = __vt__9mgCObject;
-                    ((CMapPiece *)((u_char *)new_node + 0x10))->Initialize();
+                    ((CList<CMapPiece> *)new_node)->data.Initialize();
                     new_node->piece_vptr = __vt__7CObject;
-                    ((CMapPiece *)((u_char *)new_node + 0x10))->Initialize();
+                    ((CList<CMapPiece> *)new_node)->data.Initialize();
                     new_node->piece_vptr = __vt__12CObjectFrame;
-                    ((CMapPiece *)((u_char *)new_node + 0x10))->Initialize();
+                    ((CList<CMapPiece> *)new_node)->data.Initialize();
                     new_node->piece_vptr = __vt__9CMapPiece;
-                    ((CMapPiece *)((u_char *)new_node + 0x10))->Initialize();
+                    ((CList<CMapPiece> *)new_node)->data.Initialize();
                     ((CList<CMapPiece> *)new_node)->Initialize();
                 }
                 if (new_node == NULL) {
                     return;
                 }
                 CMapPiece *source_piece = node->pGetData();
-                CMapPiece *dest_piece = (CMapPiece *)((u_char *)new_node + 0x10);
+                CMapPiece *dest_piece = ((CList<CMapPiece> *)new_node)->pGetData();
                 source_piece->Copy(*dest_piece, memory);
                 if (new_list != NULL) {
                     last = new_list;
