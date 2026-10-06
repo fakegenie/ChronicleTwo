@@ -501,7 +501,6 @@ void CCharacter2::SetNowFrameWeight(float weight) {
     }
 }
 
-#ifdef NONMATCHING
 void CCharacter2::SetMotionPara(char *name, int flags, int keep_seq) {
     CHRINFO_KEY_SET    *key;
     CHRINFO_SEQ_HEADER *sequence;
@@ -520,16 +519,16 @@ void CCharacter2::SetMotionPara(char *name, int flags, int keep_seq) {
         }
     } else {
         sequence = GetSeqHeaderPtr(name, &set);
-        if (sequence != NULL) {
+        switch ((int)sequence) {
+        case 0:
+            break;
+        default:
             next_seq = sequence;
             seq_mode = 1;
             seq_flags = flags;
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/character", SetMotionPara__11CCharacter2FPcii);
-#endif
 
 void CCharacter2::SetDAnimeEnable(int enable) {
     if (enable != 0) {
