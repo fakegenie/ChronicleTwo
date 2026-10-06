@@ -1255,8 +1255,6 @@ int CActionChara::HumanMoveIF() {
     sceVu0FVECTOR position;
     sceVu0FVECTOR rotation;
     sceVu0FVECTOR move_velocity;
-    sceVu0FVECTOR stick_vector = { 0.0f, 0.0f, 0.0f, 1.0f };
-    sceVu0FVECTOR target_position;
     CActionChara *target;
     float         camera_angle;
     float         stick_x;
@@ -1275,7 +1273,6 @@ int CActionChara::HumanMoveIF() {
     float         abs_x;
     float         abs_z;
     s8            boss;
-
     GetPosition(position);
     GetRotation(rotation);
     sceVu0CopyVector(move_velocity, velocity);
@@ -1289,8 +1286,8 @@ int CActionChara::HumanMoveIF() {
         move_x *= 0.5f;
         move_z *= 0.5f;
     }
-    stick_vector[0] = move_x;
-    stick_vector[2] = move_z;
+    sceVu0FVECTOR stick_vector = {move_x, 0.0f, move_z, 1.0f};
+    sceVu0FVECTOR target_position;
     move_speed = 3.0f;
     if (lock_on != 0) {
         move_speed = 1.8f;
