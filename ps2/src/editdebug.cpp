@@ -63,11 +63,23 @@ static int PrintCursor(char *text, int row) {
     }
     return sprintf(text, "  ");
 }
-#ifdef NONMATCHING
 int EditDebugLoop(CScene *scene, EditDebugInfo *info) {
-    if (!EditDebugFlag || !DebugFlag) return 0;
-    CCharacter2 *character = scene->GetCharacter(scene->player_chara);
-    CMapFlagData *map_flags = GetSaveData()->GetMapFlag(scene->GetMainMapNo());
+    char text[4096];
+    int edit_data_no;
+    char *end;
+    CCharacter2 *character;
+    CMapFlagData *map_flags;
+    int row;
+    int *value;
+    int closed;
+
+    if (!EditDebugFlag || !DebugFlag) {
+        return 0;
+    }
+    edit_data_no = info->edit_data_no;
+    end = text;
+    character = scene->GetCharacter(scene->player_chara);
+    map_flags = GetSaveData()->GetMapFlag(scene->GetMainMapNo());
     mgCDrawPrim background;
     background.Initialize(NULL, NULL);
     background.AlphaBlendEnable(1);
@@ -79,10 +91,9 @@ int EditDebugLoop(CScene *scene, EditDebugInfo *info) {
     background.Vertex(250, 200, 0);
     background.End();
 
-    char text[4096];
-    char *end = text;
     if (character) {
-        float position[4], rotation[4];
+        float position[4];
+        float rotation[4];
         character->GetPosition(position);
         character->GetRotation(rotation);
         end += sprintf(end, "%7.1f %7.1f %7.1f R%4.2f\n", position[0], position[1], position[2], rotation[1]);
@@ -91,59 +102,117 @@ int EditDebugLoop(CScene *scene, EditDebugInfo *info) {
             int length = sprintf(coordinates, "%.1f,%.1f,%.1f,%.2f;", position[0], position[1], position[2], rotation[1]);
             WriteFile("host0:pos.txt", coordinates, length);
         }
-    } else end += sprintf(end, "\n");
+    } else {
+        end += sprintf(end, "\n");
+    }
 
-    const char *state[2] = {"X", "O"};
-    for (int row = 0; row < SelMax[SelTAG]; ++row) {
+    for (row = 0; row < SelMax[SelTAG]; row++) {
         end += PrintCursor(end, row);
         end += sprintf(end, "%s ", SelText[SelTAG][row]);
-        if (SelTAG == EDIT_DEBUG_PAGE_EDIT_DATA && row == EDIT_DEBUG_EDIT_DATA_CONDITION) {
-            if (info->edit_data) {
-                char condition_text[128];
-                int flag = info->edit_data->dbgGetContintionFlag(info->edit_data_no, condition, condition_text);
-                end += sprintf(end, "%d[%s]%s\n", condition, state[flag != 0], condition_text);
-            } else end += sprintf(end, "nothing\n");
-        } else if (SelTAG == EDIT_DEBUG_PAGE_EDIT_DATA && row == EDIT_DEBUG_EDIT_DATA_MAP_FLAG) {
-            if (map_flags) end += sprintf(end, "(%d)%d = %s\n", scene->GetMainMapNo(), map_flag_no,
-                                          state[map_flags->GetFlag(map_flag_no) != 0]);
-            else end += sprintf(end, "nothing\n");
+        if (SelTAG == EDIT_DEBUG_PAGE_EDIT_DATA &&
+            (row == EDIT_DEBUG_EDIT_DATA_CONDITION || row == EDIT_DEBUG_EDIT_DATA_MAP_FLAG)) {
+            if (row == EDIT_DEBUG_EDIT_DATA_CONDITION) {
+                if (info->edit_data) {
+                    const char *state[2] = {"X", "O"};
+                    char condition_text[128];
+                    int flag = info->edit_data->dbgGetContintionFlag(edit_data_no, condition, condition_text);
+                    end += sprintf(end, "%d[%s]%s\n", condition, state[flag], condition_text);
+                } else {
+                    end += sprintf(end, "nothing\n");
+                }
+            }
+            if (row == EDIT_DEBUG_EDIT_DATA_MAP_FLAG) {
+                const char *state[2] = {"X", "O"};
+                if (!map_flags) {
+                    end += sprintf(end, "nothing\n");
+                } else {
+                    end += sprintf(end, "(%d)%d = %s\n", scene->GetMainMapNo(), map_flag_no,
+                                   state[map_flags->GetFlag(map_flag_no)]);
+                }
+            }
         } else if (SelData[SelTAG][row]) {
             end += sprintf(end, "%d\n", *SelData[SelTAG][row]);
-        } else end += sprintf(end, "\n");
+        } else {
+            end += sprintf(end, "\n");
+        }
     }
     end += sprintf(end, "\n");
-    if (SelHelp[SelTAG][Select]) sprintf(end, "%s\n", SelHelp[SelTAG][Select]);
+    if (SelHelp[SelTAG][Select]) {
+        sprintf(end, "%s\n", SelHelp[SelTAG][Select]);
+    }
 
-    int *value = SelData[SelTAG][Select];
+    value = SelData[SelTAG][Select];
     if (value) {
-        if (GamePad__2.Down(PAD_LEFT)) --*value;
-        if (GamePad__2.Down(PAD_RIGHT)) ++*value;
-        int step = GamePad__2.On(PAD_L2) && GamePad__2.On(PAD_R2) ? 10000 : 10;
-        if (GamePad__2.Down(PAD_L1)) *value -= step;
-        if (GamePad__2.Down(PAD_R1)) *value += step;
-        if (GamePad__2.Down(PAD_L2)) *value -= 100;
-        if (GamePad__2.Down(PAD_R2)) *value += 100;
-        if (*value < 0) *value = 0;
-        if (*value > 99999) *value = 99999;
+        if (GamePad__2.Down(PAD_LEFT)) {
+            --*value;
+        }
+        if (GamePad__2.Down(PAD_RIGHT)) {
+            ++*value;
+        }
+        if (GamePad__2.On(PAD_L2) && GamePad__2.On(PAD_R2)) {
+            if (GamePad__2.Down(PAD_L1)) {
+                *value -= 10000;
+            }
+            if (GamePad__2.Down(PAD_R1)) {
+                *value += 10000;
+            }
+        } else {
+            if (GamePad__2.Down(PAD_L1)) {
+                *value -= 10;
+            }
+            if (GamePad__2.Down(PAD_R1)) {
+                *value += 10;
+            }
+        }
+        if (GamePad__2.Down(PAD_L2)) {
+            *value -= 100;
+        }
+        if (GamePad__2.Down(PAD_R2)) {
+            *value += 100;
+        }
+        if (*value < 0) {
+            *value = 0;
+        }
+        if (*value >= 99999) {
+            *value = 99999;
+        }
     }
     if (GamePad__2.Down(PAD_SELECT)) {
         ++SelTAG;
-        if (SelTAG >= EDIT_DEBUG_PAGE_COUNT) SelTAG = EDIT_DEBUG_PAGE_GENERAL;
+        if (SelTAG >= EDIT_DEBUG_PAGE_COUNT) {
+            SelTAG = EDIT_DEBUG_PAGE_GENERAL;
+        }
     }
-    if (GamePad__2.Down(PAD_DOWN)) ++Select;
-    if (GamePad__2.Down(PAD_UP)) --Select;
-    if (Select < 0) Select = SelMax[SelTAG] - 1;
-    if (Select >= SelMax[SelTAG]) Select = 0;
+    if (GamePad__2.Down(PAD_DOWN)) {
+        ++Select;
+    }
+    if (GamePad__2.Down(PAD_UP)) {
+        --Select;
+    }
+    if (Select < 0) {
+        Select = SelMax[SelTAG] - 1;
+    }
+    if (Select >= SelMax[SelTAG]) {
+        Select = 0;
+    }
     DebugInfo.debug_camera = DebugInfo.debug_camera != 0;
     DebugInfo.georama_debug = DebugInfo.georama_debug != 0;
     DebugInfo.param_off = DebugInfo.param_off != 0;
-    if (DebugInfo.chara_move < 0) DebugInfo.chara_move = 0;
-    if (DebugInfo.chara_move > 2) DebugInfo.chara_move = 2;
-    if (DebugInfo.invent_debug < 0) DebugInfo.invent_debug = 0;
-    if (DebugInfo.invent_debug > 1) DebugInfo.invent_debug = 1;
+    if (DebugInfo.chara_move < 0) {
+        DebugInfo.chara_move = 0;
+    }
+    if (DebugInfo.chara_move > 2) {
+        DebugInfo.chara_move = 2;
+    }
+    if (DebugInfo.invent_debug < 0) {
+        DebugInfo.invent_debug = 0;
+    }
+    if (DebugInfo.invent_debug > 1) {
+        DebugInfo.invent_debug = 1;
+    }
     GetDebugFont()->DrawDirect(text, 10, 10);
 
-    int closed = 0;
+    closed = 0;
     if (GamePad__2.Down(PAD_CIRCLE)) {
         if (SelTAG == EDIT_DEBUG_PAGE_GENERAL && Select == EDIT_DEBUG_GENERAL_SUB_GAME) {
             sgInitSubGame(sg_type, info);
@@ -151,53 +220,73 @@ int EditDebugLoop(CScene *scene, EditDebugInfo *info) {
             closed = 1;
         }
         if (SelTAG == EDIT_DEBUG_PAGE_EDIT_DATA) {
+            int map_no = scene->now_map_no;
+            GetSaveData();
+            CEditData *edit_data = info->edit_data;
             CEditMap *map = (CEditMap *)scene->GetMap(scene->active_map);
-            if (info->edit_data && map) {
-                char path[128];
+            if (edit_data && map) {
+                char path[64];
                 switch (Select) {
-                case EDIT_DEBUG_EDIT_DATA_ALL_CLEAR: map->ClearAllParts(); break;
+                case EDIT_DEBUG_EDIT_DATA_ALL_CLEAR:
+                    map->ClearAllParts();
+                    break;
                 case EDIT_DEBUG_EDIT_DATA_SAVE_FILE:
                     EditDataSave();
-                    sprintf(path, "host0:geo_data/geo%d-%d.edt", scene->now_map_no, save_no);
-                    WriteFile(path, info->edit_data, 0x5510);
+                    sprintf(path, "host0:geo_data/geo%d-%d.edt", map_no, save_no);
+                    WriteFile(path, edit_data, 0x5510);
                     break;
                 case EDIT_DEBUG_EDIT_DATA_LOAD_FILE:
-                    sprintf(path, "host0:geo_data/geo%d-%d.edt", scene->now_map_no, load_no);
-                    if (LoadFile2(path, info->edit_data, NULL, 0)) EditDataLoad();
+                    sprintf(path, "host0:geo_data/geo%d-%d.edt", map_no, load_no);
+                    if (LoadFile2(path, edit_data, NULL, 0)) {
+                        EditDataLoad();
+                    }
                     break;
                 case EDIT_DEBUG_EDIT_DATA_CONDITION:
-                    info->edit_data->dbgSetContintionFlag(info->edit_data_no, condition,
-                        !info->edit_data->dbgGetContintionFlag(info->edit_data_no, condition, NULL));
+                    info->edit_data->dbgSetContintionFlag(
+                        edit_data_no, condition, !info->edit_data->dbgGetContintionFlag(edit_data_no, condition, NULL));
                     break;
                 case EDIT_DEBUG_EDIT_DATA_MAP_FLAG:
-                    if (map_flags) map_flags->SetFlag(map_flag_no, !map_flags->GetFlag(map_flag_no));
+                    if (map_flags) {
+                        map_flags->SetFlag(map_flag_no, !map_flags->GetFlag(map_flag_no));
+                    }
                     break;
                 }
             }
         }
         if (SelTAG == EDIT_DEBUG_PAGE_MAP) {
-            if (Select == EDIT_DEBUG_MAP_MAP_JUMP) { info->jump_map_no = map_jump; closed = 1; }
-            if (Select == EDIT_DEBUG_MAP_LOAD_GYORACE) LoadGyorace();
+            switch (Select) {
+            case EDIT_DEBUG_MAP_MAP_JUMP:
+                closed = 1;
+                info->jump_map_no = map_jump;
+                break;
+            case EDIT_DEBUG_MAP_LOAD_GYORACE:
+                LoadGyorace();
+                break;
+            }
         }
     }
     if (GamePad__2.Down(PAD_TRIANGLE) && SelTAG == EDIT_DEBUG_PAGE_EDIT_DATA &&
-        Select == EDIT_DEBUG_EDIT_DATA_CONDITION && info->edit_data) {
-        int new_flag = !info->edit_data->dbgGetContintionFlag(info->edit_data_no, 0, NULL);
-        for (int i = 0; i < 64; ++i) info->edit_data->dbgSetContintionFlag(info->edit_data_no, i, new_flag);
+        Select == EDIT_DEBUG_EDIT_DATA_CONDITION) {
+        int flag = info->edit_data->dbgGetContintionFlag(edit_data_no, 0, NULL);
+        for (int i = 0; i < 64; i++) {
+            info->edit_data->dbgSetContintionFlag(edit_data_no, i, !flag);
+        }
     }
     if (SelTAG == EDIT_DEBUG_PAGE_GENERAL && Select == EDIT_DEBUG_GENERAL_RUN_EVENT) {
-        if (GamePad__2.Down(PAD_CIRCLE)) { scene->RunEvent(EventNo, NULL); closed = 1; }
-        if (GamePad__2.Down(PAD_TRIANGLE)) ReloadMapScript();
+        if (GamePad__2.Down(PAD_CIRCLE)) {
+            scene->RunEvent(EventNo, NULL);
+            closed = 1;
+        }
+        if (GamePad__2.Down(PAD_TRIANGLE)) {
+            ReloadMapScript();
+        }
     }
-    if (closed || GamePad__2.Down(PAD_CROSS | PAD_L3)) {
+    if (closed || GamePad__2.Down(PAD_CROSS | PAD_R3)) {
         EditDebugEnd();
         return 1;
     }
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editdebug", EditDebugLoop__FP6CSceneP13EditDebugInfo);
-#endif
 void EditDebugEnd(void) {
     EditDebugInit();
 }
