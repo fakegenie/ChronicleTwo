@@ -1934,14 +1934,15 @@ void CAquaMes::EatMessage(int id, CAquaFish *fish) {
     fish->GetPosition2D(pos);
     AquaMesDispAdjustPos(fish_mes, pos);
 }
-#ifdef NONMATCHING
+static inline CGameDataUsed *fish_data(CAquaFish *fish) {
+    return fish->data;
+}
 void CAquaMes::ChangeManMessage(CAquaFish *fish) {
-    CGameDataUsed *data = fish->data;
+    CGameDataUsed *data = fish_data(fish);
     char *name = data->GetName(0);
     int pos[2];
 
-    int has_name = name != NULL;
-    if (has_name) {
+    if (name != NULL) {
         copy_name(fish_mes, 0, name);
     }
     fish_mes->mes_no = -1;
@@ -1955,9 +1956,6 @@ void CAquaMes::ChangeManMessage(CAquaFish *fish) {
     fish->GetPosition2D(pos);
     AquaMesDispAdjustPos(fish_mes, pos);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuaqua", ChangeManMessage__8CAquaMesFP9CAquaFish);
-#endif
 void CAquaMes::DeadMessage(CAquaFish *fish) {
     char *name;
     int pos[2];
