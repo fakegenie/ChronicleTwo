@@ -199,10 +199,10 @@ void CDynamicAnime::FramePose(mgCFrame *frame, DA_FRAME_POSE *pose) {
     sceVu0FVECTOR  end;
     sceVu0FVECTOR  across;
     sceVu0FVECTOR  along;
-    float         *v0;
-    float         *v1;
-    float         *v2;
-    float         *v3;
+    float         *vertex_a;
+    float         *vertex_b;
+    float         *vertex_c;
+    float         *vertex_d;
     int            cross_axis;
     int            along_axis;
     int            across_axis;
@@ -225,15 +225,15 @@ void CDynamicAnime::FramePose(mgCFrame *frame, DA_FRAME_POSE *pose) {
         second_axis = 1;
         
     case DA_FRAME_POSE_BONE:
-        v0 = now_vertex[pose->vertex_id[0]];
-        v1 = now_vertex[pose->vertex_id[1]];
-        v2 = now_vertex[pose->vertex_id[2]];
-        v3 = now_vertex[pose->vertex_id[3]];
-        sceVu0AddVector(origin, v0, v1);
+        vertex_a = now_vertex[pose->vertex_id[0]];
+        vertex_b = now_vertex[pose->vertex_id[1]];
+        vertex_c = now_vertex[pose->vertex_id[2]];
+        vertex_d = now_vertex[pose->vertex_id[3]];
+        sceVu0AddVector(origin, vertex_a, vertex_b);
         sceVu0ScaleVector(origin, origin, 0.5f);
-        sceVu0AddVector(end, v2, v3);
+        sceVu0AddVector(end, vertex_c, vertex_d);
         sceVu0ScaleVector(end, end, 0.5f);
-        sceVu0SubVector(along, v1, v0);
+        sceVu0SubVector(along, vertex_b, vertex_a);
         sceVu0Normalize(matrix[along_axis], along);
         matrix[along_axis][3] = 0.0f;
         sceVu0SubVector(across, end, origin);
@@ -253,19 +253,19 @@ void CDynamicAnime::FramePose(mgCFrame *frame, DA_FRAME_POSE *pose) {
         frame->SetTransMatrix(matrix);
         return;
     case DA_FRAME_POSE_B_CDLR:
-        v0 = now_vertex[pose->vertex_id[0]];
-        v1 = now_vertex[pose->vertex_id[1]];
-        v2 = now_vertex[pose->vertex_id[2]];
-        v3 = now_vertex[pose->vertex_id[3]];
-        sceVu0SubVector(matrix[0], v1, v0);
+        vertex_a = now_vertex[pose->vertex_id[0]];
+        vertex_b = now_vertex[pose->vertex_id[1]];
+        vertex_c = now_vertex[pose->vertex_id[2]];
+        vertex_d = now_vertex[pose->vertex_id[3]];
+        sceVu0SubVector(matrix[0], vertex_b, vertex_a);
         matrix[0][3] = 0.0f;
         sceVu0Normalize(matrix[0], matrix[0]);
-        sceVu0SubVector(along, v2, v3);
+        sceVu0SubVector(along, vertex_c, vertex_d);
         along[3] = 0.0f;
         sceVu0Normalize(matrix[2], along);
         sceVu0OuterProduct(matrix[1], matrix[2], matrix[0]);
         matrix[1][3] = 0.0f;
-        sceVu0CopyVector(matrix[3], v0);
+        sceVu0CopyVector(matrix[3], vertex_a);
         matrix[3][3] = 1.0f;
         if (pose->local != 0 && frame->parent != NULL) {
             frame->parent->GetLWMatrix(corner_parent_matrix);

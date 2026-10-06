@@ -2015,7 +2015,7 @@ void CFishingTournament::SetRank(int rank) {
     this->rank = rank;
 }
 void CFishingTournament::SortRecord() {
-    FISH_TOURNAMENT_ENTRY temp;
+    FISH_TOURNAMENT_ENTRY swap_entry;
     int i = 0;
     do {
         FISH_TOURNAMENT_ENTRY *slot = &entry[i];
@@ -2024,10 +2024,10 @@ void CFishingTournament::SortRecord() {
             if (j < 10) {
                 do {
                     if (slot->weight < entry[j].weight) {
-                        memcpy(&temp, slot, sizeof(FISH_TOURNAMENT_ENTRY));
+                        memcpy(&swap_entry, slot, sizeof(FISH_TOURNAMENT_ENTRY));
                         memcpy(slot, &entry[j], sizeof(FISH_TOURNAMENT_ENTRY));
                         slot = &entry[j];
-                        memcpy(slot, &temp, sizeof(FISH_TOURNAMENT_ENTRY));
+                        memcpy(slot, &swap_entry, sizeof(FISH_TOURNAMENT_ENTRY));
                         i = -1;
                         break;
                     }
