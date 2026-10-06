@@ -9466,7 +9466,6 @@ int VpkFileNameFromVoiceNo(char *name, int voiceNo) {
     }
     return 0;
 }
-#ifdef NONMATCHING
 int _STREAM_OPEN(RS_STACKDATA *stack, int argc) {
     char voicePack[0x80];
     char voicePath[0x80];
@@ -9486,7 +9485,6 @@ int _STREAM_OPEN(RS_STACKDATA *stack, int argc) {
                 case RS_STR:
                     EdEventInfo.stream_from_fpl = 0;
                     CommandStreamOpen(1, GetStackString(stack));
-                    return 0;
                 default:
                     return 0;
             }
@@ -9497,9 +9495,6 @@ int _STREAM_OPEN(RS_STACKDATA *stack, int argc) {
     }
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/event_func", _STREAM_OPEN__FP12RS_STACKDATAi);
-#endif
 int CommandStreamPlay(int stream, int volume) {
     int reverb = sndGetReverbDepth(1);
     int scaled = (int)((double)volume - 256.0 * (1.5 * (double)reverb));
