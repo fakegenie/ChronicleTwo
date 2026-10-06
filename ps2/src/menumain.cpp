@@ -1110,9 +1110,12 @@ void MakeMenuTopic(void) {
     MenuTopicLength = width;
     TopicFontX = 30;
 }
-#ifdef NONMATCHING
 void DrawMenuTopic(void) {
     mgRect<int> box;
+    float x;
+    float y;
+    float w;
+    float h;
 
     if (MenuTopicType <= 0 || MenuNowMapType == 5 || MenuNowMapType == 6) {
         return;
@@ -1135,8 +1138,7 @@ void DrawMenuTopic(void) {
         if (LanguageCode == 3) {
             title_width = 0x32;
         }
-        mgRect<int> title_rect(0x66, 0, title_width, 0xC);
-        PrimQuad(prim, 22.0f, 22.0f, title_rect);
+        PrimQuad(prim, 22.0f, 22.0f, mgRect<int>(0x66, 0, title_width, 0xC));
         prim->End();
         manager->ReloadTexture(MenuArg.mes_tex_block, (sceVif1Packet *)NULL);
         SetSpriteEnv(prim, 1);
@@ -1156,42 +1158,39 @@ void DrawMenuTopic(void) {
         ResetMenuScissor();
         menu_maintopic_colortbl_shadow[0][3] = menu_maintopic_colortbl_shadow[2][3] = 64.0f * (float)MenuTopicAlpha / 128.0f;
         prim->Begin(4);
-        float h = 24.0f;
-        float w = 40.0f;
-        float x = 20.0f;
-        float y = 36.0f;
+        h = 24.0f;
+        w = 40.0f;
+        x = 20.0f;
+        y = 36.0f;
         mgRect<float> fill0(x, y, w, h);
         PrimFillRect4(prim, fill0, menu_maintopic_colortbl_shadow[0], menu_maintopic_colortbl_shadow[1], menu_maintopic_colortbl_shadow[2], menu_maintopic_colortbl_shadow[3]);
         prim->End();
         prim->Begin(4);
-        float h1 = 24.0f;
-        float w1 = 40.0f;
-        float x1 = 162.0f;
-        float y1 = 36.0f;
-        mgRect<float> fill1(x1, y1, w1, h1);
+        h = 24.0f;
+        w = 40.0f;
+        x = 162.0f;
+        y = 36.0f;
+        mgRect<float> fill1(x, y, w, h);
         PrimFillRect4(prim, fill1, menu_maintopic_colortbl_shadow[1], menu_maintopic_colortbl_shadow[0], menu_maintopic_colortbl_shadow[3], menu_maintopic_colortbl_shadow[2]);
         prim->End();
         prim->Begin(4);
-        float h2 = 24.0f;
-        float w2 = 90.0f;
-        float x2 = 20.0f;
-        float y2 = 36.0f;
-        mgRect<float> fill2(x2, y2, w2, h2);
+        h = 24.0f;
+        w = 90.0f;
+        x = 20.0f;
+        y = 36.0f;
+        mgRect<float> fill2(x, y, w, h);
         PrimFillRect4(prim, fill2, menu_maintopic_colortbl[1], menu_maintopic_colortbl[0], menu_maintopic_colortbl[3], menu_maintopic_colortbl[2]);
         prim->End();
         prim->Begin(4);
-        float h3 = 24.0f;
-        float w3 = 90.0f;
-        float x3 = 110.0f;
-        float y3 = 36.0f;
-        mgRect<float> fill3(x3, y3, w3, h3);
+        h = 24.0f;
+        w = 90.0f;
+        x = 110.0f;
+        y = 36.0f;
+        mgRect<float> fill3(x, y, w, h);
         PrimFillRect4(prim, fill3, menu_maintopic_colortbl[0], menu_maintopic_colortbl[1], menu_maintopic_colortbl[2], menu_maintopic_colortbl[3]);
         prim->End();
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menumain", DrawMenuTopic__Fv);
-#endif
 #ifdef NONMATCHING
 int MenuInternInit(mgCMemory *stack, int open_type, int capture) {
     MenuArg.end_code = 0;
