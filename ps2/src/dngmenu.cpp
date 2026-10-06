@@ -740,14 +740,12 @@ void CDngFreeMap::DrawGlid(mgRect<float> rect) {
     prim.Vertex(rect.left, top, 0.0f);
     prim.End();
 }
-#ifdef NONMATCHING
 int CheckGeoramaMateria(TRESURE_BOX_FLOOR_INFO *tresure, int floor, int *materia) {
     int cursor;
     int materia_num;
     int g;
     int group_id;
     TRESURE_BOX_GROUP *group;
-    int k;
     int pass;
 
     if (tresure == NULL) {
@@ -771,10 +769,9 @@ int CheckGeoramaMateria(TRESURE_BOX_FLOOR_INFO *tresure, int floor, int *materia
                 break;
             }
         }
-        k = 0;
         if (group != NULL) {
-            for (; k < group->item_num; k++) {
-                materia[materia_num++] = group->item[k].item_no;
+            for (g = 0; g < group->item_num; g++) {
+                materia[materia_num++] = group->item[g].item_no;
             }
         }
         cursor++;
@@ -788,9 +785,6 @@ int CheckGeoramaMateria(TRESURE_BOX_FLOOR_INFO *tresure, int floor, int *materia
     }
     return materia_num;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dngmenu", CheckGeoramaMateria__FP22TRESURE_BOX_FLOOR_INFOiPi);
-#endif
 #ifdef NONMATCHING
 static void DrawDngRoomInfo(DNGMAP_ROOM_INFO *room) {
     if (room != NULL && Floor_InfoTex != NULL) {
