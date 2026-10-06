@@ -1584,7 +1584,7 @@ int MenuInternSelectKey(void) {
     if (MenuKeySelectCheck(direction, &CMenuInterPt->select_no, NULL, 0, CMenuInterPt->select_num, CMenuInterPt->select_num, 1) != 0 &&
         CMenuInterPt->step == MENU_INTER_STEP_SELECT) {
         moved = 1;
-        MenuSePlay(0);
+        MenuSePlay(SYSTEM_SE_CURSOR);
         CMenuInterPt->help_update = moved;
     }
     int *mode_list = CMenuInterPt->mode_list;
@@ -1646,7 +1646,7 @@ int MenuInternSelectKey(void) {
     case MENU_INTER_STEP_MESSAGE:
         MenuInterMes->StepMsg();
         if (push != 0) {
-            MenuSePlay(1);
+            MenuSePlay(SYSTEM_SE_DECIDE);
             MenuInterMesDrawFlag = 0;
             CMenuInterPt->step = MENU_INTER_STEP_SELECT;
             if (MenuCommonInfo->cursor_form != NULL) {
@@ -1675,7 +1675,7 @@ int MenuInternSelectKey(void) {
         if (menu_debug_flag != 0) {
             if (GamePad__2.Down(PAD_CIRCLE) != 0) {
                 MenuActiveSaveData->day += 1;
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
             }
             if (GamePad__2.Down(PAD_CROSS) != 0) {
                 MenuActiveSaveData->SetBitFlag(0x36, 1);

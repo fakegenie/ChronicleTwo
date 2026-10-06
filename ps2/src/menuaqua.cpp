@@ -3461,7 +3461,7 @@ void CAquarium::SelectFish(int force) {
         }
     }
     if (old_fish != no) {
-        MenuSePlay(0);
+        MenuSePlay(SYSTEM_SE_CURSOR);
     }
     sel_fish = no;
 }
@@ -3604,7 +3604,7 @@ int CAquarium::Step() {
                         love_phase = 0;
                         next = 0;
                         menu->guide_mes->fukidashi_pos = 8;
-                        MenuSePlay(1);
+                        MenuSePlay(SYSTEM_SE_DECIDE);
                     }
                 }
                 break;
@@ -3614,7 +3614,7 @@ int CAquarium::Step() {
                     love_phase = 0;
                     next = 0;
                     menu->guide_mes->fukidashi_pos = 8;
-                    MenuSePlay(1);
+                    MenuSePlay(SYSTEM_SE_DECIDE);
                 }
                 break;
             case 5:
@@ -3649,7 +3649,7 @@ int CAquarium::Step() {
                     step++;
                 }
                 if (menu->AddMenuCursor(step, menu_max_tbl_3720[aqua_no]) != 0) {
-                    MenuSePlay(0);
+                    MenuSePlay(SYSTEM_SE_CURSOR);
                 }
                 if (key & 2) {
                     MenuSePlay(5);
@@ -3661,26 +3661,26 @@ int CAquarium::Step() {
                                 MenuSePlay(5);
                             } else {
                                 next = 2;
-                                MenuSePlay(1);
+                                MenuSePlay(SYSTEM_SE_DECIDE);
                             }
                             break;
                         case 1:
                             next = 0xE;
-                            MenuSePlay(1);
+                            MenuSePlay(SYSTEM_SE_DECIDE);
                             break;
                         case 2:
                             if (InitSelFish() != 0) {
                                 MenuSePlay(5);
                             } else {
                                 next = 7;
-                                MenuSePlay(1);
+                                MenuSePlay(SYSTEM_SE_DECIDE);
                             }
                             break;
                         case 3:
                             if (InitSelFish() != 0) {
                                 MenuSePlay(5);
                             } else {
-                                MenuSePlay(1);
+                                MenuSePlay(SYSTEM_SE_DECIDE);
                                 next = 3;
                             }
                             break;
@@ -3688,12 +3688,12 @@ int CAquarium::Step() {
                             if (InitSelFish() != 0) {
                                 MenuSePlay(5);
                             } else {
-                                MenuSePlay(1);
+                                MenuSePlay(SYSTEM_SE_DECIDE);
                                 next = 0xA;
                             }
                             break;
                         case 5:
-                            MenuSePlay(1);
+                            MenuSePlay(SYSTEM_SE_DECIDE);
                             next = 0xB;
                             break;
                     }
@@ -3859,7 +3859,7 @@ int CAquarium::Step() {
                 break;
             case 14:
                 if (menu->AddQuestionCursor() != 0) {
-                    MenuSePlay(0);
+                    MenuSePlay(SYSTEM_SE_CURSOR);
                 }
                 if (key & 2) {
                     MenuSePlay(0x13);
@@ -3872,7 +3872,7 @@ int CAquarium::Step() {
                     } else {
                         int size;
 
-                        MenuSePlay(1);
+                        MenuSePlay(SYSTEM_SE_DECIDE);
                         if (LoadFile2(GetItemFilePath(item_no, 0), load_buf, &size, 0) != 0) {
                             food_stack.stack_used = 0;
                             food_stack.lock = 0;
@@ -3896,7 +3896,7 @@ int CAquarium::Step() {
             case 7:
                 if (key != 0) {
                     next = 6;
-                    MenuSePlay(1);
+                    MenuSePlay(SYSTEM_SE_DECIDE);
                 }
                 break;
             case 6:
@@ -3915,7 +3915,7 @@ int CAquarium::Step() {
                         AquaMode = 7;
                         next = 0x11;
                         AquaScene->fade.FadeOut(30, 0.0f, 0.0f, 0.0f);
-                        MenuSePlay(1);
+                        MenuSePlay(SYSTEM_SE_DECIDE);
                     }
                 }
                 break;
@@ -3945,7 +3945,7 @@ int CAquarium::Step() {
                     MenuSePlay(5);
                 } else if (key & 1) {
                     next = 0x10;
-                    MenuSePlay(1);
+                    MenuSePlay(SYSTEM_SE_DECIDE);
                 }
                 break;
             }
@@ -3993,7 +3993,7 @@ int CAquarium::Step() {
                                 MenuSePlay(0x13);
                                 next = 1;
                             }
-                            MenuSePlay(1);
+                            MenuSePlay(SYSTEM_SE_DECIDE);
                         } else {
                             next = 4;
                             menu->SetInfoMsgID(0x12E);
@@ -4005,7 +4005,7 @@ int CAquarium::Step() {
             case 4:
                 if (key != 0) {
                     next = 3;
-                    MenuSePlay(1);
+                    MenuSePlay(SYSTEM_SE_DECIDE);
                 }
                 break;
             case 10:
@@ -4024,14 +4024,14 @@ int CAquarium::Step() {
                         menu->SetInfoMsgID(0x12D);
                         MenuSePlay(5);
                     } else {
-                        MenuSePlay(1);
+                        MenuSePlay(SYSTEM_SE_DECIDE);
                         next = 0xC;
                     }
                 }
                 break;
             case 12:
                 if (menu->AddQuestionCursor() != 0) {
-                    MenuSePlay(0);
+                    MenuSePlay(SYSTEM_SE_CURSOR);
                 }
                 if (AquaDeadCheck == 1 || sel_sift_fish_select < 0 || (0 <= sel_sift_fish_select && fish[sel_sift_fish_select] == NULL)) {
                     next = 0xA;
@@ -4074,7 +4074,7 @@ int CAquarium::Step() {
                             next = 1;
                         } else {
                             next = 0xA;
-                            MenuSePlay(1);
+                            MenuSePlay(SYSTEM_SE_DECIDE);
                         }
                     }
                 } else if (key & 2) {
@@ -4085,12 +4085,12 @@ int CAquarium::Step() {
             case 13:
                 if (key != 0) {
                     next = 0xC;
-                    MenuSePlay(1);
+                    MenuSePlay(SYSTEM_SE_DECIDE);
                 }
                 break;
             case 11:
                 if (menu->AddQuestionCursor() != 0) {
-                    MenuSePlay(0);
+                    MenuSePlay(SYSTEM_SE_CURSOR);
                 }
                 if (key & 2) {
                     MenuSePlay(0x13);
@@ -4101,7 +4101,7 @@ int CAquarium::Step() {
                     mes.menu_cursor = 0;
                     mes.cursor_snap = 1;
                     AquaScene->fade.FadeOut(30, 0.0f, 0.0f, 0.0f);
-                    MenuSePlay(1);
+                    MenuSePlay(SYSTEM_SE_DECIDE);
                     next = 0x11;
                 }
                 break;
@@ -4886,7 +4886,7 @@ int MenuGyoraceFishSelKey() {
             if (button & 1) {
                 CGameDataUsed *selected;
 
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
                 MenuArg.result[0] = GyoraceFishSel[GyoraceFishSelectNo];
                 fish = GetAquariumData()->GetAquariumFishTop(0);
                 MenuArg.result[1] = 0;
@@ -5615,7 +5615,7 @@ int GyoraceMenuKey() {
                 GyoraceData->data[0].fish.Init();
                 GyoraceData->data[0].fish.TransToData(debug_pass, 14);
                 GyoraceData->data[0].fish.SetName(debug_name);
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
             }
             break;
         case 2:
@@ -5641,7 +5641,7 @@ int GyoraceMenuKey() {
         case 0xA:
             if (MenuKeySelectCheck(OmakeGyoraceSelect(key), &GyoraceFishHaveListSelect.cursor,
                                    &GyoraceFishHaveListSelect.top, 0, 0x40, 9, 0) != 0) {
-                MenuSePlay(0);
+                MenuSePlay(SYSTEM_SE_CURSOR);
                 if (old_top != GyoraceFishHaveListSelect.top) {
                     GyoraceHaveFishListMakeLine = old_top < GyoraceFishHaveListSelect.top;
                     list_update = 1;
@@ -5700,7 +5700,7 @@ int GyoraceMenuKey() {
             break;
         case 0xC:
             if (button != 0) {
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
                 GyoraceFishTacMesDrawFlag = 0;
                 GyoraceNowMode = 0xA;
             }
@@ -5708,7 +5708,7 @@ int GyoraceMenuKey() {
         case 0x14:
             if (MenuKeySelectCheck(OmakeGyoraceSelect(key), &GyoraceFishHaveListSelect.cursor,
                                    &GyoraceFishHaveListSelect.top, 0, 0x40, 9, 0) != 0) {
-                MenuSePlay(0);
+                MenuSePlay(SYSTEM_SE_CURSOR);
                 if (old_top != GyoraceFishHaveListSelect.top) {
                     GyoraceHaveFishListMakeLine = old_top < GyoraceFishHaveListSelect.top;
                     list_update = 1;
@@ -5763,7 +5763,7 @@ int GyoraceMenuKey() {
             if (button != 0) {
                 GyoraceNowMode = 0x14;
                 GyoraceQuestionMsgDrawFlag = 0;
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
             }
             break;
         case 0x1E: {
@@ -5772,7 +5772,7 @@ int GyoraceMenuKey() {
             if (answer == 1) {
                 GyoraceSubGameInitData();
                 GyoracerListUpdate();
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
             }
             if (answer == 2) {
                 MenuSePlay(5);
@@ -5795,7 +5795,7 @@ int GyoraceMenuKey() {
 
             GyoracerActive = GetOmakeGyoracer2(racer_slot);
             if (old_cursor != racer_slot) {
-                MenuSePlay(0);
+                MenuSePlay(SYSTEM_SE_CURSOR);
             }
             if (button & 2) {
                 MenuSePlay(5);
@@ -5816,7 +5816,7 @@ int GyoraceMenuKey() {
                 MenuArg.result[2] = 1000;
                 GyoraceQuestionMsgDrawFlag = 0;
                 MenuMainScene->fade.FadeOut(40, 0.0f, 0.0f, 0.0f);
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
             }
             if (answer == 2) {
                 MenuSePlay(5);
@@ -5869,7 +5869,7 @@ int GyoraceMenuKey() {
                     if (GyoraceData->SearchSpaceData(NULL) == NULL || MenuLoadFishSelectData == NULL) {
                         MenuSePlay(5);
                     } else {
-                        MenuSePlay(1);
+                        MenuSePlay(SYSTEM_SE_DECIDE);
                         next = 0x41;
                     }
                 }
@@ -5918,7 +5918,7 @@ int GyoraceMenuKey() {
                 next = 0x3F;
                 MenuLoadFishSelectData->Init();
                 MenuLoadFishSelectData = NULL;
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
             }
             break;
     }

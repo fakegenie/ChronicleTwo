@@ -1990,7 +1990,7 @@ int CMenuTreeMap::Step() {
                 next = MenuDngMap->floor_manager->GetKeyNextRoom(select_glid->room.floor_id, direction, old_glid_2833);
             }
             if (next != NULL && next != select_glid && (s8)next->room.unk_44 == 1) {
-                MenuSePlay(0);
+                MenuSePlay(SYSTEM_SE_CURSOR);
                 old_glid_2833 = select_glid;
                 old_direction_2830 = -1;
                 select_glid = next;
@@ -2039,7 +2039,7 @@ int CMenuTreeMap::Step() {
                     FadeOutMenu(0x28, 0.0f);
                     mode = 12;
                     step = 0;
-                    MenuSePlay(1);
+                    MenuSePlay(SYSTEM_SE_DECIDE);
                 } else {
                     MenuSePlay(5);
                 }
@@ -2082,7 +2082,7 @@ int CMenuTreeMap::Step() {
         case 2:
             if ((push & 4) || (push & 2)) {
                 action = 131;
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
             }
             break;
         }
@@ -2212,7 +2212,7 @@ int CMenuTreeMap::Step() {
             break;
         }
         case 110: {
-            MenuSePlay(1);
+            MenuSePlay(SYSTEM_SE_DECIDE);
             if (jump_pay != 0) {
                 MenuUserDataManPtr->AddMoney(-MenuUserDataManPtr->money / 2);
             }
@@ -2298,7 +2298,7 @@ int CMenuTreeMap::Step() {
             GeoramaMateriaInfoDrawFlag = 1;
             GeoramaMateriaInfoDrawPage = 0;
             DngInfoDrawAlpha = 0;
-            MenuSePlay(1);
+            MenuSePlay(SYSTEM_SE_DECIDE);
             key_arg_no = 2;
             break;
         case 131:

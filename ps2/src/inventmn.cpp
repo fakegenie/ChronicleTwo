@@ -3006,7 +3006,7 @@ int CMenuInvent::IsMakeObject(int keys, int button) {
         if (button != 0) {
             CreateModeSwapForm(0);
             ExeScript(at_3353);
-            MenuSePlay(1);
+            MenuSePlay(SYSTEM_SE_DECIDE);
             mode = 0;
             step = 0;
             make_cursor = 1;
@@ -3849,7 +3849,7 @@ void CMenuInvent::IsAccessAlbum() {
             move++;
         }
         if (message->AddMsgCursor(move, 1, 2, 1) != 0) {
-            MenuSePlay(0);
+            MenuSePlay(SYSTEM_SE_CURSOR);
         }
         switch (button) {
         case 1:
@@ -3948,7 +3948,7 @@ void CMenuInvent::IsAccessAlbum() {
         if (button != 0) {
             back_to_photo = 1;
             unk_eb6 = 1;
-            MenuSePlay(1);
+            MenuSePlay(SYSTEM_SE_DECIDE);
         }
         break;
     case 231:
@@ -3979,7 +3979,7 @@ void CMenuInvent::IsAccessAlbum() {
         break;
     case 100:
         if (button != 0) {
-            MenuSePlay(1);
+            MenuSePlay(SYSTEM_SE_DECIDE);
             loaded = 2;
         }
         break;
@@ -3992,7 +3992,7 @@ void CMenuInvent::IsAccessAlbum() {
             move++;
         }
         if (message->AddMsgCursor(move, 2, 3, 1) != 0) {
-            MenuSePlay(0);
+            MenuSePlay(SYSTEM_SE_CURSOR);
         }
         switch (button) {
         case 1:
@@ -4078,14 +4078,14 @@ void CMenuInvent::IsAccessAlbum() {
         break;
     case 206:
         if (button != 0) {
-            MenuSePlay(1);
+            MenuSePlay(SYSTEM_SE_DECIDE);
             finish = 1;
         }
         break;
     case 220: {
         int answer = message->YesNoCursor2(0);
         if (answer == 1) {
-            MenuSePlay(1);
+            MenuSePlay(SYSTEM_SE_DECIDE);
             if (CheckRecoverPhotoNum() > 0) {
                 ExeScript(at_4362);
                 step = 240;
@@ -4181,7 +4181,7 @@ void CMenuInvent::IsAccessAlbum() {
     case 301: {
         int answer = message->YesNoCursor2(0);
         if (answer == 1) {
-            MenuSePlay(1);
+            MenuSePlay(SYSTEM_SE_DECIDE);
             if (CheckRecoverPhotoNum() > 0) {
                 ExeScript(at_4362);
                 step = 240;
@@ -5194,7 +5194,7 @@ void CMenuInvent::NextDifferentMode(int next, int arg) {
         case 9:
             break;
     }
-    MenuSePlay(0);
+    MenuSePlay(SYSTEM_SE_CURSOR);
     this->key_arg_no = next;
 }
 int MenuInventDebugKey() {
@@ -5235,7 +5235,7 @@ int MenuInventDebugKey() {
                 photo->monster_no = -1;
                 photo->unk_8 = -1;
                 memset(photo->image, 0, 0x2000);
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
             } else {
                 MenuSePlay(5);
             }
@@ -5250,7 +5250,7 @@ int MenuInventDebugKey() {
             for (int i = 0; i < 30; i++) {
                 InventUserDataPtr->LevelCheck(&InventUserDataPtr->photo[i]);
             }
-            MenuSePlay(1);
+            MenuSePlay(SYSTEM_SE_DECIDE);
             break;
         case MENU_PUSH_BUTTON_CANCEL:
             for (int i = 0; i < InventManageMan.num - 20; i++) {
@@ -5345,7 +5345,7 @@ int MenuInventPushKey(int pad, int pushed) {
                         MenuGlidKeyCheck(pad, &CMenuInventPt->photo_cursor, &CMenuInventPt->photo_top,
                                          &maxtbl_5171, &viewnum_5172, overcode.value, 30);
                     if (old_cursor != CMenuInventPt->photo_cursor) {
-                        MenuSePlay(0);
+                        MenuSePlay(SYSTEM_SE_CURSOR);
                     }
                     if (result == 2) {
                         CMenuInventPt->NextDifferentMode(nextmodetbl_5183[CMenuInventPt->key_arg_no], 0);
@@ -5393,7 +5393,7 @@ int MenuInventPushKey(int pad, int pushed) {
                     }
                 }
                 if (old_cursor != CMenuInventPt->card_cursor) {
-                    MenuSePlay(0);
+                    MenuSePlay(SYSTEM_SE_CURSOR);
                 }
                 int new_row = CMenuInventPt->card_top;
                 if (old_row != new_row) {
@@ -5427,7 +5427,7 @@ int MenuInventPushKey(int pad, int pushed) {
                                               &CMenuInventPt->album_top, &maxtbl_album_5223,
                                               &viewnum_album_5224, overcode_album_5225, 50);
                 if (old_cursor != CMenuInventPt->album_cursor) {
-                    MenuSePlay(0);
+                    MenuSePlay(SYSTEM_SE_CURSOR);
                 }
                 if (result == 2) {
                     CMenuInventPt->NextDifferentMode(4, 0);
@@ -5491,7 +5491,7 @@ int MenuInventPushKey(int pad, int pushed) {
                 if (at_start != 0) {
                     CMenuInventPt->NextDifferentMode(11, 0);
                 } else if (old_cursor != CMenuInventPt->memo_cursor) {
-                    MenuSePlay(0);
+                    MenuSePlay(SYSTEM_SE_CURSOR);
                 }
                 break;
             }
@@ -5653,7 +5653,7 @@ int MenuInventPushKey(int pad, int pushed) {
                         case 1:
                         case 4:
                             command = K_COMMAND_OPEN_MEMO;
-                            MenuSePlay(1);
+                            MenuSePlay(SYSTEM_SE_DECIDE);
                             break;
                         case 2:
                             next_mode = 2;
@@ -5674,7 +5674,7 @@ int MenuInventPushKey(int pad, int pushed) {
                 case 11:
                     if ((pushed & 1) || (pushed & 4)) {
                         command = K_COMMAND_CLOSE_MEMO;
-                        MenuSePlay(1);
+                        MenuSePlay(SYSTEM_SE_DECIDE);
                     } else if (pushed & 2) {
                         command = K_COMMAND_BACK_MODE;
                         next_mode = 8;
@@ -5723,7 +5723,7 @@ int MenuInventPushKey(int pad, int pushed) {
                     if (form != NULL) {
                         form->draw_flag = 0;
                     }
-                    MenuSePlay(1);
+                    MenuSePlay(SYSTEM_SE_DECIDE);
                 } else {
                     switch (MenuCommonInfo->EnableSwapNowPos(&swap_info)) {
                         case 0:
@@ -5737,7 +5737,7 @@ int MenuInventPushKey(int pad, int pushed) {
                             break;
                         case 4:
                             CMenuInventPt->SetAskHowMuchItemNum(&swap_info, item);
-                            MenuSePlay(1);
+                            MenuSePlay(SYSTEM_SE_DECIDE);
                             break;
                         default:
                             MenuSePlay(5);
@@ -5765,7 +5765,7 @@ int MenuInventPushKey(int pad, int pushed) {
                         AttachPictTex(CMenuInventPt->tex_block[3], CMenuInventPt->photo_tex, photo,
                                       30);
                     }
-                    MenuSePlay(1);
+                    MenuSePlay(SYSTEM_SE_DECIDE);
                 }
                 break;
             case K_COMMAND_UNUSED:
@@ -5897,7 +5897,7 @@ int MenuInventPushKey(int pad, int pushed) {
             }
             case K_COMMAND_PICK_CREATED: {
                 int item_id = InventUserDataPtr->GetCreateItemID(CMenuInventPt->card_cursor);
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
                 if (item_id <= 0) {
                     CMenuInventPt->PrepareNextMode(0);
                 } else {

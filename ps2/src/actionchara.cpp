@@ -1441,7 +1441,7 @@ int CActionChara::HumanMoveIF() {
     }
     menu_flag = 1;
     if (GamePad__2.Down(PAD_RIGHT) != 0) {
-        sndSePlay(SystemSND_ID, 0, 0);
+        sndSePlay(SystemSND_ID, SYSTEM_SE_CURSOR, 0);
         if (DngStatus.active_item == 2) {
             DngStatus.active_item = 0;
         } else {
@@ -1449,7 +1449,7 @@ int CActionChara::HumanMoveIF() {
         }
     }
     if (GamePad__2.Down(PAD_LEFT) != 0) {
-        sndSePlay(SystemSND_ID, 0, 0);
+        sndSePlay(SystemSND_ID, SYSTEM_SE_CURSOR, 0);
         if (DngStatus.active_item == 0) {
             DngStatus.active_item = 2;
         } else {

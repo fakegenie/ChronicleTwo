@@ -779,7 +779,7 @@ s32 CNameRegiMenu::KeyStep() {
             if (answer == 1) {
                 char converted_name[0x100];
                 event = 0x1FE;
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
                 if (Nameregi_Target.target == NAMEREGI_TARGET_KEYWORD) {
                     MenuArg.result[0] = 0;
                     event = 1;
@@ -816,7 +816,7 @@ s32 CNameRegiMenu::KeyStep() {
         }
         if (unk_6 == 1 && pushed != 0) {
             event = 1;
-            MenuSePlay(1);
+            MenuSePlay(SYSTEM_SE_DECIDE);
         }
         s16 message_mode = unk_6;
         if (message_mode == 2) {
@@ -828,7 +828,7 @@ s32 CNameRegiMenu::KeyStep() {
             s32 answer = message->YesNoCursor2(1);
             if (answer == 1) {
                 event = 1;
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
                 if (Nameregi_Target.target == NAMEREGI_TARGET_SPHIDA) {
                     Nameregi_Target.keyword[0] = 0;
                 }
@@ -892,7 +892,7 @@ s32 CNameRegiMenu::KeyStep() {
                 s8 target = row[direction];
                 if (0 <= target) {
                     command_pos = target;
-                    MenuSePlay(0);
+                    MenuSePlay(SYSTEM_SE_CURSOR);
                 } else if (target == -2) {
                     ConvertPositionNameRegi(0);
                     key_arg_no = 1;
@@ -900,7 +900,7 @@ s32 CNameRegiMenu::KeyStep() {
                         keys = 2;
                         CheckKanjiPosition(2, key_table, font_mode);
                     }
-                    MenuSePlay(0);
+                    MenuSePlay(SYSTEM_SE_CURSOR);
                     break;
                 }
             }
@@ -933,7 +933,7 @@ s32 CNameRegiMenu::KeyStep() {
                     selection->row = last_row;
                 }
                 if (previous_row != selection->row) {
-                    MenuSePlay(0);
+                    MenuSePlay(SYSTEM_SE_CURSOR);
                 }
             }
             previous_position = selection->pos;
@@ -951,10 +951,10 @@ s32 CNameRegiMenu::KeyStep() {
             if (result == -1) {
                 ConvertPositionNameRegi(1);
                 key_arg_no = 0;
-                MenuSePlay(0);
+                MenuSePlay(SYSTEM_SE_CURSOR);
             } else {
                 if (previous_position != selection->pos) {
-                    MenuSePlay(0);
+                    MenuSePlay(SYSTEM_SE_CURSOR);
                 }
                 if ((pushed & 1) || (pushed & 4)) {
                     event = 5;
@@ -977,13 +977,13 @@ s32 CNameRegiMenu::KeyStep() {
         } else {
             select_mode = command_pos;
             ChangeFontSelectMode(GetActiveFontMode());
-            MenuSePlay(1);
+            MenuSePlay(SYSTEM_SE_DECIDE);
         }
         break;
     case 0xA:
         key_arg_no = 1;
         select.row = 0;
-        MenuSePlay(1);
+        MenuSePlay(SYSTEM_SE_DECIDE);
         break;
     case 0xB:
         key_arg_no = 0;
@@ -1007,7 +1007,7 @@ s32 CNameRegiMenu::KeyStep() {
         if (NameRegistMax <= name_pos) {
             name_pos = NameRegistMax - 1;
         }
-        MenuSePlay(1);
+        MenuSePlay(SYSTEM_SE_DECIDE);
         break;
     }
     case 0x46:
@@ -1017,7 +1017,7 @@ s32 CNameRegiMenu::KeyStep() {
         }
         button_flash[5] = 8;
         caret_cnt = 0x28;
-        MenuSePlay(1);
+        MenuSePlay(SYSTEM_SE_DECIDE);
         break;
     case 0x47:
         name_pos += 1;
@@ -1026,7 +1026,7 @@ s32 CNameRegiMenu::KeyStep() {
         }
         button_flash[6] = 8;
         caret_cnt = 0x28;
-        MenuSePlay(1);
+        MenuSePlay(SYSTEM_SE_DECIDE);
         break;
     case 0x64: {
         MenuSePlay(5);
@@ -1065,7 +1065,7 @@ s32 CNameRegiMenu::KeyStep() {
         ((s8 *)(NameRegistMax + (s32)this))[name_offset] = 0;
         button_flash[9] = 8;
         caret_cnt = 0x28;
-        MenuSePlay(1);
+        MenuSePlay(SYSTEM_SE_DECIDE);
         break;
     }
     case 0x82:
@@ -1095,13 +1095,13 @@ s32 CNameRegiMenu::KeyStep() {
                 message->MakeMsg(0x101B);
             }
             message->SetMsgItemNo(arguments.name, 2);
-            MenuSePlay(1);
+            MenuSePlay(SYSTEM_SE_DECIDE);
         }
         break;
     case 0x83:
         message_open = 0;
         mode = NAMEREGI_MODE_INPUT;
-        MenuSePlay(1);
+        MenuSePlay(SYSTEM_SE_DECIDE);
         memset(name, 0, 0x61);
         if (Nameregi_Target.target == NAMEREGI_TARGET_KEYWORD) {
             name_pos = 0;
@@ -1205,7 +1205,7 @@ s32 CNameRegiMenu::KeyStep() {
                     Nameregi_Target.item->used_type = USED_ITEM_TYPE_FISH;
                     Nameregi_Target.item->SetName((char *)key_text);
                     Nameregi_Target.item->TransToData((char *)decoded, 0xE);
-                    MenuSePlay(1);
+                    MenuSePlay(SYSTEM_SE_DECIDE);
                     mode = NAMEREGI_MODE_MESSAGE;
                     message->MsgPreset(0xA);
                     message->SetAbsPos(5);
@@ -1239,7 +1239,7 @@ s32 CNameRegiMenu::KeyStep() {
                 NameMessageArguments arguments = at_1684__3;
                 arguments.name[0] = old_name;
                 message->SetMsgItemNo(arguments.name, 2);
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
                 break;
             }
         } else {
@@ -1262,7 +1262,7 @@ s32 CNameRegiMenu::KeyStep() {
                 arguments.name[0] = display_name;
             }
             message->SetMsgItemNo(arguments.name, 1);
-            MenuSePlay(1);
+            MenuSePlay(SYSTEM_SE_DECIDE);
         }
         break;
     }

@@ -1150,32 +1150,32 @@ int TitleModeKey() {
             }
         }
         if (old_select != TitleInfo->select) {
-            MenuSePlay(0);
+            MenuSePlay(SYSTEM_SE_CURSOR);
             TitleInfo->idle_count = 0;
         }
         if ((push & 1) || start != 0) {
             if (TitleInfo->select == TITLE_MENU_NEW_GAME) {
                 TitlePhase = TITLE_PHASE_NEW_GAME;
                 TitleScene->fade.FadeOut(0x28, 0.0f, 0.0f, 0.0f);
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
                 TitleInfo->menu_alpha = 128.0f;
                 TitleInfo->cursor_alpha = 128.0f;
             } else if (TitleInfo->select == TITLE_MENU_CONTINUE) {
                 TitlePhase = TITLE_PHASE_CONTINUE;
                 TitleScene->fade.FadeOut(0x1E, 0.0f, 0.0f, 0.0f);
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
             } else if (TitleInfo->select == TITLE_MENU_HDD_INSTALL) {
                 if (0 < HDDINFO.connect) {
                     TitlePhase = TITLE_PHASE_HDD_INSTALL;
                     TitleScene->fade.FadeOut(0x1E, 0.0f, 0.0f, 0.0f);
-                    MenuSePlay(1);
+                    MenuSePlay(SYSTEM_SE_DECIDE);
                 } else {
                     MenuSePlay(5);
                 }
             } else if (TitleInfo->select == TITLE_MENU_OPTION) {
                 TitlePhase = TITLE_PHASE_OPTION;
                 TitleScene->fade.FadeOut(0x1E, 0.0f, 0.0f, 0.0f);
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
             } else if (TitleInfo->select == TITLE_MENU_OMAKE && OmakePlayEnableAttr != 0) {
                 TitlePhase = TITLE_PHASE_OMAKE_MENU;
                 TitleInfo->omake_alpha = 128.0f;
@@ -1191,7 +1191,7 @@ int TitleModeKey() {
                     TitleInfo->omake_num++;
                     TitleInfo->omake_gyorace = 1;
                 }
-                MenuSePlay(1);
+                MenuSePlay(SYSTEM_SE_DECIDE);
             } else {
                 MenuSePlay(5);
             }
@@ -1250,11 +1250,11 @@ int TitleModeKey() {
             TitleInfo->omake_select = TitleInfo->omake_num - 1;
         }
         if (old_select != TitleInfo->omake_select) {
-            MenuSePlay(0);
+            MenuSePlay(SYSTEM_SE_CURSOR);
             TitleInfo->idle_count = 0;
         }
         if (push & 1) {
-            MenuSePlay(1);
+            MenuSePlay(SYSTEM_SE_DECIDE);
             TitlePhase = TITLE_PHASE_OMAKE;
             TitleScene->fade.FadeOut(0x1E, 0.0f, 0.0f, 0.0f);
         } else if (push & 2) {
@@ -1663,7 +1663,7 @@ int TitleMCCheckKey() {
                 int push = MenuCheckPushButton();
                 if (push & MENU_PUSH_BUTTON_DECIDE) {
                     if (LanguageCode == 0) {
-                        MenuSePlay(1);
+                        MenuSePlay(SYSTEM_SE_DECIDE);
                     }
                     return 1;
                 }
@@ -1983,7 +1983,7 @@ int TitleHDDInstallKey() {
             HDDModeSelect = 0;
         }
         if (old_select != HDDModeSelect) {
-            MenuSePlay(0);
+            MenuSePlay(SYSTEM_SE_CURSOR);
         }
         if (push & 1) {
             if (HDDModeSelect == 0) {
@@ -2001,7 +2001,7 @@ int TitleHDDInstallKey() {
                     next_phase = HDD_PHASE_ERROR;
                 }
             }
-            MenuSePlay(1);
+            MenuSePlay(SYSTEM_SE_DECIDE);
         } else if (push & 2) {
             HDDConfirmType = HDD_CONFIRM_EXIT;
             next_phase = HDD_PHASE_CONFIRM;
@@ -2014,7 +2014,7 @@ int TitleHDDInstallKey() {
         int choice = 0;
         if (answer == 1) {
             choice = 1;
-            MenuSePlay(1);
+            MenuSePlay(SYSTEM_SE_DECIDE);
         }
         if (answer == 2) {
             choice = 2;
@@ -2069,7 +2069,7 @@ int TitleHDDInstallKey() {
             if (0 < HDDINFO.connect && 0 < HDDINFO.app_install && HDDINFO.result == 0) {
                 next_phase = HDD_PHASE_EXIT;
             }
-            MenuSePlay(1);
+            MenuSePlay(SYSTEM_SE_DECIDE);
         }
         break;
     case HDD_PHASE_CANCEL_ASK: {
@@ -2090,13 +2090,13 @@ int TitleHDDInstallKey() {
         if (StepInstallThread() <= 0) {
             DeleteInstallThread();
             next_phase = HDD_PHASE_CANCELLED;
-            MenuSePlay(1);
+            MenuSePlay(SYSTEM_SE_DECIDE);
         }
         break;
     case HDD_PHASE_CANCELLED:
         if (push != 0) {
             next_phase = HDD_PHASE_IMAGE_FADE;
-            MenuSePlay(1);
+            MenuSePlay(SYSTEM_SE_DECIDE);
         }
         break;
     case HDD_PHASE_IMAGE_FADE:
@@ -2107,7 +2107,7 @@ int TitleHDDInstallKey() {
     case HDD_PHASE_ERROR:
         if (GamePad__2.Down(PAD_CIRCLE) != 0 || GamePad__2.Down(PAD_CROSS) != 0) {
             next_phase = HDD_PHASE_SELECT;
-            MenuSePlay(1);
+            MenuSePlay(SYSTEM_SE_DECIDE);
         }
         break;
     }

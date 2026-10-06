@@ -17,6 +17,11 @@ enum sndPORT {
     SND_PORT_NUM = 16,
 };
 
+enum SYSTEM_SE {
+    SYSTEM_SE_CURSOR = 0,
+    SYSTEM_SE_DECIDE = 1,
+};
+
 enum sndSE_TYPE {
     SND_SE_TYPE_NONE = 0,
     SND_SE_TYPE_KEYON = 1,
