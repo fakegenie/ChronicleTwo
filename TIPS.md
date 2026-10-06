@@ -335,3 +335,13 @@ only functions present in both objects can be replaced, the plain build keeps th
 - Retail's `x - (x / 5) * 5` (a subtract instead of a second divide) comes from a named quotient (`int part = rest / 5; ... rest - part * 5`).
 - For a jump-table function use perm's word count or an aligned diff, not the objdiff percent: `MenuMainInit` was 13 words off while objdiff reported 44.9%.
 - In perm.py templates `[[[[` (an array subscript followed by a choice) mis-parses. Put a space after the bracket.
+- Two perm.py runs on the same unit collide on `work/<unit>_N.cpp`. Give each run its own work directory. Removing `ps2/asm` during a rebuild breaks any perm run still going.
+- A choice followed directly by `]`, as in `x[ [[[a|||b]]]]`, matches wrongly: only the last option keeps the bracket, so the base and every other option fail to compile. Write `]]] ]`. A "base 1000000" result is the symptom.
+- When a function's arrays are not in declaration-order stack slots, the original declared locals at first use. Arrays are laid out in order of appearance, block-scoped ones included.
+- Two adjacent `sceVu0FVECTOR` locals that retail addresses through a saved register (`addiu sN,sp,K` then `move a0,sN`) are one `sceVu0FVECTOR v[2]`, and `&v[1]` is the address kept.
+- Hoisting all scalar declarations to the top and permuting their order fixed most register and spill-slot differences in `MagnetParts` and `SaveData`.
+- Whether loops share a counter variable or use block-scoped ones swaps counter and induction registers. If both are tried, one usually matches.
+- A temporary register mismatch on a single expression (`subu v0,v1,v0` against `subu v1,v1,v0`) can come from a small static inline function in the original. `EditHouseIndex` fixed `SaveData`.
+- A retail `if` whose test sits at the bottom, reached by a forward `b` with the body laid out before it, is `while (cond) { ...; break; }`.
+- After a noreturn call such as `exit(0)`, retail's `b` past the loop increment is a `break`.
+- A ternary instead of if/else changes which branch's first instruction fills the delay slot (`MagnetParts`).
