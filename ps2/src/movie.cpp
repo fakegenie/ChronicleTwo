@@ -437,27 +437,38 @@ int mpegTS(sceMpeg *mpeg, sceMpegCbDataTimeStamp *data, void *user) {
     data->dts = ts.dts;
     return 1;
 }
+#pragma global_optimizer off
 #ifdef NONMATCHING
 int videoCallback(sceMpeg *mpeg, sceMpegCbDataStr *str, void *user) {
     u8 *area1;
     u8 *area2;
     int size1;
+    u_int second;
     int size2;
-    u8 *src = str->data;
-    u_int total = str->len;
-    u_int first = ((u8 *)user + ((ReadBuf *)user)->size) - src;
-    if (total < first) {
-        first = total;
-    }
+    u8 *src;
+    u_int first;
+    int copied;
+    int result;
+    u8 *end;
+    u_int total;
+    u8 *uncached1;
+    u8 *uncached2;
+
+    end = (u8 *)user + ((ReadBuf *)user)->size;
+    src = str->data;
+    total = str->len;
+    first = end - src;
+    first = (first > total) ? total : first;
+    second = total - first;
     videoDecBeginPut(&videoDec, &area1, &size1, &area2, &size2);
-    int copied = cpy2area((u8 *)(((u32)area1 & MOVIE_ADDR_MASK) | MOVIE_UNCACHED_BIT), size1,
-                          (u8 *)(((u32)area2 & MOVIE_ADDR_MASK) | MOVIE_UNCACHED_BIT), size2, src, first,
-                          (u8 *)user, total - first);
+    uncached1 = (u8 *)UncAddr(area1);
+    uncached2 = (u8 *)UncAddr(area2);
+    copied = cpy2area(uncached1, size1, uncached2, size2, src, first, (u8 *)user, second);
     if (copied > 0 && videoDecPutTs(&videoDec, str->pts, str->dts, area1, copied) == 0) {
         printf(at_584__2);
     }
     videoDecEndPut(&videoDec, copied);
-    int result = 0;
+    result = 0;
     if (copied > 0) {
         result = 1;
     }
@@ -466,6 +477,7 @@ int videoCallback(sceMpeg *mpeg, sceMpegCbDataStr *str, void *user) {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/movie", videoCallback__FP7sceMpegP16sceMpegCbDataStrPv);
 #endif
+#pragma global_optimizer reset
 int pcmCallback(sceMpeg *mpeg, sceMpegCbDataStr *str, void *user) {
     u8 *area1;
     u8 *area2;
