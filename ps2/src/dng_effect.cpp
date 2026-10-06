@@ -2600,7 +2600,6 @@ void CWeaponElement::Draw_Cold(void) {
     }
     prim.End();
 }
-#ifdef STATEMATCHING
 void CWeaponElement::Init_Wind(float *center) {
     int i;
     int j;
@@ -2633,9 +2632,6 @@ void CWeaponElement::Init_Wind(float *center) {
         frame[j] = fptosi((5.0f * (float)rand()) / 2.1474836e9f) * 0x30;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dng_effect", Init_Wind__14CWeaponElementFPf);
-#endif
 void CWeaponElement::Step_Wind(void) {
     int dead;
     int i;
