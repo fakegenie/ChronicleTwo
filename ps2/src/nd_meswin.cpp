@@ -1965,7 +1965,6 @@ int ClsMes::MakeMesWinTbl_item(int ref_code, int *x, int *y) {
         }
     }
 }
-#ifdef STATEMATCHING
 int ClsMes::GetMesWidth_system(int mes_no) {
     int inserted_width;
     unsigned short *text;
@@ -2032,9 +2031,6 @@ int ClsMes::GetMesWidth_system(int mes_no) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/nd_meswin", GetMesWidth_system__6ClsMesFi);
-#endif
 short *ClsMes::GetTextLineDataTop(int line_id) {
     short *table = buff;
     int i = 0;
