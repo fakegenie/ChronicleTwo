@@ -2395,7 +2395,6 @@ void ClsMes::AddPage(int end, int page) {
         }
     }
 }
-#ifdef STATEMATCHING
 void ClsMes::NeedMesWinWH(int mes_no) {
     unsigned short *text;
     int             y;
@@ -2598,9 +2597,6 @@ void ClsMes::NeedMesWinWH(int mes_no) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/nd_meswin", NeedMesWinWH__6ClsMesFi);
-#endif
 void ClsMes::NeedMesWinWH(char *text) {
     char message[mes_buffer_size];
     char value_text[0x80];
