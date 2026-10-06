@@ -794,7 +794,7 @@ int Lamb2WolfManager(void) {
     float rotation[4];
 
     info = GetBattleCharaInfo();
-    if (info->chr_no != 1) {
+    if (info->chr_no != USER_CHARA_MONICA) {
         return -1;
     }
     form = info->equip->item_no;

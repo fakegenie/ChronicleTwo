@@ -459,7 +459,7 @@ int CActionChara::CheckEnemyCatch(char *name) {
             other->Show(0, 0);
         }
         battle_info = GetBattleCharaInfo();
-        if (battle_info->chr_no == 0) {
+        if (battle_info->chr_no == USER_CHARA_MAX) {
             other = SearchChara(at_1358);
             if (other != NULL) {
                 other->Show(0, 0);
@@ -484,7 +484,7 @@ int CActionChara::CheckEnemyCatch(char *name) {
         if (other != NULL) {
             other->Show(0, 0);
         }
-        if ((GetBattleCharaInfo())->chr_no == 0) {
+        if ((GetBattleCharaInfo())->chr_no == USER_CHARA_MAX) {
             other = SearchChara(at_1358);
             if (other != NULL) {
                 other->Show(0, 0);

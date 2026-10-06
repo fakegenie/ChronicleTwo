@@ -1259,7 +1259,7 @@ int EditLoop() {
             if (MainScene__2->fade.NowFade() != 0 && MainScene__2->fade.cross != 0) {
                 quick_change = 0;
             }
-            next_chara = GetUserData()->active_chr_no == 0;
+            next_chara = GetUserData()->active_chr_no == USER_CHARA_MAX;
             if ((GetUserData()->CheckQuickChange(next_chara, NULL) & 0x1) == 0) {
                 quick_change = 0;
             }

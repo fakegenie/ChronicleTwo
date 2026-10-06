@@ -3676,7 +3676,7 @@ void CBattleCharaInfo::SetChrNo(int new_chara_no) {
         unk_80 = hp->max;
         prev_hp = hp->now;
         unk_88 = hp->max;
-    } else if (chr_no == 2) {
+    } else if (chr_no == USER_CHARA_ROBO) {
         chara_type = 1;
         chara_data = &manager->robo_data;
         active_item = 0;
@@ -3686,7 +3686,7 @@ void CBattleCharaInfo::SetChrNo(int new_chara_no) {
         unk_80 = hp->max;
         prev_hp = hp->now;
         unk_88 = hp->max;
-    } else if (chr_no == 3) {
+    } else if (chr_no == USER_CHARA_MONSTER) {
         chara_type = 2;
         int monster_id = GetMonsterID();
         chara_data = manager->GetMonsterBajjiDataPtrMosId(monster_id);
@@ -3948,7 +3948,7 @@ void CBattleCharaInfo::SetMagicSwordPow(int elem, int power) {
     if (elem < 0 || elem > 3) {
         return;
     }
-    if (chr_no != 1) {
+    if (chr_no != USER_CHARA_MONICA) {
         return;
     }
     int counter_max = GetMagicSwordCounterMax();
@@ -3971,7 +3971,7 @@ int CBattleCharaInfo::GetMagicSwordPow(void) {
     for (int i = 0; i < magic_sword_num; i++) {
         total += magic_sword_pow[i];
     }
-    if (chr_no == 1) {
+    if (chr_no == USER_CHARA_MONICA) {
         return total;
     }
     return 0;
@@ -4034,7 +4034,7 @@ float CBattleCharaInfo::AddAbs(int slot, float amount, int *leveled_up) {
         if (item == 0) {
             return 0.0f;
         }
-        if (chr_no == 0 && slot == 0 && item->IsFishingRod() != 0) {
+        if (chr_no == USER_CHARA_MAX && slot == 0 && item->IsFishingRod() != 0) {
             return 0.0f;
         }
         gage->AddPoint(amount);

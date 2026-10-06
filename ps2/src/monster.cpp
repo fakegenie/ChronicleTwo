@@ -325,7 +325,7 @@ float CMonsterMan::IsBattleStyleDist() {
     CActiveMonster *found;
     float nearest;
 
-    if (DngUserData->active_chr_no != 3 || mons_base == -1) {
+    if (DngUserData->active_chr_no != USER_CHARA_MONSTER || mons_base == -1) {
         found = GetPriorityLevelIndex(0, NULL);
         if (found != NULL) {
             return found->target_dist;
@@ -367,7 +367,7 @@ int CMonsterMan::CheckMonsterTolk(float *pos) {
         } while (i < MONSTER_ACTIVE_MAX);
         return found;
     }
-    if (DngUserData->active_chr_no != 3) {
+    if (DngUserData->active_chr_no != USER_CHARA_MONSTER) {
         return -1;
     }
     int mons_base = GetBattleCharaInfo()->unk_2;
@@ -1788,7 +1788,7 @@ void CMonsterMan::ThinkHost() {
         camera->GetPos(camera_pos);
     }
     int user_monster = -1;
-    if (DngUserData->active_chr_no == 3) {
+    if (DngUserData->active_chr_no == USER_CHARA_MONSTER) {
         user_monster = GetBattleCharaInfo()->unk_2;
     }
     for (int i = 0; i < MONSTER_ACTIVE_MAX; i++) {

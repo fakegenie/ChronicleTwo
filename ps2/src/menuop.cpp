@@ -472,7 +472,7 @@ void MenuManualDraw() {
                 MenuCharaSoundLoad(&StaticMenuLocalStack2, userData->active_chr_no, 0);
                 chara = (CActionChara *)GetMainScene()->GetCharacter(0);
                 MenuCharaSoundEnter(GetMainScene(), chara, 1);
-                if (userData->active_chr_no == 3) {
+                if (userData->active_chr_no == USER_CHARA_MONSTER) {
                     StaticMenuLocalStack2.stack_used = 0;
                     StaticMenuLocalStack2.lock = 0;
                     MonsterEffectRead(&StaticMenuLocalStack2, userData->monster_id, 0);
@@ -704,7 +704,7 @@ int CManualMenu::KeyStep(void) {
                             firstPage[1] = pict_num;
                             MenuDCMsg[7]->SetMsgVolumeNo(firstPage, 2);
                         } else {
-                            if (GetUserDataMan()->active_chr_no == 3) {
+                            if (GetUserDataMan()->active_chr_no == USER_CHARA_MONSTER) {
                                 DeleteMonsterEffect();
                             }
                             if (movieNo == 0x15) {

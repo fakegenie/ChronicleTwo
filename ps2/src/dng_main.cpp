@@ -640,10 +640,10 @@ void InitDungeonMain(INIT_LOOP_ARG arg) {
     if (LoadFile2(snd_path, BuffReadData, NULL, 0)) {
         int base = 3;
 
-        if (DngUserData->active_chr_no == 2) {
+        if (DngUserData->active_chr_no == USER_CHARA_ROBO) {
             base = 1;
         }
-        if (DngUserData->active_chr_no == 3) {
+        if (DngUserData->active_chr_no == USER_CHARA_MONSTER) {
             base = 0;
         }
         MainChara__2->sound_info.se_bank = sndLoadSound(7, (u32 *) BuffReadData, &BaseCharacter[base]);
@@ -1993,7 +1993,7 @@ int DngMainKey() {
         InitEyeCamera(MainChara__2);
         return 0;
     }
-    if (!DngStatus.eye_view && GamePad__2.Down(PAD_SQUARE) && !(BattleAreaScene->pause_flag & 4) && chara_info->chr_no == 0 &&
+    if (!DngStatus.eye_view && GamePad__2.Down(PAD_SQUARE) && !(BattleAreaScene->pause_flag & 4) && chara_info->chr_no == USER_CHARA_MAX &&
         MainChara__2->CheckRunEvent()) {
         int            found = 0;
         CGameDataUsed *items = GetBattleCharaInfo()->GetActiveItemInfo(0);
