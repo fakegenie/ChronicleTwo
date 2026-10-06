@@ -3629,13 +3629,17 @@ extern RECT at_4185;
 void ClsMes::DrawDigit(mgCDrawPrim *prim, int digit, int x, int y, int alpha, RGBAQ_TYPE *color) {
     RECT at = at_4185;
     mgRect<int> xy;
+    int h;
     mgRect<int> uv;
+    int w;
 
     at.x += digit % 5 * at.width;
     at.y += digit / 5 * at.height;
     color->a = alpha * 128 / 128;
-    uv.Set(at.x, at.y, at.width, at.height);
-    xy.Set(x, (int)(y + 2.0), at.width, at.height);
+    h = at.height;
+    w = at.width;
+    uv.Set(at.x, at.y, w, h);
+    xy.Set(x, (int)(y + 2.0), w, h);
     set2DSpriteEasy(prim, xy, uv, color);
 }
 #else
