@@ -373,7 +373,6 @@ FACES_ID *mgCVisualMDT::CreateFace(FACES_ID *faces, mgCMemory *memory, mgCMemory
     mgCFace      *last_face;
     mgFACE_GROUP *group;
     mgFACE_GROUP *previous;
-    int          *indices;
     int          *write;
     int           i;
 
@@ -393,11 +392,12 @@ FACES_ID *mgCVisualMDT::CreateFace(FACES_ID *faces, mgCMemory *memory, mgCMemory
     }
     face->index_num = face->vertex_num * face->index_stride;
     face->material = faces->material;
-    indices = faces->index;
+    faces = (FACES_ID *)faces->index;
     write = (int *)index_memory->Alloc(face->index_num / 4 + 1);
     face->index = write;
     for (i = 0; i < face->index_num; i++) {
-        *write++ = *indices++;
+        *write++ = *(int *)faces;
+        faces = (FACES_ID *)((int *)faces + 1);
     }
     face->next = NULL;
     previous = face_group;
@@ -440,7 +440,7 @@ FACES_ID *mgCVisualMDT::CreateFace(FACES_ID *faces, mgCMemory *memory, mgCMemory
     if (out_face != NULL) {
         *out_face = face;
     }
-    return (FACES_ID *)indices;
+    return faces;
 }
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_visual", CreateFace__12mgCVisualMDTFP8FACES_IDP9mgCMemoryP9mgCMemoryPP7mgCFace);
