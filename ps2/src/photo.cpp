@@ -144,7 +144,8 @@ int DrawTakePhoto(USER_PICTURE_INFO *picture, float *distance) {
     if (TakePhotoMode == 5) {
         mgStoreImage(WorkTex, image);
         mgRect<int> area(252, 204, 260, 212);
-        int count = mgStoreZBuffImage(area, depth) * 4;
+        int count = mgStoreZBuffImage(area, depth);
+        count *= 4;
         u_int *pixel = (u_int *)depth;
         u_int nearest = *pixel;
         int i = 0;
