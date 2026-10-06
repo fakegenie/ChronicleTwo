@@ -3322,7 +3322,7 @@ void CMenuInvent::CalcTex() {
     GradationStep();
     if (kakudai_pic_form != NULL && kakudai_pic != NULL) {
         if (mode == 12) {
-            if (ask_para.unk_70 == INVENT_ASK_ZOOM) {
+            if (ask_para.ask_mode == INVENT_ASK_ZOOM) {
                 CalcMenuAdd(&kakudai_pic->unk_2c, 0.025f, 1.3f);
             } else if (CalcMenuAdd(&kakudai_pic->unk_2c, -0.025f, 0.7f)) {
                 kakudai_pic_form->draw_flag = 0;
@@ -3377,7 +3377,7 @@ void CMenuInvent::BootExtendCommand() {
     menu_invent_command_info_move_album_Space_info = NULL;
     MenuSePlay(19);
     MENU_ASKMODE_PARA ask;
-    ask.unk_70 = 0;
+    ask.ask_mode = 0;
     ask.mes_no = 6;
     ask.form = MenuMesForm[ask.mes_no];
     int count = 0;
@@ -3386,7 +3386,7 @@ void CMenuInvent::BootExtendCommand() {
         if (menu_invent_command_info_ptr->cmd[i] == INVENT_CMD_TO_ALBUM && album_enable == 0) {
             continue;
         }
-        ask.unk_48[count] = MES_SHADE_AUTO;
+        ask.cmd_shade[count] = MES_SHADE_AUTO;
         if (menu_invent_command_info_ptr->cmd[i] == INVENT_CMD_SET_BOARD && neta_select_num >= 3) {
             enable = 0;
         } else if (menu_invent_command_info_ptr->cmd[i] == INVENT_CMD_TO_ALBUM) {
@@ -3414,7 +3414,7 @@ void CMenuInvent::BootExtendCommand() {
         }
         if (enable == 0) {
             ask.cmd_color[count] = 0x80202020;
-            ask.unk_48[count] = MES_SHADE_FAINT;
+            ask.cmd_shade[count] = MES_SHADE_FAINT;
         }
         ask.cmd_msg[count] = menu_invent_command_info_ptr->cmd[i];
         count++;
@@ -3428,7 +3428,7 @@ void CMenuInvent::BootExtendCommand() {
     message->select_top = 0;
     message->SetMsgCursor(0);
     for (int line = 0; line < count; line++) {
-        int shade = ask.unk_48[line];
+        int shade = ask.cmd_shade[line];
         if (line >= 0 && line < MES_LINE_MAX) {
             message->line_shade[line] = shade;
         }
@@ -3458,7 +3458,7 @@ int CMenuInvent::IsAskExtend(int keys, int button) {
     ItemNameList2 delete_names;
     int num;
     int all_num;
-    switch (ask_para.unk_70) {
+    switch (ask_para.ask_mode) {
     case INVENT_ASK_COMMAND: {
         int line = command_message->CommandMsgCursor();
         if (button & 1) {
@@ -3467,10 +3467,10 @@ int CMenuInvent::IsAskExtend(int keys, int button) {
                 break;
             }
             int command = command_message->item_mes[line] - INVENT_CMD_ZOOM;
-            ask->unk_70 = convtbl_3726[command];
+            ask->ask_mode = convtbl_3726[command];
             command_form->draw_flag = 0;
             int se = 1;
-            switch (ask->unk_70) {
+            switch (ask->ask_mode) {
             case INVENT_ASK_SET_BOARD: {
                 int se_end = 5;
                 if (SetNetaCircle(0, photo_cursor) > 0) {
@@ -3551,7 +3551,7 @@ int CMenuInvent::IsAskExtend(int keys, int button) {
     }
     case INVENT_ASK_ZOOM:
         if (button != 0) {
-            ask->unk_70 = INVENT_ASK_COMMAND;
+            ask->ask_mode = INVENT_ASK_COMMAND;
             MenuSePlay(5);
             command_form->draw_flag = 1;
         }
@@ -3606,14 +3606,14 @@ int CMenuInvent::IsAskExtend(int keys, int button) {
                            menu_invent_command_info_pict_info->image, 0x2000);
                     menu_invent_command_info_move_album_Space_info->used = 1;
                     Init_USER_PICTURE_INFO(menu_invent_command_info_pict_info);
-                    if (ask->unk_70 == INVENT_ASK_TO_ALBUM) {
+                    if (ask->ask_mode == INVENT_ASK_TO_ALBUM) {
                         AttachPictTex(tex_block[4], album_tex, InventAlbumPtr->GetAlbumPhotoInfo(0), 50);
                         album_flag[menu_invent_command_info_move_album_Space_pos] = 1;
                     } else {
                         AttachPictTex(tex_block[3], photo_tex, InventUserDataPtr->GetPhotoInfo(0), 30);
                         album_flag[album_cursor] = -1;
                     }
-                    ask->unk_70 = INVENT_ASK_COMMAND;
+                    ask->ask_mode = INVENT_ASK_COMMAND;
                     step = 0;
                     mode = 0;
                     IsAskEnd(5, command_form);

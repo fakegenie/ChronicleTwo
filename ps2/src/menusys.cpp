@@ -2660,7 +2660,7 @@ int CMenuKeyFunc::GetItemAll(CGameDataUsed *item, MENU_SWAPITEM_INFO *info) {
     return 1;
 }
 int GetItemCommandMsg(CGameDataUsed *item, MENU_ASKMODE_PARA *param, int slot, int arg) {
-    return GetItemCommandMsg(item, param->cmd_msg, param->cmd_color, param->unk_48, param->cmd_mark, slot, arg);
+    return GetItemCommandMsg(item, param->cmd_msg, param->cmd_color, param->cmd_shade, param->cmd_mark, slot, arg);
 }
 extern s8 human_tbl_2871[5][2];
 int GetItemCommandMsg(CGameDataUsed *item, int *cmds, u32 *colors, short *values, short *marks, int type,
@@ -4095,7 +4095,7 @@ void CMenuItemInfo::NextModeBuildUpInfo(CGameDataUsed *weapon) {
     msg->StepMsg();
     mode = MENU_ASK_MODE_EXTEND;
     step = 0;
-    ask_para.unk_70 = 2;
+    ask_para.ask_mode = 2;
     if (MenuCommonInfo->cursor_form != NULL) {
         MenuCommonInfo->cursor_form->draw_flag = 1;
     }
@@ -4746,7 +4746,7 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
     int reading = ReadBGSync();
     float position[4];
     int size;
-    switch (para->unk_70) {
+    switch (para->ask_mode) {
         case 1:
             switch (step) {
                 case 0:
@@ -4775,7 +4775,7 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
                         }
                         repair_running = 0;
                         step = 0;
-                        para->unk_70 = 0;
+                        para->ask_mode = 0;
                         mode = MENU_ASK_MODE_NONE;
                     }
                     break;
@@ -4970,7 +4970,7 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
                 MenuWeaponStatusInfoFormSet(NULL, NULL);
                 step = 0;
                 mode = MENU_ASK_MODE_NONE;
-                para->unk_70 = 0;
+                para->ask_mode = 0;
             }
             break;
         }
@@ -8762,13 +8762,13 @@ void CMenuItemInfo::SetItemEffect(void) {
         if (weapon_effect) {
             mode = MENU_ASK_MODE_EXTEND;
             step = 0;
-            ask_para.unk_70 = 1;
+            ask_para.ask_mode = 1;
             repair_running = 1;
         }
         if (repair_effect) {
             mode = MENU_ASK_MODE_EXTEND;
             step = 0;
-            ask_para.unk_70 = 1;
+            ask_para.ask_mode = 1;
             effect_pos = 1;
             MenuRepairTargetWeaponPos[0] = -100;
             MenuRepairTargetWeaponPos[1] = -100;

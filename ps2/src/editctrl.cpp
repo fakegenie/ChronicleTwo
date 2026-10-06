@@ -975,10 +975,10 @@ static void InitLadder(int mode, CScene *scene, CSceneEventData *event) {
     sceVu0ApplyMatrix(top_offset, matrix, top_offset);
     sceVu0ApplyMatrix(bottom_offset, matrix, bottom_offset);
     sceVu0ApplyMatrix(camera_offset, matrix, camera_offset);
-    height = (float)event->event.unk_2c;
-    LdrSound = event->event.unk_30;
+    height = (float)event->event.arg1;
+    LdrSound = event->event.arg2;
     current_foot = character->sound_info.foot_sound_id;
-    other_foot = event->event.unk_34;
+    other_foot = event->event.arg3;
     sceVu0AddVector(LdrTopPos, LdrPos, top_offset);
     sceVu0AddVector(LdrBottomPos, LdrPos, bottom_offset);
     sceVu0AddVector(LdrCamPos, LdrPos, camera_offset);

@@ -123,16 +123,16 @@ public:
         u32  flag;
         int  event_no;
         int  point_no;
-        int  unk_2c;
-        int  unk_30;
-        int  unk_34;
-        char unk_38[16];
+        int  arg1;
+        int  arg2;
+        int  arg3;
+        char target[16];
     };
 
     struct SoundData {
         int           se_no;
-        float         unk_24;
-        float         unk_28;
+        float         near_dist;
+        float         far_dist;
         float         unk_2c;
         int           shape;
         sceVu0FVECTOR start;

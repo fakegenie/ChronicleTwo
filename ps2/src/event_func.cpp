@@ -6257,13 +6257,13 @@ int _SET_EVENT_DATA(RS_STACKDATA *stack, int argc) {
             eventData->event.point_no = GetStackInt(value);
             break;
         case 3:
-            eventData->event.unk_2c = GetStackInt(value);
+            eventData->event.arg1 = GetStackInt(value);
             break;
         case 4:
-            eventData->event.unk_30 = GetStackInt(value);
+            eventData->event.arg2 = GetStackInt(value);
             break;
         case 5:
-            eventData->event.unk_34 = GetStackInt(value);
+            eventData->event.arg3 = GetStackInt(value);
             break;
         case 6:
             eventData->map_event.check_type = GetStackInt(value);
@@ -11650,13 +11650,13 @@ int _GET_EVENT_DATA(RS_STACKDATA *stack, int argc) {
             SetStack(stack, eventData->event.point_no);
             break;
         case 3:
-            SetStack(stack, eventData->event.unk_2c);
+            SetStack(stack, eventData->event.arg1);
             break;
         case 4:
-            SetStack(stack, eventData->event.unk_30);
+            SetStack(stack, eventData->event.arg2);
             break;
         case 5:
-            SetStack(stack, eventData->event.unk_34);
+            SetStack(stack, eventData->event.arg3);
             break;
         case 6:
             SetStack(stack, eventData->map_event.check_type);

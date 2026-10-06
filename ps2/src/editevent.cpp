@@ -161,10 +161,10 @@ int CEditEvent::Step(CScene *scene) {
     pad = &PadCtrl;
     show = character->CheckDraw();
     show &= scene->CheckDrawChara(scene->player_chara);
-    argument_1 = data.event.unk_2c;
-    argument_2 = data.event.unk_30;
+    argument_1 = data.event.arg1;
+    argument_2 = data.event.arg2;
     flags = data.event.flag;
-    argument_3 = data.event.unk_34;
+    argument_3 = data.event.arg3;
     result = EDIT_EVENT_RESULT_CONTINUE;
     if (type == EDIT_EVENT_TYPE_DOOR) {
         if (character != NULL) {
@@ -176,8 +176,8 @@ int CEditEvent::Step(CScene *scene) {
             scale = scale > scale_y ? (scale > scale_z ? scale : scale_z) : (scale_y > scale_z ? scale_y : scale_z);
             switch (step) {
             case EDIT_DOOR_STEP_START:
-                if (strcmp(data.event.unk_38, at_1133__5) != 0) {
-                    strcpy(map_name, data.event.unk_38);
+                if (strcmp(data.event.target, at_1133__5) != 0) {
+                    strcpy(map_name, data.event.target);
                     if (data.event.flag & FUNC_EVENT_ED_DOOR) {
                         int villager = -1;
                         CEditParts *parts = map->GetePlaceParts(data.map_event.parts_no);
@@ -238,7 +238,7 @@ int CEditEvent::Step(CScene *scene) {
                 if (data.event.point_no > 0) {
                     scene->RunEvent(data.event.point_no, &data);
                     result = EDIT_EVENT_RESULT_END;
-                } else if (strcmp(data.event.unk_38, at_1133__5) != 0) {
+                } else if (strcmp(data.event.target, at_1133__5) != 0) {
                     if (scene->fade.FadeCheck() && PreLoadSync__Fv() == 0) {
                         scene->fade.FadeIn(0x1E);
                         if (data.event.flag & FUNC_EVENT_ED_DOOR) result = EDIT_EVENT_RESULT_ENTER_HOUSE;

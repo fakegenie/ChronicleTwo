@@ -1604,10 +1604,10 @@ int EditStep(void) {
                     return 0;
                 }
                 if ((event_data->event.flag & kEventDataCallFlag) != 0) {
-                    event_no = event_data->event.unk_34;
+                    event_no = event_data->event.arg3;
                     if (event_no > 0) {
                         printf(at_2262, event_no);
-                        if (RunEvent(event_data->event.unk_34, MainScene__2) > 0) {
+                        if (RunEvent(event_data->event.arg3, MainScene__2) > 0) {
                             ResetViewMode(MainScene__2);
                             ControlMode = 2;
                         }

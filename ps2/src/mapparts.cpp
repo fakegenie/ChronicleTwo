@@ -966,12 +966,12 @@ int CMapTreasureBox::AssignFuncPoint(CFuncPoint *point, CMapParts *owner) {
 
     active = 1;
     flag_no = point->unk_c;
-    item_no = point->event.unk_2c;
-    item_num = point->event.unk_30;
+    item_no = point->event.arg1;
+    item_num = point->event.arg2;
     if (item_num == 0) {
         item_num = 1;
     }
-    floor_id = point->event.unk_34;
+    floor_id = point->event.arg3;
     func_point = point;
     parts = owner;
 

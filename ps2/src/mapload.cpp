@@ -1277,9 +1277,9 @@ int mapFUNC_EVENT_DATA(SPI_STACK *stack, int argc) {
     event = &mapNowFuncPoint->event;
     event->event_no = spiGetStackInt(stack++);
     event->point_no = spiGetStackInt(stack++);
-    event->unk_2c = spiGetStackInt(stack++);
-    event->unk_30 = spiGetStackInt(stack++);
-    event->unk_34 = spiGetStackInt(stack++);
+    event->arg1 = spiGetStackInt(stack++);
+    event->arg2 = spiGetStackInt(stack++);
+    event->arg3 = spiGetStackInt(stack++);
     if (kindName != NULL) {
         if (strcmp(kindName, at_1278) == 0) {
             kind = 0x10A;
@@ -1305,10 +1305,10 @@ int mapFUNC_EVENT_DATA(SPI_STACK *stack, int argc) {
         targetName = spiGetStackString(stack++);
         if (targetName != NULL) {
             if ((u32)strlen(targetName) >= 0x10) {
-                strncpy(event->unk_38, targetName, 0xF);
-                event->unk_38[0xF] = 0;
+                strncpy(event->target, targetName, 0xF);
+                event->target[0xF] = 0;
             } else {
-                strcpy(event->unk_38, targetName);
+                strcpy(event->target, targetName);
             }
         }
     }
@@ -1337,8 +1337,8 @@ int mapFUNC_SOUND_DATA(SPI_STACK *stack, int argc) {
         return 0;
     }
     sound->se_no = spiGetStackInt(stack++);
-    sound->unk_24 = spiGetStackFloat(stack++);
-    sound->unk_28 = spiGetStackFloat(stack++);
+    sound->near_dist = spiGetStackFloat(stack++);
+    sound->far_dist = spiGetStackFloat(stack++);
     sound->unk_2c = (float)spiGetStackInt(stack++);
     sound->shape = spiGetStackInt(stack++);
     spiGetStackVector(sound->start, stack);
