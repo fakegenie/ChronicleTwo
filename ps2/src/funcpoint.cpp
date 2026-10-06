@@ -430,28 +430,20 @@ CFuncPoint *CFuncPointMngr::Add(int type, CList<CFuncPoint> *node) {
     node->data.type = type;
     return &node->data;
 }
-#ifdef NONMATCHING
-void CFuncPointMngr::Reserve(int num, mgCMemory *stack) {
-    unsigned int size = num * sizeof(CList<CFuncPoint>);
-    int blocks;
-    if (size & 0xF) {
-        blocks = (size >> 4) + 1;
-    } else {
-        blocks = size >> 4;
+static inline u_int Align16Blocks(u_int n) {
+    if (n & 0xF) {
+        return (n >> 4) + 1;
     }
-    CList<CFuncPoint> *nodes = new ((u_long128 *)stack->Alloc(blocks + 2)) CList<CFuncPoint>[num];
+    return n >> 4;
+}
+void CFuncPointMngr::Reserve(int num, mgCMemory *stack) {
+    CList<CFuncPoint> *nodes = new ((u_long128 *)stack->Alloc(Align16Blocks(num * sizeof(CList<CFuncPoint>)) + 2)) CList<CFuncPoint>[num];
     if (num > 0) {
         for (int index = 0; index < num; index++) {
             Add(FUNC_POINT_NONE, &nodes[index]);
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/funcpoint", Reserve__14CFuncPointMngrFiP9mgCMemory);
-#endif
-#ifndef NONMATCHING
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/funcpoint", __ct__19CList_10CFuncPoint_Fv);
-#endif
 template <>
 void CList<CFuncPoint>::Initialize() {
     prev = NULL;
