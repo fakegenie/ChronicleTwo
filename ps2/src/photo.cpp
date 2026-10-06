@@ -61,9 +61,9 @@ void InitTakePhoto() {
     OpenMenu = 0;
     ShowLevelUpCnt = 0;
 }
-void LoadTakePhoto(int arg0, mgCMemory *memory, u_long128 *buffer) {
+void LoadTakePhoto(int camera_texb, mgCMemory *memory, u_long128 *buffer) {
     WorkTex = mgTexManager.EnterTexture(0x7FFF, at_852__6, NULL, 0x40, 0x40, 0x10, 0, (int)0, 0);
-    CameraTexb = arg0;
+    CameraTexb = camera_texb;
     Font__3.Init();
     Font__3.Preset(4);
     Font__3.SetFuchi(3);

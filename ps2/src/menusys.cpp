@@ -2288,8 +2288,8 @@ int MenuDataSwap(CGameDataUsed *destination, CGameDataUsed *source, int quantity
     int src_used = source->used_type;
     CDataCommon *dst_common = GetCommonItemData(dst_no);
     CDataCommon *src_common = GetCommonItemData(src_no);
-    int temp = dst_used == USED_ITEM_TYPE_GIFT_BOX;
-    if (temp && destination->GetGiftBoxItemNum() < 3 && src_common != NULL && (src_common->attribute & ITEM_ATTRIBUTE_TRUSH) && ((src_used == USED_ITEM_TYPE_ITEM && src_type != 0x1D && src_type != 0x1E && src_type != 0x15 && src_type != 0x1A && src_type != 0x1B) || (src_used == USED_ITEM_TYPE_ATTACH && src_type != 0x11 && src_type != 0x22))) {
+    int to_gift_box = dst_used == USED_ITEM_TYPE_GIFT_BOX;
+    if (to_gift_box && destination->GetGiftBoxItemNum() < 3 && src_common != NULL && (src_common->attribute & ITEM_ATTRIBUTE_TRUSH) && ((src_used == USED_ITEM_TYPE_ITEM && src_type != 0x1D && src_type != 0x1E && src_type != 0x15 && src_type != 0x1A && src_type != 0x1B) || (src_used == USED_ITEM_TYPE_ATTACH && src_type != 0x11 && src_type != 0x22))) {
         int slot = destination->SetGiftBoxItem(src_no, -1);
         result = 4;
         if (slot >= 0) {
@@ -4225,8 +4225,8 @@ int CMenuItemInfo::EquipDirect(int chara, CGameDataUsed *item, int &slot) {
             target = &menuUserParam_ptr2->chara[0]->equip[4];
             swap.type = 2;
         }
-        int temp = robo_slot2 == 1;
-        if (temp) {
+        int uses_slot2 = robo_slot2 == 1;
+        if (uses_slot2) {
             slot = 1;
             target = &menuUserParam_ptr2->chara[0]->equip[2];
             swap.type = 2;
@@ -5206,14 +5206,14 @@ short CMenuItemInfo::GetActiveCharaIDForItemCmd() {
     return 0;
 }
 int CMenuItemInfo::GetActiveCharaNo() {
-    int var_v0;
+    int chara_no;
 
-    var_v0 = MenuCommonInfo->GetActiveCharaNo();
-    if ((var_v0 == 3) && (sub_view == 1)) {
+    chara_no = MenuCommonInfo->GetActiveCharaNo();
+    if ((chara_no == 3) && (sub_view == 1)) {
         sub_view = 0;
-        var_v0 = 3;
+        chara_no = 3;
     }
-    return var_v0;
+    return chara_no;
 }
 void CMenuItemInfo::ExitEnd() {
     CActionChara *field_chara;

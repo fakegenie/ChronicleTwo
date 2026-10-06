@@ -1381,7 +1381,7 @@ void CNameRegiMenu::GetSelectedActiveFont(char *dst) {
     }
     if (font_mode == NAMEREGI_FONT_MODE_ALPHA) {
         table = first_table;
-        auto temp = cell % 13;
+        auto column = cell % 13;
         int line = cell / 13;
         if (cell >= 26 && cell < 52) {
             table = second_table;
@@ -1391,22 +1391,22 @@ void CNameRegiMenu::GetSelectedActiveFont(char *dst) {
             table = third_table;
             line -= 4;
         }
-        __typeof__(line * 13 + temp) temp2 = line * 13 + temp;
-        __typeof__(line + (temp2)) temp4 = line + (temp2);
-        dst[0] = table[temp4];
+        __typeof__(line * 13 + column) line_start = line * 13 + column;
+        __typeof__(line + (line_start)) glyph_index = line + (line_start);
+        dst[0] = table[glyph_index];
     }
     if (font_mode == NAMEREGI_FONT_MODE_KANJI) {
         GetNameRegistFontKanjiList(select.pos + select.row * 0x13, dst);
     }
     if (font_mode == NAMEREGI_FONT_MODE_KIGOU) {
-        __typeof__(cell % 15) temp3 = cell % 15;
+        __typeof__(cell % 15) column = cell % 15;
         int line = cell / 15;
         if (line >= 2) {
             table = second_table;
             line -= 2;
         }
-        __typeof__((unsigned int)line + (temp3 + (line * 16 - line))) temp5 = (unsigned int)line + (temp3 + (line * 16 - line));
-        dst[0] = table[temp5];
+        __typeof__((unsigned int)line + (column + (line * 16 - line))) glyph_index = (unsigned int)line + (column + (line * 16 - line));
+        dst[0] = table[glyph_index];
     }
 }
 #else
