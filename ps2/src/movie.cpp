@@ -495,12 +495,16 @@ int pcmCallback(sceMpeg *mpeg, sceMpegCbDataStr *str, void *user) {
     return result;
 }
 #pragma global_optimizer off
-#ifdef NONMATCHING
 int vblankHandler(int irq) {
     if (isCountVblank) {
         VoTag *tag = voBufGetTag(&voBuf);
         if (tag == NULL) {
             frd++;
+            asm {
+                sync
+                ei
+            }
+            return 0;
         } else {
             if (Cb == 0 && tag->status == VO_TAG_STATUS_READY) {
                 sceDmaSend(DmaCH2, tag->v[0]);
@@ -513,25 +517,24 @@ int vblankHandler(int irq) {
             Cb ^= 1;
         }
     }
-    EIntr();
+    asm {
+        sync
+        ei
+    }
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/movie", vblankHandler__Fi);
-#endif
 #pragma global_optimizer reset
-#ifdef NONMATCHING
 int handler_endimage(int irq) {
     if (isFrameEnd) {
         voBufDecCount(&voBuf);
         isFrameEnd = 0;
     }
-    EIntr();
+    asm {
+        sync
+        ei
+    }
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/movie", handler_endimage__Fi);
-#endif
 void voBufCreate(VoBuf *buf, VoData *data, VoTag *tags, int count) {
     buf->data = data;
     buf->tag = tags;
