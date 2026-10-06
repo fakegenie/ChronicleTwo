@@ -1701,23 +1701,19 @@ int MoveCheck(float *pos, float *vel, float *out, MoveCheckInfo *info, CCPoly *p
     GetCPolyAttr(info, pos, out, 34.0f, polys, count, mask);
     return 0;
 }
-#ifdef NONMATCHING
-int GetFootPoly(float *pos, float depth, CCPoly *found, float *ground, CCPoly *polys, int count, int ignore_mask) {
-    s16           poly_ignore_mask;
-    u16           parts_no;
-    s16           attribute;
-    float         attribute_value;
-    int           hit_polys[32];
+int GetFootPoly(float *pos, float depth, CCPoly *found, sceVu0FVECTOR ground, CCPoly *polys, int count, int ignore_mask) {
+    s16 poly_ignore_mask;
+    u16 parts_no;
+    s16 attribute;
+    int hit_polys[32];
     sceVu0FVECTOR from;
     sceVu0FVECTOR to;
     sceVu0FVECTOR hit_points[64];
-    sceVu0FVECTOR normal;
-    CCPoly       *poly;
-    int           hits;
-    int           found_ground;
-    int           i;
-    float         normal_y;
-
+    int attribute_value[4];
+    int hits;
+    int found_ground;
+    int i;
+    float normal_y;
     sceVu0CopyVector(from, pos);
     sceVu0CopyVector(to, pos);
     from[3] = 4.0f;
@@ -1726,20 +1722,18 @@ int GetFootPoly(float *pos, float depth, CCPoly *found, float *ground, CCPoly *p
     if (hits == 0) {
         return 0;
     }
-    s16 ground_kind = 0;
-    s16 foot_sound = 0;
-    s16 area_kind = 0;
+    int ground_kind = 0;
+    int foot_sound = 0;
+    int area_kind = 0;
     found_ground = 0;
     for (i = 0; i < hits; i++) {
+        sceVu0FVECTOR normal;
         sceVu0Normalize(normal, polys[hit_polys[i]].normal);
-        normal_y = normal[1];
-        if (normal_y < 0.0f) {
-            normal_y = -normal_y;
-        }
+        normal_y = (normal[1] < 0.0f) ? -normal[1] : normal[1];
         if (normal_y < 0.05f) {
             continue;
         }
-        *found = polys[hit_polys[i]];
+        *(CCPolyCopy *)found = *(CCPolyCopy *)&polys[hit_polys[i]];
         sceVu0CopyVector(ground, hit_points[i]);
         found_ground = 1;
         ground[0] = from[0];
@@ -1750,19 +1744,19 @@ int GetFootPoly(float *pos, float depth, CCPoly *found, float *ground, CCPoly *p
         poly_ignore_mask = found->ignore_mask;
         parts_no = found->parts_no;
         attribute = found->unk_4a;
-        attribute_value = found->unk_4c;
+        *(float *)&attribute_value[3] = found->unk_4c;
         break;
     }
     for (i = 0; i < hits; i++) {
-        poly = &polys[hit_polys[i]];
+        short *poly = &polys[hit_polys[i]].ground_kind;
         if (ground_kind == 0) {
-            ground_kind = poly->ground_kind;
+            ground_kind = poly[0];
         }
         if (foot_sound == 0) {
-            foot_sound = poly->foot_sound;
+            foot_sound = poly[1];
         }
         if (area_kind == 0) {
-            area_kind = poly->area_kind;
+            area_kind = poly[2];
         }
     }
     found->ground_kind = ground_kind;
@@ -1771,12 +1765,9 @@ int GetFootPoly(float *pos, float depth, CCPoly *found, float *ground, CCPoly *p
     found->ignore_mask = poly_ignore_mask;
     found->parts_no = parts_no;
     found->unk_4a = attribute;
-    found->unk_4c = attribute_value;
+    found->unk_4c = *(float *)&attribute_value[3];
     return found_ground;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/gameutil", GetFootPoly__FPffP6CCPolyPfP6CCPolyii);
-#endif
 void GetCPolyAttr(MoveCheckInfo *info, float *from, float *to, float dy, CCPoly *polys, int count,
                   int unused) {
     int hit_index[32];
