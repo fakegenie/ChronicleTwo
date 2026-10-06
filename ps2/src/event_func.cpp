@@ -118,10 +118,6 @@ extern "C" void *__vt__12CObjectFrame[];
 extern "C" void *__vt__11CCharacter2[];
 extern "C" void *__vt__9mgCVisual[];
 extern "C" void *__vt__11mgC3DSprite[];
-extern "C" int fptosi(float value);
-extern "C" unsigned int fptoui(float value);
-extern "C" int GetItemDataType__Fi(int);
-extern "C" int GetNowHorl__11CSphidaDataFv(CSphidaData *);
 
 static int GetStackInt(RS_STACKDATA *);
 static float GetStackFloat(RS_STACKDATA *);
@@ -262,7 +258,6 @@ extern char at_3633[];
 extern char at_3634[];
 extern char at_3635[];
 extern char at_3636[];
-extern "C" int CheckInventItem__Fi(int);
 extern char at_1083[];
 extern char at_9148[];
 extern char at_9622[];
@@ -3641,7 +3636,7 @@ int _SUB_ITEM(RS_STACKDATA *stack, int argc) {
     return 1;
 }
 int _GET_ITEM_TYPE(RS_STACKDATA *stack, int argc) {
-    int itemType = GetItemDataType__Fi(GetStackInt(stack++));
+    int itemType = GetItemDataType(GetStackInt(stack++));
     int category;
     if (itemType == 0) {
         return 0;
@@ -5578,7 +5573,7 @@ int _GET_LANGUAGE(RS_STACKDATA *stack, int argc) {
 }
 static int _CHECK_INVENT_ITEM(RS_STACKDATA *stack, int argc) {
     int item = GetStackInt(stack++);
-    SetStack(stack, CheckInventItem__Fi(item));
+    SetStack(stack, CheckInventItem(item));
     return 1;
 }
 int _SET_AI(RS_STACKDATA *stack, int argc) {
@@ -10999,7 +10994,7 @@ int _SPHIDA_GET_NOW_HOLE(RS_STACKDATA *stack, int argc) {
     if (sphidaData == NULL) {
         return 0;
     }
-    SetStack(stack, GetNowHorl__11CSphidaDataFv(sphidaData));
+    SetStack(stack, sphidaData->GetNowHorl());
     return 1;
 }
 int _SPHIDA_SET_SCORE(RS_STACKDATA *stack, int argc) {

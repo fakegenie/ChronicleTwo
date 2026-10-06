@@ -32,7 +32,6 @@ extern char at_962[];
 
 extern CSceneEventData LadderData;
 extern "C" int CharaControl__FP6CSceneP11CPadControl(CScene *, CPadControl *);
-extern "C" void CancelRotBack__14CCameraControlFv(CCameraControl *camera);
 extern MoveCheckInfo MoveInfo;
 extern int move_chara;
 extern int CharaAngleTarget;
@@ -47,17 +46,9 @@ extern float OldCameraPos[4];
 extern sceVu0FVECTOR OldFixCameraPos;
 extern int name_id_982[30];
 extern char *name_978[4];
-extern "C" void ControlOff__14CCameraControlFv(CCameraControl *camera);
-extern "C" void ControlOn__14CCameraControlFv(CCameraControl *camera);
-extern "C" void FollowOff__15mgCCameraFollowFv(CCameraControl *camera);
-extern "C" void FollowOn__15mgCCameraFollowFv(CCameraControl *camera);
-extern "C" void SetDistance__15mgCCameraFollowFf(CCameraControl *camera, float distance);
-extern "C" void SetHeight__14CCameraControlFf(CCameraControl *camera, float height);
-extern "C" float GetHeight__15mgCCameraFollowFv(CCameraControl *camera);
 extern "C" void EyeCamera__FP9mgCCameraP11CCharacter2i(mgCCameraFollow *, CCharacter2 *, int);
 extern "C" void InitEyeCamera__FP11CCharacter2P14CCameraControl(CCharacter2 *chara,
                                                                 CCameraControl *camera);
-extern "C" void GetPos__9mgCCameraFPf(CCameraControl *camera, float *out);
 extern "C" void SetPos__9mgCCameraFPf(mgCCameraFollow *camera, float *pos);
 extern "C" void SetNextPos__9mgCCameraFPf(mgCCameraFollow *camera, float *pos);
 extern "C" void SetNextRef__9mgCCameraFPf(mgCCameraFollow *camera, float *ref);
@@ -174,7 +165,7 @@ void EditControlInit(CScene *scene) {
     EditControlStatusInit(scene);
     camera = (CCameraControl *)scene->GetCamera(scene->active_camera);
     if (camera != NULL && camera->Iam() != 1000) {
-        CancelRotBack__14CCameraControlFv(camera);
+        camera->CancelRotBack();
     }
 }
 void EditControlStatusInit(CScene *scene) {
@@ -816,8 +807,8 @@ void CameraControl(CScene *scene, CPadControl *pad) {
                                         ViewMode = 2;
                                         StartTakePhoto();
                                     }
-                                    ControlOff__14CCameraControlFv(camera);
-                                    FollowOff__15mgCCameraFollowFv(camera);
+                                    camera->ControlOff();
+                                    camera->FollowOff();
                                     InitEyeCamera__FP11CCharacter2P14CCameraControl(chara, camera);
                                     EyeCamera__FP9mgCCameraP11CCharacter2i(
                                         (mgCCameraFollow *)camera, chara, 0);
@@ -831,20 +822,19 @@ void CameraControl(CScene *scene, CPadControl *pad) {
                                 if (ViewMode == 2) {
                                     EndTakePhoto();
                                 }
-                                FollowOn__15mgCCameraFollowFv(camera);
+                                camera->FollowOn();
                                 if (DebugInfo.debug_camera == 0) {
-                                    SetDistance__15mgCCameraFollowFf(camera, 5.0f);
-                                    SetHeight__14CCameraControlFf(camera, 0.0f);
+                                    camera->SetDistance(5.0f);
+                                    camera->SetHeight(0.0f);
                                 } else {
-                                    SetHeight__14CCameraControlFf(
-                                        camera, GetHeight__15mgCCameraFollowFv(camera));
+                                    camera->SetHeight(camera->GetHeight());
                                 }
                                 camera->Step(-1);
-                                ControlOn__14CCameraControlFv(camera);
+                                camera->ControlOn();
                                 ResetViewMode(scene);
                                 scene->EyeViewDrawOnOff(0);
                             } else {
-                                FollowOff__15mgCCameraFollowFv(camera);
+                                camera->FollowOff();
                                 EyeCamera__FP9mgCCameraP11CCharacter2i(
                                     (mgCCameraFollow *)camera, chara, 0);
                                 user_data = NULL;
@@ -874,7 +864,7 @@ void InitEyeCamera(CCharacter2 *chara, CCameraControl *camera) {
     AddProj = 0;
     ShutterCnt = 0;
     viewAngleH = rotation[1];
-    GetPos__9mgCCameraFPf(camera, OldCameraPos);
+    camera->GetPos(OldCameraPos);
 }
 void ResetViewMode(CScene *scene) {
     mgCCameraFollow *camera;

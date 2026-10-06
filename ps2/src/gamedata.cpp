@@ -12,8 +12,6 @@
 #include <cstdlib>
 
 extern "C" void __ct__18CScriptInterpreterFv(void *);
-extern "C" u8 *GetCommonData__9CGameDataFi(CGameData *, int);
-extern "C" int GetDataType__9CGameDataFi(CGameData *, int);
 
 extern CDataCommon *comdatapt;
 extern int comdatapt_num;
@@ -731,7 +729,7 @@ char *GetItemFilePath(int item_no, int variant) {
     return item_file_path_1288;
 }
 int GetItemDataType(int item_no) {
-    return GetDataType__9CGameDataFi(&GameItemDataManage, item_no);
+    return GameItemDataManage.GetDataType(item_no);
 }
 unsigned int GetItemDataAttribute(int item_no) {
     CDataCommon *record;

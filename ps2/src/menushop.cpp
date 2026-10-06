@@ -40,16 +40,11 @@ extern "C" void *__ct__18CScriptInterpreterFv(void *);
 extern "C" void SetTag__18CScriptInterpreterFP13SPI_TAG_PARAM(void *, SPI_TAG_PARAM *);
 extern "C" void SetScript__18CScriptInterpreterFPci(void *, char *, int);
 extern "C" void Run__18CScriptInterpreterFv(void *);
-extern "C" void GetPutPosXY__16CMenuPosDataFormFPcRfRf(CMenuPosDataForm *, char *, float &, float &);
 extern "C" void KeyStep__9CShopMenuFv(void *);
-extern "C" void FormDraw__14CPosDataManageFv(void *);
 extern "C" void KeyStep__14CMenuQuestViewFv(void *);
 
-extern "C" CMenuSystemData *GetMenuSysData__Fv();
 extern "C" int CheckGetAlready__15CMenuSystemDataFi(CMenuSystemData *, int);
-extern "C" int GetQuestRequestStatus__Fi(int);
 extern short NowSellMode;
-extern "C" int GetItemDataType__Fi(int);
 extern "C" int CheckVoiceUnit__16CUserDataManagerFv(CUserDataManager *);
 extern SHOP_PRICE_INFO *Spi_PriceList;
 extern char at_1221__3[];
@@ -70,7 +65,7 @@ extern CMenuQuestView *MenuQuestView;
 
 int GetDonyShopLineUp(int *itemList, int *status) {
     CInventUserData *inventData = GetInventUserDataPtr();
-    CMenuSystemData *systemData = GetMenuSysData__Fv();
+    CMenuSystemData *systemData = GetMenuSysData();
     if (systemData == NULL || inventData == NULL) {
         return 0;
 }
@@ -147,7 +142,7 @@ void CShop::CheckEventItem() {
         if (item_no[cursor] == 0x166 && userData->GetNumSameItem(0x166) > 0) {
             local_sort1(cursor, &item_num, item_no);
         }
-        if (GetItemDataType__Fi(item_no[cursor]) == ITEM_DATA_ROBO_CORE) {
+        if (GetItemDataType(item_no[cursor]) == ITEM_DATA_ROBO_CORE) {
             int core = CheckRobotCore();
             if (core >= 0xF6 && core < 0xFC) {
                 item_no[cursor] = core + 1;
@@ -160,7 +155,7 @@ void CShop::CheckEventItem() {
             *(u8 *)&userData->GetMonsterBajjiDataPtr(4)->enable != 0) {
             local_sort1(cursor, &item_num, item_no);
         }
-        if (GetQuestRequestStatus__Fi(2) == 2 &&
+        if (GetQuestRequestStatus(2) == 2 &&
             (item_no[cursor] == 0xC9 || item_no[cursor] == 0xCA)) {
             local_sort1(cursor, &item_num, item_no);
             cursor -= 1;

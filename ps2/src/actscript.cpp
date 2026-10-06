@@ -101,8 +101,6 @@ union ScriptVector {
     u_long128 quadword;
 };
 
-extern "C" void RemoveThrowItem__12CActionCharaFv(void *chara);
-extern "C" int GetModelNo__13CGameDataUsedFv(void *data);
 
 
 static int GetStackInt(RS_STACKDATA *slot) {
@@ -800,7 +798,7 @@ int _RELEASE_OBJ(RS_STACKDATA *stack, int argc) {
         action_info.chara->Show(1, 1);
     }
     if (action_info.chara->hold_type == ACTION_HOLD_ITEM && throw_it == 0) {
-        RemoveThrowItem__12CActionCharaFv(action_info.chara);
+        action_info.chara->RemoveThrowItem();
     }
     int chara_no = 0x18;
     if (action_info.chara->hold_type == ACTION_HOLD_ENEMY) {
@@ -1351,7 +1349,7 @@ int _GET_ACTION_CODE(RS_STACKDATA *stack, int argc) {
     if (argc != 1) {
         return 0;
     }
-    argc = GetModelNo__13CGameDataUsedFv(GetBattleCharaInfo()->GetEquipTablePtr(0));
+    argc = GetBattleCharaInfo()->GetEquipTablePtr(0)->GetModelNo();
     SetStack(stack, argc);
     return 1;
 }

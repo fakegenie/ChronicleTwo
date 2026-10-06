@@ -25,7 +25,6 @@
 #include "mapload.hpp"
 #include "gamepad.hpp"
 
-extern "C" int GetNumberKeta__Fi(int);
 
 extern char *MenuHatena_894;
 extern signed char init_895;
@@ -40,7 +39,6 @@ extern char at_1512__3[];
 extern char at_1513__3[];
 extern char at_1514__3[];
 extern char at_1623__3[];
-extern "C" int GetShiledKitLimmit__Fi(int);
 
 char *GetHatena() {
     if (init_895 == 0) {
@@ -93,7 +91,7 @@ void SetMenuBigNum(char *out, int number) {
     if (out != 0) {
         int rest = number;
         int pos = 0;
-        int digits = GetNumberKeta__Fi(number);
+        int digits = GetNumberKeta(number);
         if (CheckNowEurope() != 0) {
             if (digits > 0) {
                 do {
@@ -856,7 +854,7 @@ void CMenuMoveItem::SetMoveItemInfo(MENU_ITEM_MOVE_INFO *request, int *start, in
 int CheckRoboShieldKit(CUserDataManager *manager, CGameDataUsed *item, int apply, int *kit_count,
                        int *applied_count) {
     if (item->item_type == ITEM_DATA_ROBO_CORE) {
-        int limit = GetShiledKitLimmit__Fi(item->item_no);
+        int limit = GetShiledKitLimmit(item->item_no);
         ROBO_DATA *robo = &manager->robo_data;
         if (robo == 0) {
             return -1;

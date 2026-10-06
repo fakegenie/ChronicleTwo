@@ -71,7 +71,6 @@ extern "C" int eCurRot;
 extern "C" int PlacePartsFlag;
 extern "C" int RemainPartsNum;
 extern "C" float WallPutPos[4];
-extern "C" int __as__9mgVu0FBOXFR9mgVu0FBOX(...);
 extern "C" int GroundBalance__8CEditMapFi(CEditMap *, int);
 extern "C" int UpdateHouse__8CEditMapFv(CEditMap *);
 extern "C" float PlaceRiverPos[4];
