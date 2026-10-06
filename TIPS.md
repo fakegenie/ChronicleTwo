@@ -248,8 +248,12 @@ only functions present in both objects can be replaced, the plain build keeps th
 - Aggregate spelling changes copy instructions. A bitfield struct returned
   through a hidden pointer gives `ld/sd`. A `struct { u_long128 value; }` copies
   with `lq/sq`. `RECT t = F();` and `RECT t; t = F();` differ.
-- `sceGsTex0` has an out-of-line `operator=`. Initialise in the declaration or
-  copy through a plain mirror struct.
+- A struct-typed member (bitfield struct, union, `struct { u_long v; }`) is
+  copied through an address register in an implicit copy. An anonymous union
+  whose first member is a `u_long` copies with a direct `ld/sd`, which is how
+  `mgCTexture` holds `tex0`, `tex1` and `clamp`.
+- `sceGsTex0` has no `operator=`. `ReloadTexture` calls retail's
+  `__as__9sceGsTex0FRC9sceGsTex0` helper through an `extern "C"` declaration.
 - Qword rounding is `if (bytes & 0xF) q = (bytes >> 4) + 1; else q = bytes >> 4;`.
   Signed `x * 16 / 16 + 1` matches `Alloc` sizes where `sizeof` does not.
 - Reading an extern rodata quadword as `*(u_long128 *)&sym` gives retail's early
@@ -285,3 +289,4 @@ only functions present in both objects can be replaced, the plain build keeps th
 - objdiff scores a function with jump tables near zero because it splits at the case labels. Compare against the concatenated retail pieces instead.
 - `#pragma optimization_level 2` is needed for `mgCTextureManager::ReloadTexture(int, u_int *)`.
 - Declaring a parameter as `sceVu0FVECTOR ground` instead of `float *` fixed a stack slot in `GetFootPoly` with the same mangled name.
+- Unrelated header edits can change a matched function's scheduling. Adding a single member declaration to `mgCTexture` broke `CRain::Start` in the `scene` state compile. Declaring `view_angle` before `position` made it match with every header variant tried.
