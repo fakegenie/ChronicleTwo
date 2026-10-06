@@ -32,6 +32,7 @@ extern char at_868[];
 extern u_char lut_1246[128];
 extern int block_table8_1266[32];
 extern int block_table32_1267[32];
+extern u_char conv_work_1306[0x10000];
 extern "C" void *__construct_new_array(void *, void *(*)(void *), void *, u_int, int);
 extern "C" void *__ct__10mgCTextureFv(void *);
 extern "C" void *__ct__15mgCTextureBlockFv(void *);
@@ -1165,11 +1166,10 @@ void mgCTextureManager::ReloadTexture(int index, sceVif1Packet *packet) {
 #pragma global_optimizer reset
 #pragma schedule reset
 #pragma schedule off
-#ifdef NONMATCHING
+#pragma optimization_level 2
 int mgCTextureManager::ReloadTexture(int block, u_int *packet) {
     sceGsTex0 tex0;
-    mgCTexture *texture;
-    u_int *cursor;
+    u_int *start;
     int vram;
     int fix;
     int zbuf;
@@ -1177,38 +1177,34 @@ int mgCTextureManager::ReloadTexture(int block, u_int *packet) {
     int zbuf_end;
     int size;
     int to_zbuf;
+    int level;
     int width;
     int height;
     int bpp;
-    int level;
-
+    mgCTexture *texture;
     if (packet != NULL && (block < 0 || block >= block_max)) {
         last_block = -1;
         return 0;
     }
-
-    cursor = packet;
-
-    if (cursor != NULL) {
-        cursor += SetTexFlush_TagCnt(cursor) * 4;
+    start = packet;
+    if (packet != NULL) {
+        packet += SetTexFlush_TagCnt(packet) * 4;
     }
-
     vram = vram_top;
     fix = vram_fix;
     zbuf = GetZBufVram(&zbuf_size);
     zbuf_end = zbuf + zbuf_size;
-
     if (last_block != block) {
         for (texture = blocks[block].texture; texture != NULL; texture = texture->next) {
             width = texture->width;
             height = texture->height;
             bpp = texture->bpp;
             to_zbuf = 0;
-
-            if (CheckCopyToZBufVram(texture, &size) && zbuf + size < zbuf_end) {
-                to_zbuf = 1;
+            if (CheckCopyToZBufVram(texture, &size)) {
+                if (zbuf + size < zbuf_end) {
+                    to_zbuf = 1;
+                }
             }
-
             if (to_zbuf) {
                 texture->tex0.TBP0 = zbuf;
                 texture->tex0.PSM = SCE_GS_PSMT8H;
@@ -1216,19 +1212,15 @@ int mgCTextureManager::ReloadTexture(int block, u_int *packet) {
             } else {
                 texture->tex0.TBP0 = vram;
                 vram += texture->vram_size;
-
                 if (bpp == 8) {
                     texture->tex0.PSM = SCE_GS_PSMT8;
                 }
             }
-
             tex0 = texture->tex0;
-
             if (texture->bpp <= 8) {
                 fix -= MG_TEXTURE_CLUT_BLOCKS;
                 texture->tex0.CBP = fix;
             }
-
             if (texture->swizzled != 0 && bpp == 8) {
                 width >>= 1;
                 height >>= 1;
@@ -1236,41 +1228,35 @@ int mgCTextureManager::ReloadTexture(int block, u_int *packet) {
                 tex0.PSM = SCE_GS_PSMCT32;
                 tex0.TBW = tex0.TBW >> 1;
             }
-
-            if (cursor != NULL) {
-                cursor += ReloadCLUT(texture, cursor);
+            if (packet != NULL) {
+                packet += ReloadCLUT(texture, packet);
             }
-
-            for (level = 0; level < MG_TEXTURE_LEVEL_MAX && texture->image[level] != NULL;
-                 level++) {
+            for (level = 0; level < MG_TEXTURE_LEVEL_MAX; level++) {
+                u_long128 **image = ((mgCTexture *)((level << 2) + (int)texture))->image;
+                if (*image == NULL) {
+                    break;
+                }
                 if (tex0.TBW == 0) {
                     tex0.TBW = 1;
                 }
-
-                if (cursor != NULL) {
-                    cursor +=
-                        mgLoadImage(cursor, tex0.TBP0, tex0.PSM, tex0.TBW, texture->image[level],
-                                          bpp * width * height / 16 / 8, 0, 0, width, height);
+                if (packet != NULL) {
+                    packet += mgLoadImage(packet, tex0.TBP0, tex0.PSM, tex0.TBW, (u_long128 *)*image,
+                                          bpp * (width * height) / 16 / 8, 0, 0, width, height);
                 }
-
-                tex0.TBP0 = tex0.TBP0 + bpp * width * height / 256 / 8;
+                tex0.TBP0 = tex0.TBP0 + (u_short)(bpp * (width * height) / 256 / 8);
                 tex0.TBW = tex0.TBW >> 1;
                 width >>= 1;
                 height >>= 1;
             }
         }
     }
-
-    if (cursor != NULL) {
-        cursor += SetTexFlush_TagCnt(cursor) * 4;
+    if (packet != NULL) {
+        packet += SetTexFlush_TagCnt(packet) * 4;
         last_block = block;
     }
-
-    return (cursor - packet) / 4;
+    return (packet - start) / 4;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_texture", ReloadTexture__17mgCTextureManagerFiPUi);
-#endif
+#pragma optimization_level reset
 #pragma schedule reset
 
 #pragma schedule off
@@ -1481,23 +1467,22 @@ static int PageConv32to8(int width, int height, u_char *src, u_char *dst) {
 #pragma schedule reset
 #pragma schedule off
 #pragma optimization_level 1
-#ifdef NONMATCHING
 
 static int Conv32To8(int width, int height, u_char *image) {
-    static u_char conv_work[0x10000];
     u_char work8[0x2000];
     u_char work32[0x2000];
-    u_char *source_cursor;
-    u_char *work_cursor;
-    u_char *destination_cursor;
-    int size;
-    int pages_x;
-    int pages_y;
-    int row_bytes;
-    int row_count;
-    int i;
-    int j;
     int k;
+    int pages_x;
+    int row_count;
+    int row_bytes;
+    int j;
+    int i;
+    int pages_y;
+    u_char *source_cursor;
+    int size;
+    u_char *work_cursor;
+    int page_width;
+    u_char *destination_cursor;
 
     size = width * height;
 
@@ -1510,11 +1495,12 @@ static int Conv32To8(int width, int height, u_char *image) {
     pages_x = (width - 1) / 128 + 1;
     pages_y = (height - 1) / 64 + 1;
 
+    page_width = 128;
+    row_bytes = 256;
     if (pages_x == 1) {
         row_bytes = width * 2;
     } else {
-        width = 128;
-        row_bytes = 256;
+        width = page_width;
     }
 
     if (pages_y == 1) {
@@ -1526,7 +1512,7 @@ static int Conv32To8(int width, int height, u_char *image) {
 
     for (i = 0; i < pages_y; i++) {
         for (j = 0; j < pages_x; j++) {
-            source_cursor = image + row_bytes * j + i * pages_x * row_bytes * row_count;
+            source_cursor = image + i * (pages_x * (row_bytes * row_count)) + row_bytes * j;
             work_cursor = work32;
 
             for (k = 0; k < row_count; k++) {
@@ -1536,7 +1522,7 @@ static int Conv32To8(int width, int height, u_char *image) {
             }
 
             PageConv32to8(128, 64, work32, work8);
-            destination_cursor = conv_work + width * j + i * pages_x * width * 64;
+            destination_cursor = conv_work_1306 + i * (pages_x * (width * 64)) + width * j;
             work_cursor = work8;
 
             for (k = 0; k < height; k++) {
@@ -1547,12 +1533,9 @@ static int Conv32To8(int width, int height, u_char *image) {
         }
     }
 
-    memcpy(image, conv_work, size);
+    memcpy(image, conv_work_1306, size);
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_texture", Conv32To8__FiiPUc);
-#endif
 #pragma optimization_level reset
 #pragma schedule reset
 
