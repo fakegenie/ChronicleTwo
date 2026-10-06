@@ -4,7 +4,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
-extern "C" double pow(double base, double exponent);
 int get_gajji_id_from_monster_progress_table(int monster_no, int *level);
 int get_monster_tbl_bajjilevel(int *out, int bajji_no, int monster_no, int level);
 int get_default_monster_progresstbl(int bajji_no);
