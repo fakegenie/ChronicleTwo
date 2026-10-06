@@ -55,7 +55,7 @@ enum EpisodeTitleState {
 enum TreasureBoxState {
     TREASURE_BOX_STATE_NONE = 0,     /**< The slot holds no box. */
     TREASURE_BOX_STATE_UNOPENED = 1, /**< The box waits to be opened, and shows on the mini map. */
-    TREASURE_BOX_MAX = 24,           /**< Box slots of the treasure box manager. */
+    TREASURE_BOX_MAX = 24,
 };
 
 /**

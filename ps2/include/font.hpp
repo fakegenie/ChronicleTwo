@@ -175,8 +175,8 @@ public:
     s32 draw_w;             /**< Width a full-width character is drawn at. */
     s32 draw_h;             /**< Height a character is drawn at. */
     s32 mini;               /**< Non-zero to draw with the small font texture. */
-    float offset_x;          /**< Horizontal offset, in pixels, added to the text's screen position by DrawDirect. */
-    float offset_y;          /**< Vertical offset, in pixels, added to the text's screen position by DrawDirect. */
+    float offset_x;
+    float offset_y;
 
     /**
      *
