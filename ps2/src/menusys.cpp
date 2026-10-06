@@ -1811,7 +1811,7 @@ void MENU_SWAPITEM_INFO::Set(int type, int no, int chara, int flag) {
 }
 int IsEnableChangeRoboParts(CGameDataUsed *part) {
     int enabled = 0;
-    if (part->used_type == 5) {
+    if (part->used_type == USED_ITEM_TYPE_ROBO_PART) {
         int capacity = 0;
         int used;
         int slot;
@@ -1985,9 +1985,9 @@ void SpectolFrameCalc(CActionChara *chara, int active) {
 }
 void TransSpectolDataSave(CGameDataUsed *item, int count) {
     memcpy(&SpectolTransBefore, item, sizeof(CGameDataUsed));
-    if (SpectolTransBefore.used_type == 1) {
+    if (SpectolTransBefore.used_type == USED_ITEM_TYPE_ITEM) {
         SpectolTransBefore.data.item.num = count;
-    } else if (SpectolTransBefore.used_type == 2) {
+    } else if (SpectolTransBefore.used_type == USED_ITEM_TYPE_ATTACH) {
         SpectolTransBefore.data.attach.num = count;
     }
     item->DeleteNum(count);
@@ -2580,7 +2580,7 @@ int CMenuKeyFunc::EnableSwapNowPos(MENU_SWAPITEM_INFO *swap) {
             } else if (held_no != active->item_no) {
                 result = 0;
                 if (held_used == 1) {
-                    if (active->used_type == 7) {
+                    if (active->used_type == USED_ITEM_TYPE_GIFT_BOX) {
                         result = 0;
                     } else {
                         result = 0;
@@ -2742,7 +2742,7 @@ int GetItemCommandMsg(CGameDataUsed *item, int *cmds, u32 *colors, short *values
         human = 0;
     }
     int robo_parts = 0;
-    if (0 < GetUserItemHaveNum(0x180) && (item->used_type == 5 || item->used_type == 3)) {
+    if (0 < GetUserItemHaveNum(0x180) && (item->used_type == USED_ITEM_TYPE_ROBO_PART || item->used_type == USED_ITEM_TYPE_WEAPON)) {
         robo_parts = 1;
     }
     int i = 0;
@@ -4458,7 +4458,7 @@ int CMenuItemInfo::ItemCmdAfter(int cmd_ret, ITEMCMD_RET_PARA *ret) {
                 CDC2Mes *mes = MenuDCMsg[4];
                 CGameDataUsed spectol;
                 ask_para.item->ToSpectolTrans(&spectol, SpectolBreakNum);
-                if (ask_para.item->used_type == 3) {
+                if (ask_para.item->used_type == USED_ITEM_TYPE_WEAPON) {
                     SpectolBreakSpPoint = ask_para.item->data.weapon.fusion_point;
                 } else {
                     SpectolBreakSpPoint = 1;
@@ -9614,7 +9614,7 @@ void CItemSelect::SetPtrList() {
     entries = MenuUserParam.used_data;
     for (i = 0; i < kBagSlotCount; i++) {
         if (entries[i].item_no > 0 && !(0 < entries[i].GetSpectolNo()) &&
-            entries[i].used_type != 8) {
+            entries[i].used_type != USED_ITEM_TYPE_BOILED) {
             item_list[item_num] = &entries[i];
             limit_disp[item_num] = 0;
             if (((s8 *)menu_limmit_displayflag)[i] == 1) {

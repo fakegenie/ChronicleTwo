@@ -516,9 +516,9 @@ void NameRegistInit(mgCMemory *stack, int *tex_block, int open_type) {
             s16 used_type = Nameregi_Target.item->used_type;
             if (used_type != 0) {
                 switch (used_type) {
-                case 3:
-                case 5:
-                case 6:
+                case USED_ITEM_TYPE_WEAPON:
+                case USED_ITEM_TYPE_ROBO_PART:
+                case USED_ITEM_TYPE_FISH:
                     message_no = 1;
                     item_names.name[0] = Nameregi_Target.item->GetName(0);
                     break;
@@ -1122,7 +1122,7 @@ s32 CNameRegiMenu::KeyStep() {
         NameMessageArguments arguments;
         strcpy(final_name, name);
         if (Nameregi_Target.target == NAMEREGI_TARGET_ITEM) {
-            if (LanguageCode > 0 && Nameregi_Target.item != NULL && Nameregi_Target.item->used_type == 3 &&
+            if (LanguageCode > 0 && Nameregi_Target.item != NULL && Nameregi_Target.item->used_type == USED_ITEM_TYPE_WEAPON &&
                 Nameregi_Target.item->IsFishingRod() == 0) {
                 char ascii[0x80];
                 s32 item_no;
@@ -1135,7 +1135,7 @@ s32 CNameRegiMenu::KeyStep() {
                     message->MakeMsg(0xFD4);
                     break;
                 }
-                if (ConvertUsedItemType(GetItemDataType(item_no)) == 3) {
+                if (ConvertUsedItemType(GetItemDataType(item_no)) == USED_ITEM_TYPE_WEAPON) {
                     Nameregi_Target.item->CopyDataWeapon(item_no);
                 }
             }
@@ -1203,7 +1203,7 @@ s32 CNameRegiMenu::KeyStep() {
                     MenuSePlay(5);
                 } else {
                     Nameregi_Target.item->Init();
-                    Nameregi_Target.item->used_type = 6;
+                    Nameregi_Target.item->used_type = USED_ITEM_TYPE_FISH;
                     Nameregi_Target.item->SetName((char *)key_text);
                     Nameregi_Target.item->TransToData((char *)decoded, 0xE);
                     MenuSePlay(1);
@@ -1312,7 +1312,7 @@ s32 CNameRegiMenu::KeyStep() {
     case 0x3E8: {
         if (Nameregi_Target.target == NAMEREGI_TARGET_FISH) {
             Nameregi_Target.item->item_no = 0x140;
-            Nameregi_Target.item->used_type = 6;
+            Nameregi_Target.item->used_type = USED_ITEM_TYPE_FISH;
             if (LanguageCode > 0) {
                 char backup[0x40];
                 strcpy(backup, name);

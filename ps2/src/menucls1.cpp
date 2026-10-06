@@ -1078,7 +1078,7 @@ int MenuUseItemCheckFunc(CGameDataUsed *item, CItemUseTarget *target, int apply)
             return 0;
         }
         if (MenuUsedItemNo == 0x127) {
-            if (weapon->used_type == 3 && !weapon->IsLevelUp() && weapon->IsFishingRod() != 1) {
+            if (weapon->used_type == USED_ITEM_TYPE_WEAPON && !weapon->IsLevelUp() && weapon->IsFishingRod() != 1) {
                 count++;
                 if (apply != 0) {
                     used++;

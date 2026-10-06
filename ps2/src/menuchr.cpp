@@ -3840,7 +3840,7 @@ int CMenuMosSelect::KeyStep() {
                                     CGameDataUsed reward;
                                     reward.Init();
                                     reward.item_no = 0x17F;
-                                    reward.used_type = 2;
+                                    reward.used_type = USED_ITEM_TYPE_ATTACH;
                                     reward.item_type = 0x22;
                                     reward.data.attach.spectol_value = select_badge->class_level + 1;
                                     if (select_badge->class_level == 3) {
