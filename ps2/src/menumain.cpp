@@ -399,8 +399,8 @@ int MenuMainInit(MENU_INIT_ARG *arg) {
     if (MenuActiveSaveData != NULL) {
         user = MenuActiveSaveData->GetUserDataManager();
         MenuUserDataManPtr = user;
-        MenuSystemDataPtr = &MenuActiveSaveData->menu_system_data;
         MenuConfigPtr = MenuActiveSaveData->GetConfig();
+        MenuSystemDataPtr = &MenuActiveSaveData->menu_system_data;
         MenuSaveDataDungeonPtr = &MenuActiveSaveData->save_dungeon;
         MenuFishAquarium = &user->aquarium;
         int active_chara_no = user->active_chr_no;
