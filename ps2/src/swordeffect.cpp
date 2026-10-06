@@ -12,12 +12,6 @@
 extern char at_356[];
 
 #ifdef NONMATCHING
-#include "mg_drawprim.hpp"
-#include "mg_frame.hpp"
-#include "mg_memory.hpp"
-#include "mglib.hpp"
-#include "mg_texture.hpp"
-#include <cstdio>
 #endif
 
 #ifdef NONMATCHING

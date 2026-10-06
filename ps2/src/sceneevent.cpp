@@ -30,17 +30,8 @@ extern char at_858__3[];
 extern char at_958__3[];
 extern char at_959__3[];
 extern char at_1093[];
-#include "collision.hpp"
-#include "mapsky.hpp"
-#include "mg_camera.hpp"
-#include "mg_math.hpp"
-#include "mglib.hpp"
-#include "mg_texture.hpp"
 #include "mg_tanime.hpp"
-#include "screeneffect.hpp"
-#include <cstring>
 
-#include <cstdio>
 
 void CScene::UpDateMapInfo() {
     CMap *active_maps[4];

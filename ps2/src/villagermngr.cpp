@@ -2,8 +2,6 @@
 #include "mg_memory.hpp"
 #include "villagermngr.hpp"
 #include "mg_math.hpp"
-#include "mg_memory.hpp"
-#include "mg_math.hpp"
 #include "mglib.hpp"
 #include "vlgr_info.hpp"
 

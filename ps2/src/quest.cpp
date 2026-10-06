@@ -4,10 +4,6 @@
 #include "mainloop.hpp"
 #include "scriptinterpreter.hpp"
 #include "quest.hpp"
-#include "mainloop.hpp"
-#include "savedata.hpp"
-#include "scriptinterpreter.hpp"
-#include "mg_memory.hpp"
 #include <cstring>
 
 extern CQuestManager *spi_questman;

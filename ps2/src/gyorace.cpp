@@ -71,17 +71,8 @@ extern int old_fish_rank[6];
 #endif
 
 #ifdef NONMATCHING
-#include "gyoracesim.hpp"
-#include "subgame.hpp"
-#include "scenesnd.hpp"
 #include "character.hpp"
-#include "mg_math.hpp"
-#include "mglib.hpp"
-#include "mg_drawprim.hpp"
-#include "mg_memory.hpp"
 #include "dng_effect.hpp"
-#include "nd_meswin.hpp"
-#include "snd_mngr.hpp"
 #include "menuaqua.hpp"
 #include "userdata.hpp"
 #include <cstring>

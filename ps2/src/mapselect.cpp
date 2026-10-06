@@ -84,21 +84,6 @@ int MapTypeSelect(void);
 int MapSelect(void);
 static char *GetLine(char **columns, char *position, char *end);
 #ifdef NONMATCHING
-#include "character.hpp"
-#include "dataread.hpp"
-#include "editdata.hpp"
-#include "font.hpp"
-#include "gamepad.hpp"
-#include "mainloop.hpp"
-#include "mg_frame.hpp"
-#include "mg_memory.hpp"
-#include "savedata.hpp"
-#include "scenesnd.hpp"
-#include "scriptinterpreter.hpp"
-#include "vlgr_info.hpp"
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
 
 static int MapNameNum;
 static MAP_NAME_INFO *map_name;

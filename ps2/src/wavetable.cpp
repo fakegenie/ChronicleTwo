@@ -5,7 +5,6 @@
 extern int cnt_302;
 extern signed char init_303;
 
-#include <cstdlib>
 #include <libvu0.h>
 
 #include "mg_drawprim.hpp"
