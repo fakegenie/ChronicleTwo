@@ -4941,15 +4941,15 @@ int MenuMonsterLoadBGCheck(MENU_BGREAD_INFO2 **info, CActionChara **chara, int t
     MenuLoadInfo.request_phase = -2;
     return 1;
 }
-#ifdef NONMATCHING
 void MenuItemCharaDataLoadEndCheckAfter(MENU_BGREAD_INFO2 **info, int chara_no) {
     CUserDataManager *userData = MenuUserDataManPtr;
     ROBO_INFO_DATA *robo = GetRoboPartsInfo(userData);
     if (MenuLoadInfo.unk_6[1] != 0) {
         SetupUnitMan(MenuMainScene, userData, chara_no, robo);
     }
-    if (MenuLoadInfo.mode == 2) {
-        return;
+    switch (MenuLoadInfo.mode) {
+        case 2:
+            return;
     }
     CScene scene;
     CCharacter2 *chara;
@@ -4964,9 +4964,6 @@ void MenuItemCharaDataLoadEndCheckAfter(MENU_BGREAD_INFO2 **info, int chara_no) 
     }
     SetupUnitMan(&scene, userData, chara_no, robo);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuchr", MenuItemCharaDataLoadEndCheckAfter__FPP17MENU_BGREAD_INFO2i);
-#endif
 void InitMainCharaBG(int chara_no, mgCMemory *stack, int mode) {
     int reason;
     mgCTextureManager *texManager;
