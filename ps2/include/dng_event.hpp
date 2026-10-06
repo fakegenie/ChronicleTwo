@@ -55,6 +55,7 @@ enum EpisodeTitleState {
 enum TreasureBoxState {
     TREASURE_BOX_STATE_NONE = 0,     /**< The slot holds no box. */
     TREASURE_BOX_STATE_UNOPENED = 1, /**< The box waits to be opened, and shows on the mini map. */
+    TREASURE_BOX_MAX = 24,           /**< Box slots of the treasure box manager. */
 };
 
 /**
@@ -534,14 +535,14 @@ STATIC_ASSERT(sizeof(CTreasureBox) == 0x70);
 class CTreasureBoxManager {
 public:
     s32 tex_block;          /**< Texture block of the box model. */
-    CTreasureBox box[24];   /**< Box slots. */
+    CTreasureBox box[TREASURE_BOX_MAX];   /**< Box slots. */
     s32 unk_A90;
     CCharacter2 *model;     /**< Box model. */
     CColFrame *col_frame;   /**< Collision model of a box ("tbox_a.mds"). */
     s32 near_box;           /**< Box that the player last stood at, or -1 for none. */
 
     void Initialize() {
-        for (int i = 0; i < 24; i++) {
+        for (int i = 0; i < TREASURE_BOX_MAX; i++) {
             box[i].Initialize();
         }
         unk_A90 = 0;
