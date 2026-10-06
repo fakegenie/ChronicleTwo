@@ -124,10 +124,6 @@ int BossBattleSelFlag;
 extern SPI_TAG_PARAM tag__7[3];
 extern char *map_sel_type[MAP_SEL_TYPE_NUM];
 extern char SelectMapName[0x100];
-extern int select__1049[8];
-extern int top__1050[8];
-extern int SedSelData[SED_ITEM_NUM];
-extern char *config_str[1];
 #endif
 
 int mlMAP_NAME_NUM(SPI_STACK *stack, int argc) {

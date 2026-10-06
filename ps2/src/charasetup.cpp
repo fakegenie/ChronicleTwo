@@ -62,9 +62,6 @@ extern SetupNameTable4 at_1110;
 extern SetupNameTable3 at_1113;
 extern SetupNameTable3 at_1161;
 extern SetupNameTable3 at_1162;
-int SetupMints(CScene *scene, CUserDataManager *user_data);
-int SetupMonica(CScene *scene, CUserDataManager *user_data);
-int SetupMonster(CScene *scene, CUserDataManager *user_data);
 #include "gamedata.hpp"
 #include "maintex.hpp"
 #include "menuchr.hpp"

@@ -9464,7 +9464,6 @@ int MenuItemKey(void) {
             return 0;
     }
 }
-int CheckFishCondition(void);
 void MenuItemDraw(void) {
     DrawMenuFillBox(0x80, 0, 0, 0);
     switch (CMenuItemInfoPt->sub_menu) {
