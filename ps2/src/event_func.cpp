@@ -10000,7 +10000,6 @@ if (0 < sub) { sndId = GetMapSndDataID(sub); } else { sndId = GetMapSndDataID(ma
     }
     return 0;
 }
-#ifdef NONMATCHING
 int _SET_MOVIE_CC(RS_STACKDATA *stack, int argc) {
     int i;
     int no;
@@ -10030,8 +10029,9 @@ int _SET_MOVIE_CC(RS_STACKDATA *stack, int argc) {
             if (no >= 18) {
                 return 0;
             }
+            start = start * 50 / 60;
             frames = frames * 50 / 60;
-            EdEventInfo.caption_start[no] = start * 50 / 60;
+            EdEventInfo.caption_start[no] = start;
             strcpy(EdEventInfo.caption_text[no], text);
             EdEventInfo.caption_frames[no] = frames;
             break;
@@ -10040,9 +10040,6 @@ int _SET_MOVIE_CC(RS_STACKDATA *stack, int argc) {
     }
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/event_func", _SET_MOVIE_CC__FP12RS_STACKDATAi);
-#endif
 int _REGISTER_VILLAGER2(RS_STACKDATA *stack, int argc) {
     int villagerNo;
     int mode;
