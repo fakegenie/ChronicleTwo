@@ -1404,7 +1404,6 @@ void AutoSetTreasureBox(int id, float *position, float power) {
     (DngMainScene->battle_area.treasure_box)->PutTreasureBox(-1, position, power, 0x41, id, 1, -1, 0);
 }
 extern char at_2159[];
-#ifdef STATEMATCHING
 void AutoSetTreasureBox(void) {
     DNG_BATTLE_AREA *area = &DngMainScene->battle_area;
     CTreasureBoxManager *manager = DngMainScene->battle_area.treasure_box;
@@ -1610,9 +1609,6 @@ void AutoSetTreasureBox(void) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dng_event", AutoSetTreasureBox__Fv);
-#endif
 int _FLS(SPI_STACK *stack, int argc) {
     FLS_FLOOR_ID = spiGetStackInt(stack++);
     spiGetStackInt(stack);
