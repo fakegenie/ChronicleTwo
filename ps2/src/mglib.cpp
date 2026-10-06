@@ -156,12 +156,13 @@ void mgSetRotateThread(int priority) {
     rot_priority = priority;
 }
 void WaitVSync(int start, int frames) {
-wait:
-    if ((mgGetVSyncCount() - start) < frames) {
+    for (;;) {
+        if ((mgGetVSyncCount() - start) >= frames) {
+            break;
+        }
         if (rot_priority > 0) {
             RotateThreadReadyQueue(rot_priority);
         }
-        goto wait;
     }
 }
 int mgGetVSyncCount(void) {
