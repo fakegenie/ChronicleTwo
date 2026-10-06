@@ -215,9 +215,6 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/automap", DrawSymbol_Chara__14CMiniMapSymb
 #endif
 #ifdef NONMATCHING
 void CMiniMapSymbol::Draw(float *pos) {
-    float part_pos[4];
-    float delta[4];
-
     if (map == NULL) {
         return;
     }
@@ -235,6 +232,8 @@ void CMiniMapSymbol::Draw(float *pos) {
     }
     CPreSprite sprite;
     CPreSprite spare;
+    float part_pos[4];
+    float delta[4];
     sprite.Initialize(NULL, NULL);
     sprite.Preset2D();
     sprite.Begin(6);
@@ -242,7 +241,7 @@ void CMiniMapSymbol::Draw(float *pos) {
     sprite.Color(0x80, 0x80, 0x80, 0x60);
     sprite.SetScirror(x - w / 2, y - h / 2, w, h);
     for (int i = 0; i < parts_num; i++) {
-        if (*(s8 *)parts->name != 0) {
+        if ((*(s8 *)parts->name == 0) == 0) {
             int tile = parts->minimap_tile;
             if (tile == -1) {
                 parts++;
@@ -773,21 +772,14 @@ void CAutoMapGen::CreatDummyRoot(int room_no) {
         dist_y = -dist_y;
     }
     if (!(dist_x <= dist_y)) {
-        side = kStepLeft;
-        if (dx < 0) {
-            side = kStepRight;
-        }
+        side = dx < 0 ? kStepRight : kStepLeft;
         float d = (float)dx;
         if (d < 0.0f) {
             d = -d;
         }
         steps = iRand((int)d) + 1;
     } else {
-        if (0 > dy) {
-            side = kStepDown;
-        } else {
-            side = kStepUp;
-        }
+        side = dy < 0 ? kStepDown : kStepUp;
         float d = (float)dy;
         if (d < 0.0f) {
             d = -d;
