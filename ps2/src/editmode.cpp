@@ -1153,8 +1153,8 @@ void EditMode(CScene *scene) {
             for (i = 0; i < map_count; i++) {
                 int added = maps[i]->GetColPoly(next_poly, box, poly_rest);
                 ground_count += added;
-                poly_rest -= added;
                 next_poly += added;
+                poly_rest -= added;
                 if (poly_rest < 0) {
                     break;
                 }
