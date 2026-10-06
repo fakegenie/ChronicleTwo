@@ -1469,8 +1469,8 @@ void CommonBoardDraw(float *pos, int &tex_block) {
     prim->Begin(6);
     prim->Texture(Tex_CommonBoard);
     prim->Color(0x80, 0x80, 0x80, 0x80);
-    int row;
     int pass;
+    int row;
     for (row = 0; row < 5; row++) {
         int left = (int)(6.0f + pos[0]);
         int top = (int)(6.0f + board_y);
@@ -1506,7 +1506,8 @@ void CommonBoardDraw(float *pos, int &tex_block) {
     prim->Begin(6);
     prim->Texture(Tex_CommonBoard);
     prim->Color(0x80, 0x80, 0x80, 0x80);
-    PrimQuad(prim, mgRect<int>((int)title_x, (int)title_y, title_uv.right, title_uv.bottom), title_uv);
+    int title_top;
+    PrimQuad(prim, mgRect<int>((int)title_x, title_top = (int)title_y, title_uv.right, title_uv.bottom), title_uv);
     prim->End();
     float blink = 32.0f * sinf(0.05235988f * make_object_husoku_number_blink);
     int blink_rgba[4] = {(int)blink + 0x80, 0x80 - (int)blink, 0x80 - (int)blink, 0x80};
