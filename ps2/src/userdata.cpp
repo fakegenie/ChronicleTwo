@@ -2770,7 +2770,7 @@ void CUserDataManager::RefreshNPCStatus(int mode) {
         refresh = 1;
     }
     if (refresh != 0) {
-        s16 time = fptosi(elapsed);
+        int time = fptosi(elapsed);
         if (NowPartyCharaID() == 0xB) {
             int repair_num = 0;
             if (time > 0) {
@@ -2781,7 +2781,7 @@ void CUserDataManager::RefreshNPCStatus(int mode) {
                     }
                 }
                 if (repair_num > 0) {
-                    s16 uses = 0;
+                    int uses = 0;
                     if (time > 0) {
                         while (uses < time) {
                             if (UseNpcAbility(0xB, 3, 1) == 0) {
@@ -3809,14 +3809,10 @@ short CBattleCharaInfo::GetPalletNo(int slot) {
 }
 #ifdef NONMATCHING
 void CBattleCharaInfo::RefreshParamater() {
-    float weapon_rate[2] = {1.0f, 1.0f};
-    short status[10];
-    int capacity;
-
     if (chara_data == NULL) {
         return;
     }
-    memset(weapon_param, 0, sizeof(weapon_param));
+    memset(weapon_param, 0, 0x40);
     BATTLE_WEAPON_PARAM *param = weapon_param;
     CUserDataManager *user_data = GetUserDataMan();
     now_npc = 0;
@@ -3825,71 +3821,74 @@ void CBattleCharaInfo::RefreshParamater() {
     }
     CGameDataUsed *equipment = equip;
     CScene *scene = GetMainScene();
-    switch (chara_type) {
-        case BATTLE_CHARA_HUMAN:
-            if (((CHARA_DATA *)chara_data)->status_attr & CHARA_STATUS_POWER) {
-                weapon_rate[0] = 1.5f;
-                weapon_rate[1] = 1.5f;
-            }
-            defence = ((CHARA_DATA *)chara_data)->defence;
-            for (int i = 0; i < 2; i++) {
-                CGameDataUsed *item = &equipment[i];
-                item->GetStatusParam(status, scene->time);
-                param->status[0] = fptosi((float)status[0] * weapon_rate[i]);
-                param->status[1] = status[1];
-                param->status[2] = status[2];
-                param->status[3] = status[3];
-                param->status[4] = status[4];
-                param->status[5] = status[5];
-                param->status[6] = status[6];
-                param->status[7] = status[7];
-                param->status[8] = status[8];
-                param->status[9] = status[9];
-                param->special = item->data.weapon.special;
-                param->pallet_no = item->GetPalletColor();
-                param++;
-            }
-            break;
-        case BATTLE_CHARA_ROBO:
-            robo_hp_drain = 0.006f * ((float)CheckNowRoboUseCapacity((ROBO_DATA *)chara_data, &capacity) / (float)capacity);
-            defence = ((ROBO_DATA *)chara_data)->GetDefenceVol();
-            for (int i = 0; i < 2; i++) {
-                param->status[0] = equipment->data.weapon.level;
-                param->status[1] = equipment->data.weapon.status[0];
-                param->status[2] = equipment->data.weapon.status[1];
-                param->status[3] = equipment->data.weapon.attribute[0];
-                param->status[4] = equipment->data.weapon.attribute[1];
-                param->status[5] = equipment->data.weapon.attribute[2];
-                param->status[6] = equipment->data.weapon.attribute[3];
-                param->status[7] = equipment->data.weapon.attribute[4];
-                param->status[8] = equipment->data.weapon.attribute[5];
-                param->status[9] = equipment->data.weapon.attribute[6];
-                param++;
-            }
-            break;
-        case BATTLE_CHARA_MONSTER: {
-            monster_hp_drain = 0.005f;
-            if (user_data->monster_box.IsChange(0xC) != 0) {
-                monster_hp_drain = 0.0025f;
-            }
-            float monster_rate = 1.0f;
-            if (user_data->monster_box.IsChange(0xB) != 0) {
-                monster_rate = 1.25f;
-            }
-            MOS_CHANGE_PARAM *monster = (MOS_CHANGE_PARAM *)chara_data;
-            weapon_param[0].status[0] = fptosi(monster_rate * (float)monster->GetAttackVol(-1));
-            weapon_param[0].status[1] = fptosi(monster_rate * (float)monster->GetAttackVol(-1));
-            defence = fptosi(monster_rate * (float)monster->GetDefenceVol(-1));
-            weapon_param[0].status[2] = 0;
-            weapon_param[0].status[3] = 0;
-            weapon_param[0].status[4] = 0;
-            weapon_param[0].status[5] = 0;
-            weapon_param[0].status[6] = 0;
-            weapon_param[0].status[7] = 0;
-            weapon_param[0].status[8] = 0;
-            weapon_param[0].status[9] = 0;
-            break;
+    if (chara_type == BATTLE_CHARA_HUMAN) {
+        float weapon_rate[2] = {1.0f, 1.0f};
+        short status[10];
+        if (((CHARA_DATA *)chara_data)->status_attr & CHARA_STATUS_POWER) {
+            weapon_rate[0] = 1.5f;
+            weapon_rate[1] = 1.5f;
         }
+        defence = (u16)((CHARA_DATA *)chara_data)->defence;
+        int i = 0;
+        while (i < 2) {
+            WEAPON_USED *weapon0 = &equipment[i].data.weapon;
+            WEAPON_USED *weapon = weapon0;
+            CGameDataUsed *item = &equipment[i];
+            item->GetStatusParam(status, scene->time);
+            param->status[0] = fptosi((float)status[0] * weapon_rate[i]);
+            param->status[1] = status[1];
+            param->status[2] = status[2];
+            param->status[3] = status[3];
+            param->status[4] = status[4];
+            param->status[5] = status[5];
+            param->status[6] = status[6];
+            param->status[7] = status[7];
+            param->status[8] = status[8];
+            param->status[9] = status[9];
+            param->special = weapon->special;
+            param->pallet_no = item->GetPalletColor();
+            i++;
+            param++;
+        }
+    } else if (chara_type == BATTLE_CHARA_ROBO) {
+        int capacity;
+        robo_hp_drain = 0.006f * ((float)CheckNowRoboUseCapacity((ROBO_DATA *)chara_data, &capacity) / (float)capacity);
+        defence = ((ROBO_DATA *)chara_data)->GetDefenceVol();
+        WEAPON_USED *weapon = &equipment->data.weapon;
+        for (int i = 0; i < 2; i++) {
+            param->status[0] = weapon->level;
+            param->status[1] = weapon->status[0];
+            param->status[2] = weapon->status[1];
+            param->status[3] = weapon->attribute[0];
+            param->status[4] = weapon->attribute[1];
+            param->status[5] = weapon->attribute[2];
+            param->status[6] = weapon->attribute[3];
+            param->status[7] = weapon->attribute[4];
+            param->status[8] = weapon->attribute[5];
+            param->status[9] = weapon->attribute[6];
+            param++;
+        }
+    } else if (chara_type == BATTLE_CHARA_MONSTER) {
+        monster_hp_drain = 0.005f;
+        if (user_data->monster_box.IsChange(0xC) != 0) {
+            monster_hp_drain = 0.0025f;
+        }
+        float monster_rate = 1.0f;
+        if (user_data->monster_box.IsChange(0xB) != 0) {
+            monster_rate = 1.25f;
+        }
+        MOS_CHANGE_PARAM *monster = (MOS_CHANGE_PARAM *)chara_data;
+        weapon_param[0].status[0] = fptosi(monster_rate * (float)monster->GetAttackVol(-1));
+        weapon_param[0].status[1] = fptosi(monster_rate * (float)monster->GetAttackVol(-1));
+        defence = fptosi(monster_rate * (float)monster->GetDefenceVol(-1));
+        weapon_param[0].status[2] = 0;
+        weapon_param[0].status[3] = 0;
+        weapon_param[0].status[4] = 0;
+        weapon_param[0].status[5] = 0;
+        weapon_param[0].status[6] = 0;
+        weapon_param[0].status[7] = 0;
+        weapon_param[0].status[8] = 0;
+        weapon_param[0].status[9] = 0;
     }
     if (scene != NULL) {
         BattleParamater_Time = scene->time;

@@ -3364,9 +3364,10 @@ int _INTERSECTION_POINT(RS_STACKDATA *stack, int argc) {
         printf(at_3303__2, poly_num);
         return 0;
     }
-    int hit_no = CheckHit(poly, poly_num, start, end, hit, 1, ignore_mask);
+    CCPoly *hit_poly = poly;
+    int hit_no = CheckHit(hit_poly, poly_num, start, end, hit, 1, ignore_mask);
     if (hit_no >= 0) {
-        CCPoly *hit_poly = &poly[hit_no];
+        hit_poly += hit_no;
         sceVu0Normalize(normal, hit_poly->normal);
         mgReflectionPlane(normal, hit, start, reflection);
         sceVu0Normalize(reflection, reflection);

@@ -427,6 +427,7 @@ int sndTrack::NoteOff(int key, int velocity) {
 }
 #ifdef NONMATCHING
 int sndTrack::CtrlChg(int ctrl, int value) {
+    int result = 1;
     switch (ctrl) {
     case SND_MIDI_CTRL_VOLUME:
         vol = value;
@@ -438,7 +439,7 @@ int sndTrack::CtrlChg(int ctrl, int value) {
         expression = value;
         break;
     }
-    return 1;
+    return result;
 }
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/snd_seseq", CtrlChg__8sndTrackFii);

@@ -739,7 +739,7 @@ void CDngFreeMap::DrawGlid(mgRect<float> rect) {
 int CheckGeoramaMateria(TRESURE_BOX_FLOOR_INFO *tresure, int floor, int *materia) {
     int cursor;
     int materia_num;
-        int g;
+    int g;
     int group_id;
     TRESURE_BOX_GROUP *group;
     int k;
@@ -1811,7 +1811,6 @@ void CMenuTreeMap::InitEnd() {
     mode = 0;
     key_arg_no = 0;
 }
-#ifdef NONMATCHING
 void CMenuTreeMap::MsgInit() {
     for (int i = 0; i < DNG_TREE_MAP_MES_MAX; i++) {
         mes[i].SetMessData(mes_data, mes_data);
@@ -1835,16 +1834,15 @@ void CMenuTreeMap::MsgInit() {
     }
     help->StepMsg();
     int help_y = mgScreenHeight - 50;
-    help->SetMovePosGyou(0, (mgScreenWidth >> 2) - (help->line_w[0] >> 1), help_y);
+    int line_width = help->line_w[0];
+    int left_width = line_width;
+    help->SetMovePosGyou(0, (mgScreenWidth >> 2) - (left_width >> 1), help_y);
     help->SetMovePosGyou(1, (mgScreenWidth >> 2) * 3 - (help->line_w[1] >> 1), help_y);
     TreeMapSaveDispY = help_y;
     if (TreeMapSaveFlag == 0) {
         help->SetMovePosGyou(1, 600, help_y);
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dngmenu", MsgInit__12CMenuTreeMapFv);
-#endif
 #ifdef NONMATCHING
 int CMenuTreeMap::Step() {
     int result = DNG_TREE_MAP_CONTINUE;
@@ -2504,7 +2502,9 @@ void CMenuTreeMap::Draw() {
             prim->Color(0, 0, 0, board_alpha / 3);
             PrimQuad(prim, 289.0f, 25.0f, mgRect<int>(0, 0xB6, 0xA4, 0x38));
             prim->Color(0x80, 0x80, 0x80, board_alpha);
-            PrimQuad(prim, 286.0f, 22.0f, mgRect<int>(0, 0xB6, 0xA4, 0x38));
+            float quad_x = 286.0f;
+            float quad_y = 22.0f;
+            PrimQuad(prim, quad_x, quad_y, mgRect<int>(0, 0xB6, 0xA4, 0x38));
             prim->End();
             medal_x = 0x19A - GetNumberKeta(medal) * 16;
             medal_y = 0x27;

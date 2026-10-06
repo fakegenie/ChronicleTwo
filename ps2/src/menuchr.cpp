@@ -2368,7 +2368,8 @@ void MenuCharaChangeStarDraw() {
     float offset = size / 2.0f - 2.0f;
     RingCenter center = at_2371__4;
     center.x = menu->star_x + offset;
-    center.y = menu->star_y + 1.1538461f * offset;
+    float center_y;
+    center_y = menu->star_y + 1.1538461f * offset;
     float angle = menu->star_angle;
     mgCDrawPrim *prim = GetMenuPrim();
     mgRect<int> baseRect(0x13F, 0xC0, 0x40, 0x40);
@@ -2389,7 +2390,7 @@ void MenuCharaChangeStarDraw() {
     for (int i = 0; i < 4; i++) {
         prim->TextureCrd((int)crd.uv[i][0], (int)crd.uv[i][1]);
         float x = 1.0f + (center.x + size * cosf(angle));
-        prim->Vertex(x, center.y + 1.1538461f * (size * sinf(angle)), 0.0f);
+        prim->Vertex(x, center_y + 1.1538461f * (size * sinf(angle)), 0.0f);
         angle += 1.5707964f;
     }
     prim->End();
@@ -2410,12 +2411,12 @@ void MenuCharaChangeStarDraw() {
         float x = ringSize * cosf(angle);
         float y = ringSize * sinf(angle);
         x = center.x + x;
-        mgRect<float> inner(x - 0.5f * circle, 6.0f + (center.y + 1.1538461f * (y - 0.5f * circle)), circle,
+        mgRect<float> inner(x - 0.5f * circle, 6.0f + (center_y + 1.1538461f * (y - 0.5f * circle)), circle,
                             circle);
         DrawWakuCircle(prim, MenuCharaChangeBase_Tex, inner, wakuRect, wave, ringSize, (int)alpha, 0x80, 0x80,
                        0x80);
         circle *= 1.4f;
-        mgRect<float> outer(x - 0.5f * circle, 6.0f + (center.y + 1.1538461f * (y - 0.5f * circle)), circle,
+        mgRect<float> outer(x - 0.5f * circle, 6.0f + (center_y + 1.1538461f * (y - 0.5f * circle)), circle,
                             circle);
         DrawWakuCircle(prim, MenuCharaChangeBase_Tex, outer, wakuRect, wave, ringSize, (int)pulseAlpha, 0x80, 0x80,
                        0x80);
@@ -2427,7 +2428,8 @@ void MenuCharaChangeStarDraw() {
         return;
     }
     texManager->ReloadTexture(MenuCharaChangeStar_Tex->block, (sceVif1Packet *)NULL);
-    mgRect<short> starRect(0, 0x20, 8, 8);
+    mgRect<short> starRect;
+    starRect.Set(0, 0x20, 8, 8);
     prim->Begin(6);
     prim->Texture(MenuCharaChangeStar_Tex);
     for (int k = 0; k < CHR_CNG_STAR_NUM; k++) {

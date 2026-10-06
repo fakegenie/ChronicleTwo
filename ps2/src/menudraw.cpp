@@ -1530,8 +1530,8 @@ void CommonBoardDraw(float *pos, int &tex_block) {
     prim->Texture(Tex_CommonBoard);
     prim->Color(0x80, 0x80, 0x80, 0x80);
     int row;
-    int pass;
     int height;
+    int pass;
     for (row = 0; row < 5; row++) {
         int left = (int)(6.0f + pos[0]);
         int top = (int)(6.0f + board_y);
@@ -1582,8 +1582,8 @@ void CommonBoardDraw(float *pos, int &tex_block) {
     prim->Begin(6);
     prim->Texture(Tex_CommonBoard);
     prim->Color(0x80, 0x80, 0x80, 0x80);
-    int number_u;
     int number_v;
+    int number_u;
     for (int i = 0, line_y = 0; i < 4; i++, line_y += 34) {
         MENUFORM_MAKEBRD_LINE *line = &CommonBoardDrawInfo.line[i];
         float line_x = 20.0f + pos[0];
@@ -2440,25 +2440,25 @@ MENUFORMPARTS_TYPE *CMenuPosDataForm::GetEnableEnterPart(void) {
 }
 #ifdef NONMATCHING
 int CMenuPosDataForm::GetNowPosRGBA(MENUFORMPARTS_TYPE *part, MENU_BASETEXINFO *tex_info, float *pos, u8 *rgba) {
-    int dy;
-    int dx;
-    short color;
-    float cos_angle;
-    float sin_angle;
-    float center_x;
-    float sway[4][2];
-    int k;
-    float phase;
     MENU_PARTS_EFFECT_STRUCT1 *effect;
     int i;
+    int k;
+    int n;
+    float center_x;
     float center_y;
+    float angle;
+    float phase;
+    float cos_angle;
+    float sin_angle;
+    float scale_x;
     float scale_y;
     float grow;
-    float rot[4][4];
-    int n;
-    float scale_x;
-    float angle;
     float shrink;
+    int dx;
+    int dy;
+    float rot[4][4];
+    float sway[4][2];
+    short color;
 
     if (part == NULL) {
         return 0;
@@ -2713,6 +2713,9 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
     mgRect<int> bottom2(64, 96, 32, 32);
     mgRect<int> bottom_right(96, 96, 32, 32);
     board_frame_parts parts = at_2919;
+    int i;
+    float put_y;
+    scroll_bar_layers layers;
     parts.rect[0] = &top_left;
     parts.rect[1] = &top;
     parts.rect[2] = &top2;
@@ -2730,8 +2733,8 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
         MenuReloadTexture(tex_block, tex->block);
         put.right = 40;
         float put_x = x + 4.0f;
-        float put_y = y + 262.0f;
-        int clip_left = (int)put_x;
+        put_y = y + 262.0f;
+        int clip_left = put_x;
         int clip_top = (int)(put_y + 20.0f);
         int clip_right = (int)(put_x + 300.0f);
         mgRect<int> clip(clip_left, clip_top, clip_right, (int)(put_y + 50.0f));
@@ -2789,7 +2792,7 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
         for (i = 0; i < 2; i++) {
             put_y = y + 40;
             int put_left;
-            for (j = 0; j < 5; j++) {
+            for (j = 0; j < 5; ++j) {
                 mgRect<int> side(put_left = (int)put_x, (int)put_y, 32, 40);
                 PrimQuad(prim, side, *parts.rect[frmtbl1_2938[part++]]);
                 put_y += 40.0f;
@@ -2803,7 +2806,7 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
         scroll_bar_heights heights = at_2949__2;
         heights.height[0] = ItemBoardScrlBar1.bottom;
         heights.height[2] = ItemBoardScrlBar3.bottom;
-        scroll_bar_layers layers = at_2950__2;
+        layers = at_2950__2;
         layers.layer[0][4] = shadow_alpha;
         layers.layer[1][1] = r;
         layers.layer[1][2] = g;
@@ -2821,7 +2824,7 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
                 prim->TextureCrd(bar->left, bar->top);
                 prim->Vertex(bar_x + layer[0], bar_y + layer[0], 0.0f);
                 prim->TextureCrd(bar->left + bar->right, bar->top + bar->bottom);
-                prim->Vertex(bar_x + bar->right + layer[0], bar_y + heights.height[j] + layer[0], 0.0f);
+                prim->Vertex(bar_x + (bar->right + layer[0]), bar_y + (heights.height[j] + layer[0]), 0.0f);
                 bar_y += heights.height[j];
             }
         }
@@ -5944,8 +5947,8 @@ void CMenuEffect::PresetInfo(MENU_EFFECT_INFO *particle, int no, int mode) {
 void CMenuEffect::Step() {
     end = 0;
     if (run != 0) {
-        MENU_EFFECT_INFO *particle = info;
-        if (particle != NULL) {
+        if (info != NULL) {
+            MENU_EFFECT_INFO *particle = info;
             int i;
             s8 prev_type = type;
             int done = 1;

@@ -1742,9 +1742,6 @@ int MoveCheck(float *pos, float *vel, float *out, MoveCheckInfo *info, CCPoly *p
 }
 #ifdef NONMATCHING
 int GetFootPoly(float *pos, float depth, CCPoly *found, float *ground, CCPoly *polys, int count, int ignore_mask) {
-    s16           ground_kind;
-    s16           foot_sound;
-    s16           area_kind;
     s16           poly_ignore_mask;
     u16           parts_no;
     s16           attribute;
@@ -1752,13 +1749,13 @@ int GetFootPoly(float *pos, float depth, CCPoly *found, float *ground, CCPoly *p
     int           hit_polys[32];
     sceVu0FVECTOR from;
     sceVu0FVECTOR to;
-    sceVu0FVECTOR hit_points[32];
+    sceVu0FVECTOR hit_points[64];
     sceVu0FVECTOR normal;
-    float         normal_y;
     CCPoly       *poly;
     int           hits;
     int           found_ground;
     int           i;
+    float         normal_y;
 
     sceVu0CopyVector(from, pos);
     sceVu0CopyVector(to, pos);
@@ -1768,9 +1765,9 @@ int GetFootPoly(float *pos, float depth, CCPoly *found, float *ground, CCPoly *p
     if (hits == 0) {
         return 0;
     }
-    ground_kind = 0;
-    foot_sound = 0;
-    area_kind = 0;
+    s16 ground_kind = 0;
+    s16 foot_sound = 0;
+    s16 area_kind = 0;
     found_ground = 0;
     for (i = 0; i < hits; i++) {
         sceVu0Normalize(normal, polys[hit_polys[i]].normal);

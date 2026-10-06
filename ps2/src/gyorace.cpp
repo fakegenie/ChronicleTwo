@@ -275,20 +275,21 @@ int sgInitGyoRace(SubGameInfo *info) {
     RaceInfo.fish_num = 6;
     RaceInfo.step_max = 1000;
     RaceInfo.after_goal_step = 20;
-    fish = 0;
+    int racer = 0;
     int progress_offset = 0;
     int param_offset = 0;
     int info_offset = 0;
     do {
         ((grRACE_INFO *)((unsigned char *)&RaceInfo + progress_offset))->progress[0] = new(memory->Alloc(0x5DE)) grRACE_PROGRESS[1000];
-        if (OmakeFlag == 0 && fish == 0) {
+        if (OmakeFlag == 0 && racer == 0) {
             ((grRACE_INFO *)((unsigned char *)&RaceInfo + param_offset))->fish[0].tactics = GetGyoRaceAquariumNo();
         } else if (OmakeFlag != 0) {
-            ((grRACE_INFO *)((unsigned char *)&RaceInfo + param_offset))->fish[0].tactics = GetOmakeGyoracerTactics(fish);
+            ((grRACE_INFO *)((unsigned char *)&RaceInfo + param_offset))->fish[0].tactics = GetOmakeGyoracerTactics(racer);
         } else {
             ((grRACE_INFO *)((unsigned char *)&RaceInfo + param_offset))->fish[0].tactics = (int)(6.0f * mgRnd());
             if (((grRACE_INFO *)((unsigned char *)&RaceInfo + param_offset))->fish[0].tactics >= 6) ((grRACE_INFO *)((unsigned char *)&RaceInfo + param_offset))->fish[0].tactics = 5;
         }
+        int fatigue;
         CGameDataUsed **item = (CGameDataUsed **)((unsigned char *)game_data + progress_offset);
         grRACE_INFO *entry = (grRACE_INFO *)((unsigned char *)&RaceInfo + param_offset);
         char *name = entry->fish[0].name;
@@ -297,12 +298,12 @@ int sgInitGyoRace(SubGameInfo *info) {
         entry->fish[0].bonus_type = fish_item->data.fish.unk_16;
         entry->fish[0].power = fish_item->data.fish.param[4];
         BREEDFISH_USED *data = &fish_item->data.fish;
-        if (OmakeFlag == 0 && fish == 0) {
+        if (OmakeFlag == 0 && racer == 0) {
             if (race_rank[1] == 0) (*(unsigned short *)&data->fatigue)++;
             fish_item = *item;
             BREEDFISH_USED *stamina_pointer = &fish_item->data.fish;
             BREEDFISH_USED *const &stamina_data = stamina_pointer;
-            int fatigue = (unsigned short)fish_item->data.fish.fatigue;
+            fatigue = (unsigned short)fish_item->data.fish.fatigue;
             entry->fish[0].stamina = (int)((float)stamina_data->param[3] - (0.1f * (float)(fatigue - 1) * (float)fish_item->data.fish.param[3]));
             printf((char *)at_1377__4__DATA, fatigue);
         } else {
@@ -319,23 +320,23 @@ int sgInitGyoRace(SubGameInfo *info) {
         lane++;
         if (lane >= 6) lane = 0;
         printf((char *)at_1378__3__DATA, name, entry->fish[0].tactics);
-        fish++;
+        racer++;
         progress_offset += sizeof(grRACE_PROGRESS *);
         param_offset += sizeof(grFISH_PARAM);
         info_offset += sizeof(GYORACE_FISH_INF);
-    } while (fish < 6);
+    } while (racer < 6);
     time_max = grGyoRaceSimulate(&RaceInfo);
-    for (fish = 0; fish < 6; fish++) {
-        scene->GetCharacter(fish_inf[fish].chara_no);
-        grGetFishProgress(&RaceInfo, fish, race_cnt, &old_prog[fish]);
+    for (int racer_no = 0; racer_no < 6; racer_no++) {
+        scene->GetCharacter(fish_inf[racer_no].chara_no);
+        grGetFishProgress(&RaceInfo, racer_no, race_cnt, &old_prog[racer_no]);
     }
     CharaTexb = info->texb;
     fish = 0;
-    progress_offset = 0;
+    int old_prog_offset = 0;
     int game_offset = 0;
     info_offset = 0;
     do {
-        grRACE_PROGRESS *progress = (grRACE_PROGRESS *)((unsigned char *)old_prog + progress_offset);
+        grRACE_PROGRESS *progress = (grRACE_PROGRESS *)((unsigned char *)old_prog + old_prog_offset);
         grGetFishProgress(&RaceInfo, fish, 0.0f, progress);
         textures = &mgTexManager;
         textures->DeleteBlock(CharaTexb);
@@ -372,7 +373,7 @@ int sgInitGyoRace(SubGameInfo *info) {
         character->SetStep(0.3f);
         FishIMGReplace(buffer, character, (*item)->item_no, &(*item)->data.fish);
         fish++;
-        progress_offset += sizeof(grRACE_PROGRESS);
+        old_prog_offset += sizeof(grRACE_PROGRESS);
         game_offset += sizeof(CGameDataUsed *);
         info_offset += sizeof(GYORACE_FISH_INF);
         CharaTexb++;

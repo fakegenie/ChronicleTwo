@@ -2389,11 +2389,9 @@ void EdEventInit(void) {
     EventScriptArg.memory = 0;
     EventScreenEffect.Initialize();
 }
-#ifdef NONMATCHING
 void EventTimeDraw(void) {
     int digit[10];
     int glyph[32];
-    int label[32];
     CSaveData *saveData = GetSaveData();
     if (saveData != NULL && EdEventInfo.stopwatch_start != 0) {
         u64 elapsed;
@@ -2405,15 +2403,22 @@ void EventTimeDraw(void) {
         } else {
             elapsed = saveData->play_time - EdEventInfo.stopwatch_start;
         }
-        if (elapsed >= 0x57E40) {
+        if (0x57E40 <= elapsed) {
             elapsed = 0x57E40;
         }
         int hours = elapsed / 3600;
         int minutes = elapsed % 3600 / 60;
         int hundredths = elapsed % 60 * 100 / 60;
-        for (int i = 0; i < 10; i++) {
-            digit[i] = GetHalfFontNo('0' + i);
-        }
+        digit[0] = GetHalfFontNo('0');
+        digit[1] = GetHalfFontNo('1');
+        digit[2] = GetHalfFontNo('2');
+        digit[3] = GetHalfFontNo('3');
+        digit[4] = GetHalfFontNo('4');
+        digit[5] = GetHalfFontNo('5');
+        digit[6] = GetHalfFontNo('6');
+        digit[7] = GetHalfFontNo('7');
+        digit[8] = GetHalfFontNo('8');
+        digit[9] = GetHalfFontNo('9');
         for (int i = 0; i < 32; i++) {
             glyph[i] = -1;
         }
@@ -2448,8 +2453,7 @@ void EventTimeDraw(void) {
         for (int i = 0; i < 32; i++) {
             if (glyph[i] >= 0) {
                 int page;
-                RECT texture;
-                texture = GetRectFontTex(glyph[i], &page);
+                RECT texture = GetRectFontTex(glyph[i], &page);
                 MySetTex(page, &prim);
                 RECT destination;
                 destination.x = EdEventInfo.stopwatch_x + texture.width * i;
@@ -2461,13 +2465,14 @@ void EventTimeDraw(void) {
                 destination.height = texture.height;
                 set2DSprite_Fuchi(&prim, destination, texture, 8, 0x80);
                 RGBAQ_TYPE color;
-                color.r = color.g = color.b = color.a = 0x80;
+                color.a = color.r = color.g = color.b = 0x80;
                 set2DSpriteEasyFont(&prim,
                     mgRect<int>(destination.x, destination.y, destination.width, destination.height),
                     mgRect<int>(texture.x, texture.y, texture.width, texture.height), &color);
             }
         }
         if (EdEventInfo.stopwatch_style == 1) {
+            int label[32];
             for (int i = 0; i < 32; i++) {
                 label[i] = -1;
             }
@@ -2535,6 +2540,8 @@ void EventTimeDraw(void) {
                 label[12] = GetHalfFontNo('n');
                 label[13] = GetHalfFontNo('a');
                         break;
+                    case 1:
+                    case 3:
                     default:
                 label[0] = GetHalfFontNo('M');
                 label[1] = GetHalfFontNo('o');
@@ -2551,8 +2558,7 @@ void EventTimeDraw(void) {
             for (int i = 0; i < 32; i++) {
                 if (label[i] >= 0) {
                     int page;
-                    RECT texture;
-                    texture = GetRectFontTex(label[i], &page);
+                    RECT texture = GetRectFontTex(label[i], &page);
                     MySetTex(page, &prim);
                     RECT destination;
                     switch (LanguageCode) {
@@ -2569,6 +2575,7 @@ void EventTimeDraw(void) {
                         case 4:
                             destination.x = (int)(EdEventInfo.stopwatch_x + 0.5 * texture.width * i - 28.0);
                             break;
+                        case 1:
                         default:
                             destination.x = EdEventInfo.stopwatch_x + texture.width * i - 4;
                             break;
@@ -2581,7 +2588,7 @@ void EventTimeDraw(void) {
                     destination.height = texture.height;
                     set2DSprite_Fuchi(&prim, destination, texture, 8, 0x80);
                     RGBAQ_TYPE color;
-                    color.r = color.g = color.b = color.a = 0x80;
+                    color.a = color.r = color.g = color.b = 0x80;
                     set2DSpriteEasyFont(&prim,
                         mgRect<int>(destination.x, destination.y, destination.width, destination.height),
                         mgRect<int>(texture.x, texture.y, texture.width, texture.height), &color);
@@ -2591,9 +2598,6 @@ void EventTimeDraw(void) {
         prim.End();
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/event_func", EventTimeDraw__Fv);
-#endif
 void EdEventDraw(void) {
     int hitNo;
     int spriteNo;
@@ -3750,11 +3754,38 @@ int LoadMovie(char *name, mgCMemory *memory, bool skip) {
             mgBeginFrame(NULL);
         }
         GamePad__2.UpDate();
-        if (movie.EndCheck() != 0) {
-            break;
+        if (movie.EndCheck() != 0 || (DebugFlag != 0 && GamePad__2.Down(0x800) != 0)) {
+        movie.Term();
+        textures->ReloadTexture(movieBlock, (sceVif1Packet *)NULL);
+        mgBeginFrame(NULL);
+        mgCDrawPrim endDraw;
+        endDraw.Initialize(NULL, NULL);
+        endDraw.AlphaTestEnable(0);
+        endDraw.TextureMapEnable(1);
+        endDraw.Begin(6);
+        endDraw.Color(0, 0, 0, 0x80);
+        endDraw.Vertex(0, 0, 0);
+        endDraw.Vertex(mgScreenWidth, mgScreenHeight, 0);
+        endDraw.Texture(movieTexture);
+        endDraw.Color(0x80, 0x80, 0x80, 0x80);
+        endDraw.TextureCrd(1, 1);
+        endDraw.Vertex(0, 0, 0);
+        endDraw.TextureCrd(0x1FE, 0x19E);
+        endDraw.Vertex(mgScreenWidth, mgScreenHeight, 0);
+        endDraw.End();
+        EventScene->fade.FadeOut(1, 0.0f, 0.0f, 0.0f);
+        mgEndFrame(NULL);
+        mgBeginFrame(NULL);
+        memory->stack_used = 0;
+        memory->lock = 0;
+        textures->DeleteBlock(movieBlock);
+        if (EdEventInfo.caption_enable != 0 && captionOff == 0) {
+            textures->DeleteBlock(captionBlock);
+            textures->EnterIMGFile(GetGaijiImgPtr(), fontBlock, NULL, NULL);
+            ReLoadFontTexture(fontBlock);
+            textures->EnterIMGFile(GetFontTex2ImgPtr(), fontBlock, NULL, NULL);
         }
-        if (DebugFlag != 0 && GamePad__2.Down(0x800) != 0) {
-            break;
+            return 1;
         }
         textures->ReloadTexture(movieBlock, (sceVif1Packet *)NULL);
         movie.SwitchThread();
@@ -3802,37 +3833,6 @@ int LoadMovie(char *name, mgCMemory *memory, bool skip) {
         mgEndFrame(NULL);
         frame++;
     }
-    movie.Term();
-    textures->ReloadTexture(movieBlock, (sceVif1Packet *)NULL);
-    mgBeginFrame(NULL);
-    mgCDrawPrim endDraw;
-    endDraw.Initialize(NULL, NULL);
-    endDraw.AlphaTestEnable(0);
-    endDraw.TextureMapEnable(1);
-    endDraw.Begin(6);
-    endDraw.Color(0, 0, 0, 0x80);
-    endDraw.Vertex(0, 0, 0);
-    endDraw.Vertex(mgScreenWidth, mgScreenHeight, 0);
-    endDraw.Texture(movieTexture);
-    endDraw.Color(0x80, 0x80, 0x80, 0x80);
-    endDraw.TextureCrd(1, 1);
-    endDraw.Vertex(0, 0, 0);
-    endDraw.TextureCrd(0x1FE, 0x19E);
-    endDraw.Vertex(mgScreenWidth, mgScreenHeight, 0);
-    endDraw.End();
-    EventScene->fade.FadeOut(1, 0.0f, 0.0f, 0.0f);
-    mgEndFrame(NULL);
-    mgBeginFrame(NULL);
-    memory->stack_used = 0;
-    memory->lock = 0;
-    textures->DeleteBlock(movieBlock);
-    if (EdEventInfo.caption_enable != 0 && captionOff == 0) {
-        textures->DeleteBlock(captionBlock);
-        textures->EnterIMGFile(GetGaijiImgPtr(), fontBlock, NULL, NULL);
-        ReLoadFontTexture(fontBlock);
-        textures->EnterIMGFile(GetFontTex2ImgPtr(), fontBlock, NULL, NULL);
-    }
-    return 1;
 }
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/event_func", LoadMovie__FPcP9mgCMemoryb);
@@ -10000,33 +10000,36 @@ int _BGM_PLAY_ENABLE(RS_STACKDATA *stack, int argc) {
 #ifdef NONMATCHING
 int _GET_DEF_BGM_NO(RS_STACKDATA *stack, int argc) {
     int sndId;
+    int bgmNo;
     if (argc == 1) {
         CScene *scene = EventScene;
-        int subMapNo = scene->now_sub_map_no;
-        if (0 < subMapNo) {
-            sndId = GetMapSndDataID(subMapNo);
+        if (0 < scene->now_sub_map_no) {
+            sndId = GetMapSndDataID(scene->now_sub_map_no);
         } else {
             sndId = GetMapSndDataID(scene->now_map_no);
         }
-        SetStack__FP12RS_STACKDATAi__2(stack, EventScene->GetDefBgmNo(sndId));
-    } else if (argc == 2) {
-        sndId = GetMapSndDataID(GetStackInt__FP12RS_STACKDATA__2(stack++));
-        SetStack__FP12RS_STACKDATAi__2(stack, EventScene->GetDefBgmNo(sndId));
-    } else {
-        return 0;
+        bgmNo = EventScene->GetDefBgmNo(sndId);
+        SetStack__FP12RS_STACKDATAi__2(stack, bgmNo);
+        return 1;
     }
-    return 1;
+    if (argc == 2) {
+        sndId = GetMapSndDataID(GetStackInt__FP12RS_STACKDATA__2(stack++));
+        bgmNo = EventScene->GetDefBgmNo(sndId);
+        SetStack__FP12RS_STACKDATAi__2(stack, bgmNo);
+        return 1;
+    }
+    return 0;
 }
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/event_func", _GET_DEF_BGM_NO__FP12RS_STACKDATAi);
 #endif
 #ifdef NONMATCHING
 int _SET_MOVIE_CC(RS_STACKDATA *stack, int argc) {
-    int no;
-    int frames;
-    char *text;
-    int start;
     int i;
+    int no;
+    int start;
+    char *text;
+    int frames;
     int mode = GetStackInt__FP12RS_STACKDATA__2(stack++);
     switch (mode) {
         case 0:
@@ -10050,9 +10053,10 @@ int _SET_MOVIE_CC(RS_STACKDATA *stack, int argc) {
             if (no >= 18) {
                 return 0;
             }
+            frames = frames * 50 / 60;
             EdEventInfo.caption_start[no] = start * 50 / 60;
             strcpy(EdEventInfo.caption_text[no], text);
-            EdEventInfo.caption_frames[no] = frames * 50 / 60;
+            EdEventInfo.caption_frames[no] = frames;
             break;
         default:
             return 0;
@@ -10365,7 +10369,6 @@ void _EOH_SET_STEP(RS_STACKDATA *stack, int argc) {
     argc = GetStackInt__FP12RS_STACKDATA__2(stack++);
     SetStep__10CEohMotherFif(&EventObjHandleMother, EventAbi::GetStackFloat__FP12RS_STACKDATA__2(stack, argc));
 }
-#ifdef NONMATCHING
 int _EOH_SET_TEX_ANIM(RS_STACKDATA *stack, int argc) {
     int no = GetStackInt__FP12RS_STACKDATA__2(stack);
     switch (stack[1].type) {
@@ -10374,7 +10377,8 @@ int _EOH_SET_TEX_ANIM(RS_STACKDATA *stack, int argc) {
                 return EventObjHandleMother.SetTexAnim(no, 0, NULL);
             }
             if (argc == 3) {
-                return EventObjHandleMother.SetTexAnim(no, GetStackInt__FP12RS_STACKDATA__2(stack + 1), GetStackString__FP12RS_STACKDATA__2(stack + 2));
+                int result = EventObjHandleMother.SetTexAnim(no, GetStackInt__FP12RS_STACKDATA__2(stack + 1), GetStackString__FP12RS_STACKDATA__2(stack + 2));
+                return result;
             }
             return 0;
         case RS_STR: {
@@ -10388,9 +10392,6 @@ int _EOH_SET_TEX_ANIM(RS_STACKDATA *stack, int argc) {
     }
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/event_func", _EOH_SET_TEX_ANIM__FP12RS_STACKDATAi);
-#endif
 int _EOH_SET_SCALE(RS_STACKDATA *stack, int argc) {
     int no = GetStackInt__FP12RS_STACKDATA__2(stack++);
     float x = GetStackFloat__FP12RS_STACKDATA__2(stack++);
@@ -12649,10 +12650,9 @@ int _CANCEL_NOW_LOADING(RS_STACKDATA *stack, int argc) {
 }
 #ifdef NONMATCHING
 int _ESM_INITIALIZE(RS_STACKDATA *stack, int argc) {
-    int stackNo;
     int texbOffset = 0;
+    int stackNo = GetStackInt__FP12RS_STACKDATA__2(stack++);
     mgCMemory *memory;
-    stackNo = GetStackInt__FP12RS_STACKDATA__2(stack++);
     if (argc >= 2) {
         texbOffset = GetStackInt__FP12RS_STACKDATA__2(stack);
     }
@@ -13032,7 +13032,6 @@ int _IS_CLEAR_DESTROY(RS_STACKDATA *stack, int argc) {
 }
 #ifdef NONMATCHING
 int _IS_CLEAR_PRACTICE(RS_STACKDATA *stack, int argc) {
-    int bonus;
     if (argc != 3) {
         return 0;
     }
@@ -13057,7 +13056,8 @@ int _IS_CLEAR_PRACTICE(RS_STACKDATA *stack, int argc) {
     if (info == NULL) {
         return 0;
     }
-    if (info->practice_type == 2) {
+    int bonus = info->practice_type;
+    if (bonus == 2) {
         int param = info->practice_param;
         switch (param) {
             case 1:
@@ -13828,7 +13828,7 @@ int _GET_FLOOR_STATUS(RS_STACKDATA *stack, int argc) {
     if (info == NULL) {
         return 0;
     }
-    SetStack__FP12RS_STACKDATAi__2(stack, info->floor_status);
+    SetStack__FP12RS_STACKDATAi__2(stack, (u_long)(u_int) info->floor_status);
     return 1;
 }
 #else

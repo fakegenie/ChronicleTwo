@@ -2229,8 +2229,8 @@ int _SET_DEAD_OFF(RS_STACKDATA *args, int argc) {
         return 0;
     }
     nowMonster->dead_alpha = 128;
-    height = 2.0f * nowMonster->body_height;
     radius = 3.0f * nowMonster->body_width;
+    height = 2.0f * nowMonster->body_height;
     if (height >= 60.0f) {
         height = 60.0f;
     }

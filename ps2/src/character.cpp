@@ -2470,28 +2470,22 @@ mgCFrame *CreateChangeFrame(mgLoadData *data, mgCFrame *target) {
 #ifdef NONMATCHING
 
 static int _SKIN_MOTION(SPI_STACK *stack, int count) {
-    mgCMemory           work_memory;
-    mgCreateVisualType  visual_type[64];
-    mgIMG_HEADER        image_header;
-    mgLoadData          load;
-    u_long128           work_buffer[6400];
-    sceVu0FVECTOR       box_max;
-    sceVu0FVECTOR       box_min;
-    mgCFrame           *root;
-    mgCFrame           *source_frame;
-    mgCFrame           *dest_frame;
-    mgCVisualMDT       *visual;
-    char               *matrix_name;
-    char               *weight_name;
-    unsigned char      *weight_file;
-    unsigned char      *matrix_file;
-    unsigned char      *model_file;
-    unsigned char      *image;
-    char              **group_names;
-    int                 index;
-    int                 visual_count;
-    int                 deform_index;
-    int                 image_count;
+    mgCreateVisualType visual_type[64];
+    mgLoadData load;
+    u_long128 work_buffer[6400];
+    sceVu0FVECTOR box_max;
+    sceVu0FVECTOR box_min;
+    mgCFrame *root;
+    mgCVisualMDT *visual;
+    char *matrix_name;
+    unsigned char *weight_file;
+    unsigned char *image;
+    char **group_names;
+    char *weight_name;
+    int visual_count;
+    mgCFrame *dest_frame;
+    int deform_index;
+    int image_count;
 
     if (nowChr->CObjectFrame::frame == NULL) {
         return 0;
@@ -2501,21 +2495,26 @@ static int _SKIN_MOTION(SPI_STACK *stack, int count) {
     matrix_name = spiGetStackString(stack++);
     weight_name = spiGetStackString(stack++);
     weight_file = (unsigned char *)GetPackFile(pack_file, weight_name, NULL);
+    unsigned char *matrix_file;
     matrix_file = (unsigned char *)GetPackFile(pack_file, matrix_name, NULL);
     if (weight_file == NULL) {
         printf("not found %s\n", weight_name);
         return 0;
     }
+    mgCFrame *root_skin_frame2 = root_skin_frame;
     if (nowChr->shape_anime == 0) {
+        int index;
+        unsigned char *model_file;
         model_file = (unsigned char *)GetPackFile(pack_file, skin_mds_name, NULL);
+        mgCMemory work_memory;
         visual_count = 0;
         deform_index = 0;
         for (index = 0; index < nowChr->deform_frame_num; index++) {
             if (nowChr->deform_frame[deform_index] != NULL) {
                 visual_type[visual_count].type = MG_VISUAL_CREATE_MOTION_MDT;
                 visual_type[visual_count].name = nowChr->deform_frame[deform_index]->name;
-                visual_count++;
                 deform_index++;
+                visual_count++;
             }
         }
         visual_type[visual_count].type = MG_VISUAL_CREATE_END;
@@ -2525,8 +2524,8 @@ static int _SKIN_MOTION(SPI_STACK *stack, int count) {
             memcpy(image, load_img_ptr, load_img_size);
             image_count = mgGetIMGHeaderNum((char *)image);
             for (index = 0; index < image_count; index++) {
-                image_header = mgGetIMGHeader((char *)image, index);
-                mgTexManager.DeleteTexture(image_header.name, set_imgblock);
+                mgIMG_HEADER header = mgGetIMGHeader((char *)image, index);
+                mgTexManager.DeleteTexture(header.name, set_imgblock);
             }
             mgTexManager.EnterIMGFile(image, set_imgblock, base_stack, NULL);
             group_names = mgTexManager.GetGroupNameList(set_imgblock, &nowChr->tex_anime_group_num);
@@ -2551,23 +2550,28 @@ static int _SKIN_MOTION(SPI_STACK *stack, int count) {
             return 0;
         }
         root = nowChr->CObjectFrame::frame;
-        for (index = 0; index < root_skin_frame->frame_num; index++) {
-            source_frame = root_skin_frame->frame_list[index];
-            if (source_frame != NULL && source_frame->visual != NULL) {
-                source_frame->GetBBox(box_max, box_min);
-                dest_frame = root->SearchFrame(source_frame->name);
-                if (dest_frame != NULL) {
-                    dest_frame->SetVisual(source_frame->visual);
-                    dest_frame->SetBBox(box_max, box_min);
+        index = 0;
+        if (index < root_skin_frame2->frame_num) {
+            do {
+                mgCFrame *source_frame = root_skin_frame2->frame_list[index];
+                if (source_frame != NULL && NULL != source_frame->visual) {
+                    source_frame->GetBBox(box_max, box_min);
+                    dest_frame = root->SearchFrame(source_frame->name);
+                    if (dest_frame != NULL) {
+                        dest_frame->SetVisual(source_frame->visual);
+                        dest_frame->SetBBox(box_max, box_min);
+                    }
                 }
-            }
+                index++;
+            } while (index < root_skin_frame2->frame_num);
         }
     } else {
         if (skin_frame != NULL) {
             root = nowChr->CObjectFrame::frame;
             if (root != NULL) {
                 visual = (mgCVisualMDT *)skin_frame->visual;
-                ChangeWeight(nowChr->motion[0].skin_list, base_stack, weight_file, root->SearchFrameID(skin_name_ptr), nowChr->motion[0].frame_info, visual, root, root_skin_frame);
+                int skin_id = root->SearchFrameID(skin_name_ptr);
+                ChangeWeight(nowChr->motion[0].skin_list, base_stack, weight_file, skin_id, nowChr->motion[0].frame_info, visual, root, root_skin_frame);
                 dest_frame = root->SearchFrame(skin_name_ptr);
                 if (dest_frame != NULL) {
                     dest_frame->SetVisual(visual);

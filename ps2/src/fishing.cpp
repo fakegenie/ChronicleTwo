@@ -2528,11 +2528,11 @@ int GetUkiWaitTime(FISH_DATA *fish, CScene *scene, float *position, int rod_no, 
     int fish_no;
     float size;
     float weight;
-    float length_scale;
     float width_scale;
-    float pull_strength;
-    int fishing_point;
+    float length_scale;
+    int time_affinity;
     int wait_time;
+    int bait_affinity;
 
     if (bait_no < 0) {
         fish->fish_no = -1;
@@ -2540,28 +2540,30 @@ int GetUkiWaitTime(FISH_DATA *fish, CScene *scene, float *position, int rod_no, 
     }
     int time_band = GetTimeBand(scene->time);
     int place_num = GetAppearFish(scene->GetMainMapNo(), position, place, 16);
-    for (int i = 0; i < place_num; i++) {
+    for (int i = 0; i < place_num; i = i + 1) {
         FISH_PARAM *param = GetFishParam(place[i].fish_no);
         if (param != NULL) {
-            int bait_affinity = 0;
-            if (bait_no >= 0 && bait_no < 18) {
+            bait_affinity = 0;
+            if (0 <= bait_no && bait_no < 18) {
                 bait_affinity = param->bait_affinity[bait_no];
             }
-            if (place[i].fish_no > 0) {
+            FISH_PLACE *entry = &place[i];
+            int candidate_no = entry->fish_no;
+            if (candidate_no > 0) {
                 switch (bait_affinity) {
                     case FISH_AFFINITY_NORMAL:
                         break;
                     case FISH_AFFINITY_NONE:
-                        place[i].rate = 0.0f;
+                        entry->rate = 0.0f;
                         break;
                     case FISH_AFFINITY_LOW:
-                        place[i].rate = place[i].rate * 0.5f;
+                        entry->rate *= 0.5f;
                         break;
                     case FISH_AFFINITY_HIGH:
-                        place[i].rate = place[i].rate * 1.5f;
+                        entry->rate = entry->rate * 1.5f;
                         break;
                 }
-                int time_affinity = 0;
+                time_affinity = 0;
                 if (time_band >= 0 && time_band < 4) {
                     time_affinity = param->time_band_affinity[time_band];
                 }
@@ -2569,21 +2571,21 @@ int GetUkiWaitTime(FISH_DATA *fish, CScene *scene, float *position, int rod_no, 
                     case FISH_AFFINITY_NORMAL:
                         break;
                     case FISH_AFFINITY_NONE:
-                        place[i].rate = 0.0f;
+                        entry->rate = 0.0f;
                         break;
                     case FISH_AFFINITY_LOW:
-                        place[i].rate = place[i].rate * 0.5f;
+                        entry->rate *= 0.5f;
                         break;
                     case FISH_AFFINITY_HIGH:
-                        place[i].rate = place[i].rate * 1.5f;
+                        entry->rate *= 1.5f;
                         break;
                 }
             }
-            if (place[i].fish_no == 0) {
-                place[i].rate = place[i].rate * (1.0f - 0.5f * RodData.status4_rate);
+            if (entry->fish_no == 0) {
+                entry->rate = entry->rate * (1.0f - 0.5f * RodData.status4_rate);
             }
-            rate_sum += place[i].rate;
-            if (!(place[i].rate <= 0.0f)) {
+            rate_sum += entry->rate;
+            if (!(entry->rate <= 0.0f)) {
                 candidate_num++;
             }
         }
@@ -2592,26 +2594,28 @@ int GetUkiWaitTime(FISH_DATA *fish, CScene *scene, float *position, int rod_no, 
     float cumulative = 0.0f;
     picked = 0;
     for (; picked < place_num; picked++) {
-        place[picked].rate = place[picked].rate / rate_sum;
-        if (!(place[picked].rate <= 0.0f)) {
-            cumulative += place[picked].rate;
+        FISH_PLACE *picked_entry = &place[picked];
+        picked_entry->rate = picked_entry->rate / rate_sum;
+        if (!(picked_entry->rate <= 0.0f)) {
+            cumulative += picked_entry->rate;
             if (!(cumulative <= roll)) {
                 break;
             }
         }
     }
     int wait_base = 240;
-    int wait_extra = 240;
     FavoredEsa = 0;
+    int fishing_point;
     fishing_point = 0;
-    fish_no = place[picked].fish_no;
     size = 100.0f;
+    fish_no = place[picked].fish_no;
     width_scale = 1.0f;
     length_scale = 1.0f;
-    pull_strength = 0.5f;
+    float pull_strength = 0.5f;
     if (MardanEventMap != 0 && bait_no == 4 && position[0] < 1000.0f && position[2] < -300.0f) {
         MardanEventPlace = 1;
     }
+    int wait_extra = 240;
     if (MardanEventPlace != 0) {
         fish->vigour_recovery = 0.005f;
         fish_no = 7;
@@ -2628,10 +2632,12 @@ int GetUkiWaitTime(FISH_DATA *fish, CScene *scene, float *position, int rod_no, 
         }
         float wait_bias = 0.0f;
         if (fish_no > 0) {
-            FISH_PARAM *param = GetFishParam(fish_no);
+            FISH_PARAM *const entry = GetFishParam(fish_no);
             int bait_affinity = 0;
-            if (bait_no >= 0 && bait_no < 18) {
-                bait_affinity = param->bait_affinity[bait_no];
+            if (bait_no >= 0) {
+                if (bait_no < 18) {
+                    bait_affinity = entry->bait_affinity[bait_no];
+                }
             }
             FavoredEsa = bait_affinity;
             wait_bias = place[picked].wait_bias;
@@ -2641,12 +2647,12 @@ int GetUkiWaitTime(FISH_DATA *fish, CScene *scene, float *position, int rod_no, 
             if (wait_bias < -2.0f) {
                 wait_bias = -2.0f;
             }
-            size = GetRandamNumber(param->min_size * CastDistSizeRate, param->max_size * CastDistSizeRate,
-                                   param->min_size * CastDistSizeRate / 2.0f);
+            size = GetRandamNumber(entry->min_size * CastDistSizeRate, entry->max_size * CastDistSizeRate, entry->min_size * CastDistSizeRate / 2.0f);
             if (GetCaptureMode() != 0) {
                 size = 60.0f;
             }
-            length_scale = size / param->base_size * 1.05f;
+            float growth = size / entry->base_size * 1.05f;
+            length_scale = growth;
             if (!(length_scale <= 4.0f)) {
                 length_scale = 4.0f;
             }
@@ -2655,9 +2661,9 @@ int GetUkiWaitTime(FISH_DATA *fish, CScene *scene, float *position, int rod_no, 
                 width_rate = 1.3f;
             }
             width_scale = length_scale * width_rate;
-            weight = width_rate * (size * param->weight_rate);
-            pull_strength = param->pull_rate * (size / 80.0f * width_rate);
-            fishing_point = fptosi(width_rate * (param->fishing_point_rate * size));
+            pull_strength = entry->pull_rate * (size / 80.0f * width_rate);
+            weight = width_rate * (size * entry->weight_rate);
+            fishing_point = fptosi(width_rate * (size * entry->fishing_point_rate));
             if (GetFishingMode() == 2) {
                 fishing_point *= 2;
             }
@@ -2667,19 +2673,17 @@ int GetUkiWaitTime(FISH_DATA *fish, CScene *scene, float *position, int rod_no, 
             wait_extra = 240 / 2;
         }
         if (!(wait_bias < 0.0f)) {
-            float rate = 1.0f + wait_bias;
-            wait_time = fptosi((float)wait_base / rate);
-            int extra = fptosi((float)wait_extra / rate);
-            wait_time += fptosi((float)extra * mgRnd());
+            wait_time = fptosi(wait_base / (1.0f + wait_bias));
+            wait_time += fptosi((float)fptosi((float)wait_extra / (1.0f + wait_bias)) * mgRnd());
         } else {
-            float rate = 1.0f - wait_bias;
-            wait_time = fptosi((float)wait_base * rate);
-            int extra = fptosi((float)wait_extra / rate);
+            wait_time = fptosi((float)wait_base * (1.0f - wait_bias));
+            int extra = fptosi((float)wait_extra / (1.0f - wait_bias));
             wait_time += fptosi((float)extra * mgRnd());
         }
     }
     int rod_power = RodData.status[2] - 10;
-    if (rod_power < 0) {
+    int temp2 = rod_power < 0;
+    if (temp2) {
         rod_power = 0;
     }
     fish->fish_no = fish_no;

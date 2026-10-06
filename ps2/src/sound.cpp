@@ -169,7 +169,7 @@ int CSound::Init(int mode0, int mode1, int depth0, int depth1) {
         msinBfGrp[0].buffCtx = NULL;
         msinBfGrp[1].buffNum = MIDI_MSIN_PORT_COUNT;
         msinBfGrp[1].buffCtx = msinBfCtx;
-        for (port = 0; port < MIDI_MSIN_PORT_COUNT; port++) {
+        for (int port = 0; port < MIDI_MSIN_PORT_COUNT; port++) {
             msinBfCtx[port].sema = 0;
             msinBfCtx[port].buff = &msinBf[port];
             msinBf[port].size = sizeof(MSIN_BUFFER);

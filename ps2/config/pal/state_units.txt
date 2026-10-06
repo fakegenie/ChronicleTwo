@@ -28,3 +28,4 @@ pbuggy drafts
 menushop drafts primer=u64div
 menumap primer=u64div
 menumain primer=u64div
+gyorace primer=u64div

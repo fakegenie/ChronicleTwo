@@ -213,55 +213,87 @@ void dbgCJISFont::Clear(void) {
 }
 #ifdef NONMATCHING
 void dbgCJISFont::__putc(unsigned long serno) {
-    if (serno >= DBG_FONT_SERNO_END) return;
-    int sheet = DBG_FONT_SHEET_FULL_WIDTH_0;
-    int glyph_width = 16;
-    if (serno >= DBG_FONT_SERNO_HALF_WIDTH) {
-        sheet = DBG_FONT_SHEET_HALF_WIDTH;
-        serno -= DBG_FONT_SERNO_HALF_WIDTH;
-        glyph_width = 9;
-    } else if (serno >= DBG_FONT_SERNO_SHEET_1) {
-        sheet = DBG_FONT_SHEET_FULL_WIDTH_1;
-        serno -= DBG_FONT_SERNO_SHEET_1;
-    }
-    if (loaded_texture_id != texture_id[sheet]) mgTexManager.ReloadTexture(texture_id[sheet], (sceVif1Packet *)NULL);
-    mgCTexture *texture = mgTexManager.GetTexture(texture_name[sheet], -1);
-    loaded_texture_id = texture_id[sheet];
-    mgCDrawPrim prim;
-    prim.Initialize(NULL, NULL);
-    prim.DepthTestEnable(0);
-    prim.AlphaTestEnable(0);
-    prim.AlphaBlendEnable(1);
-    int advance = char_width - (16 - (glyph_width - 1));
-    if (back_enable) {
-        prim.Begin(6);
-        prim.Color(back_color[0], back_color[1], back_color[2], back_color[3]);
-        prim.Vertex(x - 1, y - 1, 0);
-        prim.Vertex(x + advance, y + char_height + 1, 0);
-        prim.End();
-    }
-    prim.TextureMapEnable(1);
-    int tex_x = (serno & 63) * 16;
-    int tex_y = (serno >> 6) * 16;
-    if (shadow_enable) {
+    long glyph_width = 16;
+    mgCTexture *texture;
+    int loaded;
+    mgCTextureManager *textures = &mgTexManager;
+
+    if (serno < DBG_FONT_SERNO_END) {
+        if (serno >= DBG_FONT_SERNO_HALF_WIDTH) {
+            if (loaded_texture_id != texture_id[DBG_FONT_SHEET_HALF_WIDTH]) {
+                textures->ReloadTexture(texture_id[DBG_FONT_SHEET_HALF_WIDTH], (sceVif1Packet *)NULL);
+            }
+            texture = textures->GetTexture(texture_name[DBG_FONT_SHEET_HALF_WIDTH], -1);
+            serno -= DBG_FONT_SERNO_HALF_WIDTH;
+            loaded = texture_id[DBG_FONT_SHEET_HALF_WIDTH];
+            glyph_width = 9;
+        } else if (serno >= DBG_FONT_SERNO_SHEET_1) {
+            if (loaded_texture_id != texture_id[DBG_FONT_SHEET_FULL_WIDTH_1]) {
+                textures->ReloadTexture(texture_id[DBG_FONT_SHEET_FULL_WIDTH_1], (sceVif1Packet *)NULL);
+            }
+            texture = textures->GetTexture(texture_name[DBG_FONT_SHEET_FULL_WIDTH_1], -1);
+            serno -= DBG_FONT_SERNO_SHEET_1;
+            loaded = texture_id[DBG_FONT_SHEET_FULL_WIDTH_1];
+        } else {
+            if (loaded_texture_id != texture_id[DBG_FONT_SHEET_FULL_WIDTH_0]) {
+                textures->ReloadTexture(texture_id[DBG_FONT_SHEET_FULL_WIDTH_0], (sceVif1Packet *)NULL);
+            }
+            texture = textures->GetTexture(texture_name[DBG_FONT_SHEET_FULL_WIDTH_0], -1);
+            loaded = texture_id[DBG_FONT_SHEET_FULL_WIDTH_0];
+        }
+        loaded_texture_id = loaded;
+        mgCDrawPrim prim;
+        prim.Initialize(NULL, NULL);
+        prim.DepthTestEnable(0);
+        prim.AlphaTestEnable(0);
+        prim.AlphaBlendEnable(1);
+        if (back_enable != 0) {
+            prim.Begin(6);
+            prim.Color(back_color[0], back_color[1], back_color[2], back_color[3]);
+            prim.Vertex(x - 1, y - 1, 0);
+            prim.Vertex(x + (char_width - (15 - (glyph_width - 1))), y + char_height + 1, 0);
+            prim.End();
+        }
+        prim.TextureMapEnable(1);
+        if (shadow_enable != 0) {
+            long column = serno & 0x3F;
+            int tex_x = column * 16;
+            int tex_y = ((serno - column) >> 6) * 16;
+            prim.Begin(6);
+            prim.Texture(texture);
+            prim.Color(0, 0, 0, 128);
+            prim.TextureCrd(tex_x + 1, tex_y + 1);
+            prim.Vertex(x - 1, y - 1, 0);
+            prim.TextureCrd(glyph_width - 1 + tex_x, tex_y + 15);
+            prim.Vertex(x + (char_width - (15 - (glyph_width - 1))), y + char_height + 1, 0);
+            prim.End();
+        }
         prim.Begin(6);
         prim.Texture(texture);
-        prim.Color(0, 0, 0, 128);
+        prim.Color(color[0], color[1], color[2], color[3]);
+        long column = serno & 0x3F;
+        int tex_x = column * 16;
+        unsigned long row = (serno - column) >> 6;
+        int tex_y = row * 16;
         prim.TextureCrd(tex_x + 1, tex_y + 1);
-        prim.Vertex(x - 1, y - 1, 0);
-        prim.TextureCrd(tex_x + glyph_width - 1, tex_y + 15);
-        prim.Vertex(x + advance, y + char_height + 1, 0);
+        prim.Vertex(x, y, 0);
+        if (column == 0x3F) {
+            if (row == 0x3F) {
+                prim.TextureCrd(glyph_width - 1 + tex_x, tex_y + 15);
+            } else {
+                prim.TextureCrd(glyph_width - 1 + tex_x, tex_y + 16);
+            }
+        } else if (row == 0x3F) {
+            prim.TextureCrd(glyph_width + tex_x, tex_y + 15);
+        } else {
+            prim.TextureCrd(glyph_width + tex_x, tex_y + 16);
+        }
+        int advance = char_width - (16 - (glyph_width - 1));
+        prim.Vertex(x + advance, y + char_height, 0);
         prim.End();
+        x += advance;
+        x += 2;
     }
-    prim.Begin(6);
-    prim.Texture(texture);
-    prim.Color(color[0], color[1], color[2], color[3]);
-    prim.TextureCrd(tex_x + 1, tex_y + 1);
-    prim.Vertex(x, y, 0);
-    prim.TextureCrd(tex_x + glyph_width - ((serno & 63) == 63), tex_y + 16 - ((serno >> 6) == 63));
-    prim.Vertex(x + advance, y + char_height, 0);
-    prim.End();
-    x += advance + 2;
 }
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/dbg_font", __putc__11dbgCJISFontFUl);

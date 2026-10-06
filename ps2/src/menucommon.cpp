@@ -807,10 +807,10 @@ float GetFloatCommaValue(float value) {
 }
 #ifdef NONMATCHING
 int CalcScrlBarPutPos(int top, float pos, int length, float pos_max) {
-    int y = top;
+    int y = (unsigned short)top;
     if (pos_max != 0.0f) {
         float ratio = pos / pos_max;
-        y = fptosi((float)top + (float)length * ratio);
+        y = fptosi((float)top + ratio * length);
     }
     return y;
 }

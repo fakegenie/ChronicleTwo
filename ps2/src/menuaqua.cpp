@@ -1853,7 +1853,6 @@ int CAquaMes::AddMenuCursor(int step, int count) {
     }
     return 0;
 }
-#ifdef NONMATCHING
 void CAquaMes::SetQuestionId(int id, int top, int num) {
     char *item_name[12];
     int item_no[12];
@@ -1865,10 +1864,6 @@ void CAquaMes::SetQuestionId(int id, int top, int num) {
     question_mes->select_top = top;
     if (id == 0x320) {
         int esa_num;
-        int i;
-        int have;
-        int pad;
-        int j;
         int listed;
 
         question_mes->mes_no = -1;
@@ -1880,7 +1875,9 @@ void CAquaMes::SetQuestionId(int id, int top, int num) {
             id = 0x321;
         }
         listed = 0;
-        for (i = 0; item_no[i] > 0; i++) {
+        for (int i = 0; item_no[i] > 0; i++, listed++) {
+            int have;
+            int pad;
             item_name[i] = GetItemMessage(item_no[i]);
             if (item_name[i] == NULL) {
                 break;
@@ -1893,19 +1890,18 @@ void CAquaMes::SetQuestionId(int id, int top, int num) {
                 pad = 24 - strlen(format);
             }
             if (LanguageCode == 0) {
-                for (j = 0; j < pad / 2; j++) {
+                for (int j = 0; j < pad / 2; j++) {
                     strcat(format, at_2183__3);
                 }
                 strcat(format, at_2184__2);
             } else {
-                for (j = 0; j < pad; j++) {
+                for (int j = 0; j < pad; j++) {
                     strcat(format, at_2185__2);
                 }
                 strcat(format, at_2186__2);
             }
             sprintf(line, format, have);
             strcpy(question_mes->name[listed], line);
-            listed++;
         }
         question_num = listed;
     }
@@ -1913,9 +1909,6 @@ void CAquaMes::SetQuestionId(int id, int top, int num) {
     question_mes->MakeMesWin(id);
     question_mes->Step();
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuaqua", SetQuestionId__8CAquaMesFiii);
-#endif
 int CAquaMes::AddQuestionCursor() {
     int step = 0;
     int before = question_cursor;
@@ -1996,7 +1989,8 @@ void CAquaMes::ChangeManMessage(CAquaFish *fish) {
     char *name = data->GetName(0);
     int pos[2];
 
-    if (name != NULL) {
+    int has_name = name != NULL;
+    if (has_name) {
         copy_name(fish_mes, 0, name);
     }
     fish_mes->mes_no = -1;
@@ -2189,7 +2183,6 @@ int FishIMGReplace(u_long128 *data, CCharacter2 *character, int item_no, BREEDFI
 }
 #ifdef NONMATCHING
 void DrawFishParam(int x, int y, mgCTexture *tex, CGameDataUsed *data) {
-    BREEDFISH_USED *breed;
     float fx;
     float fy;
     int pass;
@@ -2202,11 +2195,11 @@ void DrawFishParam(int x, int y, mgCTexture *tex, CGameDataUsed *data) {
     int bx;
     int by;
     int name_x;
-    int name_y;
 
     if (data == NULL || tex == NULL) {
         return;
     }
+    BREEDFISH_USED *breed;
     breed = &data->data.fish;
     fx = x;
     int w[5] = {wtbl_2470[0], (0x14A - wtbl_2470[0] - wtbl_2470[2] - wtbl_2470[4]) >> 1, wtbl_2470[2],
@@ -2223,11 +2216,12 @@ void DrawFishParam(int x, int y, mgCTexture *tex, CGameDataUsed *data) {
         params[5] = breed->param[2];
     }
     mgCDrawPrim prim;
-    SetSpriteEnv(&prim, 0);
-    prim.Begin(6);
-    prim.Texture(tex);
+    mgCDrawPrim *pen = pen;
+    SetSpriteEnv(pen, 0);
+    pen->Begin(6);
+    pen->Texture(tex);
     for (pass = 0; pass < 2; pass++) {
-        prim.Color(coltbl_2472[pass][0], coltbl_2472[pass][1], coltbl_2472[pass][2], coltbl_2472[pass][3]);
+        pen->Color(coltbl_2472[pass][0], coltbl_2472[pass][1], coltbl_2472[pass][2], coltbl_2472[pass][3]);
         for (row = 0, cy = 0; row < 5; cy += h[row], row++) {
             for (col = 0, cx = 0; col < 5; cx += w[col], col++) {
                 mgRect<int> src;
@@ -2235,13 +2229,13 @@ void DrawFishParam(int x, int y, mgCTexture *tex, CGameDataUsed *data) {
 
                 src.Set(xtbl_2468[col], ytbl_2469[row], wtbl_2470[col], htbl_2471[row]);
                 dst.Set(fptosi(fx + cx), fptosi(fy + cy), w[col], h[row]);
-                PrimQuad(&prim, dst, src);
+                PrimQuad(pen, dst, src);
             }
         }
         fx -= 4.0f;
         fy -= 4.0f;
     }
-    prim.End();
+    pen->End();
     lang = LanguageCode;
     fx = x;
     fy = y;
@@ -2249,23 +2243,24 @@ void DrawFishParam(int x, int y, mgCTexture *tex, CGameDataUsed *data) {
     mgRect<int> digit_rect;
     label_rect.Set(0, 0xA6, 0x3A, 0x12);
     digit_rect.Set(0, 0xEE, 0xC, 0x12);
-    prim.Begin(6);
-    prim.Texture(tex);
-    prim.Color(0x80, 0x80, 0x80, 0x80);
+    pen->Begin(6);
+    pen->Texture(tex);
+    pen->Color(0x80, 0x80, 0x80, 0x80);
     float label_y = 24.0f + fy;
-    PrimQuad(&prim, fx + ptbl_2495[lang][5], label_y, label_rect);
+    PrimQuad(pen, fx + ptbl_2495[lang][5], label_y, label_rect);
     bx = fptosi(fx + ptbl_2495[lang][0]);
+    int name_y;
     name_y = fptosi(22.0f + fy);
     {
         mgRect<int> board;
         board.Set(bx, name_y, ptbl_2495[lang][1], u_brdtbl_2493[3]);
-        Menu3DivideTextureDraw(&prim, board, u_brdtbl_2493, 1);
+        Menu3DivideTextureDraw(pen, board, u_brdtbl_2493, 1);
     }
     {
         mgRect<int> sex_rect;
         s8 sex = breed->sex;
         sex_rect.Set(0, offtbl_2496[sex] + 0xCA, ptbl_2495[lang][3 + sex], 0x12);
-        PrimQuad(&prim, fx + ptbl_2495[lang][2], label_y, sex_rect);
+        PrimQuad(pen, fx + ptbl_2495[lang][2], label_y, sex_rect);
     }
     cx = 0x16;
     cy = 0x2C;
@@ -2275,20 +2270,20 @@ void DrawFishParam(int x, int y, mgCTexture *tex, CGameDataUsed *data) {
         bx = fptosi(fx + cx);
         by = fptosi(fy + cy);
         board.Set(bx, by, 0x5C, u_brdtbl_2493[3]);
-        Menu3DivideTextureDraw(&prim, board, u_brdtbl_2493, 1);
+        Menu3DivideTextureDraw(pen, board, u_brdtbl_2493, 1);
         if (i == 0) {
             mgRect<int> kind_rect;
             u8 *kind = chrtbl_2503[lang][breed->unk_16];
 
             kind_rect.Set(kind[0], kind[1], 0x4C, 0x12);
-            PrimQuad(&prim, bx + 8, by + 2, kind_rect);
+            PrimQuad(pen, bx + 8, by + 2, kind_rect);
         } else {
             mgRect<int> icon_rect;
             aqua_param_icon *icon = &get_paraxtbl_2494[lang][i];
 
             icon_rect.Set(icon->x, icon->y, icon->w, 0x12);
-            PrimQuad(&prim, bx + 2, by + 2, icon_rect);
-            PrimDrawNumber(&prim, params[i], 0, bx + 0x56, by + 3, digit_rect, -2, 0);
+            PrimQuad(pen, bx + 2, by + 2, icon_rect);
+            PrimDrawNumber(pen, params[i], 0, bx + 0x56, by + 3, digit_rect, -2, 0);
         }
         cx += 0x5C;
         if (i == 2) {
@@ -2303,11 +2298,11 @@ void DrawFishParam(int x, int y, mgCTexture *tex, CGameDataUsed *data) {
         mgRect<int> size_rect;
 
         board.Set(bx, by, 0x8A, u_brdtbl_2493[3]);
-        Menu3DivideTextureDraw(&prim, board, u_brdtbl_2493, 1);
+        Menu3DivideTextureDraw(pen, board, u_brdtbl_2493, 1);
         size_rect.Set(0x78, 0xEE, 0x82, 0x12);
-        PrimQuad(&prim, bx + 2, by + 2, size_rect);
-        PrimDrawNumber(&prim, breed->size / 10, 0, bx + 0x5A, by + 2, digit_rect, -1, 0);
-        PrimDrawNumber(&prim, breed->size % 10, 0, bx + 0x6A, by + 2, digit_rect, 0, 0);
+        PrimQuad(pen, bx + 2, by + 2, size_rect);
+        PrimDrawNumber(pen, breed->size / 10, 0, bx + 0x5A, by + 2, digit_rect, -1, 0);
+        PrimDrawNumber(pen, breed->size % 10, 0, bx + 0x6A, by + 2, digit_rect, 0, 0);
     }
     {
         mgRect<int> board;
@@ -2318,27 +2313,27 @@ void DrawFishParam(int x, int y, mgCTexture *tex, CGameDataUsed *data) {
         aqua_param_icon *icon = get_paraxtbl_2494[lang];
 
         board.Set(wx, by, 0x8A, u_brdtbl_2493[3]);
-        Menu3DivideTextureDraw(&prim, board, u_brdtbl_2493, 1);
+        Menu3DivideTextureDraw(pen, board, u_brdtbl_2493, 1);
         unit_rect.Set(icon[8].x, icon[8].y, icon[8].w, 0x12);
-        PrimQuad(&prim, wx + 0x78, wy, unit_rect);
+        PrimQuad(pen, wx + 0x78, wy, unit_rect);
         weight_rect.Set(icon[7].x, icon[7].y, icon[7].w, 0x12);
-        PrimQuad(&prim, fptosi(2.0f + (fx + 160.0f)), wy, weight_rect);
+        PrimQuad(pen, fptosi(2.0f + (fx + 160.0f)), wy, weight_rect);
         if (breed->flags & 1) {
-            PrimDrawNumber(&prim, breed->weight, 0, fptosi(138.0f + (fx + 160.0f) - 18.0f - 2.0f), wy, digit_rect, -1, 0);
+            PrimDrawNumber(pen, breed->weight, 0, fptosi(138.0f + (fx + 160.0f) - 18.0f - 2.0f), wy, digit_rect, -1, 0);
         } else {
             aqua_param_icon *unknown = &icon[9];
             int qx = fptosi(69.0f + (fx + 160.0f) - 2.0f);
             mgRect<int> mark;
 
             mark.Set(unknown->x, unknown->y, unknown->w, 0x12);
-            PrimQuad(&prim, qx, wy, mark);
+            PrimQuad(pen, qx, wy, mark);
             mark.Set(unknown->x, unknown->y, unknown->w, 0x12);
-            PrimQuad(&prim, qx + 0xE, wy, mark);
+            PrimQuad(pen, qx + 0xE, wy, mark);
             mark.Set(unknown->x, unknown->y, unknown->w, 0x12);
-            PrimQuad(&prim, qx + 0x1C, wy, mark);
+            PrimQuad(pen, qx + 0x1C, wy, mark);
         }
     }
-    prim.End();
+    pen->End();
     mgTexManager.ReloadTexture(MenuArg.mes_tex_block, (sceVif1Packet *)NULL);
     name_x = fptosi(fx + poffset_2511[lang]);
     if (LanguageCode >= 2 && LanguageCode < 6) {
@@ -2980,14 +2975,14 @@ int CAquarium::GetBattleTarget(int slot) {
 }
 #ifdef NONMATCHING
 void CAquarium::Thinking(int no) {
-    CAquaFish *me;
-    CAquaFishEff *effect;
-    CGameDataUsed *data;
+    int next;
     BREEDFISH_USED *breed;
     int food_state;
-    int next;
+    CAquaFish *me;
     float food_pos[4];
     NEXT_THINK_PARAM param;
+    CGameDataUsed *data;
+    CAquaFishEff *effect;
 
     if (fish[no] == NULL) {
         return;
@@ -3026,11 +3021,11 @@ void CAquarium::Thinking(int no) {
             break;
         case AQUA_FISH_THINK_SWIM:
             if (me->swim_mode == AQUA_FISH_SWIM_POINT) {
-                float pos[4];
-                float rot[4];
-                aqua_vector dir;
-                aqua_vector steer;
                 float speed;
+                float pos[4];
+                aqua_vector dir;
+                float rot[4];
+                aqua_vector steer;
 
                 me->GetPosition(pos);
                 me->GetRotation(rot);
@@ -3066,12 +3061,12 @@ void CAquarium::Thinking(int no) {
                 me->MoveActionRound();
             }
             if (me->swim_mode == AQUA_FISH_SWIM_ROUTE) {
-                float pos[4];
                 float rot[4];
-                aqua_vector dir;
                 aqua_vector steer;
-                float ahead[4];
+                aqua_vector dir;
+                float pos[4];
                 float dist;
+                float ahead[4];
                 float speed;
 
                 me->GetPosition(pos);
@@ -3239,10 +3234,10 @@ void CAquarium::Thinking(int no) {
             break;
         case AQUA_FISH_THINK_LOVE_CHASE: {
             CAquaFish *partner = fish[me->pair_no];
-            float partner_pos[4];
+            float love_pos[4];
             float pos[4];
             float gap[4];
-            float love_pos[4];
+            float partner_pos[4];
 
             if (partner != NULL) {
                 float speed;

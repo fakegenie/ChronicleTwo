@@ -1595,7 +1595,7 @@ void CMonsterMan::CheckDamage() {
                     monster->gekirin_time = 900;
                     monster->pallet[1].SetAnim(0xC8, 0xC8, 0x80, 1, 0x1E, -1);
                     if (monster->tbl->boss == 0) {
-                        monster->attack = 1.3f * (u16)monster->tbl->attack;
+                        monster->attack = 1.3f * monster->tbl->attack;
                     }
                 }
             }
@@ -1786,6 +1786,7 @@ void CMonsterMan::ThinkHost() {
     sceVu0FVECTOR own_pos;
     mgVu0FBOX box;
     sceVu0FVECTOR item_pos;
+    DNG_BATTLE_AREA *battle = &scene->battle_area;
     CMap *map = scene->GetMap(scene->active_map);
     if (map == NULL) {
         return;
@@ -1809,7 +1810,7 @@ void CMonsterMan::ThinkHost() {
         if (monster->scoop.type & MONSTER_SCOOP_ALWAYS) {
             scoop->ok = 1;
         }
-        if (monster->scoop.type != 0 && (monster->scoop.type & MONSTER_SCOOP_MOTION)) {
+        if (scoop->type != 0 && (scoop->type & MONSTER_SCOOP_MOTION)) {
             char *motion = monster->GetNowMotionName();
             if (motion != NULL && strcmp(motion, scoop->motion) == 0) {
                 float frame = monster->GetNowFrameWait(NULL);
@@ -1818,7 +1819,7 @@ void CMonsterMan::ThinkHost() {
                 }
             }
         }
-        if (scene->battle_area.pause_flag & 0x1000) {
+        if (battle->pause_flag & 0x1000) {
             if (monster->tbl->user_mons_id == user_monster) {
                 monster->Step();
             }
@@ -1869,8 +1870,8 @@ void CMonsterMan::ThinkHost() {
         box.min[2] = monster_pos[2] - 40.0f;
         box.max[1] = monster_pos[1] + 200.0f;
         box.min[1] = monster_pos[1] - 200.0f;
-        CTreasureBoxManager *treasure = scene->battle_area.treasure_box;
-        int poly_num = map->GetPoly(0, polys, box, 0x80);
+        int poly_num = map->GetColPoly(polys, box, 0x80);
+        CTreasureBoxManager *treasure = battle->treasure_box;
         if (treasure != NULL) {
             poly_num += treasure->PickupCollision(monster_pos, &polys[poly_num], box, 0x80 - poly_num);
         }

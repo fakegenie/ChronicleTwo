@@ -1477,7 +1477,6 @@ int CActionChara::HumanShrowMoveIF() {
     float         stick_y;
     float         move_x;
     float         move_z;
-    float         motion_speed;
     float         abs_x;
     float         abs_z;
 
@@ -1512,15 +1511,21 @@ int CActionChara::HumanShrowMoveIF() {
         if (abs_z < 0.0f) {
             abs_z = -abs_z;
         }
-        motion_speed = abs_x;
-        if (abs_x <= abs_z) {
-            motion_speed = abs_z;
+        if (!(abs_x <= abs_z)) {
+            if (move_x < 0.0f) {
+                move_x = -move_x;
+            }
+        } else {
+            if (move_z < 0.0f) {
+                move_z = -move_z;
+            }
+            move_x = move_z;
         }
-        if (motion_speed > 0.5f) {
-            motion_speed = 0.5f;
+        if (!(move_x <= 0.5f)) {
+            move_x = 0.5f;
         }
         SetMotion("\x8E\x9D\x82\xBF\x8F\xE3\x82\xB0\x95\xE0\x82\xAB", 0, 1);
-        SetStep(0.5f * motion_speed);
+        SetStep(0.5f * move_x);
     } else if (lock_on != 0) {
         target = (CActionChara *)nowScene__2->GetCharacter(target_no);
         if (target->chara_kind == ACTION_KIND_SCRIPT) {
@@ -2181,6 +2186,7 @@ int CActionChara::RoboAirMoveIF(int unk, int mode) {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/actionchara", RoboAirMoveIF__12CActionCharaFii);
 #endif
+#ifdef NONMATCHING
 int CActionChara::MonsterMoveIF() {
     sceVu0FVECTOR position;
     sceVu0FVECTOR rotation;
@@ -2315,6 +2321,9 @@ int CActionChara::MonsterMoveIF() {
     RockOn();
     return 1;
 }
+#else
+INCLUDE_ASM("ps2/asm/pal/nonmatchings/actionchara", MonsterMoveIF__12CActionCharaFv);
+#endif
 
 void HitEffectSet(CScene *scene, float *point) {
     float pos[4];

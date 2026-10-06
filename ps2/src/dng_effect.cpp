@@ -178,10 +178,7 @@ static inline void LocalPrimCorner(int *out, float *corner, float *center, float
     float reach_y = 1.0f * half_h;
     float shift_x = reach_x * cosf(angle) - reach_y * sinf(angle);
     float shift_y = reach_x * sinf(angle) + reach_y * cosf(angle);
-    corner[0] = center[0];
-    corner[1] = center[1];
-    corner[2] = center[2];
-    corner[3] = center[3];
+    *(u_long128 *)corner = *(u_long128 *)center;
     corner[0] += shift_x;
     corner[1] += shift_y;
     out[0] = fptosi(16.0f * corner[0]);
@@ -208,14 +205,14 @@ int LocalTransWorldPrimPos(int (*corners)[4], float *pos, float width, float hei
     half_h = half_h * inv_w * 0.5f;
     screen[1] *= inv_w;
     screen[0] *= inv_w;
-    float turn = angle + 1.5707964f;
-    LocalPrimCorner(corners[0], corner0, screen, half_w, half_h, turn);
-    turn = mgAngleLimit(turn - 1.5707964f);
-    LocalPrimCorner(corners[1], corner1, screen, half_w, half_h, turn);
-    turn = mgAngleLimit(turn - 1.5707964f);
-    LocalPrimCorner(corners[2], corner2, screen, half_w, half_h, turn);
-    turn = mgAngleLimit(turn - 1.5707964f);
-    LocalPrimCorner(corners[3], corner3, screen, half_w, half_h, turn);
+    angle += 1.5707964f;
+    LocalPrimCorner(corners[0], corner0, screen, half_w, half_h, angle);
+    angle = mgAngleLimit(angle - 1.5707964f);
+    LocalPrimCorner(corners[1], corner1, screen, half_w, half_h, angle);
+    angle = mgAngleLimit(angle - 1.5707964f);
+    LocalPrimCorner(corners[2], corner2, screen, half_w, half_h, angle);
+    angle = mgAngleLimit(angle - 1.5707964f);
+    LocalPrimCorner(corners[3], corner3, screen, half_w, half_h, angle);
     if (corner0[0] < 0.0f || !(corner0[0] <= 4095.0f)) {
         return 0;
     }
@@ -691,15 +688,16 @@ void CThunder::Draw(void) {
         return;
     }
     mgC3DSprite sprite;
+    mgC3DSprite *packet = &sprite;
     mgCDrawEnv env = *mgGetpDrawEnv(0);
     sceGsTest *test = &env.test;
     test->bits.zte = 1;
     test->bits.ztst = 2;
     env.SetZBuf(MG_ZBUF_NO_WRITE);
     env.SetAlpha(MG_ALPHA_MACRO_ADD);
-    sprite.BeginCreatePacket(1, NULL);
-    sprite.CPSetDrawEnv(&env);
-    sprite.CPSetTexture(TEX_ExFx_THUN);
+    packet->BeginCreatePacket(1, NULL);
+    packet->CPSetDrawEnv(&env);
+    packet->CPSetTexture(TEX_ExFx_THUN);
     THUNDER_SPARK *bolt = spark;
     for (int i = 0; i < THUNDER_SPARK_MAX; i++) {
         if (bolt->life > 0.0f) {
@@ -709,18 +707,20 @@ void CThunder::Draw(void) {
             float color[4] = {128.0f, 128.0f, 128.0f, 96.0f};
             size[0] = (0.2f + 0.8f * rate) * (bolt->scale * (4.0f * thn_tbl[bolt->frame][0]));
             size[1] = (0.2f + 0.8f * rate) * (bolt->scale * (4.0f * thn_tbl[bolt->frame][1]));
-            size[2] = mgAngleLimit(bolt->angle);
+            float *angle = &size[2];
+            *angle = bolt->angle;
+            *angle = mgAngleLimit(*angle);
             uv0[0] = thn_uv[bolt->frame][0];
             uv0[1] = thn_uv[bolt->frame][1];
             uv1[0] = uv0[0] + thn_uv[bolt->frame][2];
             uv1[1] = uv0[1] + thn_uv[bolt->frame][3];
-            sprite.BeginCPSprite();
-            sprite.CPSetSprite(bolt->pos, size, color, uv0, uv1);
-            sprite.EndCPSprite();
+            packet->BeginCPSprite();
+            packet->CPSetSprite(bolt->pos, size, color, uv0, uv1);
+            packet->EndCPSprite();
         }
         bolt++;
     }
-    sprite.EndCreatePacket();
+    packet->EndCreatePacket();
     if (live_num > 0) {
         mgCFrame *frame_ptr = &frame;
         frame_ptr->SetVisual(&sprite);
@@ -1834,6 +1834,7 @@ void CDeadEffect::Step(void) {
 }
 #ifdef NONMATCHING
 void CDeadEffect::Draw(void) {
+    union { CPreSprite prim_draw; };
     float world[4];
     int corner0[4];
     int corner_b_r[4];
@@ -1843,7 +1844,7 @@ void CDeadEffect::Draw(void) {
     if (duration <= 0 && live_num <= 0) {
         return;
     }
-    CPreSprite prim_draw;
+    __ct__11mgCDrawPrimFv(&prim_draw);
     prim_draw.Initialize(0, 0);
     prim_draw.Preset2D();
     prim_draw.DepthTestEnable(1);
@@ -1854,17 +1855,18 @@ void CDeadEffect::Draw(void) {
     prim_draw.Begin(3);
     prim_draw.Texture(TEX_SystemEffect2);
     prim_draw.AlphaTestEnable(1);
+    int u;
+    int v;
+    int span;
     BattleEffectPrim *fleck = prim;
     for (int i = 0; i < prim_max; i++) {
         if (fleck->life > 0) {
-            int u;
-            int v;
-            int span;
             if (fleck->kind == 0) {
                 u = 0x80;
                 v = 0x40;
                 span = 0x1F;
-            } else {
+            }
+            if (fleck->kind == 1) {
                 u = 0xA0;
                 v = 0x40;
                 if (fleck->life % 3 == 1) {

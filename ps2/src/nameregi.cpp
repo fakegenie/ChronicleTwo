@@ -1369,20 +1369,20 @@ void CNameRegiMenu::GetSelectedActiveFont(char *dst) {
     char *table = first_table;
     s16 cell = select.pos;
     if (font_mode == NAMEREGI_FONT_MODE_HIRA || font_mode == NAMEREGI_FONT_MODE_KATA) {
-        int rest = cell % 15;
-        char *kana_tables[3] = {NULL, NULL, NULL};
+        u32 rest = cell % 15;
+        char *kana_tables[3] = { NULL, NULL, NULL };
         kana_tables[0] = first_table;
+        unsigned short column = cell / 15;
         kana_tables[1] = second_table;
         kana_tables[2] = third_table;
-        int column = cell / 15;
         table = kana_tables[rest / 5];
-        char *glyph = table + column + ((rest % 5 + column * 5) * 2);
+        char *glyph = column + (2 * (rest % 5 + column * 5)) + table;
         dst[0] = glyph[0];
         dst[1] = glyph[1];
     }
     if (font_mode == NAMEREGI_FONT_MODE_ALPHA) {
         table = first_table;
-        int rem = cell % 13;
+        auto temp = cell % 13;
         int line = cell / 13;
         if (cell >= 26 && cell < 52) {
             table = second_table;
@@ -1392,19 +1392,22 @@ void CNameRegiMenu::GetSelectedActiveFont(char *dst) {
             table = third_table;
             line -= 4;
         }
-        dst[0] = table[line + (rem + line * 13)];
+        __typeof__(line * 13 + temp) temp2 = line * 13 + temp;
+        __typeof__(line + (temp2)) temp4 = line + (temp2);
+        dst[0] = table[temp4];
     }
     if (font_mode == NAMEREGI_FONT_MODE_KANJI) {
         GetNameRegistFontKanjiList(select.pos + select.row * 0x13, dst);
     }
     if (font_mode == NAMEREGI_FONT_MODE_KIGOU) {
-        int rem = cell % 15;
+        __typeof__(cell % 15) temp3 = cell % 15;
         int line = cell / 15;
         if (line >= 2) {
             table = second_table;
             line -= 2;
         }
-        dst[0] = table[rem + line * 16];
+        __typeof__((unsigned int)line + (temp3 + (line * 16 - line))) temp5 = (unsigned int)line + (temp3 + (line * 16 - line));
+        dst[0] = table[temp5];
     }
 }
 #else

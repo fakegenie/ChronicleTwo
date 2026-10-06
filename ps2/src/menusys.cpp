@@ -502,8 +502,8 @@ int CBaseMenuClass::MenuItemCommandSelect(int select_key, int push_button) {
                 }
                 MenuItemCmdRet.item2 = &chara->equip[slot];
                 GameDataSwap(MenuItemCmdRet.item2, ask_para.item, 1);
-                MenuItemCmdRet.cmd = 8;
                 MenuItemCmdRet.result = slot;
+                MenuItemCmdRet.cmd = 8;
             } else if (cmd == 10) {
                 if (ask_para.cmd_color[cursor] == 0x80202020) {
                     MenuItemCmdRet.cmd = 0x1C;
@@ -523,8 +523,8 @@ int CBaseMenuClass::MenuItemCommandSelect(int select_key, int push_button) {
                     }
                     MenuItemCmdRet.item2 = &robo->parts[slot];
                     GameDataSwap(MenuItemCmdRet.item2, ask_para.item, 0);
-                    MenuItemCmdRet.cmd = 8;
                     MenuItemCmdRet.result = slot;
+                    MenuItemCmdRet.cmd = 8;
                 }
             } else if (cmd == 3 || cmd == 8) {
                 MenuItemCmdRet.cmd = 1;
@@ -795,9 +795,11 @@ extern s8 wakutbl_1411[2];
 extern s8 tartbl_1412[2];
 #ifdef NONMATCHING
 void CBaseMenuClass::SetItemCmdMsgPos(int *item_pos) {
-    int pos[2] = {0, 0};
+    int pos[2] = { 0, 0 };
     int width = 0;
     int lines = 0;
+    int i;
+
     pos[0] = item_pos[0] + 4;
     pos[1] = item_pos[1] + 0x2A;
     int cmd_num = ask_para.cmd_num;
@@ -806,7 +808,7 @@ void CBaseMenuClass::SetItemCmdMsgPos(int *item_pos) {
     if (message == NULL) {
         return;
     }
-    for (int i = 0; i < cmd_num; i++) {
+    for (i = 0; i < cmd_num; i++) {
         if (message->item_mes[i] < 0) {
             break;
         }
@@ -821,10 +823,7 @@ void CBaseMenuClass::SetItemCmdMsgPos(int *item_pos) {
     CGameDataUsed *item = ask_para.item;
     int fishing_rod = 0;
     if (mode == MENU_ASK_MODE_ITEM_COMMAND) {
-        if (item == NULL) {
-            return;
-        }
-        if (form == NULL) {
+        if (item == NULL || form == NULL) {
             return;
         }
         if (item->item_no == 0x130) {
@@ -846,8 +845,9 @@ void CBaseMenuClass::SetItemCmdMsgPos(int *item_pos) {
         case 1:
         case 2:
             pos[1] = item_pos[1] - height - 0x14;
-            message->point_x = wakutbl_1411[MenuCommonInfo->cursor];
-            pos[0] += tartbl_1412[MenuCommonInfo->cursor];
+            __typeof__(MenuCommonInfo) menuCommonInfo2 = MenuCommonInfo;
+            message->point_x = wakutbl_1411[menuCommonInfo2->cursor];
+            pos[0] += tartbl_1412[menuCommonInfo2->cursor];
             message->point_y = height * 2;
             break;
         case 3:
@@ -864,23 +864,24 @@ void CBaseMenuClass::SetItemCmdMsgPos(int *item_pos) {
                     message->point_x = -0x1E;
                 }
             } else {
+                int *pos_y = &pos[1];
                 pos[0] -= 0x12;
-                pos[1] += 0x1C;
-                if (pos[1] + height > 0x132) {
-                    pos[1] = pos[1] - height - 0x5E;
+                *pos_y += 0x1C;
+                if (*pos_y + height > 0x132) {
+                    *pos_y = *pos_y - height - 0x5E;
                     message->point_y = height * 3;
                 }
-                if (pos[1] < 0x14) {
+                if (*pos_y < 0x14) {
                     while (item_pos[0] < pos[0] + width + 0x1A) {
                         pos[0] -= 2;
                     }
-                    while (pos[1] + height < item_pos[1] + 0x32) {
-                        pos[1] += 2;
+                    while (*pos_y + height < item_pos[1] + 0x32) {
+                        *pos_y += 2;
                     }
                     message->point_x = width + 0x1E;
                     message->point_y = height - 0xE;
-                    while (pos[1] < 0x14) {
-                        pos[1]++;
+                    while (*pos_y < 0x14) {
+                        *pos_y++;
                         message->point_y--;
                     }
                     MenuItemCommandDir = 2;
@@ -2229,11 +2230,8 @@ int MenuDataSwap(CGameDataUsed *destination, CGameDataUsed *source, int quantity
     int src_used = source->used_type;
     CDataCommon *dst_common = GetCommonItemData(dst_no);
     CDataCommon *src_common = GetCommonItemData(src_no);
-    if (dst_used == USED_ITEM_TYPE_GIFT_BOX && destination->GetGiftBoxItemNum() < 3 && src_common != NULL &&
-        (src_common->attribute & ITEM_ATTRIBUTE_TRUSH) &&
-        ((src_used == USED_ITEM_TYPE_ITEM && src_type != 0x1D && src_type != 0x1E && src_type != 0x15 &&
-          src_type != 0x1A && src_type != 0x1B) ||
-         (src_used == USED_ITEM_TYPE_ATTACH && src_type != 0x11 && src_type != 0x22))) {
+    int temp = dst_used == USED_ITEM_TYPE_GIFT_BOX;
+    if (temp && destination->GetGiftBoxItemNum() < 3 && src_common != NULL && (src_common->attribute & ITEM_ATTRIBUTE_TRUSH) && ((src_used == USED_ITEM_TYPE_ITEM && src_type != 0x1D && src_type != 0x1E && src_type != 0x15 && src_type != 0x1A && src_type != 0x1B) || (src_used == USED_ITEM_TYPE_ATTACH && src_type != 0x11 && src_type != 0x22))) {
         int slot = destination->SetGiftBoxItem(src_no, -1);
         result = 4;
         if (slot >= 0) {
@@ -2278,7 +2276,7 @@ int MenuDataSwap(CGameDataUsed *destination, CGameDataUsed *source, int quantity
         if (dst_no > 0) {
             had_dst = 1;
         }
-        s8 results[2] = {0, 2};
+        s8 results[2] = { 0, 2 };
         results[0] = ret_tbl1_2511[had_src];
         result = results[had_dst];
     }
@@ -2335,7 +2333,6 @@ int CMenuKeyFunc::GetActiveCharaNo() {
 #ifdef NONMATCHING
 int CMenuKeyFunc::MenuPosStep(int *pos, int *offset) {
     ScreenPos waku_pos;
-    int end;
     if (waku_form != NULL) {
         waku_form->SetNextMovePos(pos, 2);
         waku_form->GetNextMovePos(&waku_pos.x);
@@ -2348,12 +2345,12 @@ int CMenuKeyFunc::MenuPosStep(int *pos, int *offset) {
         next.y += offset[1];
     }
     cursor_form->SetNextMovePos(&next.x, 2);
-    end = cursor_form->CheckMoveEnd(next.x, next.y);
+    int end = cursor_form->CheckMoveEnd(next.x, next.y);
     cursor_form->GetPutPosXY(at_2545__2, put[0], put[1]);
     CMenuPosDataForm *form = how_much_form;
     if (form != NULL) {
         form->x = put[0] + 10;
-        form->y = put[1] + 40;
+        form->y = (float)put[1] + 40;
     }
     if (have_item.item_no > 0) {
         SetHaveItemInfo(1, 0);
@@ -2480,66 +2477,85 @@ void CMenuKeyFunc::CursorFadeOut(float speed, int steps) {
 }
 #ifdef NONMATCHING
 int CMenuKeyFunc::EnableSwapNowPos(MENU_SWAPITEM_INFO *swap) {
-    ROBO_DATA *robo = NULL;
-    CHARA_DATA *chara = NULL;
-    s16 held_no = have_item.item_no;
     int result = 0;
-    s16 held_used = have_item.used_type;
+    s32 used_type;
+    CHARA_DATA *chara = NULL;
+    u32 held_no = have_item.item_no;
+    ROBO_DATA *robo = NULL;
     CDataCommon *common = GameItemDataManage.GetCommonData(held_no);
-    s16 chara_no = swap->chara;
     int data_type = GetItemDataType__Fi(held_no);
-    switch (chara_no) {
+    int held_used = have_item.used_type;
+    switch (swap->chara) {
         case 0:
         case 1:
-            chara = MenuUserParam.chara[chara_no];
+            chara = MenuUserParam.chara[swap->chara];
             break;
         case 2:
             robo = MenuUserParam.robo;
             break;
     }
     switch (swap->type) {
-        case 0:
+            int num;
+        case 0: {
             if (common != NULL && common->active_set == 0) {
-                result = 1;
-            } else {
-                if (chara == NULL || swap->no < 0 || swap->no > 3) {
-                    return 9;
-                }
-                CGameDataUsed *active = &chara->active_item[swap->no];
-                if (active == NULL || CheckItemEquip(chara_no, held_no) == 0) {
-                    return 9;
-                }
-                int num = active->GetNum();
-                if (common == NULL) {
-                    if (num > 1) {
-                        result = 4;
-                    }
-                } else if (held_no != active->item_no) {
-                    result = 0;
-                }
-            }
-            break;
-        case 1:
-            if (held_used != 0 && (held_used == 2 || (u32)(held_used - 5) < 3 || held_used == 4)) {
                 result = 1;
                 break;
             }
+            if (chara == NULL || swap->no < 0 || swap->no > 3) {
+                result = 9;
+                break;
+            }
+            CGameDataUsed *active = &chara->active_item[swap->no];
+            if (active == NULL) {
+                result = 9;
+                break;
+            }
+            if (CheckItemEquip(swap->chara, held_no) == 0) {
+                result = 9;
+                break;
+            }
+            int num = active->GetNum();
+            if (common == NULL) {
+                if (num > 1) {
+                    result = 4;
+                }
+            } else if (held_no != active->item_no) {
+                result = 0;
+                if (held_used == 1) {
+                    if (active->used_type == 7) {
+                        result = 0;
+                    } else {
+                        result = 0;
+                    }
+                }
+            }
+            break;
+        }
+        case 1:
+            if (held_used != 0) {
+                if (held_used == 2 || (u32)(held_used - 5) < 3 || held_used == 4) {
+                    result = 1;
+                    break;
+                }
+            }
             if (chara == NULL) {
-                return 9;
+                result = 9;
+                break;
             }
             if (chara->status_attr & CHARA_STATUS_UNK_4) {
                 result = 8;
             } else if (chara->status_attr & CHARA_STATUS_UNK_8) {
                 result = 8;
-            } else if (chara->status_attr & CHARA_STATUS_UNK_20) {
-                result = 8;
-            } else {
+            } else if (!(chara->status_attr & CHARA_STATUS_UNK_20)) {
                 result = 9;
                 if (held_used != 0) {
-                    if (data_type == SearchEquipType(chara_no, swap->no)) {
+                    if (data_type == SearchEquipType(swap->chara, swap->no)) {
                         result = 0;
-                        if (have_item.IsFishingRod() && !CheckFishCondition()) {
-                            return 9;
+                        if (have_item.IsFishingRod()) {
+                            if (CheckFishCondition()) {
+                            } else {
+                                result = 9;
+                            }
                         }
                     } else {
                         result = 1;
@@ -2548,6 +2564,8 @@ int CMenuKeyFunc::EnableSwapNowPos(MENU_SWAPITEM_INFO *swap) {
                         }
                     }
                 }
+            } else {
+                result = 8;
             }
             break;
         case 2:
@@ -2558,23 +2576,25 @@ int CMenuKeyFunc::EnableSwapNowPos(MENU_SWAPITEM_INFO *swap) {
                 }
             }
             if (robo == NULL) {
-                return 9;
+                result = 9;
+                break;
             }
-            if (held_used != 1) {
+            if (held_used == 1) {
+                result = 1;
+                if (MenuItemUse.CheckItemUseEnable(&have_item, 1, &robo->parts[swap->no])) {
+                    result = 5;
+                }
+            } else {
                 result = 9;
                 if (held_used != 0) {
+                    int equip_type = SearchEquipType(2, swap->no);
                     result = 3;
-                    if (data_type == SearchEquipType(2, swap->no)) {
+                    if (data_type == equip_type) {
                         result = 0;
                         if (!IsEnableChangeRoboParts(&have_item)) {
                             result = 3;
                         }
                     }
-                }
-            } else {
-                result = 1;
-                if (MenuItemUse.CheckItemUseEnable(&have_item, 1, &robo->parts[swap->no])) {
-                    result = 5;
                 }
             }
             break;
@@ -2583,16 +2603,26 @@ int CMenuKeyFunc::EnableSwapNowPos(MENU_SWAPITEM_INFO *swap) {
         case 9: {
             CGameDataUsed *used = &MenuUserParam.used_data[swap->no];
             if (used == NULL) {
-                return 9;
+                result = 9;
+                break;
             }
-            s16 used_type = used->used_type;
             result = 0;
+            used_type = used->used_type;
             if (MenuItemUse.CheckItemUseEnable(&have_item, 1, used)) {
                 result = 5;
-            } else if (used_type != USED_ITEM_TYPE_GIFT_BOX && used->CheckTypeEnableStack()) {
-                int num = used->GetNum();
-                if (held_used == 0 && num > 1) {
-                    result = 4;
+            } else {
+                if (used_type == USED_ITEM_TYPE_GIFT_BOX) {
+                    if (held_used == 1) {
+                    }
+                } else if (used->CheckTypeEnableStack()) {
+                    num = used->GetNum();
+                    if (held_used == 0) {
+                        if (num > 1) {
+                            result = 4;
+                        }
+                    } else if (have_item.CheckTypeEnableStack()) {
+                    } else if (used->item_no == held_no) {
+                    }
                 }
             }
             break;
@@ -2600,24 +2630,27 @@ int CMenuKeyFunc::EnableSwapNowPos(MENU_SWAPITEM_INFO *swap) {
         case 10: {
             CGameDataUsed *esa = GetUserDataMan()->GetActiveEsa();
             if (esa == NULL) {
-                return 9;
+                result = 9;
+                break;
             }
             if (common == NULL) {
                 result = 0;
-            } else if (common->type != 0x20 && !(common->attribute & 4)) {
+                break;
+            }
+            if (common->type != 0x20 && !(common->attribute & 4)) {
                 result = 9;
-            } else {
-                result = 0;
-                if (have_item.GetNum() >= 2 && esa->GetNum() > 0 && have_item.item_no != esa->item_no) {
-                    result = 9;
-                }
-                int rod_no = GetUserDataMan()->GetFishingRodNo();
-                if (rod_no == 0x12F && (common->attribute & 4)) {
-                    result = 9;
-                }
-                if (rod_no == 0x12E && common->type == 0x20) {
-                    return 9;
-                }
+                break;
+            }
+            result = 0;
+            if (have_item.GetNum() >= 2 && 0 < esa->GetNum() && have_item.item_no != esa->item_no) {
+                result = 9;
+            }
+            int rod_no = GetUserDataMan()->GetFishingRodNo();
+            if (rod_no == 0x12F && (common->attribute & 4)) {
+                result = 9;
+            }
+            if (rod_no == 0x12E && common->type == 0x20) {
+                result = 9;
             }
             break;
         }
@@ -3467,20 +3500,22 @@ short CMenuKeyFunc::StepMenuBGM() {
 #ifdef NONMATCHING
 void CheckEnableHaveItemNum(void) {
     CGameData *item_data = &GameItemDataManage;
+    int i;
     CUserDataManager *user_data = GetUserDataMan();
     int have_num[512];
+    int j, gift_no;
     s16 full[512];
+
     memset(have_num, 0, sizeof(have_num));
     memset(full, 0, sizeof(full));
     CGameDataUsed *used = user_data->GetUsedDataPtr(0);
     int bag_max = GetNowBagMax(1);
-    int i;
     for (i = 0; i < bag_max; i++, used++) {
         s16 item_no = used->item_no;
         if (item_no > 0) {
             have_num[item_no] += used->GetNum();
             if (0 < used->GetGiftBoxItemNum()) {
-                for (int j = 0; j < 3; j++) {
+                for (j = 0; j < 3; j = j + 1) {
                     int gift_no = used->GetGiftBoxItemNo(j);
                     if (gift_no > 0) {
                         have_num[gift_no]++;
@@ -3490,15 +3525,16 @@ void CheckEnableHaveItemNum(void) {
         }
     }
     CHARA_DATA *chara = user_data->GetCharaDataPtr(0);
-    for (int c = 0; c < 2; c++, chara++) {
+    for (int c = 0; c < 2; c++) {
+        chara = chara + c;
         for (int k = 0; k < 3; k++) {
             CGameDataUsed *active = &chara->active_item[k];
-            s16 item_no = active->item_no;
+            int item_no = active->item_no;
             if (item_no > 0) {
-                have_num[item_no] += active->GetNum();
+                have_num[item_no] += (&chara->active_item[k])->GetNum();
                 if (0 < active->GetGiftBoxItemNum()) {
                     for (int j = 0; j < 3; j++) {
-                        int gift_no = active->GetGiftBoxItemNo(j);
+                        gift_no = (&chara->active_item[k])->GetGiftBoxItemNo(j);
                         if (gift_no > 0) {
                             have_num[gift_no]++;
                         }
@@ -3509,7 +3545,7 @@ void CheckEnableHaveItemNum(void) {
     }
     for (i = 1; i < item_data->max_item_no; i++) {
         CDataCommon *common = item_data->GetCommonData(i);
-        if (common != NULL && have_num[i] >= common->max_num) {
+        if (common != NULL && common->max_num <= have_num[i]) {
             full[i] = 1;
         }
     }
@@ -3521,13 +3557,18 @@ void CheckEnableHaveItemNum(void) {
         }
     }
     chara = user_data->GetCharaDataPtr(0);
-    for (int c = 0; c < 2; c++, chara++) {
-        for (int k = 0; k < 3; k++) {
-            menu_chara_activeItem_limmit_check[c * 3 + k] = 0;
-            s16 item_no = chara->active_item[k].item_no;
-            if (item_no > 0 && full[item_no] != 0) {
-                menu_chara_activeItem_limmit_check[c * 3 + k] = 1;
-            }
+    {
+        int c = 0;
+        if (c < 2) {
+            do {
+                for (int k = 0; k < 3; k++) {
+                    menu_chara_activeItem_limmit_check[c * 3 + k] = 0;
+                    if (chara->active_item[k].item_no > 0 && full[chara->active_item[k].item_no] != 0) {
+                        menu_chara_activeItem_limmit_check[c * 3 + k] = 1;
+                    }
+                }
+                c++, chara++;
+            } while (c < 2);
         }
     }
 }
@@ -4084,8 +4125,9 @@ int CMenuItemInfo::EquipDirect(int chara, CGameDataUsed *item, int &slot) {
     if ((status & CHARA_STATUS_UNK_4) || (status & CHARA_STATUS_UNK_8) || (status & CHARA_STATUS_UNK_20)) {
         return 0;
     }
+    int robo_slot2;
     int robo_slot4 = 0;
-    int robo_slot2 = 0;
+    robo_slot2 = 0;
     if (view_mode == 3 && data_type == 5) {
         robo_slot4 = 1;
     }
@@ -4117,16 +4159,18 @@ int CMenuItemInfo::EquipDirect(int chara, CGameDataUsed *item, int &slot) {
     MENU_SWAPITEM_INFO swap;
     swap.Set(1, slot, chara_no, 0);
     if (chara < 2) {
-        target = &MenuUserParam.chara[chara_no]->equip[slot];
+        __typeof__(&MenuUserParam) menuUserParam_ptr2 = &MenuUserParam;
+        target = &menuUserParam_ptr2->chara[chara_no]->equip[slot];
         swap.type = 1;
         if (robo_slot4 == 1) {
             slot = 1;
-            target = &MenuUserParam.chara[0]->equip[4];
+            target = &menuUserParam_ptr2->chara[0]->equip[4];
             swap.type = 2;
         }
-        if (robo_slot2 == 1) {
+        int temp = robo_slot2 == 1;
+        if (temp) {
             slot = 1;
-            target = &MenuUserParam.chara[0]->equip[2];
+            target = &menuUserParam_ptr2->chara[0]->equip[2];
             swap.type = 2;
         }
     } else if (chara == 2) {
@@ -5012,8 +5056,8 @@ void CommonSetMoveItemClass(int (*table)[4]) {
                 items[i] = &MenuUserParam.robo->parts[slot[3]];
             }
         } else if (move->from[0] == 1) {
-            clear_source = 1;
             items[i] = &MenuUserParam.used_data[slot[3]];
+            clear_source = 1;
         } else if (move->from[0] == 2) {
             clear_source = 1;
             items[i] = &MenuCommonInfo->have_item;
@@ -5023,8 +5067,8 @@ void CommonSetMoveItemClass(int (*table)[4]) {
             move->from[0] = 1;
             slot[0] = 1;
         } else if (move->from[0] == 5) {
-            clear_source = 1;
             items[i] = GetUserDataMan()->GetActiveEsa();
+            clear_source = 1;
         }
     }
     MenuMoveItemPos(table[0], start, 0);
@@ -5668,9 +5712,9 @@ void CMenuItemInfo::CalcCursorPosition(void) {
     char part_name[0x20];
     CMenuPosDataForm *form = NULL;
     int pos[2] = {0, 0};
-    s16 arg_no = key_arg_no;
+    int arg_no = key_arg_no;
     int cursor = MenuCommonInfo->cursor;
-    s16 waku_no = arg_no;
+    int waku_no = arg_no;
     if (arg_no != 12) {
         if (arg_no < 0) {
             key_arg_no = 0;
@@ -6626,6 +6670,7 @@ void MenuItemDebugDraw(void) {
     mgCDrawPrim prim;
     CGameDataUsed *weapon = CMenuItemInfoPt->view_weapon;
     char text[0x100];
+    int count;
     switch (CMenuItemInfoPt->key_arg_no) {
     case 2: {
         tex_manager->ReloadTexture(MenuCommonInfo->tex_block[1], (sceVif1Packet *)NULL);
@@ -6644,7 +6689,8 @@ void MenuItemDebugDraw(void) {
         for (int row = 0; row < 8; row++) {
             int col;
             for (col = 0; col < 8; col++) {
-                int item_no = page * 64 + 1 + row * 8 + col;
+                int row_first = row * 8;
+                int item_no = page * 64 + 1 + row_first + col;
                 if (item_no == CMenuItemInfoPt->debug_item_no) {
                     int x = col * 32 + 24;
                     int y = row * 32 + 60;
@@ -6799,7 +6845,7 @@ void MenuItemDebugDraw(void) {
         DebugPrint(font, at_6805, 236, 120);
         char special[0x100];
         special[0] = '\0';
-        int count = 0;
+        count = 0;
         for (int i = 0; i < 12 && stchar_6508[i] != NULL; i++) {
             if (weapon->data.weapon.special & (1 << i)) {
                 strcat(special, stchar_6508[i]);
@@ -7871,24 +7917,25 @@ void MenuPosFormValueSetCharaRobo(ROBO_DATA *robo, int flag) {
         return;
     }
     int red = 0x80;
-    int green = 0x80;
+    int green = red;
     int blink = (int)(64.0f * sinf(WeaponWarningCounter));
     CGameDataUsed *parts = robo->parts;
+    COMMON_GAGE *hp = &robo->hp;
     MENUFORMPARTS_TYPE *hp_part = form->GetPartInfo(at_3822);
     if (hp_part != NULL) {
-        hp_part->w = (int)(140.0f * GetCommonGageRate(&robo->hp));
+        hp_part->w = (int)(140.0f * GetCommonGageRate(hp));
     }
     MENUFORMPARTS_TYPE *hp_end = form->GetPartInfo(at_7534);
     if (hp_end != NULL && hp_part != NULL) {
         hp_end->x = hp_part->x + hp_part->w - 4.0f;
         hp_end->y = hp_part->y - 10.0f;
     }
-    form->SetNumber(at_3823, GetDispVolumeForFloat(robo->hp.now));
-    form->SetNumber(at_3824, (int)robo->hp.max);
+    form->SetNumber(at_3823, GetDispVolumeForFloat(hp->now));
+    form->SetNumber(at_3824, (int)hp->max);
     int capacity = 0;
     form->SetNumber(at_7535, CheckNowRoboUseCapacity(&capacity));
     form->SetNumber(at_7536, capacity);
-    s16 part_defence = MenuUserParam.robo->parts[1].data.robopart.defence;
+    int part_defence = MenuUserParam.robo->parts[1].data.robopart.defence;
     int defence = MenuUserParam.robo->GetDefenceVol();
     form->SetNumber(at_7537, GetShiledKitLimmit(MenuUserDataManPtr->CheckRobotCore()) * 4);
     form->SetNumber(at_7538, defence - part_defence);
@@ -7904,9 +7951,10 @@ void MenuPosFormValueSetCharaRobo(ROBO_DATA *robo, int flag) {
         }
     }
     for (int i = 0; i < 6; i++) {
-        CMenuItemInfoPt->robo_parts[i]->rgba[0] = red;
-        CMenuItemInfoPt->robo_parts[i]->rgba[1] = green;
-        CMenuItemInfoPt->robo_parts[i]->rgba[2] = green;
+        MENUFORMPARTS_TYPE *part = CMenuItemInfoPt->robo_parts[i];
+        part->rgba[0] = red;
+        part->rgba[1] = green;
+        part->rgba[2] = green;
     }
     form->SetNumber(at_5262, whp[0]);
     form->SetNumber(at_5264, whp[1]);

@@ -1211,14 +1211,13 @@ int CMap::GetFixCameraPos(sceVu0FVECTOR pos, sceVu0FVECTOR out_camera_pos) {
     sceVu0FVECTOR projection_sum;
 
     selected = NULL;
-    CCameraInfo *camera_base = camera_info;
     {
-        CCameraInfo *current = camera_base;
+        CCameraInfo *current = camera_info;
         for (int default_no = 0; default_no < camera_info_num; default_no++, current++) {
             if (current->rect[0] == NULL) selected = current;
         }
     }
-    camera = camera_base;
+    camera = camera_info;
     for (camera_no = 0; camera_no < camera_info_num; camera_no++, camera++) {
         for (rect_no = 0; rect_no < camera->rect_num; rect_no++) {
             CColFrame *rect = camera->rect[rect_no];

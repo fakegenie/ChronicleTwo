@@ -630,7 +630,7 @@ int CShopMenu::KeyStep() {
             break;
         case 2:
         case 3: {
-            s16 old_num = num;
+            int old_num = num;
             s16 old_cursor = num_cursor;
             if (lr & 4) {
                 num_cursor = old_cursor - 1;
@@ -754,7 +754,7 @@ int CShopMenu::KeyStep() {
         }
         CGameDataUsed *item = SearchNowPosItemExist();
         char *item_name = NULL;
-        s16 item_no = -1;
+        int item_no = -1;
         if (item != NULL) {
             item_no = item->item_no;
             item_name = item->GetName(1);
@@ -1082,7 +1082,7 @@ void CShopMenu::CalcTex() {
     Func_MenuItemBrdPosStep(bag_top);
     NowGiftBoxPtr = SearchNowPosItemExist();
     if (GiftBoxViewForm != NULL) {
-        int view_pos[2] = {0, 0};
+        int view_pos[2] = { 0, 0 };
         if (key_arg_no == SHOP_MENU_MODE_BAG) {
             MenuPosData->GetPosMenuItemOnItemBrd(view_pos, bag_pos, 0);
         } else {
@@ -1102,8 +1102,7 @@ void CShopMenu::CalcTex() {
     if (message_form != NULL) {
         message_form->draw_flag = 0;
         message->MakeMsg(0);
-        if (NowSellMode == SHOP_SELL_MODE_MONEY &&
-            (key_arg_no == SHOP_MENU_MODE_BAG || key_arg_no == SHOP_MENU_MODE_SELL_NUM)) {
+        if (NowSellMode == SHOP_SELL_MODE_MONEY && (key_arg_no == SHOP_MENU_MODE_BAG || key_arg_no == SHOP_MENU_MODE_SELL_NUM)) {
             s16 *mes_width = &price_mes_width;
             CGameDataUsed *item = SearchNowPosItemExist();
             message->point_y = 0;
@@ -1153,11 +1152,10 @@ void CShopMenu::CalcTex() {
             } else {
                 koma[0] += 0x14;
                 win_x = koma[0] - *mes_width / 2;
-                int right_limit = mgScreenWidth - 0x28;
-                if (right_limit < win_x + *mes_width) {
-                    while (right_limit - *mes_width < win_x) {
+                if (mgScreenWidth - 0x28 < win_x + *mes_width && win_x > mgScreenWidth - 0x28 - *mes_width) {
+                    do {
                         win_x--;
-                    }
+                    } while (mgScreenWidth - 0x28 - *mes_width < win_x);
                 }
                 win_y = koma[1] + 0x32;
                 if (line >= 3) {
@@ -1178,26 +1176,25 @@ void CShopMenu::CalcTex() {
         trade_brd->GetPutPosXY(at_1822, up_pos[0], up_pos[1]);
         trade_brd->GetPutPosXY(at_1823__2, down_pos[0], down_pos[1]);
         trade_brd->SetNumber(at_1824__2, num);
-        if (NowSellMode != SHOP_SELL_MODE_DONY ||
-            (key_arg_no != SHOP_MENU_MODE_BUY_NUM && key_arg_no != SHOP_MENU_MODE_BUY_ASK &&
-             key_arg_no != SHOP_MENU_MODE_BUY_ERROR)) {
+        if (NowSellMode != SHOP_SELL_MODE_DONY || (key_arg_no != SHOP_MENU_MODE_BUY_NUM && key_arg_no != SHOP_MENU_MODE_BUY_ASK && key_arg_no != SHOP_MENU_MODE_BUY_ERROR)) {
             MenuDCMsg[3]->SetMovePosGyou(0, num_pos[0], num_pos[1]);
             MenuDCMsg[3]->SetMovePosGyou(1, up_pos[0], up_pos[1]);
             MenuDCMsg[3]->SetMovePosGyou(2, down_pos[0], down_pos[1]);
         }
         trade_brd->SetPartRGBA(at_1825__3, 0x80, 0x80, 0x80, 0x80);
         trade_brd->SetPartRGBA(at_1826__4, 0x80, 0x80, 0x80, 0x80);
-        if (arrow_flash[0] > 0) {
+        if (0 < arrow_flash[0]) {
             trade_brd->SetPartRGBA(at_1825__3, 0xA4, 0xA4, 0xA4, 0x80);
         }
-        if (arrow_flash[1] > 0) {
+        int temp = arrow_flash[1] > 0;
+        if (temp) {
             trade_brd->SetPartRGBA(at_1826__4, 0xA4, 0xA4, 0xA4, 0x80);
         }
     }
-    if (arrow_flash[0] > 0) {
+    if (0 < arrow_flash[0]) {
         arrow_flash[0]--;
     }
-    if (arrow_flash[1] > 0) {
+    if (0 < arrow_flash[1]) {
         arrow_flash[1]--;
     }
 }
@@ -1281,6 +1278,7 @@ CGameDataUsed *CShopMenu::SearchNowPosItemExist() {
 extern u8 rgba_1897[4];
 void ShopSellListDraw(int &tex_block, float *pos) {
     mgCTexture *icon_tex = MenuPosData->item_icon_tex[0][0];
+    int line;
     if (icon_tex == NULL) {
         return;
     }
@@ -1314,10 +1312,10 @@ void ShopSellListDraw(int &tex_block, float *pos) {
     mgCDrawPrim *prim = GetMenuPrim();
     SetSpriteEnv(prim, 0);
     float x = pos[0] + 18.0f;
+    float mark_x;
     float y = pos[1] + 44.0f;
     CGameDataUsed item;
     float price_x = x + 92.0f;
-    float mark_x;
     if (LanguageCode > 0 && NowSellMode == SHOP_SELL_MODE_MEDAL) {
         mark_x = price_x;
         price_x -= 12.0f;
@@ -1327,8 +1325,7 @@ void ShopSellListDraw(int &tex_block, float *pos) {
     if (LanguageCode > 0 && NowSellMode == SHOP_SELL_MODE_ROBO_ABS) {
         mark_x = price_x + 6.0f;
     }
-    int item_num = CShopPtr->item_num;
-    for (int line = 0; line < item_num; line++, y += 44.0f) {
+    for (line = 0; (unsigned int)line < CShopPtr->item_num; line++, y += 44.0f) {
         if (y + 44.0f < 0.0f) {
             continue;
         }

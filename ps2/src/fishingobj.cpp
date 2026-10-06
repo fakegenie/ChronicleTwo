@@ -1159,11 +1159,10 @@ void InitLureObj(int rod_type, mgCFrame *rod_frame) {
 #ifdef NONMATCHING
 void InitUkiObj(int no, mgCFrame *uki, mgCFrame *hari) {
     float rod_tip[4];
-    CFishObj *uki_obj;
     int i;
-    int j;
-    UkiObj.point_num = 4;
+    CFishObj *uki_obj;
     i = 0;
+    UkiObj.point_num = 4;
     uki_obj = &UkiObj;
     for (; i < uki_obj->point_num; i++) {
         FISH_POINT *point = &uki_obj->point[i];
@@ -1188,14 +1187,17 @@ void InitUkiObj(int no, mgCFrame *uki, mgCFrame *hari) {
     uki_obj->point[3].pos[2] = -1.5f;
     uki_obj->point[3].pos[3] = 1.0f;
     SaoFrame[7]->GetWorldPosition0(rod_tip);
-    for (i = 0; i < uki_obj->point_num; i++) mgAddVector(uki_obj->point[i].pos, rod_tip);
+    for (i = 0; i < uki_obj->point_num; i++) {
+        mgAddVector(uki_obj->point[i].pos, rod_tip);
+    }
+    float *pt2;
     float *pt1 = uki_obj->point[1].pos;
     float dist = mgDistVector(uki_obj->point[0].pos, pt1);
     uki_obj->bind[0].point0 = (FISH_POINT *)uki_obj->point[0].pos;
     uki_obj->bind[0].point1 = (FISH_POINT *)pt1;
     uki_obj->bind[0].length = dist;
     uki_obj->bind[0].rate = 0.5f;
-    float *pt2 = uki_obj->point[2].pos;
+    pt2 = uki_obj->point[2].pos;
     dist = mgDistVector(uki_obj->point[0].pos, pt2);
     uki_obj->bind[1].point0 = (FISH_POINT *)uki_obj->point[0].pos;
     uki_obj->bind[1].point1 = (FISH_POINT *)pt2;
@@ -1238,7 +1240,7 @@ void InitUkiObj(int no, mgCFrame *uki, mgCFrame *hari) {
     uki_obj->float_info[2].unk_8 = 0;
     CFishObj *hari_obj = &HariObj;
     HariObj.point_num = 3;
-    for (j = 0; j < hari_obj->point_num; j++) {
+    for (int j = 0; j < hari_obj->point_num; j++) {
         FISH_POINT *point = &hari_obj->point[j];
         mgZeroVector(point->pos);
         mgZeroVector(point->old_pos);
@@ -1256,7 +1258,9 @@ void InitUkiObj(int no, mgCFrame *uki, mgCFrame *hari) {
     hari_obj->point[2].pos[1] = -4.0f;
     hari_obj->point[2].pos[2] = 0.0f;
     hari_obj->point[2].pos[3] = 1.0f;
-    for (i = 0; i < hari_obj->point_num; i++) mgAddVector(hari_obj->point[i].pos, rod_tip);
+    for (i = 0; i < hari_obj->point_num; i++) {
+        mgAddVector(hari_obj->point[i].pos, rod_tip);
+    }
     hari_obj->bind_num = 3;
     pt1 = hari_obj->point[1].pos;
     dist = mgDistVector(hari_obj->point[0].pos, pt1);

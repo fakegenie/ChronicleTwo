@@ -101,8 +101,7 @@ void CreateSystemMes(void) {
 
 #ifdef NONMATCHING
 void CreateSystemMes(int index, int unused) {
-    ClsMes *message = GetSystemMessage(index);
-    message->Init();
+    GetSystemMessage(index)->Init();
     GetSystemMessage(index)->Preset(5);
     GetSystemMessage(index)->SetBuff(GetSysMesBuffer());
     GetSystemMessage(index)->SetBuff_system(GetSystemMesBuffer());

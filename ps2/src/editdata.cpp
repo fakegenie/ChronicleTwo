@@ -138,10 +138,11 @@ void CEditMap::SaveData(CEditData *data) {
         log[i].parts_no = -1;
     }
     for (i = 0; i < place_log_max; i++) {
-        unused = place_log[i].parts_no < 0;
+        EditPlaceLog *entry = &place_log[i];
+        unused = entry->parts_no < 0;
         if (!unused) {
-            log[logCount].parts_no = place_log[i].parts_no;
-            log[logCount].base_no = place_log[i].base_no;
+            log[logCount].parts_no = entry->parts_no;
+            log[logCount].base_no = entry->base_no;
             logCount++;
         }
     }

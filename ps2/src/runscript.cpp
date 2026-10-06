@@ -481,9 +481,9 @@ void CRunScript::exe(vmcode_t *entry) {
                 }
 
                 break;
-            case RS_OP_ADD:
-                rhs = pop();
-                lhs = pop();
+            case RS_OP_ADD: {
+                RS_STACKDATA rhs = pop();
+                RS_STACKDATA lhs = pop();
 
                 if (lhs.type == RS_INT && rhs.type == RS_INT) {
                     push_int(lhs.i + rhs.i);
@@ -499,6 +499,7 @@ void CRunScript::exe(vmcode_t *entry) {
                 }
 
                 break;
+            }
             case RS_OP_SUB:
                 rhs = pop();
                 lhs = pop();

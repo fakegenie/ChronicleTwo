@@ -634,8 +634,7 @@ void CWorldMapMenu::Draw() {
     int loaded_tex = -1;
     if (capture_view == 1 && capture_tex != NULL) {
         MenuReloadTexture(loaded_tex, capture_tex->block);
-        PrimQuad(capture_tex, mgRect<int>(0, 0, mgScreenWidth, mgScreenHeight),
-                 mgRect<int>(0, 0, mgScreenWidth >> 1, mgScreenHeight >> 1), 0x80, 0x80, 0x80, 0x80);
+        PrimQuad(capture_tex, mgRect < int > (0, 0, mgScreenWidth, mgScreenHeight), mgRect < int > (0, 0, mgScreenWidth >> 1, mgScreenHeight >> 1), 0x80, 0x80, 0x80, 0x80);
     }
     DrawMenuFillBox((int)back_alpha, 0, 0, 0);
     SetSpriteEnv(prim, 0);
@@ -649,7 +648,7 @@ void CWorldMapMenu::Draw() {
             prim->Begin(6);
             prim->Texture(anim_tex);
             prim->Color(0, 0, 0, 0x5E);
-            for (int i = 0; i < 0xFF; i++) {
+            for (int i = 0; i < 0xFF; i = i + 1) {
                 int x = (int)(250.0f + 8.0f * sinf(wave_x[i]));
                 prim->TextureCrd(0, i);
                 prim->Vertex(x, i, 0);
@@ -676,10 +675,10 @@ void CWorldMapMenu::Draw() {
             prim->Vertex(0x200, 0x126, 0);
             prim->End();
             SetSpriteEnv(prim, 0);
-            float pulse_color[2][4] = {{230.0f, 0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 230.0f, 0.0f}};
+            float pulse_color[2][4] = { { 230.0f, 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 230.0f, 0.0f } };
             pulse_color[0][3] = 196.0f + 48.0f * sinf(pulse_angle[0]);
             pulse_color[1][3] = 196.0f + 48.0f * sinf(pulse_angle[1]);
-            float pulse_speed[2] = {0.07853982f, 0.06283185f};
+            float pulse_speed[2] = { 0.07853982f, 0.06283185f };
             int shift = 0;
             prim->Begin(6);
             prim->Texture(pulse_tex);
@@ -715,7 +714,7 @@ void CWorldMapMenu::Draw() {
         }
     }
     if (mark_tex != NULL) {
-        mgRect<int> title_rect(-0x1C, -0xE, 0x100, 0x60);
+        mgRect<int> title_rect(- 0x1C, - 0xE, 0x100, 0x60);
         mgRect<int> title_source(0, 0, 0x100, 0x60);
         prim->Bilinear(1);
         prim->Begin(6);
@@ -743,7 +742,7 @@ void CWorldMapMenu::Draw() {
         for (int i = 1; i < spi_wmaparea_tblnum; i++) {
             WMAP_AREA_DATA *area = &spi_wmaparea_tbl[i];
             if ((0 < here_area && here_area == area->area_no) || (here_area < 0 && area->enable != 0)) {
-                PrimQuad(prim, mgRect<int>(area->x - 10, area->y - 15, 0x14, 0x1E), mark_source);
+                PrimQuad(prim, mgRect < int > (area->x - 10, area->y - 15, 0x14, 0x1E), mark_source);
             }
         }
         prim->End();
@@ -782,7 +781,7 @@ void CWorldMapMenu::Draw() {
         MenuReloadTexture(loaded_tex, map_tex->block);
         int frame_x = name_mes->line_pos[0][0] - 0x10;
         int frame_y = name_mes->line_pos[0][1] - 0xC;
-        int frame_step[4] = {0x1E, 0, 0x1E, 0};
+        int frame_step[4] = { 0x1E, 0, 0x1E, 0 };
         frame_step[1] = name_mes->line_w[0] - 0x1E;
         mgRect<int> frame(frame_x, frame_y, 0x1E, 0x2E);
         SetSpriteEnv(prim, 0);
@@ -790,10 +789,10 @@ void CWorldMapMenu::Draw() {
         prim->Texture(mark_tex);
         for (int i = 0; i < 3; i++) {
             prim->Color(0, 0, 0, 0x2E);
-            PrimQuad(prim, mgRect<int>(frame.left + 4, frame.top + 4, frame.right, frame.bottom),
-                     mgRect<int>(i * 0x1E, 0x60, 0x1E, 0x32));
+            int temp = i * 0x1E;
+            PrimQuad(prim, mgRect < int > (frame.left + 4, frame.top + 4, frame.right, frame.bottom), mgRect < int > (temp, 0x60, 0x1E, 0x32));
             prim->Color(0x80, 0x80, 0x80, 0x80);
-            PrimQuad(prim, frame, mgRect<int>(i * 0x1E, 0x60, 0x1E, 0x32));
+            PrimQuad(prim, frame, mgRect < int > (i * 0x1E, 0x60, 0x1E, 0x32));
             frame.left += frame_step[i];
             frame.right = frame_step[i + 1];
         }
@@ -810,7 +809,7 @@ void CWorldMapMenu::Draw() {
             area_y = now_area->name_y;
         }
         list_mes->StepMsg();
-        int put_pos[2] = {0, 0};
+        int put_pos[2] = { 0, 0 };
         put_pos[0] = (int)(60.0f + area_x);
         put_pos[1] = (int)area_y;
         int max_w = 0;

@@ -435,7 +435,8 @@ void TitleBootInit() {
     sndInitPort(4);
     TitleEventSound = sndLoadSound(4, (u_int *)sound_buffer, &snd_memory);
     DataBuffer.Align64();
-    Stack_ReadBuff.stSetBuffer(DataBuffer.stGetTop(), DataBuffer.stGetRest());
+    int rest = DataBuffer.stGetRest();
+    Stack_ReadBuff.stSetBuffer(DataBuffer.stGetTop(), rest);
     read_buffer = Stack_ReadBuff.stGetTop();
     TitleScene->read_buff = read_buffer;
     TitleScene->fade.Initialize();
@@ -1289,13 +1290,13 @@ void TitleModeDraw() {
     int y;
     int row_num;
     int row_y[2];
+    int row;
     TitleMapDraw();
     mgTexManager.ReloadTexture(0x40, (sceVif1Packet *)NULL);
     mgCDrawPrim prim;
     SetSpriteEnv(&prim, 0);
-    float title_x = 0.0f;
-    float title_y = 24.0f;
-    PrimQuad(Tex_Chronicle, title_x, title_y, mgRect<int>(0, 0, 0x200, 0x1A0), fptosi(TitleInfo->title_alpha), 0x80, 0x80, 0x80);
+    float title_alpha = TitleInfo->title_alpha;
+    PrimQuad(Tex_Chronicle, 0.0f, 24.0f, mgRect<int>(0, 0, 0x200, 0x1A0), fptosi(title_alpha), 0x80, 0x80, 0x80);
     mgRect<int> start_rect(start_button_tbl_1826[LanguageCode].left, start_button_tbl_1826[LanguageCode].top,
                            start_button_tbl_1826[LanguageCode].right, start_button_tbl_1826[LanguageCode].bottom);
     if (LanguageCode == 0) {
@@ -1350,7 +1351,7 @@ void TitleModeDraw() {
         prim.TextureMapEnable(1);
         prim.Begin(6);
         prim.Texture(Tex_Logo);
-        int row = 0;
+        row = 0;
         row_y[0] = 0xD0 - TitleInfo->omake_num * 0x1B;
         row_y[1] = row_y[0] + 0x3C;
         cursor_goal_y = (float)row_y[TitleInfo->omake_select];
@@ -1394,8 +1395,6 @@ void TitleMapDraw() {
     float ref[4];
     float view[4][4];
     mgCTextureManager *textures = &mgTexManager;
-    int i;
-    int block;
 
     mgFogEnable(1);
     mgCCamera *camera = TitleScene->GetCamera(TitleScene->active_camera);
@@ -1439,7 +1438,6 @@ void TitleMapDraw() {
         }
     }
     int texture_group;
-    texture_group = 6;
     if (TitleMap != NULL) {
         int texture_order[72];
         TitleWorkBuffer.stack_used = 0;
@@ -1460,10 +1458,10 @@ void TitleMapDraw() {
             WaveTable__3->GetEffect();
         }
         mgPreEndDraw(NULL);
-        for (texture_group = 0; texture_group < 6; texture_group++) {
+        for (int group = 0; group < 6; group++) {
             int i;
             int block;
-            int block_count = TitleScene->mds_list_set.GetTextureBlockNo(texture_group, texture_blocks, 128);
+            int block_count = TitleScene->mds_list_set.GetTextureBlockNo(group, texture_blocks, 128);
             for (i = 0; i < block_count; i++) {
                 int index = block_count - i - 1;
                 block = texture_blocks[index];
@@ -1475,9 +1473,11 @@ void TitleMapDraw() {
         }
         mgSetPkTextureRepeat(0);
     }
-    for (; texture_group < 16; texture_group++) {
+    for (texture_group = 6; texture_group < 16; texture_group++) {
         int later_blocks[128];
         int block_count = TitleScene->mds_list_set.GetTextureBlockNo(texture_group, later_blocks, 128);
+        int i;
+        int block;
         for (i = 0; i < block_count; i++) {
             block = later_blocks[i];
             mgEndDrawReloadTexture(block, NULL);
@@ -1641,11 +1641,12 @@ int TitleMCCheckKey() {
         case TITLE_MC_PHASE_OMAKE_2:
             if (busy) {
                 CMemoryCardManager *manager = TitleMCCheck;
-                if (manager->file_exists != 0) {
-                    if (manager->omake_flag & 1) {
+                int *found = &manager->file_exists;
+                if (*found != 0) {
+                    if (found[1] & 1) {
                         OmakePlayEnableAttr |= 2;
                     }
-                    if (manager->omake_flag & 2) {
+                    if (found[1] & 2) {
                         OmakePlayEnableAttr |= 1;
                     }
                 }

@@ -140,7 +140,11 @@ void CSWordAfterEffect::Draw() {
     prim.AlphaTest(1, 0);
     prim.ZMask(-1);
     prim.Bilinear(1);
-    prim.TextureMapEnable(texture != NULL);
+    if (texture != NULL) {
+        prim.TextureMapEnable(1);
+    } else {
+        prim.TextureMapEnable(0);
+    }
     prim.Coord(1);
     prim.Shading(1);
     prim.DepthTestEnable(1);
@@ -149,21 +153,35 @@ void CSWordAfterEffect::Draw() {
     if (texture != NULL) prim.Texture(texture);
     float u_step = (float)tex_w / (float)count;
     float u = (float)tex_u;
-    for (int point = 0; point < count; ++point) {
-        int projected[4];
-        if (mgTransWorldPrim(projected, smooth0[point])) {
-            prim.Color(color0[0], color0[1], color0[2], (int)((float)color0[3] * opacity));
-            if (texture != NULL) prim.TextureCrd((int)u, tex_v);
-            prim.Vertex4(projected);
+    int projected[4];
+    if (texture == NULL) {
+        for (int point = 0; point < count; ++point) {
+            if (mgTransWorldPrim(projected, smooth0[point])) {
+                prim.Color(color0[0], color0[1], color0[2], (int)((float)color0[3] * opacity));
+                prim.Vertex4(projected);
+            }
+            if (mgTransWorldPrim(projected, smooth1[point])) {
+                prim.Color(color1[0], color1[1], color1[2], (int)((float)color1[3] * opacity));
+                prim.Vertex4(projected);
+            }
+            opacity -= alpha_step;
         }
-        if (mgTransWorldPrim(projected, smooth1[point])) {
-            int *edge_color = texture != NULL ? color0 : color1;
-            prim.Color(edge_color[0], edge_color[1], edge_color[2], (int)((float)edge_color[3] * opacity));
-            if (texture != NULL) prim.TextureCrd((int)u, tex_v + tex_h);
-            prim.Vertex4(projected);
+    } else {
+        for (int point = 0; point < count; ++point) {
+            int texel_u = (int)u;
+            if (mgTransWorldPrim(projected, smooth0[point])) {
+                prim.Color(color0[0], color0[1], color0[2], (int)((float)color0[3] * opacity));
+                prim.TextureCrd(texel_u, tex_v);
+                prim.Vertex4(projected);
+            }
+            if (mgTransWorldPrim(projected, smooth1[point])) {
+                prim.Color(color0[0], color0[1], color0[2], (int)((float)color0[3] * opacity));
+                prim.TextureCrd(texel_u, tex_v + tex_h);
+                prim.Vertex4(projected);
+            }
+            u += u_step;
+            opacity -= alpha_step;
         }
-        if (texture != NULL) u += u_step;
-        opacity -= alpha_step;
     }
     prim.End();
 }

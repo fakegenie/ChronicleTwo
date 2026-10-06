@@ -43,38 +43,61 @@ void CWaveTable::CreateTexture(mgCTexture *output_texture) {
     prim.Shading(1);
     prim.AlphaBlendEnable(1);
 
-    const float cell_width = static_cast<float>(output_texture->width) / 23.0f;
-    const float cell_height = static_cast<float>(output_texture->height) / 23.0f;
-    const float origin_x = static_cast<float>(mgScreenOffx);
-    const float origin_y = static_cast<float>(mgScreenOffy);
+    float position[4];
+    position[3] = 0.0f;
+    position[2] = 0.0f;
+    float cell_width = (float)output_texture->width / 23.0f;
+    float cell_height = (float)output_texture->height / 23.0f;
+    float origin_x = (float)mgScreenOffx;
+    float origin_y = (float)mgScreenOffy;
     prim.Begin2();
 
-    for (int row = 0; row < WAVE_TABLE_DIM - 1; ++row) {
+    float row_offset = 0.0f;
+    for (int row = 0; row < WAVE_TABLE_DIM - 1; row++) {
         prim.BeginPrim2(4, 0x4141U, 0U, 4);
-        for (int column = 0; column < WAVE_TABLE_DIM; ++column) {
-            int sample_column = column == WAVE_TABLE_DIM - 1 ? 0 : column;
+        float column_offset = 0.0f;
+        for (int column = 0; column < WAVE_TABLE_DIM; column++) {
+            position[0] = origin_x + column_offset * cell_width;
+            position[1] = origin_y + row_offset * cell_height;
+            int sample_column = column;
+            if (column >= WAVE_TABLE_DIM - 1) {
+                sample_column = 0;
+            }
             int next_column = (sample_column + 1) % WAVE_TABLE_DIM;
-            float position[4] = {origin_x + column * cell_width,
-                                 origin_y + row * cell_height, 0.0f, 0.0f};
-            float intensity = 40.0f + 540.0f *
-                (height[current][row][sample_column] - height[current][row][next_column]);
-            if (intensity > 200.0f) intensity = 200.0f;
-            if (intensity < 0.0f) intensity = 0.0f;
-            float color[4] = {intensity, intensity, intensity, 96.0f};
+            float *line = height[current][row];
+            float intensity = 40.0f + 540.0f * (line[sample_column] - line[next_column]);
+            if (!(intensity <= 200.0f)) {
+                intensity = 200.0f;
+            }
+            if (intensity < 0.0f) {
+                intensity = 0.0f;
+            }
+            float color[4] = {0.0f, 0.0f, 0.0f, 96.0f};
+            color[0] = intensity;
+            color[1] = intensity;
+            color[2] = intensity;
             prim.Data0(color);
             prim.Data4(position);
 
-            int next_row = (row + 1) % WAVE_TABLE_DIM;
-            intensity = 40.0f + 540.0f *
-                (height[current][next_row][sample_column] - height[current][next_row][next_column]);
-            if (intensity < 0.0f) intensity = 0.0f;
-            if (intensity > 200.0f) intensity = 200.0f;
-            float next_color[4] = {intensity, intensity, intensity, 96.0f};
+            float *next_line = height[current][(row + 1) % WAVE_TABLE_DIM];
+            intensity = 40.0f + 540.0f * (next_line[sample_column] - next_line[next_column]);
+            if (intensity < 0.0f) {
+                intensity = 0.0f;
+            }
+            if (!(intensity <= 200.0f)) {
+                intensity = 200.0f;
+            }
+            float next_color[4] = {0.0f, 0.0f, 0.0f, 96.0f};
+            next_color[0] = intensity;
+            next_color[1] = intensity;
+            next_color[2] = intensity;
             position[1] += cell_height;
             prim.Data0(next_color);
             prim.Data4(position);
+            column_offset += 1.0f;
         }
         prim.EndPrim2();
+        row_offset += 1.0f;
     }
 
     prim.End2();
@@ -117,24 +140,20 @@ void CWaveTable::GetEffect() {
 
 #ifdef NONMATCHING
 void CWaveTable::Effect() {
-    const int previous = 1 - current;
-    for (int row = 1; row < WAVE_TABLE_DIM - 1; ++row) {
-        for (int column = 1; column < WAVE_TABLE_DIM - 1; ++column) {
-            float neighbors = height[current][row - 1][column]
-                            + height[current][row + 1][column]
-                            + height[current][row][column - 1]
-                            + height[current][row][column + 1];
-            float now = height[current][row][column];
-            float before = height[previous][row][column];
-            height[previous][row][column] = neighbors * 0.0196f
-                + (now * 1.9216f - before) - (now - before) * 0.0015f;
+    float *before = &height[1 - current][0][0];
+    float *now = &height[current][0][0];
+    for (int row = 1; row < 23; row++) {
+        for (int column = 1; column < 23; column++) {
+            float *center = &now[row * 24 + column];
+            float *old = &before[row * 24 + column];
+            *old = (*center * 1.9216f - *old) - (*center - *old) * 0.0015f + (center[-24] + (center[-1] + center[1] + center[24])) * 0.0196f;
         }
     }
-    for (int row = 1; row < WAVE_TABLE_DIM - 1; ++row) {
-        float seam = (height[previous][row][1] +
-                      height[previous][row][WAVE_TABLE_DIM - 2]) * 0.5f;
-        height[previous][row][1] = seam;
-        height[previous][row][WAVE_TABLE_DIM - 2] = seam;
+    for (int row = 1; row < 23; row++) {
+        float *line = &before[row * 24];
+        float seam = (line[22] + line[1]) * 0.5f;
+        line[1] = seam;
+        line[22] = seam;
     }
 }
 #else

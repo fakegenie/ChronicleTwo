@@ -1183,8 +1183,8 @@ void ClsMes::StepNormal() {
         if (distance > 0.0f) {
             float tip_y = tail_length * dy / distance;
             float tip_x = tail_length * dx / distance;
-            tail_tip_x = tail_root_x + fptosi(tip_x);
-            tail_tip_y = tail_root_y + fptosi(tip_y);
+            tail_tip_x = tail_root_x + (int)tip_x;
+            tail_tip_y = tail_root_y + (int)tip_y;
         } else {
             tail_tip_x = tail_root_x;
             tail_tip_y = tail_root_y;
@@ -3539,13 +3539,12 @@ void ClsMes::DrawSelectCursor(mgCDrawPrim *prim) {
     cursorDst.Set(x, y, cursor_w, cursor_h);
     set2DSprite(prim, cursorDst, cursorSrc, &cursor_color);
 }
-#ifdef NONMATCHING
 void ClsMes::DrawEquipment(mgCDrawPrim *prim) {
     RECT       at = {191, 82, 9, 16};
     RGBAQ_TYPE color;
-    int        line;
     mgRect<int> xy;
     mgRect<int> uv;
+    int        line;
 
     for (line = 0; line < MES_LINE_MAX; line++) {
         if (equip_on[line] != 0) {
@@ -3556,23 +3555,20 @@ void ClsMes::DrawEquipment(mgCDrawPrim *prim) {
                 color.r = color.g = color.b = 0x80;
                 color.a = alpha * 128 / 128;
             }
-            uv.Set(at.x, at.y, at.width, at.height);
+            unsigned int uv_y = at.y;
+            uv.Set(at.x, uv_y, at.width, at.height);
             xy.Set((int)(draw_off_x + (line_pos[line][0] + equip_x[line])),
                            (int)(draw_off_y + (line_pos[line][1] + equip_y[line])), at.width, at.height);
             set2DSprite(prim, xy, uv, &color);
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/nd_meswin", DrawEquipment__6ClsMesFP11mgCDrawPrim);
-#endif
-#ifdef NONMATCHING
 void ClsMes::DrawCross(mgCDrawPrim *prim) {
     RECT       at = {132, 104, 10, 16};
     RGBAQ_TYPE color;
-    int        line;
     mgRect<int> xy;
     mgRect<int> uv;
+    int        line;
 
     for (line = 0; line < MES_LINE_MAX; line++) {
         if (cross_on[line] != 0) {
@@ -3583,23 +3579,20 @@ void ClsMes::DrawCross(mgCDrawPrim *prim) {
                 color.r = color.g = color.b = 0x80;
                 color.a = alpha * 128 / 128;
             }
-            uv.Set(at.x, at.y, at.width, at.height);
+            unsigned int uv_y = at.y;
+            uv.Set(at.x, uv_y, at.width, at.height);
             xy.Set((int)(draw_off_x + (line_pos[line][0] + cross_x[line])),
                            (int)(draw_off_y + (line_pos[line][1] + cross_y[line])), at.width, at.height);
             set2DSprite(prim, xy, uv, &color);
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/nd_meswin", DrawCross__6ClsMesFP11mgCDrawPrim);
-#endif
-#ifdef NONMATCHING
 void ClsMes::DrawRightDelta(mgCDrawPrim *prim) {
     RECT       at = {158, 240, 10, 16};
     RGBAQ_TYPE color;
-    int        line;
     mgRect<int> xy;
     mgRect<int> uv;
+    int        line;
 
     for (line = 0; line < MES_LINE_MAX; line++) {
         if (delta_on[line] != 0) {
@@ -3610,16 +3603,14 @@ void ClsMes::DrawRightDelta(mgCDrawPrim *prim) {
                 color.r = color.g = color.b = 0x80;
                 color.a = alpha * 128 / 128;
             }
-            uv.Set(at.x, at.y, at.width, at.height);
+            unsigned int uv_y = at.y;
+            uv.Set(at.x, uv_y, at.width, at.height);
             xy.Set((int)(draw_off_x + (line_pos[line][0] + delta_x[line])),
                            (int)(draw_off_y + (line_pos[line][1] + delta_y[line])), at.width, font_h - 2);
             set2DSprite(prim, xy, uv, &color);
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/nd_meswin", DrawRightDelta__6ClsMesFP11mgCDrawPrim);
-#endif
 #ifdef NONMATCHING
 extern RECT at_4185;
 void ClsMes::DrawDigit(mgCDrawPrim *prim, int digit, int x, int y, int alpha, RGBAQ_TYPE *color) {
@@ -3776,7 +3767,7 @@ void ClsMes::DrawMesWin() {
     color.b = 0x80;
     color.g = 0x80;
     color.r = 0x80;
-    color.a = alpha;
+    color.a = alpha * 0x80 / 128;
     shadow_color.b = 0;
     shadow_color.g = 0;
     shadow_color.r = 0;
@@ -3786,7 +3777,11 @@ void ClsMes::DrawMesWin() {
     RECT       inner;
     RECT       outer;
     RECT       shadow;
-    RECT       scaled;
+    RECT       help_scaled;
+    RECT       versatile_1_scaled;
+    RECT       yesno_scaled;
+    RECT       versatile_3_scaled;
+    RECT       versatile_4_scaled;
     int        dx;
     int        dy;
     int        select_y;
@@ -3824,10 +3819,10 @@ void ClsMes::DrawMesWin() {
             inner.height = text_h;
             break;
         case MES_WIN_HELP:
-            CalcRectScale(outer, fade, &scaled);
-            scaled.x = (int)(scaled.x + draw_off_x);
-            scaled.y = (int)(scaled.y + draw_off_y);
-            MyMenuHelpWinDraw(&sprite_prim, scaled, alpha);
+            CalcRectScale(outer, fade, &help_scaled);
+            help_scaled.x = (int)(help_scaled.x + draw_off_x);
+            help_scaled.y = (int)(help_scaled.y + draw_off_y);
+            MyMenuHelpWinDraw(&sprite_prim, help_scaled, alpha);
             break;
         case MES_WIN_FLOATING:
             shadow.x = (int)(shadow.x + draw_off_x);
@@ -3840,49 +3835,49 @@ void ClsMes::DrawMesWin() {
                                   &color, &win_color);
             break;
         case MES_WIN_VERSATILE_1:
-            CalcRectScale(shadow, fade, &scaled);
-            scaled.x = (int)(scaled.x + draw_off_x);
-            scaled.y = (int)(scaled.y + draw_off_y);
-            DrawVersatileWin_1(&frame_prim, scaled, &shadow_color, alpha, bg_opaque);
-            CalcRectScale(outer, fade, &scaled);
-            scaled.x = (int)(scaled.x + draw_off_x);
-            scaled.y = (int)(scaled.y + draw_off_y);
-            DrawVersatileWin_1(&frame_prim, scaled, &color, alpha, bg_opaque);
+            CalcRectScale(shadow, fade, &versatile_1_scaled);
+            versatile_1_scaled.x = (int)(versatile_1_scaled.x + draw_off_x);
+            versatile_1_scaled.y = (int)(versatile_1_scaled.y + draw_off_y);
+            DrawVersatileWin_1(&frame_prim, versatile_1_scaled, &shadow_color, alpha, bg_opaque);
+            CalcRectScale(outer, fade, &versatile_1_scaled);
+            versatile_1_scaled.x = (int)(versatile_1_scaled.x + draw_off_x);
+            versatile_1_scaled.y = (int)(versatile_1_scaled.y + draw_off_y);
+            DrawVersatileWin_1(&frame_prim, versatile_1_scaled, &color, alpha, bg_opaque);
             break;
         case MES_WIN_YESNO:
             OffsetYesNoWin(&outer, &shadow);
-            CalcRectScale(shadow, fade, &scaled);
-            scaled.x = (int)(scaled.x + draw_off_x);
-            scaled.y = (int)(scaled.y + draw_off_y);
-            DrawVersatileWin_yesno(&frame_prim, scaled, &shadow_color, alpha, bg_opaque);
-            CalcRectScale(outer, fade, &scaled);
-            scaled.x = (int)(scaled.x + draw_off_x);
-            scaled.y = (int)(scaled.y + draw_off_y);
-            DrawVersatileWin_yesno(&frame_prim, scaled, &color, alpha, bg_opaque);
-            SetSelectCursorPos(scaled);
+            CalcRectScale(shadow, fade, &yesno_scaled);
+            yesno_scaled.x = (int)(yesno_scaled.x + draw_off_x);
+            yesno_scaled.y = (int)(yesno_scaled.y + draw_off_y);
+            DrawVersatileWin_yesno(&frame_prim, yesno_scaled, &shadow_color, alpha, bg_opaque);
+            CalcRectScale(outer, fade, &yesno_scaled);
+            yesno_scaled.x = (int)(yesno_scaled.x + draw_off_x);
+            yesno_scaled.y = (int)(yesno_scaled.y + draw_off_y);
+            DrawVersatileWin_yesno(&frame_prim, yesno_scaled, &color, alpha, bg_opaque);
+            SetSelectCursorPos(yesno_scaled);
             DrawYesNo(&frame_prim, choice_pos[0][0], choice_pos[0][1], choice_pos[1][0], choice_pos[1][1], &color);
             break;
         case MES_WIN_VERSATILE_3:
-            CalcRectScale(shadow, fade, &scaled);
-            select_y = scaled.y + scaled.height / 2;
+            CalcRectScale(shadow, fade, &versatile_3_scaled);
+            select_y = versatile_3_scaled.y + versatile_3_scaled.height / 2;
             select_y += (int)((inner.y + font_h * select_top + 7 - select_y) * fade);
-            scaled.x = (int)(scaled.x + draw_off_x);
-            scaled.y = (int)(scaled.y + draw_off_y);
-            DrawVersatileWin_3(&frame_prim, scaled, select_y, &shadow_color, alpha, bg_opaque);
-            CalcRectScale(outer, fade, &scaled);
-            scaled.x = (int)(scaled.x + draw_off_x);
-            scaled.y = (int)(scaled.y + draw_off_y);
-            DrawVersatileWin_3(&frame_prim, scaled, select_y, &color, alpha, bg_opaque);
+            versatile_3_scaled.x = (int)(versatile_3_scaled.x + draw_off_x);
+            versatile_3_scaled.y = (int)(versatile_3_scaled.y + draw_off_y);
+            DrawVersatileWin_3(&frame_prim, versatile_3_scaled, select_y, &shadow_color, alpha, bg_opaque);
+            CalcRectScale(outer, fade, &versatile_3_scaled);
+            versatile_3_scaled.x = (int)(versatile_3_scaled.x + draw_off_x);
+            versatile_3_scaled.y = (int)(versatile_3_scaled.y + draw_off_y);
+            DrawVersatileWin_3(&frame_prim, versatile_3_scaled, select_y, &color, alpha, bg_opaque);
             break;
         case MES_WIN_VERSATILE_4:
-            CalcRectScale(shadow, fade, &scaled);
-            scaled.x = (int)(scaled.x + draw_off_x);
-            scaled.y = (int)(scaled.y + draw_off_y);
-            DrawVersatileWin_4(&frame_prim, scaled, &shadow_color, alpha, bg_opaque);
-            CalcRectScale(outer, fade, &scaled);
-            scaled.x = (int)(scaled.x + draw_off_x);
-            scaled.y = (int)(scaled.y + draw_off_y);
-            DrawVersatileWin_4(&frame_prim, scaled, &color, alpha, bg_opaque);
+            CalcRectScale(shadow, fade, &versatile_4_scaled);
+            versatile_4_scaled.x = (int)(versatile_4_scaled.x + draw_off_x);
+            versatile_4_scaled.y = (int)(versatile_4_scaled.y + draw_off_y);
+            DrawVersatileWin_4(&frame_prim, versatile_4_scaled, &shadow_color, alpha, bg_opaque);
+            CalcRectScale(outer, fade, &versatile_4_scaled);
+            versatile_4_scaled.x = (int)(versatile_4_scaled.x + draw_off_x);
+            versatile_4_scaled.y = (int)(versatile_4_scaled.y + draw_off_y);
+            DrawVersatileWin_4(&frame_prim, versatile_4_scaled, &color, alpha, bg_opaque);
             break;
         case MES_WIN_DQ_FUKIDASHI:
         case MES_WIN_DQ_FUKIDASHI_2:

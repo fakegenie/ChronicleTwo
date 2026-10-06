@@ -1864,8 +1864,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/snd_mngr", at_1636__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/snd_mngr", at_1679__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/snd_mngr", at_1680__DATA);
 
-// Static initialiser table (.ctor)
-INCLUDE_RODATA("ps2/asm/pal/nonmatchings/snd_mngr", D_0037AFF4__DATA);
 
 // Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/snd_mngr", EnableSndMngr__DATA);

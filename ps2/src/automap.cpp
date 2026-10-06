@@ -370,6 +370,7 @@ void CAutoMapGen::SetupRoomInfo(char *name, int length, mgCMemory *mem) {
 }
 #ifdef NONMATCHING
 int CAutoMapGen::CreatRoom(int x, int y, int room_no, int info_no) {
+    AUTOMAP_PARTS_INFO *parts_info;
     if (info_no == -1) {
         int pick;
         do {
@@ -383,42 +384,43 @@ int CAutoMapGen::CreatRoom(int x, int y, int room_no, int info_no) {
             info_no = pick;
         } while (pick == -1);
     }
-    AUTOMAP_ROOM_INFO *info = &room_info[info_no];
-    s16 *table = info->table;
+    s16 *table = room_info[info_no].table;
+    int col, row;
     if (table == NULL) {
         return 0;
     }
-    int h = info->h;
-    int w = info->w;
+    int w = room_info[info_no].w, h = room_info[info_no].h;
     if (x < 0 || y < 0) {
         return 0;
     }
-    int right = x + w;
-    int bottom = y + h;
-    if (grid_w < right || grid_h < bottom) {
+    if (x + w > grid_w || grid_h < y + h) {
         return 0;
     }
-    for (int row = y - 1; row < bottom + 1; row++) {
-        for (int col = x; col < right; col++) {
+    for (int row = y - 1; row < y + h + 1; row++) {
+        for (int col = x; col < x + w; col++) {
             if ((grid + row * grid_w)[col].kind != 0) {
                 return 0;
             }
         }
     }
-    for (int row = y; row < bottom; row++) {
-        for (int col = x - 1; col < right + 1; col++) {
-            if ((grid + row * grid_w)[col].kind != 0) {
-                return 0;
-            }
+    for (row = y; row < y + h; row++) {
+        col = x - 1;
+        if (col < x + w + 1) {
+            do {
+                if ((grid + grid_w * row)[col].kind != 0) {
+                    return 0;
+                }
+                col++;
+            } while (col < x + w + 1);
         }
     }
-    for (int row = y; row < bottom; row++) {
-        for (int col = x; col < right; col++) {
+    for (row = y; row < y + h; row++) {
+        for (col = x; col < x + w; col++) {
             s16 parts_no = table[0];
             s16 attr = table[1];
             table += 2;
             if (parts_no != -1) {
-                AUTOMAP_PARTS_INFO *parts_info = &PartsInfoData[parts_no];
+                parts_info = &PartsInfoData[parts_no];
                 (grid + row * grid_w)[col].parts_no = parts_no;
                 (grid + row * grid_w)[col].attr = attr;
                 (grid + row * grid_w)[col].kind = parts_info->kind;
@@ -517,11 +519,10 @@ void CAutoMapGen::RoomLink(int from, int to) {
     AUTOMAP_ROOM *src = &room[from];
     AUTOMAP_ROOM *dst = &room[to];
 
-    int src_cx = src->x + src->w / 2;
+    int goal_y = dst->y + dst->h / 2;
     int src_cy = src->y + src->h / 2;
     int goal_x = dst->x + dst->w / 2;
-    int goal_y = dst->y + dst->h / 2;
-    int dx = src_cx - goal_x;
+    int dx = src->x + src->w / 2 - goal_x;
     float dist_x = (float)dx;
     if (dist_x < 0.0f) {
         dist_x = -dist_x;
@@ -532,21 +533,19 @@ void CAutoMapGen::RoomLink(int from, int to) {
         dist_y = -dist_y;
     }
     int side;
-    if (!(dist_x <= dist_y)) {
-        side = kStepLeft;
-        if (dx < 0) {
-            side = kStepRight;
-        }
-    } else {
+    if ((dist_x <= dist_y)) {
         side = kStepUp;
         if (dy < 0) {
             side = kStepDown;
         }
-    }
-    if (gen_flag & AUTOMAP_GEN_FIXED_START) {
-        if (from == 0) {
+    } else {
+        side = kStepLeft;
+        if (dx < 0) {
             side = kStepRight;
         }
+    }
+    if (gen_flag & AUTOMAP_GEN_FIXED_START && from == 0) {
+        side = kStepRight;
     }
     int start_num = 0;
     int depth = 0;
@@ -555,24 +554,21 @@ void CAutoMapGen::RoomLink(int from, int to) {
             do {
                 for (int col = src->x; col < src->x + src->w; col++) {
                     u32 kind = (grid + (src->y + depth) * grid_w)[col].kind;
-                    if ((kind & (AUTOMAP_KIND_ROOM | AUTOMAP_KIND_ROOM_ALT)) &&
-                        !(kind & (AUTOMAP_KIND_PART | AUTOMAP_KIND_HEALING))) {
+                    if ((kind & (AUTOMAP_KIND_ROOM | AUTOMAP_KIND_ROOM_ALT)) && !(kind & (AUTOMAP_KIND_PART | AUTOMAP_KIND_HEALING))) {
                         starts[start_num].x = col;
                         starts[start_num].y = src->y + depth;
                         start_num++;
                     }
                 }
                 depth++;
-            } while (start_num <= 0);
+            } while (0 >= start_num);
             break;
         case kStepDown:
             do {
-                for (int col = src->x; col < src->x + src->w; col++) {
-                    u32 kind = (grid + (src->y + src->h - 1 - depth) * grid_w)[col].kind;
-                    if ((kind & (AUTOMAP_KIND_ROOM | AUTOMAP_KIND_ROOM_ALT)) &&
-                        !(kind & (AUTOMAP_KIND_PART | AUTOMAP_KIND_HEALING))) {
+                for (s16 col = src->x; col < src->x + src->w; col++) {
+                    if (((grid + (src->y + src->h - 1 - depth) * grid_w)[col].kind & (AUTOMAP_KIND_ROOM | AUTOMAP_KIND_ROOM_ALT)) && !((grid + (src->y + src->h - 1 - depth) * grid_w)[col].kind & (AUTOMAP_KIND_PART | AUTOMAP_KIND_HEALING))) {
                         starts[start_num].x = col;
-                        starts[start_num].y = src->y + src->h - 1 - depth;
+                        starts[start_num].y = src->y + (src->h - 1 - depth);
                         start_num++;
                     }
                 }
@@ -582,10 +578,8 @@ void CAutoMapGen::RoomLink(int from, int to) {
         case kStepRight:
             do {
                 for (int row = src->y; row < src->y + src->h; row++) {
-                    u32 kind = (grid + row * grid_w)[src->x + src->w - 1 - depth].kind;
-                    if ((kind & (AUTOMAP_KIND_ROOM | AUTOMAP_KIND_ROOM_ALT)) &&
-                        !(kind & (AUTOMAP_KIND_PART | AUTOMAP_KIND_HEALING))) {
-                        starts[start_num].x = src->x + src->w - 1 - depth;
+                    if (((grid + row * grid_w)[src->x + (src->w - 1) - depth].kind & (AUTOMAP_KIND_ROOM | AUTOMAP_KIND_ROOM_ALT)) && !((grid + row * grid_w)[src->x + (src->w - 1 - depth)].kind & (AUTOMAP_KIND_PART | AUTOMAP_KIND_HEALING))) {
+                        starts[start_num].x = src->x + (src->w - 1) - depth;
                         starts[start_num].y = row;
                         start_num++;
                     }
@@ -596,9 +590,7 @@ void CAutoMapGen::RoomLink(int from, int to) {
         case kStepLeft:
             do {
                 for (int row = src->y; row < src->y + src->h; row++) {
-                    u32 kind = (grid + row * grid_w)[src->x + depth].kind;
-                    if ((kind & (AUTOMAP_KIND_ROOM | AUTOMAP_KIND_ROOM_ALT)) &&
-                        !(kind & (AUTOMAP_KIND_PART | AUTOMAP_KIND_HEALING))) {
+                    if (((grid + grid_w * row)[depth + src->x].kind & (AUTOMAP_KIND_ROOM | AUTOMAP_KIND_ROOM_ALT)) && !((grid + grid_w * row)[depth + src->x].kind & (AUTOMAP_KIND_PART | AUTOMAP_KIND_HEALING))) {
                         starts[start_num].x = src->x + depth;
                         starts[start_num].y = row;
                         start_num++;
@@ -608,16 +600,15 @@ void CAutoMapGen::RoomLink(int from, int to) {
             } while (start_num <= 0);
             break;
     }
-    if (start_num <= 0) {
+    if (0 >= start_num) {
         printf(at_1661);
         return;
     }
     ROOM_LINK_POINT *start = &starts[iRand(start_num)];
-    int x = start->x;
-    int y = start->y;
-    (grid + y * grid_w)[x].kind |= AUTOMAP_KIND_ENTRANCE;
-    int steps;
-    dist_x = (float)dx;
+    unsigned int x = start->x, y = start->y;
+    (grid + grid_w * y)[x].kind |= AUTOMAP_KIND_ENTRANCE;
+    dist_x = dx;
+    s32 steps;
     if (dist_x < 0.0f) {
         dist_x = -dist_x;
     }
@@ -779,7 +770,7 @@ void CAutoMapGen::CreatDummyRoot(int room_no) {
         }
         steps = iRand((int)d) + 1;
     } else {
-        if (dy < 0) {
+        if (0 > dy) {
             side = kStepDown;
         } else {
             side = kStepUp;
@@ -869,7 +860,7 @@ void CAutoMapGen::CreatDummyRoot(int room_no) {
             } else {
                 side = kStepUp;
             }
-            float d = (float)dy;
+            float d = dy;
             if (d < 0.0f) {
                 d = -d;
             }

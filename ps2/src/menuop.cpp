@@ -404,8 +404,6 @@ int MenuManualKey() {
 void MenuManualDraw() {
     CManualMenu *menu;
     mgCTexture *picture;
-    mgRect<int> putRect;
-    mgRect<int> texRect;
     CUserDataManager *userData;
     CActionChara *chara;
     u_long128 *buffer;
@@ -425,9 +423,7 @@ void MenuManualDraw() {
             picture = (mgCTexture *)MnOnePictTex[menu->pict_page];
             if (picture != NULL) {
                 textures->ReloadTexture(picture->block, (sceVif1Packet *)NULL);
-                texRect.Set(0, 0, 0x200, 0x1A0);
-                putRect.Set(0, 0, 0x200, mgScreenHeight);
-                PrimQuad(picture, putRect, texRect, 0x80, 0x80, 0x80, 0x80);
+                PrimQuad(picture, mgRect<int>(0, 0, 0x200, mgScreenHeight), mgRect<int>(0, 0, 0x200, 0x1A0), 0x80, 0x80, 0x80, 0x80);
                 DrawMenuFillBox(35.0f, (float)(mgScreenHeight - 0x28), (float)fillw_1125[LanguageCode],
                                 30.0f, 0x40, 0, 0, 0);
                 if (MenuDCMsg[7] != NULL) {
@@ -2758,11 +2754,10 @@ static inline MC_CARD_INFO *GetSubGameCard(CMemoryCardManager *manager) {
 #ifdef NONMATCHING
 int SubGameSaveKey(void) {
     MC_CARD_INFO *card;
+    u32 stepResult;
     int pushed;
     CDC2Mes *window;
-    int stepResult;
     int next;
-    MC_ERROR_INFO *error;
     int cursor;
     int pressed;
     int answer;
@@ -2773,19 +2768,19 @@ int SubGameSaveKey(void) {
         MemoryCardPtr->FinishForMC();
         if (SubGameSaveOrLoad == 1) {
             MenuMainScene->StopBGM(0);
-            MenuMainScene->LoadBGM(SubGameDataBgm.load_no,
-                                   SaveMenuStack.stack + SaveMenuStack.stack_used);
+            MenuMainScene->LoadBGM(SubGameDataBgm.load_no, SaveMenuStack.stack + SaveMenuStack.stack_used);
             MenuMainScene->SetActiveBgmStatus(&SubGameDataBgm);
         }
         return 1;
     }
     pushed = MenuCommonInfo->CheckPushButton();
+    MC_ERROR_INFO *error;
     stepResult = MemoryCardPtr->Step();
     error = &MemoryCardPtr->error;
     window = MenuDCMsg[0];
     next = -1;
     switch (SubGameSaveOrLoadPhase) {
-        case -1:
+        case - 1:
             break;
         case SUB_SAVE_SLOT_SELECT:
             pressed = ConvertCheckPushButton(pushed);
@@ -2893,7 +2888,8 @@ int SubGameSaveKey(void) {
             }
             break;
         case SUB_SAVE_WRITE_DONE:
-            if (pushed != 0) {
+            unsigned int temp = pushed != 0;
+            if (temp) {
                 MenuSePlay(1);
                 SubGameSaveLoadStatus = 1;
             }
@@ -2957,7 +2953,8 @@ int SubGameSaveKey(void) {
             break;
         case SUB_SAVE_FORMATTING:
             card = GetSubGameCard(MemoryCardPtr);
-            if (stepResult != 0) {
+            int temp3 = stepResult != 0;
+            if (temp3) {
                 if (McCheckMCPs2(card) != 0) {
                     next = SUB_SAVE_DIR_MAKING;
                     if (card != NULL && card->formatted == 0) {
@@ -3105,7 +3102,7 @@ int SubGameSaveKey(void) {
                 break;
             case SUB_SAVE_SPACE_ASK:
                 SubGameCFGAnalyze(at_3202__3);
-                int values[2] = {0, 0};
+                int values[2] = { 0, 0 };
                 values[0] = slotNo;
                 values[1] = SubCheckTotalSaveFileSize;
                 window->SetMsgVolumeNo(values, 2);
@@ -3160,7 +3157,7 @@ int SubGameSaveKey(void) {
                     window->SetMsgVolumeNoOne(slotNo);
                 } else if (card->free_size < SubCheckTotalSaveFileSize) {
                     window->MakeMsg(0xC50);
-                    int values[2] = {0, 0};
+                    int values[2] = { 0, 0 };
                     values[0] = slotNo;
                     values[1] = SubCheckTotalSaveFileSize;
                     window->SetMsgVolumeNo(values, 0x10);

@@ -479,6 +479,8 @@ int mgCTextureManager::GetRemainVRAM(int block) {
 }
 #pragma global_optimizer reset
 #pragma schedule reset
+#pragma schedule off
+#pragma optimization_level 2
 #ifdef NONMATCHING
 mgCTexture *mgCTextureManager::EnterTexture(int block, char *name, u_long128 **image, int width,
                                             int height, int bpp, u_long128 *clut, u_long tex1,
@@ -682,6 +684,9 @@ mgCTexture *mgCTextureManager::EnterTexture(int block, char *name, u_long128 **i
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_texture", EnterTexture__17mgCTextureManagerFiPcPP1iiiP1Uli);
 #endif
+#pragma optimization_level reset
+#pragma schedule reset
+
 #pragma schedule off
 #pragma optimization_level 2
 mgCTexture *mgCTextureManager::EnterTexture(int id, char *name, TM2_head *head, int reload,
@@ -750,6 +755,8 @@ mgCTexture *mgCTextureManager::EnterTexture(int id, char *name, TM2_head *head, 
 }
 #pragma optimization_level reset
 #pragma schedule reset
+#pragma schedule off
+#pragma optimization_level 2
 #ifdef NONMATCHING
 int mgCTextureManager::EnterIMGFile(u_char *img, int block, mgCMemory *stack,
                                     mgCEnterIMGInfo *info) {
@@ -759,8 +766,8 @@ int mgCTextureManager::EnterIMGFile(u_char *img, int block, mgCMemory *stack,
     mgIMG_HEADER *entry;
     mgIMG1_HEADER *entry1;
     mgCTexture *texture;
-    int not_im2;
-    int not_im3;
+    int is_im2;
+    int is_im3;
     int spill;
     int current_block;
     int last_block_used;
@@ -775,12 +782,19 @@ int mgCTextureManager::EnterIMGFile(u_char *img, int block, mgCMemory *stack,
         return 0;
     }
 
+    is_im2 = 0;
     if (memcmp(img, "IM", 2) != 0) {
         return 0;
     }
 
-    not_im2 = memcmp(img, "IM2", 3);
-    not_im3 = memcmp(img, "IM3", 3);
+    if (memcmp(img, "IM2", 3) == 0) {
+        is_im2 = 1;
+    }
+
+    is_im3 = 0;
+    if (memcmp(img, "IM3", 3) == 0) {
+        is_im3 = 1;
+    }
 
     if (info != NULL) {
         for (i = 0; i < MG_TEXTURE_IMG_GROUP_MAX; i++) {
@@ -789,14 +803,36 @@ int mgCTextureManager::EnterIMGFile(u_char *img, int block, mgCMemory *stack,
         }
     }
 
-    spill = 0;
     current_block = block;
-    last_block_used = block;
+    spill = 0;
+    last_block_used = current_block;
 
-    if (not_im3 == 0) {
+    if (is_im3 == 0) {
+        entry1 = (mgIMG1_HEADER *)(file + 1);
+
+        for (a = 0; a < file->num; a++, entry1++) {
+            texture = EnterTexture(current_block, entry1->name, (TM2_head *)(img + entry1->offset),
+                                   is_im2, 0);
+
+            if (texture != NULL && current_block < block_max - 1 &&
+                GetRemainVRAM(current_block) < 0) {
+                current_block++;
+                spill++;
+                texture->block = current_block;
+            }
+
+            if (texture != NULL && texture->block > last_block_used) {
+                last_block_used = texture->block;
+            }
+        }
+
+        if (info != NULL) {
+            info->block[0] = block;
+            info->block_num[0] = spill + 1;
+        }
+    } else {
         entries = (mgIMG_HEADER *)(file + 1);
 
-        // Order the pictures by group, leaving texture animation scripts where they are.
         for (a = 0; a < file->num3 - 1; a++) {
             for (b = a + 1; b < file->num3; b++) {
                 if (entries[a].block < 0) {
@@ -824,27 +860,24 @@ int mgCTextureManager::EnterIMGFile(u_char *img, int block, mgCMemory *stack,
                 if (block >= 0 && stack != NULL) {
                     LoadCFGFile((char *)img + offset, entry->size, stack, NULL);
                 }
+            } else {
+                swizzled = entry->swizzled;
+                texture_block = spill + block + entry->block;
 
-                continue;
-            }
+                if (info != NULL && info->block[entry->block] < 0) {
+                    info->block[entry->block] = texture_block;
+                    info->block_num[entry->block] = 1;
+                }
 
-            swizzled = entry->swizzled;
-            texture_block = spill + block + entry->block;
+                texture = EnterTexture(texture_block, entry->name, (TM2_head *)(img + offset), swizzled,
+                                       entry->no_image);
 
-            if (info != NULL && info->block[entry->block] < 0) {
-                info->block[entry->block] = texture_block;
-                info->block_num[entry->block] = 1;
-            }
+                if (texture != NULL) {
+                    entry->swizzled = texture->swizzled;
+                    texture->clamp = entry->clamp;
+                }
 
-            texture = EnterTexture(texture_block, entry->name, (TM2_head *)(img + offset), swizzled,
-                                   entry->no_image);
-
-            if (texture != NULL) {
-                entry->swizzled = texture->swizzled;
-                texture->clamp = entry->clamp;
-
-                // A block out of VRAM passes the texture on to the following block.
-                if (texture_block < block_max - 1 && GetRemainVRAM(texture_block) < 0) {
+                if (texture != NULL && texture_block < block_max - 1 && GetRemainVRAM(texture_block) < 0) {
                     if (info != NULL && info->block[entry->block] >= 0) {
                         info->block_num[entry->block]++;
                     }
@@ -865,34 +898,11 @@ int mgCTextureManager::EnterIMGFile(u_char *img, int block, mgCMemory *stack,
 
                     printf("texture over %d:%s\n", block, texture->name);
                 }
+
+                if (texture != NULL && texture->block > last_block_used) {
+                    last_block_used = texture->block;
+                }
             }
-
-            if (texture != NULL && texture->block > last_block_used) {
-                last_block_used = texture->block;
-            }
-        }
-    } else {
-        entry1 = (mgIMG1_HEADER *)(file + 1);
-
-        for (a = 0; a < file->num; a++, entry1++) {
-            texture = EnterTexture(current_block, entry1->name, (TM2_head *)(img + entry1->offset),
-                                   not_im2 == 0, 0);
-
-            if (texture != NULL && current_block < block_max - 1 &&
-                GetRemainVRAM(current_block) < 0) {
-                current_block++;
-                spill++;
-                texture->block = current_block;
-            }
-
-            if (texture != NULL && texture->block > last_block_used) {
-                last_block_used = texture->block;
-            }
-        }
-
-        if (info != NULL) {
-            info->block[0] = block;
-            info->block_num[0] = spill + 1;
         }
     }
 
@@ -901,6 +911,9 @@ int mgCTextureManager::EnterIMGFile(u_char *img, int block, mgCMemory *stack,
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_texture", EnterIMGFile__17mgCTextureManagerFPUciP9mgCMemoryP15mgCEnterIMGInfo);
 #endif
+#pragma optimization_level reset
+#pragma schedule reset
+
 #pragma schedule off
 
 /**
@@ -1185,6 +1198,7 @@ void mgCTextureManager::ReloadTexture(int index, sceVif1Packet *packet) {
 }
 #pragma global_optimizer reset
 #pragma schedule reset
+#pragma schedule off
 #ifdef NONMATCHING
 int mgCTextureManager::ReloadTexture(int block, u_int *packet) {
     sceGsTex0 tex0;
@@ -1291,6 +1305,8 @@ int mgCTextureManager::ReloadTexture(int block, u_int *packet) {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_texture", ReloadTexture__17mgCTextureManagerFiPUi);
 #endif
+#pragma schedule reset
+
 #pragma schedule off
 // sceGsTex0::operator= is the compiler-generated copy assignment of the SDK type (sce/libgraph.h).
 sceGsTex0 &sceGsTex0::operator=(const sceGsTex0 &src) {
@@ -1505,6 +1521,8 @@ static int PageConv32to8(int width, int height, u_char *src, u_char *dst) {
 }
 #pragma optimization_level reset
 #pragma schedule reset
+#pragma schedule off
+#pragma optimization_level 1
 #ifdef NONMATCHING
 
 /**
@@ -1581,6 +1599,9 @@ static int Conv32To8(int width, int height, u_char *image) {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_texture", Conv32To8__FiiPUc);
 #endif
+#pragma optimization_level reset
+#pragma schedule reset
+
 
 // Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_texture", texflush_dma__DATA);
