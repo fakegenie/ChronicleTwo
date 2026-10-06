@@ -1157,16 +1157,22 @@ void InitLureObj(int rod_type, mgCFrame *rod_frame) {
         mgAddVector(LureObj.point[j].pos, sao_pos);
     }
 }
-#ifdef NONMATCHING
 void InitUkiObj(int no, mgCFrame *uki, mgCFrame *hari) {
     float rod_tip[4];
-    int i;
+    float *pt2;
+    FISH_POINT *point;
+    float *pt3;
+    float dist;
+    CFishObj *hari_obj;
     CFishObj *uki_obj;
+    int j;
+    float *pt1;
+    int i;
     i = 0;
     UkiObj.point_num = 4;
     uki_obj = &UkiObj;
     for (; i < uki_obj->point_num; i++) {
-        FISH_POINT *point = &uki_obj->point[i];
+        point = &uki_obj->point[i];
         mgZeroVector(point->pos);
         mgZeroVector(point->old_pos);
         mgZeroVector(point->velo);
@@ -1188,12 +1194,11 @@ void InitUkiObj(int no, mgCFrame *uki, mgCFrame *hari) {
     uki_obj->point[3].pos[2] = -1.5f;
     uki_obj->point[3].pos[3] = 1.0f;
     SaoFrame[7]->GetWorldPosition0(rod_tip);
-    for (i = 0; i < uki_obj->point_num; i++) {
-        mgAddVector(uki_obj->point[i].pos, rod_tip);
+    for (int k = 0; k < uki_obj->point_num; k++) {
+        mgAddVector(uki_obj->point[k].pos, rod_tip);
     }
-    float *pt2;
-    float *pt1 = uki_obj->point[1].pos;
-    float dist = mgDistVector(uki_obj->point[0].pos, pt1);
+    pt1 = uki_obj->point[1].pos;
+    dist = mgDistVector(uki_obj->point[0].pos, pt1);
     uki_obj->bind[0].point0 = (FISH_POINT *)uki_obj->point[0].pos;
     uki_obj->bind[0].point1 = (FISH_POINT *)pt1;
     uki_obj->bind[0].length = dist;
@@ -1204,7 +1209,7 @@ void InitUkiObj(int no, mgCFrame *uki, mgCFrame *hari) {
     uki_obj->bind[1].point1 = (FISH_POINT *)pt2;
     uki_obj->bind[1].length = dist;
     uki_obj->bind[1].rate = 0.5f;
-    float *pt3 = uki_obj->point[3].pos;
+    pt3 = uki_obj->point[3].pos;
     dist = mgDistVector(uki_obj->point[0].pos, pt3);
     uki_obj->bind[2].point0 = (FISH_POINT *)uki_obj->point[0].pos;
     uki_obj->bind[2].point1 = (FISH_POINT *)pt3;
@@ -1239,10 +1244,10 @@ void InitUkiObj(int no, mgCFrame *uki, mgCFrame *hari) {
     uki_obj->float_info[2].point1 = (FISH_POINT *)uki_obj->point[0].pos;
     uki_obj->float_info[2].buoyancy = 1.6f;
     uki_obj->float_info[2].unk_8 = 0;
-    CFishObj *hari_obj = &HariObj;
+    hari_obj = &HariObj;
     HariObj.point_num = 3;
-    for (int j = 0; j < hari_obj->point_num; j++) {
-        FISH_POINT *point = &hari_obj->point[j];
+    for (j = 0; j < hari_obj->point_num; j++) {
+        point = &hari_obj->point[j];
         mgZeroVector(point->pos);
         mgZeroVector(point->old_pos);
         mgZeroVector(point->velo);
@@ -1259,8 +1264,8 @@ void InitUkiObj(int no, mgCFrame *uki, mgCFrame *hari) {
     hari_obj->point[2].pos[1] = -4.0f;
     hari_obj->point[2].pos[2] = 0.0f;
     hari_obj->point[2].pos[3] = 1.0f;
-    for (i = 0; i < hari_obj->point_num; i++) {
-        mgAddVector(hari_obj->point[i].pos, rod_tip);
+    for (int k = 0; k < hari_obj->point_num; k++) {
+        mgAddVector(hari_obj->point[k].pos, rod_tip);
     }
     hari_obj->bind_num = 3;
     pt1 = hari_obj->point[1].pos;
@@ -1281,9 +1286,6 @@ void InitUkiObj(int no, mgCFrame *uki, mgCFrame *hari) {
     hari_obj->bind[2].length = dist;
     hari_obj->bind[2].rate = 0.5f;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/fishingobj", InitUkiObj__FiP8mgCFrameP8mgCFrame);
-#endif
 void CFishObj::MovePoint() {
     for (int i = 0; i < point_num; i++) {
         *(u_long128 *)point[i].old_pos = *(u_long128 *)point[i].pos;
