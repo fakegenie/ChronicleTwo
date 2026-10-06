@@ -2244,7 +2244,6 @@ extern short sndtimetbl_2868[2];
 extern signed char D_003532DF[];
 extern float eff_light_2927[4];
 
-#ifdef NONMATCHING
 
 #pragma inline_depth(5)
 int CMenuInvent::IsCreateObject(int mode, int keys) {
@@ -2645,6 +2644,7 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
             this->create_effect->Initialize(0);
             frame = mgLoadMDSFile(pack_file, load_stack, NULL, NULL);
             this->create_effect->CObjectFrame::frame = frame;
+            float effect_y = -20.0f;
             if (frame != NULL) {
                 mgCFrameAttr *attr = (mgCFrameAttr *)frame->attr;
                 attr->no_light = 1;
@@ -2652,7 +2652,10 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
                 attr->color[1] = eff_light_2927[1];
                 attr->color[2] = eff_light_2927[2];
                 attr->color[3] = eff_light_2927[3];
-                this->create_effect->SetPosition(18.0f, -20.0f, 20.0f);
+                float x = 18.0f;
+                float y = -20.0f;
+                float z = 20.0f;
+                this->create_effect->SetPosition(18.0f, y, z);
                 this->create_effect->SetRotation(0.0f, 0.15707964f, 0.0f);
                 frame->SetAttrParam(*attr, 1, kSceneAttrFlags);
             }
@@ -2756,9 +2759,6 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
 }
 
 #pragma inline_depth reset
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/inventmn", IsCreateObject__11CMenuInventFii);
-#endif
 void CMenuInvent::CalcMakeBrd(int message_index) {
     if (makebrd_form != NULL && makebrd_form->draw_flag) {
         make_board.unk_1c = make_num;
@@ -5979,9 +5979,9 @@ int MenuInventPushKey(int pad, int pushed) {
 #ifdef NONMATCHING
 int MenuInventKey() {
     int result = 0;
-    int item_pos[8][2];
+    int item_pos[16];
     char *names[MES_ITEM_MAX];
-    int number_pos[8][2];
+    int number_pos[16];
     int numbers[8];
     CardListTops tops;
     int count_x;
@@ -6056,30 +6056,30 @@ int MenuInventKey() {
             CMenuInventPt->SelectedNetaPhotoAlready(CMenuInventPt->photo_cursor);
         }
         if (CMenuInventPt->neta_board_form != NULL) {
-            CMenuInventPt->neta_board_form->GetPutPosXY(at_5742, item_pos[0][0], item_pos[0][1]);
-            item_pos[0][1] += 5;
+            CMenuInventPt->neta_board_form->GetPutPosXY(at_5742, item_pos[0], item_pos[1]);
+            item_pos[1] += 5;
         }
-        MakeMsgNetaName(list_message, MenuMesForm[2], photo, item_pos[0], 1);
+        MakeMsgNetaName(list_message, MenuMesForm[2], photo, item_pos, 1);
         int line;
         CDC2Mes *name_message = MenuDCMsg[7];
         if (name_message != NULL) {
             short key = CMenuInventPt->key_arg_no;
             if (key == 4 || key == 5) {
                 if (CMenuInventPt->album_big_form != NULL && InventAlbumPtr != NULL) {
-                    CMenuInventPt->album_big_form->GetPutPosXY(at_5743, item_pos[0][0], item_pos[0][1]);
-                    item_pos[0][1] += 5;
+                    CMenuInventPt->album_big_form->GetPutPosXY(at_5743, item_pos[0], item_pos[1]);
+                    item_pos[1] += 5;
                     MenuMesForm[7]->draw_flag = 1;
                     name_message->line_pos_on[0] = 0;
                     MakeMsgNetaName(name_message, MenuMesForm[7],
-                                    InventAlbumPtr->GetAlbumPhotoInfo(CMenuInventPt->album_cursor), item_pos[0], 1);
+                                    InventAlbumPtr->GetAlbumPhotoInfo(CMenuInventPt->album_cursor), item_pos, 1);
                 }
             } else if (key != 6 && CMenuInventPt->unk_112 == 0 && CMenuInventPt->photo_only == 0) {
                 for (line = 0; line < 3; line++) {
                     CMenuPosDataForm *name_form = CMenuInventPt->neta_name_form[line];
                     if (name_form != NULL) {
-                        name_form->GetPutPosXY(at_5744, item_pos[0][0], item_pos[0][1]);
-                        int x = item_pos[0][0];
-                        int y = item_pos[0][1];
+                        name_form->GetPutPosXY(at_5744, item_pos[0], item_pos[1]);
+                        int x = item_pos[0];
+                        int y = item_pos[1];
                         if (line >= 0 && line < MES_LINE_MAX) {
                             name_message->line_pos[line][0] = x;
                             name_message->line_pos[line][1] = y;
@@ -6089,8 +6089,7 @@ int MenuInventKey() {
                 }
             }
         }
-        CMenuPosDataForm *count_form = MenuMesForm[3];
-        if (count_form != NULL) {
+        if (MenuMesForm[3] != NULL) {
             count_x = 370;
             count_y = 16;
             if (LanguageCode == 1) {
@@ -6098,7 +6097,7 @@ int MenuInventKey() {
                 count_y = 14;
             }
             if (LanguageCode < 2) {
-                count_form->SetPos(count_x, count_y);
+                MenuMesForm[3]->SetPos(count_x, count_y);
             } else {
                 MenuPosData->GetEtcTblValue(at_5745, count_x, count_y);
             }
@@ -6130,28 +6129,29 @@ int MenuInventKey() {
         int number_x = 11.0f + list_x;
         for (int card = top; card < 0; card++) {
             names[line] = NULL;
-            item_pos[line][0] = name_x;
-            item_pos[line][1] = y;
+            item_pos[line * 2] = name_x;
+            item_pos[line * 2 + 1] = y;
             y += 46;
             line++;
         }
         int europe = CheckNowEurope();
         for (; line < 7; line++) {
             int card = top + line;
-            item_pos[line][0] = name_x;
-            item_pos[line][1] = y;
-            number_pos[line][0] = number_x;
-            number_pos[line][1] = y + 2;
+            int pos = line * 2;
+            item_pos[pos] = name_x;
+            item_pos[pos + 1] = y;
+            number_pos[pos] = number_x;
+            number_pos[pos + 1] = y + 2;
             int item = InventUserDataPtr->GetCreateItemID(card);
             names[line] = GetItemMessage(item);
             numbers[line] = card + 1;
             if (europe != 0) {
                 if (card + 1 < 10) {
-                    number_pos[line][0] -= 8;
+                    number_pos[pos] -= 8;
                 } else if (card + 1 < 100) {
-                    number_pos[line][0] += 2;
+                    number_pos[pos] += 2;
                 } else {
-                    number_pos[line][0] += 12;
+                    number_pos[pos] += 12;
                 }
             }
             if (card == 0) {
@@ -6162,9 +6162,9 @@ int MenuInventKey() {
             y += 46;
         }
         list_message->SetMsgItemNo(names, 6);
-        list_message->SetMsgItemPos(&item_pos[0][0], 6);
+        list_message->SetMsgItemPos(item_pos, 6);
         number_message->SetMsgVolumeNo(numbers, digit_tbl3_5641, 6);
-        number_message->SetMsgItemPos(&number_pos[0][0], 6);
+        number_message->SetMsgItemPos(number_pos, 6);
         CGameDataUsed *item = CMenuInventPt->SearchNowPosItemExist();
         if (CMenuInventPt->key_arg_no == 2 && InventUserDataPtr->GetCreateItemID(CMenuInventPt->card_cursor) <= 0) {
             item_message->MakeMsg(617);
