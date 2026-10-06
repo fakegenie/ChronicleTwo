@@ -1635,10 +1635,12 @@ void CFlushEffect::Draw(void) {
 }
 #ifdef NONMATCHING
 void CFlushEffect::Step() {
-    if (active != 0) {
-        mgCFrame *frame;
-        if ((frame = follow) != NULL) {
-            frame->GetWorldPosition0(pos);
+    switch (active) {
+    case 0:
+        break;
+    default:
+        if (follow != NULL) {
+            follow->GetWorldPosition0(pos);
         }
         size += grow;
         alpha = alpha - fptosi(fade_speed);
@@ -1647,6 +1649,7 @@ void CFlushEffect::Step() {
             active = 0;
             follow = NULL;
         }
+        break;
     }
 }
 #else
