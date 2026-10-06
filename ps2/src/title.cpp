@@ -332,8 +332,8 @@ void TitleBootInit() {
     WaveTable__3 = new ((u_long128 *)DataBuffer.Alloc(0x123)) CWaveTable;
     mgCTextureManager *textures = &mgTexManager;
     DataBuffer.Align64();
-    u_long128 *map_top;
-    TitleMapBuffer.stSetBuffer(map_top = DataBuffer.stGetTop(), 0x40000);
+    u_long128 *map_top = DataBuffer.stGetTop();
+    TitleMapBuffer.stSetBuffer(map_top, 0x40000);
     DataBuffer.Alloc(0x60000);
     TitleWorkBuffer.stSetBuffer(DataBuffer.stGetTop(), 0x2800);
     DataBuffer.Alloc(0x2800);
@@ -345,8 +345,10 @@ void TitleBootInit() {
     TitleScene->before_camera = 0;
     TitleScene->SetStack(1, &TitleMapBuffer);
     TitleScene->work_stack = &TitleWorkBuffer;
-    u8 *map_buffer = (u8 *)DataBuffer.stGetTop();
-    int map_no = SearchMapNo(at_1221__4);
+    int map_no;
+    u8 *map_buffer;
+    map_buffer = (u8 *)DataBuffer.stGetTop();
+    map_no = SearchMapNo(at_1221__4);
     TitleScene->active_map = 0;
     MapJumpMapInfo main_map;
     SCN_LOADMAP_INFO2 load_info;
@@ -357,23 +359,23 @@ void TitleBootInit() {
     main_map.load_buf = map_buffer;
     SetMainMapInfo(&main_map);
     GetLoadMapInfo(&load_info, map_no);
+    load_info.load_sky = 1;
     load_info.sky_tex_block = 0x6B;
     load_info.place_parts_max = 0x190;
-    load_info.load_sky = 1;
     TitleScene->DeleteMap(0, 1);
     TitleScene->LoadMap(0, &load_info, 0);
     TitleScene->SetNowMapNo(map_no);
     TitleScene->SetActive(2, 0);
     TitleMap = TitleScene->GetMap(TitleScene->active_map);
-    u32 file_size;
-    u32 bg_size;
-    if (LoadFile2(at_1222__4, DataBuffer.stAllocTest(1), (int *)&bg_size, 0) != 0) {
+    int file_size;
+    int bg_size;
+    if (LoadFile2(at_1222__4, DataBuffer.stAllocTest(1), &bg_size, 0) != 0) {
         textures->EnterIMGFile((u_char *)DataBuffer.Alloc(Align16Blocks(bg_size)), 0x6A, NULL, NULL);
     }
     textures->EnterTexture(0x6A, at_1223__4, NULL, mgScreenWidth, mgScreenHeight, 0x20, 0, 0, 0);
     char lang_file[0x40];
     sprintf(lang_file, at_1224__4, LanguageCode);
-    LoadFile2(lang_file, map_buffer, (int *)&file_size, 0);
+    LoadFile2(lang_file, map_buffer, &file_size, 0);
     DataBuffer.Alloc(Align16Blocks(file_size));
     textures->EnterIMGFile(map_buffer, 0x40, NULL, NULL);
     Tex_TitleBG = textures->GetTexture(at_1225__4, -1);
@@ -388,11 +390,9 @@ void TitleBootInit() {
     u_long128 *save_pack = (u_long128 *)((u8 *)DataBuffer.stGetTop() + 0x41000);
     if (LoadFileMenu(at_1233, save_pack, MENU_FILE_LOAD_DIRECT) != 0) {
         for (int i = 0; i < 3; i++) {
-            MC_ICON_DATA *icon = &MC_ICON_Data[i];
-            u_int *icon_file = GetPackFile((u_int *)save_pack, icon->name, &icon->size);
-            int *size = &icon->size;
-            icon->data = DataBuffer.Alloc(Align16Blocks(icon->size));
-            memcpy(icon->data, icon_file, *size);
+            u_int *icon_file = GetPackFile((u_int *)save_pack, MC_ICON_Data[i].name, &MC_ICON_Data[i].size);
+            MC_ICON_Data[i].data = DataBuffer.Alloc(Align16Blocks(MC_ICON_Data[i].size));
+            memcpy(MC_ICON_Data[i].data, icon_file, MC_ICON_Data[i].size);
         }
     }
     TitleMCCheck->SetIconData(MC_ICON_Data, 0);
@@ -400,7 +400,7 @@ void TitleBootInit() {
     RushWork = textures->EnterTexture(0x43, at_1234, NULL, mgScreenWidth, mgScreenHeight, mgScreenDepth, 0, 0, 0);
     DataBuffer.Align64();
     u_long128 *push_start_img = DataBuffer.stGetTop();
-    if (LoadFile2(at_1235, push_start_img, (int *)&file_size, 0) != 0) {
+    if (LoadFile2(at_1235, push_start_img, &file_size, 0) != 0) {
         textures->EnterIMGFile((u_char *)push_start_img, 0x43, NULL, NULL);
     }
     RushStart = textures->GetTexture(at_1236, 0x43);
@@ -414,9 +414,9 @@ void TitleBootInit() {
     textures->EnterIMGFile(GetFontTex2ImgPtr(), 0x46, NULL, NULL);
     DataBuffer.Align64();
     MenuArg.mes_tex_block = 0x46;
+    MenuArg.scene = TitleScene;
     MenuArg.tex_block_top = 0x54;
     MenuArg.tex_block_num = 0x10;
-    MenuArg.scene = TitleScene;
     MenuArg.pack = (u_int *)DataBuffer.stGetTop();
     file_size = LoadFileMenu(at_1237__2, (u_long128 *)MenuArg.pack, MENU_FILE_LOAD_DIRECT);
     DataBuffer.Alloc(Align16Blocks(file_size));
@@ -429,7 +429,7 @@ void TitleBootInit() {
     TitleScene->LoadSound(0x1F4, sound_buffer);
     TitleScene->StopEnvBGM();
     sndWaitTransBd();
-    LoadFile2(at_1239__2, sound_buffer, (int *)&file_size, 0);
+    LoadFile2(at_1239__2, sound_buffer, &file_size, 0);
     sndInitPort(4);
     TitleEventSound = sndLoadSound(4, (u_int *)sound_buffer, &snd_memory);
     DataBuffer.Align64();
