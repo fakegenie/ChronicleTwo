@@ -3786,26 +3786,26 @@ void CMenuItemInfo::Initialize(void) {
     *(int *)((u8 *)this + kBaseMenuWord0xF8Offset) = 0;
     SetEquipListNo(4);
     load_weapon_no = 0;
-    unk_16C = 0;
+    repair_running = 0;
     effect_pos = 0;
     sub_menu = -1;
     next_sub_menu = -1;
     build_up_chara = NULL;
-    unk_2F8 = 0;
-    unk_13A = 0;
+    build_loading = 0;
+    reset_cursor_pos = 0;
     sound_load = 0;
     opened = 0;
     mode = 1;
     step = 0;
-    unk_170 = 0;
-    unk_172 = -1;
-    unk_174 = 0;
+    item_consumed = 0;
+    equipped_model_no = -1;
+    chara_reload = 0;
     sound_loaded = 0;
     for (i = 0; i < 8; i++) {
         equip_flag[i] = 0;
         equip_list[i] = 0;
     }
-    unk_160 = 0;
+    viewing_weapon = 0;
 }
 void CMenuItemInfo::SetEquipListNo(int list_no) {
     if (list_no < 2) {
@@ -4324,7 +4324,7 @@ int CMenuItemInfo::ItemCmdAfter(int cmd_ret, ITEMCMD_RET_PARA *ret) {
             } else if ((data_type >= 16 && data_type <= 18) || data_type == 34) {
                 MenuFormUpdataAttachInfo(MenuSpectolSatusCheckForm, ask_para.item, ask_para.item->item_no, 1, NULL);
                 read = 0;
-                unk_198 = 1;
+                status_check_ready = 1;
             } else if (view_mode == 3) {
                 read = 0;
             } else {
@@ -4552,7 +4552,7 @@ int CMenuItemInfo::ItemCmdAfter(int cmd_ret, ITEMCMD_RET_PARA *ret) {
             if (ret->cmd == 1) {
                 view_weapon = ask_para.item;
                 view_chara = ask_para.item->item_no;
-                unk_160 = 1;
+                viewing_weapon = 1;
                 SpectolInfoStay.CopyGameData(ask_para.item);
                 MenuCommonInfo->cursor = 0;
                 key_arg_no = 10;
@@ -4664,9 +4664,9 @@ int CMenuItemInfo::ItemCmdAfter(int cmd_ret, ITEMCMD_RET_PARA *ret) {
             MenuSePlay(1);
             mode = MENU_ASK_MODE_CLOSE;
             step = 0;
-            unk_170 = 1;
+            item_consumed = 1;
             sound_loaded = 0;
-            unk_174 = 0;
+            chara_reload = 0;
             FadeOutMenu(40, 0.0f);
         }
         if (answer == 2) {
@@ -4768,7 +4768,7 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
                         int repair_tex_block = tex_block[2];
                         MenuRepairMan->CheckDataBG(repair_tex_block);
                         MenuActionChara[0]->GetPosition(position);
-                        if (unk_16C) {
+                        if (repair_running) {
                             MenuRepairMan->GeneratePoly(position, repair_tex_block);
                             if (MenuActionChara[0] != NULL) {
                                 MenuActionChara[0]->pallet[0].SetAnim(0xEB, 0xEB, 0x3C, 1, 0x29, 0);
@@ -4779,11 +4779,11 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
                     }
                     break;
                 case 2:
-                    if (unk_16C == 0 || (unk_16C == 1 && !MenuRepairMan->IsRun())) {
+                    if (repair_running == 0 || (repair_running == 1 && !MenuRepairMan->IsRun())) {
                         if (MenuCommonInfo->cursor_form != NULL) {
                             MenuCommonInfo->cursor_form->draw_flag = 1;
                         }
-                        unk_16C = 0;
+                        repair_running = 0;
                         step = 0;
                         para->unk_70 = 0;
                         mode = MENU_ASK_MODE_NONE;
@@ -4915,7 +4915,7 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
                         u_long128 *buffer = work.stGetTop();
                         StartReadBG();
                         LoadFileBG(path, buffer, &size);
-                        unk_2F8 = 1;
+                        build_loading = 1;
                         step++;
                     }
                     break;
@@ -4947,7 +4947,7 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
                         }
                     }
                     if (BuildEndFlag_4703 == 1 && build_up_chara->CheckMotionEnd(NULL)) {
-                        unk_2F8 = 0;
+                        build_loading = 0;
                         build_up_chara = NULL;
                         ExeScript(at_4957);
                         if (name_message->name[info->select_no + 1] != NULL) {
@@ -5165,7 +5165,7 @@ void CMenuItemInfo::ExitEnd() {
     if (sound_loaded != 0) {
         MenuCharaSoundEnter(MenuMainScene, field_chara, 1);
     }
-    if (unk_174 != 0) {
+    if (chara_reload != 0) {
         chara_no = GetActiveCharaNo();
         chara = (CActionChara *)MenuMainScene->GetCharacter(0);
         DeleteOutLineMenu(chara, 0);
@@ -5259,7 +5259,7 @@ void CMenuItemInfo::AttachFormInfo(void) {
     }
     MenuSpectolSatusCheckForm = (CMenuPosDataForm *)MenuPosData->GetFormInfo(at_5259);
     MenuSpectolSatusCheckBGFadeForm = (CMenuPosDataForm *)MenuPosData->GetFormInfo(at_5260);
-    unk_198 = 0;
+    status_check_ready = 0;
     for (i = 0; i < 2; i++) {
         CMenuPosDataForm *form = view_form[i];
         wep_parts[i][4] = form->GetPartInfo(at_5261);
@@ -5383,7 +5383,7 @@ void CMenuItemInfo::CalcTex() {
             view_form[i]->SetAction(at_5757);
         } else {
             view_form[i]->SetAction(at_3893);
-            if (mode == MENU_ASK_MODE_CLOSE && CheckTrushMenu() == 0 && unk_170 == 0) {
+            if (mode == MENU_ASK_MODE_CLOSE && CheckTrushMenu() == 0 && item_consumed == 0) {
                 view_form[i]->SetAction(at_5757);
             }
         }
@@ -5805,9 +5805,9 @@ void CMenuItemInfo::CalcCursorPosition(void) {
     } else {
         MenuCommonInfo->SetWakuType(-1);
     }
-    if (unk_13A) {
+    if (reset_cursor_pos) {
         MenuCommonInfo->MenuSetPos(pos[0], pos[1]);
-        unk_13A = 0;
+        reset_cursor_pos = 0;
     }
 }
 #else
@@ -5916,14 +5916,14 @@ int MenuItemInit(mgCMemory *stack, int *tex_block, int mode) {
     MenuCommonInfo->CursorFadeIn(1.0f, 0);
     CMenuItemInfoPt->ExeScript(at_6016);
     int chara_no = CMenuItemInfoPt->GetActiveCharaNo();
-    CMenuItemInfoPt->unk_172 = -1;
+    CMenuItemInfoPt->equipped_model_no = -1;
     if (chara_no < 2) {
-        CMenuItemInfoPt->unk_172 = MenuUserParam.chara[chara_no]->equip[0].GetModelNo();
+        CMenuItemInfoPt->equipped_model_no = MenuUserParam.chara[chara_no]->equip[0].GetModelNo();
     }
     MenuLoadInfo.unk_1 = 0;
     if (GetMenuLoopType() == 0) {
         MenuLoadInfo.unk_1 = 1;
-        CMenuItemInfoPt->unk_172 = -1;
+        CMenuItemInfoPt->equipped_model_no = -1;
     }
     MenuLoadInfo.mode = 0;
     MenuLoadInfo.unk_5 = 0;
@@ -6072,16 +6072,16 @@ void MenuItemDebugKey(void) {
                 count_step = 5;
             }
             if (direction & 0x80) {
-                CMenuItemInfoPt->unk_300 += count_step;
+                CMenuItemInfoPt->debug_item_count += count_step;
             }
             if (direction & 0x40) {
-                CMenuItemInfoPt->unk_300 -= count_step;
+                CMenuItemInfoPt->debug_item_count -= count_step;
             }
-            if (CMenuItemInfoPt->unk_300 <= 0) {
-                CMenuItemInfoPt->unk_300 = 1;
+            if (CMenuItemInfoPt->debug_item_count <= 0) {
+                CMenuItemInfoPt->debug_item_count = 1;
             }
-            if (CMenuItemInfoPt->unk_300 > 0x64) {
-                CMenuItemInfoPt->unk_300 = 0x64;
+            if (CMenuItemInfoPt->debug_item_count > 0x64) {
+                CMenuItemInfoPt->debug_item_count = 0x64;
             }
             if (CMenuItemInfoPt->debug_item_no <= 0) {
                 CMenuItemInfoPt->debug_item_no = 1;
@@ -6102,7 +6102,7 @@ void MenuItemDebugKey(void) {
                 if (debug_common_data != NULL) {
                     MenuUserDataManPtr->GetItemNotOver(
                         CMenuItemInfoPt->debug_item_no,
-                        CMenuItemInfoPt->unk_300);
+                        CMenuItemInfoPt->debug_item_count);
                     if (CheckItemOver() &&
                         (MenuCommonInfo->open_type == 0 ||
                          MenuCommonInfo->open_type == 1)) {
@@ -6706,7 +6706,7 @@ void MenuItemDebugDraw(void) {
         char title[0x80];
         CMenuItemInfo *info = CMenuItemInfoPt;
         sprintf(title, at_6760, CMenuItemInfoPt->debug_item_no, GetItemMessage(info->debug_item_no),
-                info->unk_300);
+                info->debug_item_count);
         DebugPrint(font, title, 26, 40);
         if (MenuDebugModelDrawFlag == 1) {
             DrawMenuFillBox(0.0f, 0.0f, mgScreenWidth, mgScreenHeight, 0x80, 0, 0, 0);
@@ -6925,9 +6925,9 @@ int CMenuItemInfo::PushKey(int pad, int trigger) {
             item_type = ConvertUsedItemType(GetItemDataType(held_item_no));
             fusion_target = 0;
             if (pad != 0 || trigger != 0) {
-                if (MenuSpectolSatusCheckForm != NULL && this->unk_198 != 0) {
+                if (MenuSpectolSatusCheckForm != NULL && this->status_check_ready != 0) {
                     MenuSpectolSatusCheckForm->SetAction(at_5757);
-                    this->unk_198 = 0;
+                    this->status_check_ready = 0;
                     goto done;
                 }
             }
@@ -7395,19 +7395,19 @@ int CMenuItemInfo::PushKey(int pad, int trigger) {
                 MenuRepairMan->Clear();
                 if (MenuSpectolSatusCheckForm != NULL) {
                     MenuSpectolSatusCheckForm->SetAction(at_5757);
-                    this->unk_198 = 0;
+                    this->status_check_ready = 0;
                 }
                 if (CheckTrushMenu() != 0 && ItemOverFlowCheckFlag == 1) {
                     MenuCommonInfo->open_type -= 0x10;
                 }
                 StartReadBG();
-                this->unk_174 = 0;
-                if (0 <= this->unk_172) {
+                this->chara_reload = 0;
+                if (0 <= this->equipped_model_no) {
                     int chara_no;
                     CHARA_DATA **chr_ptr =
                         &MenuUserParam.chara[chara_no = this->GetActiveCharaNo()];
                     int model_no = GetModelNo__13CGameDataUsedFv(&(*chr_ptr)->equip[0]);
-                    if (this->unk_172 != model_no) {
+                    if (this->equipped_model_no != model_no) {
                         SetMenuEtcFlag(1);
                         MainCharaReadStackReadAdr =
                             (u8*)(MainCharaReadStack.stack + MainCharaReadStack.stack_used);
@@ -7436,7 +7436,7 @@ int CMenuItemInfo::PushKey(int pad, int trigger) {
                             blocks = QuadwordsFor(file_size);
                             MainCharaReadStack.Alloc(blocks);
                         }
-                        this->unk_174 = 1;
+                        this->chara_reload = 1;
                     }
                 }
                 InitFishBoiledEffect(NULL, NULL);
@@ -7542,7 +7542,7 @@ int CMenuItemInfo::PushKey(int pad, int trigger) {
                     int answer = MenuDCMsg[7]->YesNoCursor2(0);
                     if (answer == 1) {
                         MenuSePlay(0x1E);
-                        this->unk_160 = 0;
+                        this->viewing_weapon = 0;
                         this->mode = kStateBrowse;
                         this->ExeScript(at_7346);
                     }
@@ -7557,7 +7557,7 @@ int CMenuItemInfo::PushKey(int pad, int trigger) {
                     int answer = MenuDCMsg[7]->YesNoCursor2(0);
                     if (answer == 1) {
                         this->view_weapon->CopyGameData(&SpectolInfoStay);
-                        this->unk_160 = 0;
+                        this->viewing_weapon = 0;
                         this->mode = kStateBrowse;
                         this->step = kTuneAdjust;
                         this->ExeScript(at_7346);
@@ -8347,7 +8347,7 @@ extern s8 conv_7932[];
 #ifdef NONMATCHING
 #pragma divbyzerocheck on
 int MenuItemSelectDiffer(int select) {
-    if (CMenuItemInfoPt->unk_160) {
+    if (CMenuItemInfoPt->viewing_weapon) {
         return 0;
     }
     CMenuKeyFunc *key = MenuCommonInfo;
@@ -8769,13 +8769,13 @@ void CMenuItemInfo::SetItemEffect(void) {
         }
     }
     if (MenuUsedItemType & 0x400) {
-        unk_16C = 0;
+        repair_running = 0;
         effect_pos = 0;
         if (weapon_effect) {
             mode = MENU_ASK_MODE_EXTEND;
             step = 0;
             ask_para.unk_70 = 1;
-            unk_16C = 1;
+            repair_running = 1;
         }
         if (repair_effect) {
             mode = MENU_ASK_MODE_EXTEND;
@@ -8786,7 +8786,7 @@ void CMenuItemInfo::SetItemEffect(void) {
             MenuRepairTargetWeaponPos[1] = -100;
             SearchEffectDisplayPosition(MenuRepairTargetWeaponPos, MenuUsedTarget.target.item);
         }
-        if (unk_16C && MenuCommonInfo->cursor_form != NULL) {
+        if (repair_running && MenuCommonInfo->cursor_form != NULL) {
             MenuCommonInfo->cursor_form->draw_flag = 0;
         }
     }
@@ -8807,7 +8807,7 @@ int CMenuItemInfo::LRCheck(int key) {
     if (mode != MENU_ASK_MODE_NONE) {
         return 0;
     }
-    if (unk_160) {
+    if (viewing_weapon) {
         return 0;
     }
     int dir = 0;
@@ -9153,9 +9153,9 @@ void CMenuItemInfo::KeyStepLocal(int select_key, int push_button, int flag) {
     }
     if (select >= 0) {
         MenuItemSelectDiffer(select);
-        if (unk_198 != 0 && MenuSpectolSatusCheckForm != NULL && (select_key != 0 || push_button != 0)) {
+        if (status_check_ready != 0 && MenuSpectolSatusCheckForm != NULL && (select_key != 0 || push_button != 0)) {
             MenuSpectolSatusCheckForm->SetAction(at_5757);
-            unk_198 = 0;
+            status_check_ready = 0;
         }
     } else if (!MenuLoadFileCheck(MenuCharaBuild2)) {
         PushKey(select_key, push_button);
@@ -9231,11 +9231,11 @@ int CMenuItemInfo::KeyStep(void) {
             }
             break;
         case MENU_ASK_MODE_CLOSE:
-            if ((CheckTrushMenu() && ItemOverFlowCheckFlag == 0) || unk_170 == 1) {
+            if ((CheckTrushMenu() && ItemOverFlowCheckFlag == 0) || item_consumed == 1) {
                 if (reading == 0 && FadeCheckMenu()) {
                     ExitEnd();
                     result = 1;
-                    if (unk_170) {
+                    if (item_consumed) {
                         MenuArg.result[0] = 1;
                         MenuArg.end_code = 5;
                         MenuArg.result[1] = 1;
@@ -9279,7 +9279,7 @@ int CMenuItemInfo::KeyStep(void) {
     if (CheckTrushMenu()) {
         icon_mode = 2;
     }
-    if (unk_170) {
+    if (item_consumed) {
         icon_mode = 2;
     }
     MenuPosData->StepMainMenuIconMove(mode_id, 2, icon_mode);
@@ -9467,7 +9467,7 @@ int MenuItemKey(void) {
                 CMenuItemInfoPt->next_sub_menu = -1;
                 CMenuItemInfoPt->sub_menu = -1;
                 CMenuItemInfoPt->FadeInMenu(0x28, 0.0f);
-                CMenuItemInfoPt->unk_13A = 1;
+                CMenuItemInfoPt->reset_cursor_pos = 1;
             }
             return 0;
         default:
