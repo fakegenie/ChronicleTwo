@@ -583,7 +583,17 @@ asm float mgDistVectorXZ2(float *a, float *b) {
     jr ra
     nop
 }
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgUnitMatrix__FPA4_f);
+asm void mgUnitMatrix(float (*matrix)[4]) {
+    .set noreorder
+    vmr32.xyzw vf1, vf0
+    vmr32.xyzw vf2, vf1
+    vmr32.xyzw vf3, vf2
+    sqc2 vf0, 0x30(a0)
+    sqc2 vf1, 0x20(a0)
+    sqc2 vf2, 0x10(a0)
+    jr ra
+    sqc2 vf3, 0x0(a0)
+}
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgZeroMatrix__FPA4_f);
 
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", MulMatrix3__FPA4_fPA4_fPA4_f);
