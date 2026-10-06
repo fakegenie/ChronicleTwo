@@ -6010,7 +6010,6 @@ void CMosBookMenu::InitEnd(void) {
     this->SetMonsterInfo(this->monster_info);
     FadeInMenu(0x32, 0.0f);
 }
-#ifdef STATEMATCHING
 void CMosBookMenu::Draw() {
     sceVu0FMATRIX view;
     sceVu0FVECTOR eye;
@@ -6209,9 +6208,6 @@ void CMosBookMenu::Draw() {
     font.SetPos(0x14C, 0x2D);
     font.DrawDirect(font.str, font.pos_x, font.pos_y);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuchr", Draw__12CMosBookMenuFv);
-#endif
 int CMosBookMenu::KeyStep(void) {
     int select;
     int lr;
