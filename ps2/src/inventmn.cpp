@@ -109,7 +109,6 @@ extern short NetaMemoID[512];
 extern int NetaMemoStr[512];
 extern short NetaMemoStrNum;
 extern CMenuPosDataForm *GiftBoxViewForm;
-extern "C" int fptosi(float);
 extern "C" void *__ct__9CMenuFontFv(void *);
 extern "C" int neta_sort__FiiiPi(int, int, int);
 enum { K_COMMAND_HANDLED = -1 };

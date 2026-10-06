@@ -17,7 +17,6 @@
 #include "runscript_opcodes.hpp"
 #include <cstring>
 
-extern "C" int fptosi(float value);
 extern "C" void __ct__10CRunScriptFv(void *);
 extern "C" void *Alloc__9mgCMemoryFi(mgCMemory *, int);
 extern "C" void Delete__8CColPrimFi(void *, int);

@@ -34,7 +34,6 @@
 #include "editanalyze.hpp"
 #include "common.h"
 
-extern "C" int fptosi(float value);
 
 enum { kBitFlagGekkaView = 0x2BE, kBitFlagCulture = 0x208 };
 /**

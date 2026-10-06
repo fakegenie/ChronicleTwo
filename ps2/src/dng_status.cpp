@@ -31,7 +31,6 @@
 #include "userdata.hpp"
 #include "dng_status.hpp"
 
-extern "C" int fptosi(float value);
 extern "C" void __ct__11mgCDrawPrimFv(mgCDrawPrim *);
 extern "C" void PrintV__FiiiP10mgCTexture9mgRect_i_iiiP7SP_RGBA(
     int x, int y, int value, mgCTexture *texture, mgRect<int> *rect,

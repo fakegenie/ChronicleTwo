@@ -21,7 +21,6 @@ union EditVector {
     u_long128 quad;
 };
 
-extern "C" int fptosi(float value);
 
 const int kPartsInfoColorCountOffset = 0x1C;
 const int kPartsInfoRepaintOffset = 0x20;

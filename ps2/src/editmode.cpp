@@ -25,7 +25,6 @@
 #include "mg_dataset.hpp"
 #include <cmath>
 
-extern "C" int fptosi(float);
 extern "C" int GetBuildPartsNum__9CSaveDataFi(CSaveData *save, int parts_no);
 static void InitBalanceDraw(CScene *scene);
 static int CheckFocusBalanceParts(CEditMap *map, int index, float *cursor);

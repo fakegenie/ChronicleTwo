@@ -82,7 +82,6 @@ extern int ActionChanceCnt;
 extern int ActionChanceDir;
 extern int NowFishSpeed;
 extern float NowFishRot;
-extern "C" int fptosi(float value);
 #include <libvu0.h>
 #include "mg_math.hpp"
 #include "gameutil.hpp"

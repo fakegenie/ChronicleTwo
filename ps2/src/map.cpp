@@ -15,7 +15,6 @@
 #include "mg_texture.hpp"
 #include "map.hpp"
 #include "mg_sprite.hpp"
-extern "C" int fptosi(float value);
 extern "C" void __ct__8mgCFrameFv(void *);
 
 enum { kFuncPointHasFire = 2, kFuncPointHasPLight = 0x40, kMapPartsSize = 0x310 };

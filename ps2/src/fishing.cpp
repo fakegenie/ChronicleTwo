@@ -51,7 +51,6 @@ extern FISH_PLACE_MAP *FishPlaceMap;
 extern int FishPlaceMapNum;
 extern u_int fpNowFishPlaceMapNum;
 extern SPI_TAG_PARAM tag__8[];
-extern "C" int fptosi(float value);
 void StepDataLoading(void *arg);
 extern int RodActFlag;
 extern int UkiCameraFlag;

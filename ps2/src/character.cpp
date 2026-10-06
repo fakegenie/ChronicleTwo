@@ -32,7 +32,6 @@
 #include "scriptinterpreter.hpp"
 #include "visualmotion.hpp"
 #include "character.hpp"
-extern "C" int fptosi(float value);
 
 extern CCharacter2 *nowChr;
 extern u32 *pack_file;

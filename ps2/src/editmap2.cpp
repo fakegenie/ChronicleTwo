@@ -13,7 +13,6 @@
 #include "editmap.hpp"
 #include "editmap2.hpp"
 
-extern "C" int fptosi(float value);
 extern "C" int sndGetVolPan__FPfPfPfff(float *, float *, float *, float, float);
 
 static const float kFenceChainDistance = 5.0f;

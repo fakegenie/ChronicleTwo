@@ -46,7 +46,6 @@ static mgCTexAnimeData nowTexData;
 }
 
 extern char at_873[];
-extern "C" int fptosi(float);
 // Code (.text)
 #pragma schedule off
 mgCTexAnimeData::mgCTexAnimeData() {

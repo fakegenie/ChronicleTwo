@@ -72,7 +72,6 @@ extern char at_1438__3[];
 extern char at_1439__3[];
 extern char at_1440__3[];
 extern char at_1441__2[];
-extern "C" int fptosi(float value);
 extern CMenuPosDataForm *LocalMenuBGForm;
 extern CMenuPosDataForm *LocalMenuClipForm;
 extern signed char manual_list_mesclstbl[5];

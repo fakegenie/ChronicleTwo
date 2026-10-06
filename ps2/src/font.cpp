@@ -69,7 +69,6 @@ extern char at_996__3[];
 extern char at_997__3[];
 extern const unsigned char at_1543[6];
 extern mgRect<int> at_817__4;
-extern "C" int fptosi(float value);
 
 // Code (.text)
 int GetGaijiW(int code) {

@@ -4,7 +4,6 @@
 #include "mg_memory.hpp"
 #include "editcoll.hpp"
 
-extern "C" int fptosi(float value);
 
 struct CollisionRow {
     float value[4];

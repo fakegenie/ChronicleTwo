@@ -34,7 +34,6 @@ mgCMemory MenuLocalStack;
 CInventUserData *GetInventUserDataPtr();
 
 extern "C" int CheckRobotCore__16CUserDataManagerFv(CUserDataManager *);
-extern "C" int fptosi(float value);
 extern "C" int AddYarikomiMedal__16CUserDataManagerFi(CUserDataManager *, int);
 extern "C" void *__ct__18CScriptInterpreterFv(void *);
 extern "C" void SetTag__18CScriptInterpreterFP13SPI_TAG_PARAM(void *, SPI_TAG_PARAM *);

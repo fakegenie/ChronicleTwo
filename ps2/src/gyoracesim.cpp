@@ -14,7 +14,6 @@ struct FISH_STATS {
     float unknownB;
 };
 
-extern "C" int fptosi(float value);
 extern int jrand;
 extern int ia[56];
 extern grFISH_DATA fish_data[18];

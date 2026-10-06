@@ -40,7 +40,6 @@
 #include "nd_meswin.hpp"
 
 extern "C" mgCDrawPrim *__ct__11mgCDrawPrimFv(mgCDrawPrim *);
-extern "C" int fptosi(float);
 extern int gekirin_anim[16];
 extern "C" const char at_1221__2[];
 

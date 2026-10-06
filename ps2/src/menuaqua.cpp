@@ -389,7 +389,6 @@ extern "C" aqua_fish_info aquafish_info[];
 
 extern aqua_food_info esa_info[10];
 
-extern "C" int fptosi(float value);
 
 static int GetFishPath(int item_no, char *out);
 

@@ -83,7 +83,6 @@ extern float at_863[4];
 extern float at_1389[4];
 extern char at_715[];
 extern char at_716[];
-extern "C" int fptosi(float value);
 extern "C" void Exit__2(int code);
 #ifndef NONMATCHING
 extern "C" int sceDevConsInit();

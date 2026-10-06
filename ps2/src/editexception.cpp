@@ -19,7 +19,6 @@
 #include "scene.hpp"
 #include "editexception.hpp"
 
-extern "C" int fptosi(float value);
 extern char at_917__5[];
 extern char at_918__4[];
 extern char at_919__6[];

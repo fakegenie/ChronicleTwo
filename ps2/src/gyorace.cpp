@@ -856,7 +856,6 @@ int sgCharaDrawGyoRace(SubGameInfo *info) {
     } while (j < 0x60);
     return 0;
 }
-extern "C" int fptosi(float);
 static void DivSpriteScreen(mgCDrawPrim &prim) {
     int strip_height;
     int screen_width;

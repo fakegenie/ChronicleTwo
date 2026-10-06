@@ -36,7 +36,6 @@ const int kBagSlotCount = 0x96;
 #include <cstring>
 #undef MenuEffect
 
-extern "C" int fptosi(float value);
 
 inline unsigned int QuadwordsFor(int bytes) {
     return ((unsigned int)bytes & 0xF) ? ((unsigned int)bytes >> 4) + 1 : ((unsigned int)bytes >> 4);

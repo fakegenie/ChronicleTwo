@@ -507,7 +507,6 @@ extern float MenuItemBrdScrlCurLen;
 
 
 
-extern "C" int fptosi(float value);
 
 extern "C" unsigned int fptoui(float value);
 

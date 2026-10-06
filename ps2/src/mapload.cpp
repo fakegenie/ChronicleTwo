@@ -1,5 +1,4 @@
 #include <cmath>
-extern "C" int fptosi(float value);
 #include "mglib.hpp"
 #include "common.h"
 #include "collision.hpp"

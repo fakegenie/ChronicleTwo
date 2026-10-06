@@ -50,7 +50,6 @@
 #include "pot.hpp"
 #include <cstring>
 
-extern "C" int fptosi(float value);
 extern int FLS_FLOOR_ID;
 extern char at_1082__2[];
 extern char at_1248[];

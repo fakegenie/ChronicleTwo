@@ -15,7 +15,6 @@
 #include "funcpoint.hpp"
 #include "snd_mngr.hpp"
 
-extern "C" int fptosi(float value);
 
 // Code (.text)
 int CheckTime(float time, float start, float end) {

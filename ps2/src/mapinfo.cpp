@@ -41,7 +41,6 @@ static int amapPCP(SPI_STACK *stack, int argument_count);
 
 // mglib.hpp cannot be included beside mapload.hpp (both declare mgFOG_PARAM).
 extern int mgScreenWidth;
-extern "C" int fptosi(float);
 extern char at_360[];
 extern char at_361[];
 extern char at_362[];

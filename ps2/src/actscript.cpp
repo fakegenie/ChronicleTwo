@@ -110,7 +110,6 @@ struct AccumeSlot {
     int unk_320;
     int unk_324;
 };
-extern "C" int fptosi(float);
 extern "C" int fptoui(float);
 void ParabolicInitialVector(float *result, float *from, float *to, float gravity, float flight_time);
 

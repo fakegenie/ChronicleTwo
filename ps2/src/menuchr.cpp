@@ -410,7 +410,6 @@ extern char at_1132__5[];
 extern char at_1133__4[];
 extern char at_1134__3[];
 extern char at_1135__3[];
-extern "C" int fptosi(float value);
 extern "C" char at_1319[11];
 extern "C" char at_1361[];
 extern char at_2287[];

@@ -73,7 +73,6 @@ extern WMAP_AREA_DATA *spi_wmaparea_tbl;
 extern mgCMemory *spi_wmapstack;
 extern short MapEnableNum;
 extern SPI_TAG_PARAM menu_wmap_analyze_tag[];
-extern "C" int fptosi(float value);
 
 // Code (.text)
 int _WMAP_POSNUM(SPI_STACK *stack, int) {

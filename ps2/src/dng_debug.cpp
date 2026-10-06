@@ -53,7 +53,6 @@ extern char at_973__2[];
 extern char at_974__2[];
 extern char at_975[];
 extern CFont dbFont;
-extern "C" int fptosi(float value);
 #include "dng_debug.hpp"
 #include "colprim.hpp"
 #include "actionchara.hpp"
