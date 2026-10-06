@@ -863,31 +863,31 @@ void CAquaFish::NormalGetNextRot() {
     target_rot[1] = mgAngleLimit(atan2f(dir[0], dir[2]));
 }
 float CAquaFish::CalcMoveSpeed(float speed) {
-    u8 *stats;
+    BREEDFISH_USED *stats;
     float ceiling;
-    int offset;
+    int param_no;
 
     if (data == NULL) {
         stats = NULL;
     } else {
-        stats = (u8 *)data + 0x10;
+        stats = &data->data.fish;
     }
     ceiling = 3.0f;
     switch (think_mode) {
         case 1:
-            offset = GetRandI(3) * 2;
-            speed *= 0.55f + 0.02f * (float) * (u16 *)(offset + (int)stats + 0x26);
+            param_no = GetRandI(3);
+            speed *= 0.55f + 0.02f * (float)stats->param[param_no];
             break;
         case 5:
-            speed *= 0.65f + 0.024f * (float) * (u16 *)(stats + 0x26);
+            speed *= 0.65f + 0.024f * (float)stats->param[0];
             ceiling = 4.4f;
             break;
         case 6:
-            speed *= 0.65f + 0.024f * (float) * (u16 *)(stats + 0x26);
+            speed *= 0.65f + 0.024f * (float)stats->param[0];
             break;
         case 7:
         case 8:
-            speed *= 0.4f + 0.02f * (float) * (u16 *)(stats + 0x2C);
+            speed *= 0.4f + 0.02f * (float)stats->param[3];
             break;
     }
     if (ceiling < speed) {
@@ -5054,7 +5054,7 @@ static int _GYORACE_LISTNUM(SPI_STACK *stack, int arg_count) {
 }
 static int _GYORACE_DATA(SPI_STACK *stack, int arg_count) {
     CGameDataUsed *entry;
-    u8 *fields;
+    BREEDFISH_USED *fish;
 
     if (spi_nowanalyze_gyorace_limmit <= spi_gyorace_counter) {
         return 0;
@@ -5062,15 +5062,15 @@ static int _GYORACE_DATA(SPI_STACK *stack, int arg_count) {
     entry = &spi_nowanalyze_gyorace_data[spi_gyorace_counter];
     entry->CopyDataFish(spiGetStackInt(stack++));
 
-    fields = (u8 *)entry + 0x10;
+    fish = &entry->data.fish;
     entry->SetName(spiGetStackString(stack++));
-    *(u8 *)(fields + 0x16) = spiGetStackInt(stack++);
-    *(short *)(fields + 0x2E) = spiGetStackInt(stack++);
-    *(short *)(fields + 0x26) = spiGetStackInt(stack++);
-    *(short *)(fields + 0x28) = spiGetStackInt(stack++);
-    *(short *)(fields + 0x2A) = spiGetStackInt(stack++);
-    *(short *)(fields + 0x2C) = spiGetStackInt(stack++);
-    *(short *)(fields + 0x18) = spiGetStackInt(stack);
+    fish->unk_16 = spiGetStackInt(stack++);
+    fish->param[4] = spiGetStackInt(stack++);
+    fish->param[0] = spiGetStackInt(stack++);
+    fish->param[1] = spiGetStackInt(stack++);
+    fish->param[2] = spiGetStackInt(stack++);
+    fish->param[3] = spiGetStackInt(stack++);
+    fish->size = spiGetStackInt(stack);
     spi_gyorace_counter += 1;
     return 1;
 }
