@@ -8167,10 +8167,10 @@ void MenuWeaponBuildUpDraw(int &tex_block) {
     prim->End();
     mes->SetMovePosGyou(0, 0x208, 0);
     mes->SetMovePosGyou(1, msg_x, name_y + 5);
-    for (i = 0; i < 3; i++) {
-        BuildUpNameXY[i][0] = list_name_x;
-        BuildUpNameXY[i][1] = list_y[i] + 5;
-        MenuDCMsg[6]->SetMovePosGyou(i + 2, list_msg_x, BuildUpNameXY[i][1]);
+    for (int k = 0; k < 3; k++) {
+        BuildUpNameXY[k][0] = list_name_x;
+        BuildUpNameXY[k][1] = list_y[k] + 5;
+        MenuDCMsg[6]->SetMovePosGyou(k + 2, list_msg_x, BuildUpNameXY[k][1]);
     }
     prim->Begin(6);
     prim->Texture(Tex_BuildUpBoard);
@@ -8234,7 +8234,7 @@ void MenuWeaponBuildUpDraw(int &tex_block) {
                 }
             }
             int mark_y = mos_y;
-            for (i = 0; i < 3; i++) {
+            for (int i = 0; i < 3; i++) {
                 mos_names[i] = GetMonsterName(data->buildup_monster[i]);
                 if (mos_names[i] != NULL) {
                     BuildUpWeaponNameBoardDraw(prim, mos_name_x, mark_y, name_w);
