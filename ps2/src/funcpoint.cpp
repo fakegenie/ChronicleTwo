@@ -15,6 +15,9 @@
 #include "funcpoint.hpp"
 #include "snd_mngr.hpp"
 
+extern "C" void *__vt__19CList_10CFuncPoint_[];
+extern "C" void __ct__8mgCFrameFv(mgCFrame *frame);
+
 int CheckTime(float time, float start, float end) {
     int outside;
 
@@ -391,18 +394,19 @@ int CObjAnime::AssignFuncAnime(CFuncPoint *point, CMapParts *map_parts) {
     SetParam(initial_value);
     return 1;
 }
-#ifdef NONMATCHING
 CFuncPoint *CFuncPointMngr::Add(int type, mgCMemory *stack) {
-    CList<CFuncPoint> *node = new ((u_long128 *)stack->Alloc(0x20)) CList<CFuncPoint>;
+    CList<CFuncPoint> *node;
+    if ((node = (CList<CFuncPoint> *)operator new(sizeof(CList<CFuncPoint>), stack->Alloc(0x20))) != NULL) {
+        *(void ***)((u_int)node + 0x1D0) = __vt__19CList_10CFuncPoint_;
+        __ct__8mgCFrameFv(&node->data.frame);
+        node->Initialize();
+    }
     if (node == NULL) {
         return NULL;
     }
     node->data.Initialize();
     return Add(type, node);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/funcpoint", Add__14CFuncPointMngrFiP9mgCMemory);
-#endif
 
 CFuncPoint *CFuncPointMngr::Add(int type, CList<CFuncPoint> *node) {
     if (node == NULL) {
@@ -430,28 +434,20 @@ CFuncPoint *CFuncPointMngr::Add(int type, CList<CFuncPoint> *node) {
     node->data.type = type;
     return &node->data;
 }
-#ifdef NONMATCHING
-void CFuncPointMngr::Reserve(int num, mgCMemory *stack) {
-    unsigned int size = num * sizeof(CList<CFuncPoint>);
-    int blocks;
-    if (size & 0xF) {
-        blocks = (size >> 4) + 1;
-    } else {
-        blocks = size >> 4;
+static inline u_int Align16Blocks(u_int n) {
+    if (n & 0xF) {
+        return (n >> 4) + 1;
     }
-    CList<CFuncPoint> *nodes = new ((u_long128 *)stack->Alloc(blocks + 2)) CList<CFuncPoint>[num];
+    return n >> 4;
+}
+void CFuncPointMngr::Reserve(int num, mgCMemory *stack) {
+    CList<CFuncPoint> *nodes = new ((u_long128 *)stack->Alloc(Align16Blocks(num * sizeof(CList<CFuncPoint>)) + 2)) CList<CFuncPoint>[num];
     if (num > 0) {
         for (int index = 0; index < num; index++) {
             Add(FUNC_POINT_NONE, &nodes[index]);
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/funcpoint", Reserve__14CFuncPointMngrFiP9mgCMemory);
-#endif
-#ifndef NONMATCHING
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/funcpoint", __ct__19CList_10CFuncPoint_Fv);
-#endif
 template <>
 void CList<CFuncPoint>::Initialize() {
     prev = NULL;

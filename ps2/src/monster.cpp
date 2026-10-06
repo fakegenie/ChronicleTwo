@@ -340,9 +340,8 @@ float CMonsterMan::IsBattleStyleDist() {
     return nearest;
 }
 
-#ifdef NONMATCHING
 int CMonsterMan::CheckMonsterTolk(float *pos) {
-    int found2;
+    int j;
     CActiveMonster *monster;
     float nearest;
     int found;
@@ -373,26 +372,23 @@ int CMonsterMan::CheckMonsterTolk(float *pos) {
     if (mons_base == -1) {
         return -1;
     }
-    i = 0;
-    found2 = -1;
+    j = 0;
+    found = -1;
     nearest = 90.0f;
     do {
-        monster = active[i];
+        monster = active[j];
         if (monster != NULL && monster->IsDraw(1)) {
-            monster = active[i];
+            monster = active[j];
             if (monster->tbl->user_mons_id == mons_base && monster->tbl->boss == 0 &&
                 monster->locate_param != -1 && monster->gekirin > 0.0f && nearest > monster->target_dist) {
                 nearest = monster->target_dist;
-                found2 = i;
+                found = j;
             }
         }
-        i++;
-    } while (i < MONSTER_ACTIVE_MAX);
-    return found2;
+        j++;
+    } while (j < MONSTER_ACTIVE_MAX);
+    return found;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/monster", CheckMonsterTolk__11CMonsterManFPf);
-#endif
 
 CActiveMonster *CMonsterMan::CheckThrowTarget(mgCFrame *frame) {
     float frame_pos[4];
