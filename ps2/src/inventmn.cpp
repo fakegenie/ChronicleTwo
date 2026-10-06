@@ -4790,7 +4790,6 @@ void MenuInventAlbumPictureDraw(float *origin, int &loadedTex) {
     USER_PICTURE_INFO *photo;
     float y;
     int i;
-    int offset;
     float top;
     int clip_top;
 
@@ -4805,11 +4804,10 @@ void MenuInventAlbumPictureDraw(float *origin, int &loadedTex) {
     if (first_texture != NULL) {
         MenuReloadTexture(loadedTex, first_texture->block);
         i = 0;
-        offset = 0;
         y = CMenuInventPt->album_scroll_y;
         do {
             if ((30.0f) < y && photo != NULL && *(signed char *)&photo->used == 1) {
-                PictureDraw(*(mgCTexture **)((u8 *)CMenuInventPt + 0x440 + offset), photo, *(float *)((u8 *)CMenuInventPt + 0x250) + (80.0f) * (float)(i % 2), y, (0.7f), 0x80, 0x80, 0x80, 0x80);
+                PictureDraw(CMenuInventPt->album_tex[i], photo, CMenuInventPt->album_scroll_x + (80.0f) * (float)(i % 2), y, (0.7f), 0x80, 0x80, 0x80, 0x80);
             }
             if (i % 2 != 0) {
                 y += (54.0f);
@@ -4818,7 +4816,6 @@ void MenuInventAlbumPictureDraw(float *origin, int &loadedTex) {
                 break;
             }
             i += 1;
-            offset += 4;
             photo = (USER_PICTURE_INFO *)((u8 *)photo + 0x18);
         } while (i < (0x32));
         ResetMenuScissor();
@@ -4881,7 +4878,7 @@ void MenuInventNetaMemoDraw(float *origin, int &loadedTex) {
         prim->Begin(6);
         prim->Texture(Tex_Hatsumei);
         prim->Color(0x80, 0x80, 0x80, 0x80);
-        PrimQuad(prim, 209.0f + origin[0], *(float *)((u8 *)CMenuInventPt + 0x35C), barRect);
+        PrimQuad(prim, 209.0f + origin[0], CMenuInventPt->memo_bar, barRect);
         prim->End();
         SetMenuScissor(clipRect);
         MenuReloadTexture(loadedTex, MenuArg.mes_tex_block);
