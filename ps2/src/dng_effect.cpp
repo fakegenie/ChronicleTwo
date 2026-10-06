@@ -2901,7 +2901,6 @@ void CWeaponElement::Draw_Fire(void) {
     }
     prim.End();
 }
-#ifdef STATEMATCHING
 void CWeaponElement::Init_Thunder(float *center) {
     float scaled[4];
     float dir[4];
@@ -2940,9 +2939,6 @@ void CWeaponElement::Init_Thunder(float *center) {
         bolt_frame[j] = fptosi((4.0f * (float)rand()) / 2.1474836e9f);
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dng_effect", Init_Thunder__14CWeaponElementFPf);
-#endif
 void CWeaponElement::Step_Thunder(void) {
     int dead;
     int i;
