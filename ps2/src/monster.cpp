@@ -631,8 +631,8 @@ CActiveMonster *CMonsterMan::SetActiveMonster(int refer_no, float *pos, float *r
     monster->next_pos[3] = 1.0f;
     monster->move_speed = 0.0f;
     monster->max_life = monster->life = tbl->life;
-    monster->reward_exp = tbl->unk_56;
-    monster->reward_money = tbl->unk_58;
+    monster->reward_exp = tbl->reward_exp;
+    monster->reward_money = tbl->reward_money;
     monster->unk_1322 = tbl->unk_5a;
     monster->whp = tbl->whp;
     monster->attack = tbl->attack;
@@ -1269,7 +1269,7 @@ void CMonsterMan::CheckDamage() {
             float damage = prim->damage - monster->defense;
             if (prim->status & 0x1000) {
                 damage = (float)monster->max_life * (0.01f * (float)prim->param->damage) *
-                         (0.01f * (float)monster->tbl->unk_ae);
+                         (0.01f * (float)monster->tbl->ratio_damage_rate);
             }
             if (prim->status & 0x40000) {
                 if (monster->tbl->user_mons_id != 9) {
@@ -1601,7 +1601,7 @@ void CMonsterMan::CheckDamage() {
                     monster->req_prog = MONSTER_PROG_GUARD;
                     break;
                 }
-                if ((tbl->unk_94 & 1) || monster->piyori_time > 0) {
+                if ((tbl->flags & 1) || monster->piyori_time > 0) {
                     break;
                 }
                 if (monster->tbl->stagger > 0) {
@@ -1615,7 +1615,7 @@ void CMonsterMan::CheckDamage() {
                 sndSePlay(monster->sound_info.se_bank, 0xB, 0);
                 break;
             case 4:
-                if (tbl->unk_94 & 4) {
+                if (tbl->flags & 4) {
                     break;
                 }
                 monster->req_prog = MONSTER_PROG_KNOCK;

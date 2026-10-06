@@ -5901,7 +5901,7 @@ BASE_MONSTER_TBL *GetMonsterBaseInfoForMonsterMemoIndex(int memoIndex) {
 
     monster = GetMonsterBaseInfo(0);
     for (i = 0; i < 0x14A; i++) {
-        if (monster->unk_b2 == memoIndex) {
+        if (monster->memo_index == memoIndex) {
             return monster;
         }
         monster++;
@@ -5939,17 +5939,17 @@ void CMosBookMenu::SetMonsterInfo(BASE_MONSTER_TBL *monster) {
     if (monster != NULL) {
         strcpy(this->name, monster->name);
         area = NULL;
-        if (0 <= monster->unk_b0) {
-            area = GetMapTitle(GetDngMapNo(monster->unk_b0));
+        if (0 <= monster->area_no) {
+            area = GetMapTitle(GetDngMapNo(monster->area_no));
         }
 
         *(MonsterBookBlock64 *)localAreaNames = *(MonsterBookBlock64 *)at_5452;
         if (LanguageCode == 1) {
-            if (monster->unk_b0 == 1) {
+            if (monster->area_no == 1) {
                 area = localAreaNames[0];
             }
         }
-        if (LanguageCode == 2 && monster->unk_b0 == 1) {
+        if (LanguageCode == 2 && monster->area_no == 1) {
             area = localAreaNames[1];
         }
         if (area != NULL) {
@@ -5959,8 +5959,8 @@ void CMosBookMenu::SetMonsterInfo(BASE_MONSTER_TBL *monster) {
         if (typeNames[0] != NULL) {
             strcpy(this->type_name, typeNames[monster->user_mons_id]);
         }
-        this->hp = monster->unk_56;
-        this->abs = monster->unk_58;
+        this->hp = monster->reward_exp;
+        this->abs = monster->reward_money;
         this->kill_num = KillMonsterCount(monster->id, 0);
         itemCount = 0;
         for (i = 0; i < 3; i++) {
