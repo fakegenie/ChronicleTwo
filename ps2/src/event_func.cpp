@@ -118,8 +118,6 @@ extern "C" void *__vt__12CObjectFrame[];
 extern "C" void *__vt__11CCharacter2[];
 extern "C" void *__vt__9mgCVisual[];
 extern "C" void *__vt__11mgC3DSprite[];
-extern "C" int fptosi(float value);
-extern "C" int GetItemDataType__Fi(int);
 extern "C" int GetNowHorl__11CSphidaDataFv(CSphidaData *);
 
 static int GetStackInt(RS_STACKDATA *);
@@ -3640,7 +3638,7 @@ int _SUB_ITEM(RS_STACKDATA *stack, int argc) {
     return 1;
 }
 int _GET_ITEM_TYPE(RS_STACKDATA *stack, int argc) {
-    int itemType = GetItemDataType__Fi(GetStackInt(stack++));
+    int itemType = GetItemDataType(GetStackInt(stack++));
     int category;
     if (itemType == 0) {
         return 0;

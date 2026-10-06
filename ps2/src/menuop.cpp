@@ -196,7 +196,6 @@ extern char at_3205[];
 extern char at_3206[];
 extern char at_3207[];
 void InitMnOnePictTex(void);
-extern "C" int ReadBGSync__Fv(void);
 
 extern CDC2Mes *MenuDCMsg[9];
 extern CMemoryCardManager *MemoryCardPtr;
@@ -575,7 +574,7 @@ int CManualMenu::KeyStep(void) {
     frameEnd = GetMenuMainFrameEndFlag();
     switch (mode) {
         case 1:
-            if (ReadBGSync__Fv() == 0 && frameEnd != 0) {
+            if (ReadBGSync() == 0 && frameEnd != 0) {
                 MenuCommonInfo->key_enable = 1;
                 MenuCommonInfo->CursorFadeIn(10.0f, 1);
                 MenuCommonInfo->SetMoveMethod(2);
@@ -974,7 +973,7 @@ int CMenuOption::KeyStep(void) {
     frameEnd = GetMenuMainFrameEndFlag();
     switch (mode) {
         case 1:
-            if (this->step == 0 && ReadBGSync__Fv() == 0 && frameEnd != 0) {
+            if (this->step == 0 && ReadBGSync() == 0 && frameEnd != 0) {
                 GamePad__2.KeyLock(0);
                 MenuCommonInfo->SetWakuType(0);
                 MenuCommonInfo->SetMoveMethod(2);

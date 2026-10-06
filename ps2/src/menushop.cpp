@@ -47,7 +47,6 @@ extern "C" CMenuSystemData *GetMenuSysData__Fv();
 extern "C" int CheckGetAlready__15CMenuSystemDataFi(CMenuSystemData *, int);
 extern "C" int GetQuestRequestStatus__Fi(int);
 extern short NowSellMode;
-extern "C" int GetItemDataType__Fi(int);
 extern "C" int CheckVoiceUnit__16CUserDataManagerFv(CUserDataManager *);
 extern SHOP_PRICE_INFO *Spi_PriceList;
 extern char at_1221__3[];
@@ -145,7 +144,7 @@ void CShop::CheckEventItem() {
         if (item_no[cursor] == 0x166 && userData->GetNumSameItem(0x166) > 0) {
             local_sort1(cursor, &item_num, item_no);
         }
-        if (GetItemDataType__Fi(item_no[cursor]) == ITEM_DATA_ROBO_CORE) {
+        if (GetItemDataType(item_no[cursor]) == ITEM_DATA_ROBO_CORE) {
             int core = CheckRobotCore();
             if (core >= 0xF6 && core < 0xFC) {
                 item_no[cursor] = core + 1;

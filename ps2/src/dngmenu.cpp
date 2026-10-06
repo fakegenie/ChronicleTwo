@@ -43,7 +43,6 @@ extern "C" char at_2740[];
 extern "C" char at_2741[];
 extern "C" char at_2742[];
 extern "C" char *name_tbl_2728[7];
-extern "C" int fptosi(float value);
 extern int MenuDngDebugFlagSelect;
 extern char at_2176[];
 extern char at_2177[];

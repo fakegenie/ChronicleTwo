@@ -111,7 +111,6 @@ void MenuFormUpdataAttachInfo(CMenuPosDataForm *form, CGameDataUsed *item, int i
                               short *b);
 void SetSwordBlurEffect(CCharacter2 *chara, mgCMemory *stack, int charaNo);
 void SetupUnitMan(CScene *scene, CUserDataManager *userData, int unit, ROBO_INFO_DATA *robo);
-extern "C" void MenuBGReadInfo2Malloc__FP9mgCMemoryPi(mgCMemory *, int *);
 void InitSpectol(void);
 void MenuItemDebugKey();
 
@@ -5318,7 +5317,7 @@ void CMenuItemInfo::MenuModeMalloc(mgCMemory *stack) {
         MenuActionChara[i] = NewMenuActionChara(&MenuItemMemory2);
         MenuActionChara[i]->Initialize(NULL);
     }
-    MenuBGReadInfo2Malloc__FP9mgCMemoryPi(&MenuItemMemory2, tbl_5293);
+    MenuBGReadInfo2Malloc(&MenuItemMemory2, tbl_5293);
     if ((move_item = (CMenuMoveItem *)operator new(0x104, (u_long128*)MenuItemMemory2.Alloc(0x13))) != NULL) {
         slot = move_item->info;
         do {

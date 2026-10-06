@@ -100,7 +100,6 @@ extern signed char MenuNPCLoadFlag;
 extern "C" int stSetBuffer__9mgCMemoryFP1i(mgCMemory *memory, void *buffer, int size);
 extern "C" void *__ct__14CBaseMenuClassFv(void *self);
 extern "C" void MenuMainFrameStep__Fv(void);
-extern "C" void MenuBGReadInfo2Malloc__FP9mgCMemoryPi(mgCMemory *, int *);
 extern "C" void MenuMainFrameModeSet__Fii(int, int);
 extern int mos_effect_read_num;
 extern "C" void BuildBase__16CEffectScriptManFPcP1iP1iP9mgCMemoryi(CEffectScriptMan *manager,
@@ -541,7 +540,6 @@ extern "C" char at_2197__2[];
 extern "C" char at_2662__2[];
 short GetCostumeList(unsigned long charaFlag, int kind, short *list);
 int GetDngMapNo(int dungeonNo);
-extern "C" int ReadBGSync__Fv(void);
 static int MenuMemoryDivide(mgCMemory *memory, mgCMemory **list, int chara);
 static void MenuItemCharaDataLoadPack(int chara_no, CActionChara *chara, CActionChara *body, int part,
                                       u_int *pack, mgCMemory *stack, int tex_block, int blur_type);
@@ -2588,7 +2586,7 @@ int MenuCharaChangeInit(mgCMemory *memory, int *texBlock, int bootMode) {
         *(CCharacter2 **)((u8 *)MenuActionChara + offset) = chara;
         offset += 4;
     } while (i < 7);
-    MenuBGReadInfo2Malloc__FP9mgCMemoryPi(&MenuChangeMemory, tbl_2483);
+    MenuBGReadInfo2Malloc(&MenuChangeMemory, tbl_2483);
     MenuCharaChangeCLUT_Tex = 0;
     MenuMainFrameModeSet__Fii(4, 1);
     ChrChangMenuPt->EnterDataMenu((u8*)memory->stack);
@@ -5385,7 +5383,7 @@ void CMenuCostumeSel::LoadMenuData(mgCMemory *stack, int *texBlock) {
     MenuDCMsg[7]->MsgPreset(0xB);
     MenuDCMsg[7]->SetAbsPos(8);
     *(int *)&MenuDrawEnv->speed = 0x40000000;
-    MenuBGReadInfo2Malloc__FP9mgCMemoryPi(stack, tbl_5016);
+    MenuBGReadInfo2Malloc(stack, tbl_5016);
     MenuLoadInfo.mode = 3;
     MenuLoadInfo.unk_1 = 1;
     MenuLoadInfo.unk_2 = 1;
@@ -5400,7 +5398,7 @@ void CMenuCostumeSel::LoadMenuData(mgCMemory *stack, int *texBlock) {
     SetMenuLoadItemNo(0);
     MenuItemCharaDataLoad(&MenuCharaLoadStack, 0, MenuCharaBuild2, 1);
     do {
-    } while (ReadBGSync__Fv() == 0);
+    } while (ReadBGSync() == 0);
     this->load_wait = 0;
     MenuCosutumeLoadPhase = 2;
 }
@@ -6341,7 +6339,7 @@ int CMosBookMenu::KeyStep(void) {
             }
             break;
         case 3:
-            if (ReadBGSync__Fv() == 0) {
+            if (ReadBGSync() == 0) {
                 this->load_phase += 1;
                 this->show_wait = 0;
                 this->monster = NewMenuActionChara(&this->stack);
@@ -6416,7 +6414,7 @@ void MonsterBookInit(mgCMemory *memory, int *texBlock, int bootMode) {
     ((CBaseMenuClass *)book)->SetTexBlock(texBlock);
     MonsterBookPtr = (u8*)&GetSaveData()->monster_book;
     MonsterBookBootMode = bootMode;
-    MenuBGReadInfo2Malloc__FP9mgCMemoryPi(&MosBookStack, tbl_5848);
+    MenuBGReadInfo2Malloc(&MosBookStack, tbl_5848);
     MenuLoadInfo.mode = 4;
     MenuLoadInfo.unk_2 = 1;
     MenuLoadInfo.unk_6[1] = 0;
