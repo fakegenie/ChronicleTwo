@@ -1174,8 +1174,8 @@ void ClsMes::StepNormal() {
         if (distance > 0.0f) {
             float tip_y = tail_length * dy / distance;
             float tip_x = tail_length * dx / distance;
-            tail_tip_x = tail_root_x + (int)tip_x;
-            tail_tip_y = tail_root_y + (int)tip_y;
+            tail_tip_x = (int)tip_x + tail_root_x;
+            tail_tip_y = (int)tip_y + tail_root_y;
         } else {
             tail_tip_x = tail_root_x;
             tail_tip_y = tail_root_y;
