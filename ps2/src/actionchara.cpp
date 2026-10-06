@@ -2702,28 +2702,32 @@ void CActionChara::SetHold() {
         prog_no = -1;
     }
 }
-#ifdef NONMATCHING
+static inline float MoveCheckRadius(float width) {
+    return 4.0f + 2.0f * width;
+}
 void CActionChara::RunScript(CScene *scene, RUN_SCRIPT_ENV *env) {
+    int               pallet_u;
+    int               history;
     CBattleCharaInfo *battle;
-    CTreasureBoxManager *treasure;
     CSphida          *sphida;
-    CMap             *map;
-    ACTION_DAMAGE    *entry;
-    CColPrim         *reversed;
-    float             frame;
-    float             target_distance;
     int               count;
-    int               foot;
-    int               index;
+    float             frame;
+    int               effect;
     int               pallet_no;
     int               target;
-    DNG_BATTLE_AREA  *area;
-    int               history;
-    int               pallet_u;
     int               pallet_v;
+    int               index;
+    int               foot;
+    ACTION_DAMAGE    *entry;
+    DNG_BATTLE_AREA  *area;
+    CColPrim         *reversed;
+    CTreasureBoxManager *treasure;
+    CMap             *map;
+    float             target_distance;
 
-    action_info.chara = this;
     nowScene__2 = scene;
+    area = &scene->battle_area;
+    action_info.chara = this;
     action_info.camera = (mgCCameraFollow *)scene->GetCamera(scene->GetCameraID("MainCam"));
     action_info.env = env;
     sceVu0FVECTOR adjusted_velocity = { 0.0f, 0.0f, 0.0f, 0.0f };
@@ -2793,7 +2797,6 @@ void CActionChara::RunScript(CScene *scene, RUN_SCRIPT_ENV *env) {
     box.max[3] = 1.0f;
     box.min[3] = 1.0f;
     count = map->GetColPoly(polys, box, 128);
-    area = &scene->battle_area;
     treasure = area->treasure_box;
     if (treasure != NULL) {
         count += treasure->PickupCollision(position, &polys[count], box, 128 - count);
@@ -2802,7 +2805,7 @@ void CActionChara::RunScript(CScene *scene, RUN_SCRIPT_ENV *env) {
     if (sphida != NULL) {
         count += sphida->PickupCollision(position, &polys[count], box, 128 - count);
     }
-    move_check.radius = 4.0f + 2.0f * body_width;
+    move_check.radius = MoveCheckRadius(body_width);
     MoveCheck(position, adjusted_velocity, new_position, &move_check, polys, count, 1);
     adjusted_velocity[0] = new_position[0] - position[0];
     adjusted_velocity[2] = new_position[2] - position[2];
@@ -2872,9 +2875,9 @@ void CActionChara::RunScript(CScene *scene, RUN_SCRIPT_ENV *env) {
     if (pallet_no >= 0) {
         pallet_u = pallet_no % 2;
         pallet_v = pallet_no / 2;
-        for (index = 0; index < 3; index++) {
-            if (sword_effect[index] != NULL) {
-                sword_effect[index]->SetTexture(pallet_u * 64, pallet_v * 32, 64, 32);
+        for (effect = 0; effect < 3; effect++) {
+            if (sword_effect[effect] != NULL) {
+                sword_effect[effect]->SetTexture(pallet_u * 64, pallet_v * 32, 64, 32);
             }
         }
     }
@@ -2898,9 +2901,6 @@ void CActionChara::RunScript(CScene *scene, RUN_SCRIPT_ENV *env) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/actionchara", RunScript__12CActionCharaFP6CSceneP14RUN_SCRIPT_ENV);
-#endif
 int CActionChara::CheckReleaseTimming(int id) {
     if (id == -1) {
         return release_timing;
