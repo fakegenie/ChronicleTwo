@@ -356,3 +356,8 @@ only functions present in both objects can be replaced, the plain build keeps th
 - Function-scope declarations in a searched order, and a fresh variable instead of reusing an earlier loop counter, fixed saved-register swaps (`sgInitGyoRace`, `InitUkiObj`). They did not fix caller-saved swaps between a loop index and its offset.
 - To promote a draft that only compiles with a unit's `#ifdef NONMATCHING` globals block, make the needed includes unconditional and add externs to the `#ifndef NONMATCHING` block.
 - `VAR=1 ./dev.sh ...` has no effect inside the container. Toggle tools with files instead.
+- An `asm` function defined earlier in the file and made `static` lets MWCC keep a caller-saved register live across calls to it (a loop index stays in v1 across `trance_normal`). This extends the static-callee tip to `asm` functions. A global `asm` function does not do it.
+- To stop MWCC reusing a float it already loaded for a compare, read the source through a cast address, as in `box_max[0] = ((float *)&box)[0];`. Retail reloaded the value after the guard branches.
+- Retail's `lq`/`sq` CCPoly copy, with `normal` copied last, is an explicit member-by-member copy using `*(u_long128 *)` for the vectors. `*out = *poly` copies each float with `lwc1`/`swc1`.
+- Two adjacent 16-byte locals copied with `lq`/`sq` through address registers (`addiu tN,sp,K; sq x,0(tN)`) were two separate `sceVu0FVECTOR` locals in retail, not a `[2]` array or an `mgVu0FBOX`. The array form made MWCC reuse the address register for later loads.
+- A nop at a loop's continue label came out of `for (...) { if (call()) { ...; if (max <= 0) break; } }` with no extra work.
