@@ -32,7 +32,6 @@ extern char item_file_path_1288[0x80];
 extern SPI_TAG_PARAM gamedata_tag[];
 extern short msg_offsettbl_1363[3];
 extern signed char ItemCmdMsgTbl[33][8];
-extern "C" unsigned int fptoui(float);
 extern char at_1018[];
 extern char at_1019[];
 extern char at_1020[];

@@ -538,9 +538,8 @@ int CMap::PreDraw(float *view_pos) {
     }
 
     active_occlusion = 0;
-    int occlusion_offset;
-    for (index = 0, occlusion_offset = 0; index < occlusion_num; occlusion_offset += 0xC0, index++) {
-        COcclusion *current = (COcclusion *)((u8 *)this + occlusion_offset + 0x680);
+    for (index = 0; index < occlusion_num; index++) {
+        COcclusion *current = &occlusion[index];
         if (current->enable != 0) {
             current->Setup(mgRenderInfo.view);
             active_occlusion++;
@@ -1134,7 +1133,7 @@ int CMap::GetPoly(int kind, CCPoly *polys, mgVu0FBOX &box, int max) {
             j = 0;
             do {
                 j++;
-                *(s16 *)((u8 *)polys + 0x48) = i;
+                polys->parts_no = i;
                 polys++;
             } while (j < effect_num);
         }
@@ -1320,7 +1319,7 @@ CFuncPoint *CMap::GetEvent(float *pos, int check_type, MapEventInfo *info) {
     current = (MapEventInfo *)&event_storage;
     nearest_point = NULL;
     current->event_no = 0;
-    mgUnitMatrix((float (*)[4])((u8 *)current + 0x10));
+    mgUnitMatrix(current->matrix);
     current->point_no = -1;
     current->parts_no = -1;
     func_point.GetStart(FUNC_POINT_EVENT);

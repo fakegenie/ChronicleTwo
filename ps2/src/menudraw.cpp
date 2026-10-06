@@ -509,7 +509,6 @@ extern float MenuItemBrdScrlCurLen;
 
 
 
-extern "C" unsigned int fptoui(float value);
 
 
 
@@ -1866,7 +1865,7 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", DrawMenuTilePattern__FP11mgCDra
 #endif
 void DrawMenuMainFrmImg(int &loaded_tex_no, mgRect<int> dest, mgRect<int> source, int red, int green,
                         int blue, int alpha, int unused) {
-    mgCTexture *texture = *(mgCTexture **)((u8 *)MenuPosData + 0x3C);
+    mgCTexture *texture = MenuPosData->common_tex;
     if (texture != 0) {
         MenuReloadTexture(loaded_tex_no, *(short *)texture);
     mgCDrawPrim *prim = GetMenuPrim();
@@ -3305,14 +3304,14 @@ void CMenuPosDataForm::SetAction(char *action) {
     int offset = 0;
     while (i < action_num) {
         if (strcmp(action, (char *)this->action + offset) == 0) {
-            *(short *)((u8 *)this + 0x5E) = i;
-            *(short *)((u8 *)this + 0x60) = 1;
+            action_no = i;
+            action_state = 1;
             return;
         }
         offset += 0x14;
         i++;
     }
-    *(short *)((u8 *)this + 0x5E) = -1;
+    action_no = -1;
 }
 void CMenuPosDataForm::SetNextMovePos(int *position, int move_type) {
     mtype = move_type;
@@ -4540,7 +4539,7 @@ void CheckItemBoardFunc_MenuIconDrawPrepare(CUserDataManager *manager, MENUFORMP
                 part->item_flag |= 2;
             }
             i++;
-            item = (CGameDataUsed *)((u8 *)item + 0x6C);
+            item++;
             offset += 0x48;
         } while (i < count);
     }

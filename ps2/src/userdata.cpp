@@ -57,7 +57,6 @@ extern signed char tbl1_5167[3];
 extern signed char tbl2_5168[2];
 extern unsigned int at_table_5400[12];
 extern signed char equip_type_tbl_5456[15];
-extern "C" unsigned int fptoui(float);
 extern char at_1378__2[];
 extern char at_1379__2[];
 extern char at_1623[];

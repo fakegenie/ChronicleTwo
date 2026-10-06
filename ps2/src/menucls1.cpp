@@ -3,6 +3,7 @@
 #include "prespr.hpp"
 #include "mg_drawprim.hpp"
 #include <cstdio>
+#include <cmath>
 #include "font.hpp"
 #include "sysmes.hpp"
 #include "scenesnd.hpp"
@@ -25,7 +26,6 @@
 #include "gamepad.hpp"
 
 extern "C" int GetNumberKeta__Fi(int);
-extern "C" double pow(double, double);
 
 extern char *MenuHatena_894;
 extern signed char init_895;

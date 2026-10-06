@@ -47,7 +47,6 @@ extern "C" void KeyStep__14CMenuQuestViewFv(void *);
 
 extern "C" CMenuSystemData *GetMenuSysData__Fv();
 extern "C" int CheckGetAlready__15CMenuSystemDataFi(CMenuSystemData *, int);
-extern "C" void *GetSaveData__Fv();
 extern "C" int GetQuestRequestStatus__Fi(int);
 extern short NowSellMode;
 extern "C" int GetItemDataType__Fi(int);
@@ -120,7 +119,7 @@ int CheckRobotCore(void) {
     return CheckRobotCore__16CUserDataManagerFv(GetUserDataMan());
 }
 void CShop::CheckEventItem() {
-    CUserDataManager *userData = (CUserDataManager *)((u8 *)GetSaveData__Fv() + 0x1D2A0);
+    CUserDataManager *userData = GetSaveData()->GetUserDataManager();
     if (NowSellMode == 3) {
         item_num = GetDonyShopLineUp(item_no, NULL);
         return;
