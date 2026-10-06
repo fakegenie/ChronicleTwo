@@ -1713,7 +1713,6 @@ int CActionChara::RoboWalkMoveIF(int mode) {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/actionchara", RoboWalkMoveIF__12CActionCharaFi);
 #endif
-#ifdef STATEMATCHING
 int CActionChara::RoboTankMoveIF(int mode) {
     sceVu0FVECTOR position;
     sceVu0FVECTOR move_velocity;
@@ -1854,9 +1853,6 @@ int CActionChara::RoboTankMoveIF(int mode) {
     RockOn();
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/actionchara", RoboTankMoveIF__12CActionCharaFi);
-#endif
 int CActionChara::RoboBikeMoveIF(int mode) {
     sceVu0FVECTOR position;
     sceVu0FVECTOR leg_rotation;
