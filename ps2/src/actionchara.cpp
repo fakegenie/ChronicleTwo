@@ -1141,7 +1141,6 @@ int Check_LockOn(CScene *scene, float range, int index) {
 
     return farther = farther ^ 1;
 }
-#ifdef NONMATCHING
 void CActionChara::CollisionCheck(float *pos, float *velocity, float *out_velocity) {
     sceVu0FVECTOR      next_position;
     sceVu0FVECTOR      flat_position;
@@ -1170,36 +1169,40 @@ void CActionChara::CollisionCheck(float *pos, float *velocity, float *out_veloci
             continue;
         }
         int body_no = 0;
-        body = monster->GetEntryObjectPos(4, body_no, body_position);
-        while (body != NULL) {
-            body_no++;
-            if (body->enable != 0 &&
-                next_position[1] + body->unk_04 >= body_position[1] - body_height &&
-                next_position[1] - body->unk_04 <= body_position[1] + body_height) {
-                body_position[1] = 0.0f;
-                separation = 2.0f * body->unk_04 + 2.0f * body_width;
-                distance = mgDistVector(body_position, flat_position);
-                if (distance < separation) {
-                    separation -= distance;
-                    push_direction[0] = flat_position[0] - body_position[0];
-                    push_direction[1] = flat_position[1] - body_position[1];
-                    push_direction[2] = flat_position[2] - body_position[2];
-                    push_direction[3] = 1.0f;
-                    sceVu0Normalize(push_direction, push_direction);
-                    out_velocity[0] = (out_velocity[0] + push_direction[0] * separation) / 2.0f;
-                    out_velocity[1] = (out_velocity[1] + push_direction[1] * separation) / 2.0f;
-                    out_velocity[2] = (out_velocity[2] + push_direction[2] * separation) / 2.0f;
-                    out_velocity[3] = 1.0f;
-                    sceVu0ScaleVector(out_velocity, out_velocity, 1.5f);
-                }
+        for (body = monster->GetEntryObjectPos(4, body_no, body_position); body != NULL;
+             body = monster->GetEntryObjectPos(4, body_no, body_position)) {
+            if (body->enable == 0) {
+                body_no++;
+                continue;
             }
-            body = monster->GetEntryObjectPos(4, body_no, body_position);
+            if (next_position[1] + body->unk_04 < body_position[1] - body_height) {
+                body_no++;
+                continue;
+            }
+            if (!(next_position[1] - body->unk_04 <= body_position[1] + body_height)) {
+                body_no++;
+                continue;
+            }
+            body_position[1] = 0.0f;
+            separation = 2.0f * body->unk_04 + 2.0f * body_width;
+            distance = mgDistVector(body_position, flat_position);
+            if (distance < separation) {
+                separation -= distance;
+                push_direction[0] = flat_position[0] - body_position[0];
+                push_direction[1] = flat_position[1] - body_position[1];
+                push_direction[2] = flat_position[2] - body_position[2];
+                push_direction[3] = 1.0f;
+                sceVu0Normalize(push_direction, push_direction);
+                out_velocity[0] = (out_velocity[0] + push_direction[0] * separation) / 2.0f;
+                out_velocity[1] = (out_velocity[1] + push_direction[1] * separation) / 2.0f;
+                out_velocity[2] = (out_velocity[2] + push_direction[2] * separation) / 2.0f;
+                out_velocity[3] = 1.0f;
+                sceVu0ScaleVector(out_velocity, out_velocity, 1.5f);
+            }
+            body_no++;
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/actionchara", CollisionCheck__12CActionCharaFPfPfPf);
-#endif
 void CActionChara::RockOn() {
     float own_pos[4];
     float target_pos[4];
