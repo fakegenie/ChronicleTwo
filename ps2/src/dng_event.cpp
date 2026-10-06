@@ -76,7 +76,6 @@ extern char at_1348[];
 extern char at_2529[];
 static MapJumpMapInfo MainMapInfo;
 
-#ifdef STATEMATCHING
 void CStartupEpisodeTitle::DrawEpisode(int mes_tex_block, int frame_tex_block) {
     union { CPreSprite prim; };
 
@@ -115,9 +114,6 @@ void CStartupEpisodeTitle::DrawEpisode(int mes_tex_block, int frame_tex_block) {
     prim.SetScirror(0, 0, mgScreenWidth - 1, mgScreenHeight - 1);
     prim.End();
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dng_event", DrawEpisode__20CStartupEpisodeTitleFii);
-#endif
 void CStartupEpisodeTitle::Switch(int on) {
     char *title;
     ClsMes *current;
