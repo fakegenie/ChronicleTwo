@@ -189,7 +189,7 @@ void EditControlStatusInit(CScene *scene) {
     if (chara != NULL) {
         chara->SetMotion(at_962, 4);
 
-        *(int *)((u8 *)chara + 0x84) = 0;
+        chara->velocity[1] = 0.0f;
         chara->Step();
     }
 }
