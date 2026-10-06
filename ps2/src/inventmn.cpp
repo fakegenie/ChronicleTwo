@@ -1701,7 +1701,11 @@ void CMenuInvent::InitNetaCircle(int show) {
         i++;
     } while (i < 3);
 }
-#ifdef NONMATCHING
+static inline void SetNetaName(CDC2Mes *message, int line, char *name) {
+    if (name != NULL) {
+        strcpy(message->name[line], name);
+    }
+}
 int CMenuInvent::SetNetaCircle(int type, int index) {
     char *name;
     CMenuPosDataForm *form;
@@ -1776,10 +1780,7 @@ int CMenuInvent::SetNetaCircle(int type, int index) {
     if (label != NULL) {
         label->SetAction(at_2313);
     }
-    CDC2Mes *message = MenuDCMsg[7];
-    if (name != NULL) {
-        strcpy(message->name[neta_select_num], name);
-    }
+    SetNetaName(MenuDCMsg[7], neta_select_num, name);
     MenuDCMsg[7]->ClsMes::mes_no = -1;
     MenuDCMsg[7]->MakeMsg(neta_select_num + 50);
     neta_select_num++;
@@ -1789,9 +1790,6 @@ int CMenuInvent::SetNetaCircle(int type, int index) {
     neta_circle_angle += 0.05235988f;
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/inventmn", SetNetaCircle__11CMenuInventFii);
-#endif
 int CMenuInvent::CancelNetaCircle(int mode) {
     int removed_idea = -1;
     if (neta_select_num <= 0) {
@@ -2062,7 +2060,6 @@ void CMenuInvent::GradationSet(int mode) {
             return;
     }
 }
-#ifdef STATEMATCHING
 void CMenuInvent::GradationStep() {
     if (invent_okeff_form == NULL) {
         return;
@@ -2121,9 +2118,6 @@ void CMenuInvent::GradationStep() {
         break;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/inventmn", GradationStep__11CMenuInventFv);
-#endif
 void CMenuInvent::InitEnd() {
     BG_READ_INFO *read_info;
 

@@ -1868,7 +1868,6 @@ void TitleCopyRightDraw() {
         }
     }
 }
-#ifdef NONMATCHING
 void TitleHDDInstallInit() {
     char image_name[32];
     char message_path[0x4C];
@@ -1877,12 +1876,12 @@ void TitleHDDInstallInit() {
     mgCTextureManager *textures = &mgTexManager;
     stack = &Stack_ReadBuff;
 
-    stack->stack_used = 0;
     HDDnowDisplayImageNo = 0;
     HDDMesDrawFlag = 0;
     HDDPhase = 0;
     HDDConfirmType = 0;
     HDDModeSelect = 0;
+    stack->stack_used = 0;
     stack->lock = 0;
     textures->DeleteBlock(0x4A);
     textures->DeleteBlock(0x4B);
@@ -1941,9 +1940,6 @@ void TitleHDDInstallInit() {
     TitleScene->LoadBGM(0x32, stack->stGetTop());
     TitleScene->fade.FadeIn(0x28);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/title", TitleHDDInstallInit__Fv);
-#endif
 int TitleHDDInstallKey() {
     int next_phase = -1;
     int push = MenuCheckPushButton();
@@ -2251,7 +2247,6 @@ int TitleHDDInstallKey() {
     }
     return 0;
 }
-#ifdef STATEMATCHING
 void DrawMenuDl(int x, int y, int width, int alpha, float rate) {
     mgCDrawPrim prim;
     mgRect<int> frame_tex;
@@ -2295,9 +2290,6 @@ void DrawMenuDl(int x, int y, int width, int alpha, float rate) {
     }
     prim.End();
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/title", DrawMenuDl__Fiiiif);
-#endif
 void TitleHDDInstallDraw() {
     union { CMenuFont font; };
     mgCTextureManager *textures = &mgTexManager;

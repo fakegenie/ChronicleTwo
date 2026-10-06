@@ -1144,7 +1144,6 @@ void PrimDrawNumber2(mgCDrawPrim *prim, int number, int digit_count, int x, int 
     mgRect<int> rect(x, y, texture_rect.right, texture_rect.bottom);
     DrawMenuNumber(prim, number, 0, rect, texture_rect, texture_rect.right + spacing, mode);
 }
-#ifdef STATEMATCHING
 void PrimFillRect4(mgCDrawPrim *prim, mgRect<float> rect, float *rgba0, float *rgba1, float *rgba2, float *rgba3) {
     float right;
     float bottom;
@@ -1163,9 +1162,6 @@ void PrimFillRect4(mgCDrawPrim *prim, mgRect<float> rect, float *rgba0, float *r
     prim->Color((int)rgba3[0], (int)rgba3[1], (int)rgba3[2], (int)rgba3[3]);
     prim->Vertex(right, bottom, 0.0f);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", PrimFillRect4__FP11mgCDrawPrim9mgRect_f_PfPfPfPf);
-#endif
 void MenuReloadTexture(int &loaded_tex, int tex_no) {
     mgCTextureManager *manager = &mgTexManager;
     if (loaded_tex != tex_no) {
@@ -1299,7 +1295,6 @@ int StepMenuDl2(int progress) {
     }
     return 0;
 }
-#ifdef STATEMATCHING
 void DrawMenuDl(int &tex_block, int x, int y, int w, int alpha) {
     mgCDrawPrim *prim;
     int left;
@@ -1353,9 +1348,6 @@ void DrawMenuDl(int &tex_block, int x, int y, int w, int alpha) {
         prim->End();
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", DrawMenuDl__FRiiiii);
-#endif
 void DrawMenuDl(int alpha) {
     char text[0x80];
     int loaded_tex_no;
@@ -1387,7 +1379,6 @@ void DrawMenuDl(int alpha) {
         }
     }
 }
-#ifdef STATEMATCHING
 void CalcCommonBrdDrawInfo(float *pos, MENUFORM_MAKEBRD_INFO *info, ClsMes *mes) {
     float board_w;
     int i;
@@ -1438,9 +1429,6 @@ void CalcCommonBrdDrawInfo(float *pos, MENUFORM_MAKEBRD_INFO *info, ClsMes *mes)
     }
     memcpy(&CommonBoardDrawInfo, info, sizeof(MENUFORM_MAKEBRD_INFO));
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", CalcCommonBrdDrawInfo__FPfP21MENUFORM_MAKEBRD_INFOP6ClsMes);
-#endif
 #ifdef NONMATCHING
 void CommonBoardDraw(float *pos, int &tex_block) {
     mgCTexture *board_tex = Tex_CommonBoard;
@@ -1626,7 +1614,6 @@ void MenuCursorDraw(mgCTexture *tex, float *pos, float rot, int reverse, int alp
 void MenuCursorDraw(mgCTexture *texture, float *position, float value, int flag) {
     MenuCursorDraw(texture, position, value, 0, flag, 1.0f);
 }
-#ifdef STATEMATCHING
 void DrawMenuTilePattern(mgCDrawPrim *prim, mgCTexture *tex, float x, float y, mgRect<int> tex_rect, int unused,
                          u8 *rgba) {
     mgRect<int> dest(0, 0, 0, 0);
@@ -1657,9 +1644,6 @@ void DrawMenuTilePattern(mgCDrawPrim *prim, mgCTexture *tex, float x, float y, m
     }
     prim->End();
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", DrawMenuTilePattern__FP11mgCDrawPrimP10mgCTextureff9mgRect_i_iPUc);
-#endif
 void DrawMenuMainFrmImg(int &loaded_tex_no, mgRect<int> dest, mgRect<int> source, int red, int green,
                         int blue, int alpha, int unused) {
     mgCTexture *texture = MenuPosData->common_tex;

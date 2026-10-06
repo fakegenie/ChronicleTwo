@@ -1965,7 +1965,6 @@ int ClsMes::MakeMesWinTbl_item(int ref_code, int *x, int *y) {
         }
     }
 }
-#ifdef STATEMATCHING
 int ClsMes::GetMesWidth_system(int mes_no) {
     int inserted_width;
     unsigned short *text;
@@ -2032,9 +2031,6 @@ int ClsMes::GetMesWidth_system(int mes_no) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/nd_meswin", GetMesWidth_system__6ClsMesFi);
-#endif
 short *ClsMes::GetTextLineDataTop(int line_id) {
     short *table = buff;
     int i = 0;
@@ -2395,7 +2391,6 @@ void ClsMes::AddPage(int end, int page) {
         }
     }
 }
-#ifdef STATEMATCHING
 void ClsMes::NeedMesWinWH(int mes_no) {
     unsigned short *text;
     int             y;
@@ -2598,9 +2593,6 @@ void ClsMes::NeedMesWinWH(int mes_no) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/nd_meswin", NeedMesWinWH__6ClsMesFi);
-#endif
 void ClsMes::NeedMesWinWH(char *text) {
     char message[mes_buffer_size];
     char value_text[0x80];
@@ -3422,7 +3414,6 @@ void ClsMes::DrawFont() {
     prim.End();
 }
 #pragma divbyzerocheck reset
-#ifdef STATEMATCHING
 void ClsMes::SetGoalCursorXY() {
     int dx;
     int dy;
@@ -3463,9 +3454,6 @@ void ClsMes::SetGoalCursorXY() {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/nd_meswin", SetGoalCursorXY__6ClsMesFv);
-#endif
 void ClsMes::StepSelectCursor(int steps) {
     int i;
 

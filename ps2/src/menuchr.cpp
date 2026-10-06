@@ -724,7 +724,6 @@ void CMenuChrCngMenu::AttachForm() {
         cmd_part[j] = form->GetPartInfo(name);
     }
 }
-#ifdef STATEMATCHING
 void CMenuChrCngMenu::EnterDataMenu(u8 *pack) {
     char name[0x20];
     int size;
@@ -838,9 +837,6 @@ void CMenuChrCngMenu::EnterDataMenu(u8 *pack) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuchr", EnterDataMenu__15CMenuChrCngMenuFPUc);
-#endif
 void CMenuChrCngMenu::LoadNPCFaceData(mgCMemory *memory, int mode) {
     char path[0x40];
     unsigned int size;
@@ -5782,7 +5778,6 @@ void CMenuCostumeSel::Draw() {
 extern u_long CostumeOptionEnv;
 extern "C" void *__ct__15mgCCameraFollowFffff(void *camera, float distance, float height, float angle,
                                                float speed);
-#ifdef STATEMATCHING
 void MenuCostumeInit(mgCMemory *stack, int *tex_block, int mode) {
     int i;
     CMenuCostumeSel *menu;
@@ -5857,9 +5852,6 @@ void MenuCostumeInit(mgCMemory *stack, int *tex_block, int mode) {
     MenuArg.result[2] = 0;
     MenuCamInit(1.0f);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuchr", MenuCostumeInit__FP9mgCMemoryPii);
-#endif
 int MenuCostumeKey() {
     return MenuCosPtr->KeyStep();
 }
@@ -6004,7 +5996,6 @@ void CMosBookMenu::InitEnd(void) {
     this->SetMonsterInfo(this->monster_info);
     FadeInMenu(0x32, 0.0f);
 }
-#ifdef STATEMATCHING
 void CMosBookMenu::Draw() {
     sceVu0FMATRIX view;
     sceVu0FVECTOR eye;
@@ -6203,9 +6194,6 @@ void CMosBookMenu::Draw() {
     font.SetPos(0x14C, 0x2D);
     font.DrawDirect(font.str, font.pos_x, font.pos_y);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuchr", Draw__12CMosBookMenuFv);
-#endif
 int CMosBookMenu::KeyStep(void) {
     int select;
     int lr;
@@ -6401,20 +6389,16 @@ void MonsterBookInit(mgCMemory *memory, int *texBlock, int bootMode) {
 int MonsterBookKey() {
     return MenuMosBookPtr->KeyStep();
 }
-#ifdef NONMATCHING
 void MonsterBookDraw() {
     MenuMosBookPtr->Draw();
     if (menu_debug_flag) {
-        DrawMenuFillBox(20.0f, 40.0f, 200.0f, 24.0f, 0x40, 0, 0, 0);
+        DrawMenuFillBox(20.0f, 40.0f, 200.0f, float(24), 0x40, 0, 0, 0);
         CMenuFont font;
         font.SetStr(at_5893);
         font.SetPos(20, 40);
         font.DrawDirect(font.str, font.pos_x, font.pos_y);
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuchr", MonsterBookDraw__Fv);
-#endif
 extern "C" void Set__9mgRect_s_Fssss(mgRect<short> *rect, short x, short y, short w, short h) {
     rect->left = x;
     rect->top = y;

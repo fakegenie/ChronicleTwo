@@ -127,27 +127,26 @@ void MyMenuHelpWinDraw(mgCDrawPrim *prim, RECT rect, int alpha) {
     screen8.Set(right, bottom, 0x18, 0x16);
     set2DSprite(prim, screen8, texture8, &color);
 }
-#ifdef NONMATCHING
 void MyMenuFloatingWinDraw(mgCDrawPrim *prim, RECT win, int point_x, int point_y,
                            RGBAQ_TYPE *frame_color, RGBAQ_TYPE *fill_color) {
-    int top_y;
     int inside_x;
     int side_y;
     int inside_width;
     int right_edge;
-    int inside_height;
-    int right_x;
     int bottom_edge;
+    int inside_height;
+    int top_y;
+    int right_x;
     int bottom_y;
     inside_x = win.x + 7;
     right_edge = win.x + win.width;
-    inside_height = win.height - 18;
     inside_width = win.width - 14;
-    right_x = right_edge - 7;
-    top_y = win.y;
-    side_y = win.y + 9;
     bottom_edge = win.y + win.height;
+    inside_height = win.height - 18;
+    top_y = win.y;
+    right_x = right_edge - 7;
     bottom_y = bottom_edge - 9;
+    side_y = win.y + 9;
     MySetPrim(prim, 1, 0);
     DrawWindowTile(prim, win.x, top_y, 7, 9, 0xa0, 0x0, 0x7, 0x9, fill_color);
     DrawWindowTile(prim, inside_x, top_y, inside_width, 9, 0xa7, 0x0, 0x22, 0x9, fill_color);
@@ -181,9 +180,6 @@ void MyMenuFloatingWinDraw(mgCDrawPrim *prim, RECT win, int point_x, int point_y
         DrawWindowTile(prim, point_x - 10, top_y, 0x15, 0x15, 0x91, 0x30, 0x15, 0x15, frame_color);
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/drawwin", MyMenuFloatingWinDraw__FP11mgCDrawPrim4RECTiiP10RGBAQ_TYPEP10RGBAQ_TYPE);
-#endif
 void DrawVersatileWin_1(mgCDrawPrim *prim, RECT rect, RGBAQ_TYPE *color, int alpha, int opaque) {
     mgRect<int> screen0;
     mgRect<int> texture0;
