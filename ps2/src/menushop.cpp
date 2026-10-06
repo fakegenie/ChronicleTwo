@@ -1821,7 +1821,6 @@ int CMenuQuestView::KeyStep() {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/menushop", KeyStep__14CMenuQuestViewFv);
 #endif
-extern "C" void *__ct__14CBaseMenuClassFv(void *);
 void MenuNPCQuestViewInit(mgCMemory *stack, int *tex_block, int view_mode) {
     Menu_Memo_ViewMode = 0;
     if (view_mode == 1) {

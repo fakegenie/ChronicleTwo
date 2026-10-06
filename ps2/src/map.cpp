@@ -31,19 +31,10 @@ extern char at_1927[];
 #include <cmath>
 #include <cstdlib>
 #include <cstdio>
-#include <cstring>
 
-#include "collision.hpp"
 #include "dataread.hpp"
-#include "mapparts.hpp"
-#include "mdslist.hpp"
 #include "mg_camera.hpp"
 #include "mg_drawprim.hpp"
-#include "mg_math.hpp"
-#include "mg_memory.hpp"
-#include "mg_sprite.hpp"
-#include "mg_texture.hpp"
-#include "mglib.hpp"
 #include "water.hpp"
 #include "vtables.hpp"
 
@@ -475,7 +466,6 @@ int CMap::ConvertParts(CMapParts *parts) {
     }
     return no;
 }
-extern "C" int GetBoundBox__9CMapPartsFP9mgVu0FBOX(void *, float *);
 int CMap::GetPlaceParts(mgVu0FBOX *box, CMapParts **out, int max) {
     float parts_box[8];
     char *parts;

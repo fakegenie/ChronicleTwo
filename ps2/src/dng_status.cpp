@@ -39,15 +39,10 @@ extern float cur_ang_1005;
 extern s8 init_1006;
 
 #pragma divbyzerocheck on
-#include <cmath>
 
 #include "actionchara.hpp"
-#include "dng_main.hpp"
-#include "maintex.hpp"
-#include "prespr.hpp"
 #include "scenesnd.hpp"
 #include "subgame.hpp"
-#include "userdata.hpp"
 // Code (.text)
 void PrintV(int x, int y, int value, mgCTexture *texture, mgRect<int> rect, int digit_count,
             int right_align, int spacing, SP_RGBA *color) {

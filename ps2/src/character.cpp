@@ -133,29 +133,9 @@ int _SKIN_IMG_END(SPI_STACK *stack, int argc);
 int _SKIN_MODEL(SPI_STACK *stack, int argc);
 int _LOD_MODEL_START(SPI_STACK *stack, int argc);
 int _LOD_MODEL_END(SPI_STACK *stack, int argc);
-#include "character.hpp"
 
-#include <cmath>
-#include <cstdio>
-#include <cstring>
 #include <libvu0.h>
 
-#include "dataread.hpp"
-#include "dynamicanime.hpp"
-#include "effect.hpp"
-#include "gameutil.hpp"
-#include "mg_dataset.hpp"
-#include "mg_frame.hpp"
-#include "mg_math.hpp"
-#include "mg_memory.hpp"
-#include "mg_sprite.hpp"
-#include "mg_texture.hpp"
-#include "mglib.hpp"
-#include "outline.hpp"
-#include "scriptinterpreter.hpp"
-#include "snd_mngr.hpp"
-#include "swordeffect.hpp"
-#include "visualmotion.hpp"
 
 
 

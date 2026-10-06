@@ -76,31 +76,19 @@ static inline u32 align16_blocks(u32 bytes) {
     }
     return bytes >> 4;
 }
-#include "mg_math.hpp"
-#include "mg_memory.hpp"
 #include "vtables.hpp"
 #include "mg_frame.hpp"
 #include "mg_drawenv.hpp"
-#include "mg_texture.hpp"
 #include "mg_tanime.hpp"
 #include "mg_camera.hpp"
-#include "mapparts.hpp"
-#include "mdslist.hpp"
 #include "map.hpp"
-#include "mapload.hpp"
 #include "editmap.hpp"
 #include "editparts.hpp"
 #include "scenesnd.hpp"
 #include "savedata.hpp"
-#include "mainloop.hpp"
-#include "dataread.hpp"
-#include "event_func.hpp"
 #include "snd_mngr.hpp"
-#include "mglib.hpp"
 
 #include <cmath>
-#include <cstdlib>
-#include <cstring>
 
 extern s32 rea_chara_id;
 extern s32 rea_mtn_step;
@@ -111,14 +99,11 @@ extern s32 fade_cnt;
 extern s32 sound_flag;
 extern s32 sound_cnt;
 extern s32 FirePowderFlag;
-extern FirePowder *fire_powder;
 extern s32 FirePowderTexb;
 extern mgC3DSprite *SpriteVis;
 extern mgCFrame *FirePowFrame;
 extern s32 GeyserEffectFlag;
-extern CGeyserEffect *GeyserEffect;
 extern s32 GeyserEffectTexb;
-extern mgCFrame *GeyserFrame;
 extern s32 GeyserRndSeed;
 
 // Code (.text)

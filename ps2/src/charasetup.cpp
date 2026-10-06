@@ -84,24 +84,12 @@ void SetupUnitMan(CScene *scene, CUserDataManager *user_data, int unit, ROBO_INF
 int SetupMints(CScene *scene, CUserDataManager *user_data);
 int SetupMonica(CScene *scene, CUserDataManager *user_data);
 int SetupMonster(CScene *scene, CUserDataManager *user_data);
-#include "actionchara.hpp"
-#include "character.hpp"
-#include "dataread.hpp"
-#include "dng_main.hpp"
 #include "gamedata.hpp"
-#include "mainloop.hpp"
 #include "maintex.hpp"
-#include "mapselect.hpp"
 #include "menuchr.hpp"
 #include "mg_memory.hpp"
-#include "savedata.hpp"
-#include "scenesnd.hpp"
-#include "userdata.hpp"
 
-#include <cstdio>
-#include <cstring>
 
-extern int mem_table[4][7];
 extern char r_robo_pname_1282[4][16];
 extern char fname_1290[64];
 /**

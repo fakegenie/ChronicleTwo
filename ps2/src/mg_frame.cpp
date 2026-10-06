@@ -8,7 +8,6 @@
 #include <libvu0.h>
 
 #include "mg_drawenv.hpp"
-#include "mg_drawprim.hpp"
 #include "mg_math.hpp"
 #include "mglib.hpp"
 

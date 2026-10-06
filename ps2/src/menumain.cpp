@@ -181,7 +181,6 @@ extern float menu_old_chara_position[4];
 extern float menu_old_chara_rotation[4];
 extern int MenuBGMVolume_Save;
 extern mgCMemory MenuMainStack;
-extern int (*menu_keyfunctbl[])(void);
 extern MenuKeyPageTable at_1514__4;
 extern signed char refresh_cnt_1523;
 extern signed char init_1524;

@@ -83,11 +83,7 @@ extern int ActionChanceDir;
 extern int NowFishSpeed;
 extern float NowFishRot;
 #include <libvu0.h>
-#include "mg_math.hpp"
 #include "gameutil.hpp"
-#include "mg_frame.hpp"
-#include "mg_drawprim.hpp"
-#include "mglib.hpp"
 #include "scenesnd.hpp"
 #include "dng_main.hpp"
 

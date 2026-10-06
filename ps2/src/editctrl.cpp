@@ -84,27 +84,11 @@ extern int FixCameraChgCnt;
 extern int ViewMode;
 
 #include <cmath>
-#include <cstring>
 #include <libvu0.h>
 
-#include "cameracontrol.hpp"
-#include "character.hpp"
 #include "dng_event.hpp"
-#include "editmap.hpp"
 #include "effscript.hpp"
-#include "gamepad.hpp"
 #include "gameutil.hpp"
-#include "helpmes.hpp"
-#include "inventmn.hpp"
-#include "mainloop.hpp"
-#include "mg_math.hpp"
-#include "mglib.hpp"
-#include "padcontrol.hpp"
-#include "photo.hpp"
-#include "savedata.hpp"
-#include "scenesnd.hpp"
-#include "sphida.hpp"
-#include "userdata.hpp"
 
 #ifdef NONMATCHING
 static int           LadderMode;           /**< End of the ladder the player entered. */

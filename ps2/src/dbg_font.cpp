@@ -4,8 +4,6 @@
 #include "mg_texture.hpp"
 #include "mg_memory.hpp"
 #include "dbg_font.hpp"
-#include "mg_drawprim.hpp"
-#include "mg_texture.hpp"
 #include "mglib.hpp"
 #include <cstdio>
 #include <cstring>

@@ -9481,8 +9481,6 @@ int MenuItemKey(void) {
     }
 }
 int CheckFishCondition(void);
-extern s8 menu_camera_reference_id;
-extern s8 menu_camera_reference_no;
 void MenuItemDraw(void) {
     DrawMenuFillBox(0x80, 0, 0, 0);
     switch (CMenuItemInfoPt->sub_menu) {

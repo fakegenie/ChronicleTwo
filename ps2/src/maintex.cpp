@@ -46,26 +46,10 @@ extern char at_830__5[];
 extern char at_831__4[];
 extern char at_832__4[];
 
-#include <cstdio>
 
-#include "character.hpp"
-#include "colprim.hpp"
-#include "dataread.hpp"
 #include "dng_effect.hpp"
 #include "dng_main.hpp"
-#include "dng_hud.hpp"
 #include "effectlist.hpp"
-#include "gaiji.hpp"
-#include "mainloop.hpp"
-#include "mg_memory.hpp"
-#include "mg_texture.hpp"
-#include "mglib.hpp"
-#include "monster.hpp"
-#include "photo.hpp"
-#include "scenesnd.hpp"
-#include "snd_mngr.hpp"
-#include "swordeffect.hpp"
-#include "userdata.hpp"
 
 #ifdef NONMATCHING
 mgCTexture *TEX_ShadowTexture;

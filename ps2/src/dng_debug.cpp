@@ -53,28 +53,11 @@ extern char at_973__2[];
 extern char at_974__2[];
 extern char at_975[];
 extern CFont dbFont;
-#include "dng_debug.hpp"
 #include "colprim.hpp"
-#include "actionchara.hpp"
-#include "dng_event.hpp"
-#include "dng_main.hpp"
-#include "effscript.hpp"
-#include "font.hpp"
 #include "gamepad.hpp"
-#include "mainloop.hpp"
-#include "mg_drawprim.hpp"
-#include "mg_memory.hpp"
-#include "mg_texture.hpp"
-#include "mglib.hpp"
-#include "monster.hpp"
-#include "prespr.hpp"
 #include "savedata.hpp"
-#include "savedatadungeon.hpp"
 #include "scenesnd.hpp"
-#include "snd_mngr.hpp"
 #include "userdata.hpp"
-#include <cstdio>
-#include <cstdlib>
 
 extern int command_int[];
 extern char *command_str[];

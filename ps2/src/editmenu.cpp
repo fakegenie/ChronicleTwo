@@ -340,7 +340,6 @@ extern char at_1277__2[];
 extern char at_1278__2[];
 extern char at_1299__3[];
 extern char at_1300__3[];
-extern float menu_georama_title_pos[2];
 extern char at_1860[];
 extern char at_2654[];
 extern char at_2655[];

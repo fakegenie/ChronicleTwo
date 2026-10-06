@@ -37,21 +37,9 @@ extern u32 wait_cnt_918;
 extern mgCTexture *MenuChapterBG;
 extern mgCTexture *MenuChapter_Logo;
 #include "mg_memory.hpp"
-#include "mg_texture.hpp"
-#include "mg_drawprim.hpp"
 #include "mg_tanime.hpp"
-#include "mglib.hpp"
-#include "menucommon.hpp"
-#include "menudraw.hpp"
-#include "menumain.hpp"
-#include "mainloop.hpp"
-#include "scenesnd.hpp"
-#include "sound.hpp"
 #include "snd_mngr.hpp"
-#include "dataread.hpp"
 
-#include <cstdio>
-#include <cstring>
 
 extern mgCMemory MenuChapterStack;
 extern char *chap_voice_851[8];
