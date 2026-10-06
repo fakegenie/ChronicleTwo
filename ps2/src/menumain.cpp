@@ -1763,7 +1763,6 @@ void CopyActiveItemAndWeapon(int slot, int weaponSlot) {
 #ifdef NONMATCHING
 int CopyActiveIconTexture(mgCTexture **textures, int chara_no, u_int *unused) {
     CUserDataManager *user = GetUserDataMan();
-    int x;
     int offset;
     if (user == NULL) {
         return 0;
@@ -1813,8 +1812,7 @@ int CopyActiveIconTexture(mgCTexture **textures, int chara_no, u_int *unused) {
             }
         }
         pixels = (u8 *)textures[sheet]->image[0];
-        offset = 0;
-        for (slot = 0; slot < loopnumtbl_2360[sheet]; ++slot, offset += 0x20) {
+        for (slot = 0, offset = 0; slot < loopnumtbl_2360[sheet]; offset += 0x20, ++slot) {
             if (slot < 2) {
                 dest = pixels + offset;
             } else {
@@ -1823,14 +1821,15 @@ int CopyActiveIconTexture(mgCTexture **textures, int chara_no, u_int *unused) {
             int item_no = items[sheet * 4 + slot];
             if (item_no <= 0) {
                 for (row = 0; row < 0x20; ++row) {
-                    for (x = 0; x < 0x20; x++) {
+                    for (int x = 0; x < 0x20; x++) {
                         dest[x] = transparent;
                     }
                     dest += 0x40;
                 }
             } else {
                 int icon_no = GetItemIconNo(item_no);
-                source = (u8 *)icon_sheet[sheet]->image[0] + (icon_no % 8) * 0x20 + (icon_no / 8) * 0x2000;
+                source = (u8 *)icon_sheet[sheet]->image[0];
+                source += (icon_no % 8) * 0x20 + (icon_no / 8) * 0x2000;
                 for (row = 0; row < 0x20; ++row) {
                     memcpy(dest, source, 0x20);
                     dest += 0x40;
