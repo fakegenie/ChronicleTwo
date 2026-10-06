@@ -1302,13 +1302,13 @@ int mgCVisualPrim::CreateRenderInfoPacket(u_int *packet, float (*matrix)[4], mgR
     *(u_long128 *)tag = 0;
     tag[0] = 0x10000007;
     tag[3] = 0x50000007;
+    *(u_long *)&start[12] = 0;
     *(u_long128 *)start = *(u_long128 *)tag;
     giftag.word0 = 0x8002;
     *(u_long128 *)&start[4] = *(u_long128 *)&giftag;
-    u_int *body = start + 8;
     *(u_long *)&start[8] = 1;
+    u_int *body = start + 8;
     *(u_long *)&start[10] = MG_GS_PRMODECONT;
-    *(u_long *)&start[12] = 0;
     *(u_long *)&start[14] = SCE_GS_TEXFLUSH;
     environment = (mgCDrawEnv *)(body + 8);
     if (draw_env != NULL) {
