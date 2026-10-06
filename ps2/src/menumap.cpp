@@ -188,7 +188,6 @@ void CWorldMapMenu::SetMsgBuffer() {
     ((ClsMes *)MenuDCMsg[3])->push_button = 0;
     ((ClsMes *)MenuDCMsg[3])->fade_speed = 1.0f;
 }
-#ifdef NONMATCHING
 extern char at_1302__4[];
 extern char at_1303__4[];
 extern char at_1304__5[];
@@ -260,9 +259,9 @@ int CWorldMapMenu::KeyStep() {
         exit_wait = 0;
         back_alpha = 0.0f;
         WorldMapStack.Align64();
+        char *script = (char *)WorldMapStack.stGetTop();
         unsigned int size;
-        u_long128 *script = WorldMapStack.stGetTop();
-        size = LoadFileMenu(at_1312, script, 1);
+        size = LoadFileMenu(at_1312, (u_long128 *)script, 1);
         unsigned int blocks;
         if (size & 0xF) {
             blocks = (size >> 4) + 1;
@@ -270,7 +269,7 @@ int CWorldMapMenu::KeyStep() {
             blocks = size >> 4;
         }
         WorldMapStack.Alloc(blocks);
-        worldmap_analyze(&WorldMapStack, (char *)script, size);
+        worldmap_analyze(&WorldMapStack, script, size);
         area_no = GetSaveData()->area_no;
         if (MapEnableNum <= 0) {
             cursor_tex = NULL;
@@ -492,7 +491,7 @@ int CWorldMapMenu::KeyStep() {
                 }
                 if (select_pos == NULL) {
                     MenuSePlay(5);
-                } else if (MenuMainScene->now_map_no == select_pos->map_no) {
+                } else if (select_pos->map_no == MenuMainScene->GetNowMapNo()) {
                     MenuSePlay(5);
                 } else {
                     next_step = WORLD_MAP_STEP_ASK;
@@ -628,9 +627,6 @@ int CWorldMapMenu::KeyStep() {
     }
     return result;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menumap", KeyStep__13CWorldMapMenuFv);
-#endif
 #ifdef NONMATCHING
 extern char at_1498__3[];
 void CWorldMapMenu::Draw() {
@@ -784,9 +780,11 @@ void CWorldMapMenu::Draw() {
         name_mes->line_pos[0][0] -= 10;
         name_mes->line_pos[0][1] -= 15;
         MenuReloadTexture(loaded_tex, map_tex->block);
+        int frame_x = name_mes->line_pos[0][0] - 0x10;
+        int frame_y = name_mes->line_pos[0][1] - 0xC;
         int frame_step[4] = {0x1E, 0, 0x1E, 0};
         frame_step[1] = name_mes->line_w[0] - 0x1E;
-        mgRect<int> frame(name_mes->line_pos[0][0] - 0x10, name_mes->line_pos[0][1] - 0xC, 0x1E, 0x2E);
+        mgRect<int> frame(frame_x, frame_y, 0x1E, 0x2E);
         SetSpriteEnv(prim, 0);
         prim->Begin(6);
         prim->Texture(mark_tex);
@@ -834,8 +832,8 @@ void CWorldMapMenu::Draw() {
         list_mes->StepMsg();
         list_mes->DrawMsg();
         MenuReloadTexture(loaded_tex, mark_tex->block);
-        float icon_y = 25.0f + put_pos[1];
         float icon_x = 24.0f + put_pos[0];
+        float icon_y = 25.0f + put_pos[1];
         SetSpriteEnv(prim, 0);
         prim->Begin(6);
         prim->Texture(mark_tex);
@@ -1107,7 +1105,6 @@ int OmakeSfidaSelect(int key) {
     return movement;
 }
 
-#ifdef NONMATCHING
 int SphidaMenuKey() {
     int select_key = MenuCommonInfo->CheckSelectKey() | MenuCommonInfo->CheckLRKey();
     int push_button = MenuCommonInfo->CheckPushButton();
@@ -1281,11 +1278,10 @@ int SphidaMenuKey() {
                 if (player == NULL || player->name[0] == 0) {
                     MenuSePlay(5);
                 } else {
-                    char *clear_names[2] = {NULL, NULL};
-
                     question->MsgPreset(0xB);
                     question->SetAbsPos(5);
                     question->MakeMsg(0x13F1);
+                    char *clear_names[2] = {NULL, NULL};
                     clear_names[0] = player->name;
                     question->SetMsgItemNo(clear_names, 1);
                     question->SetMsgCursor(1);
@@ -1338,7 +1334,7 @@ int SphidaMenuKey() {
     }
     SphidaScreListUpdate(SphidaScore, list_changed);
     SfidaBGXY += 0.5f;
-    if (SfidaBGXY >= 0.0f) {
+    if (0.0f <= SfidaBGXY) {
         SfidaBGXY -= 256.0f;
     }
     question->StepMsg();
@@ -1347,9 +1343,6 @@ int SphidaMenuKey() {
     MenuDCMsg[2]->StepMsg();
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menumap", SphidaMenuKey__Fv);
-#endif
 #ifdef NONMATCHING
 extern float SphidaScoreListY;
 extern float SphidaScoreListBarY;
@@ -1435,7 +1428,7 @@ void SphidaMenuDraw() {
         mgTexManager.ReloadTexture(SphidaCursor->block, (sceVif1Packet *)NULL);
         CalcMenu1((float)(list_rect[1] + 0xD + (SphidaSelect[0] - SphidaSelect[1]) * 0x18), &SphidaCursorY, 4.0f, 3.2f, 0);
         SphidaCursorCount++;
-        if (SphidaCursorCount >= 59999999) {
+        if (SphidaCursorCount > 59999998) {
             SphidaCursorCount = 0;
         }
         float cursor_x = (float)(list_rect[0] - 0xC) + 8.0f * cosf(mgAngleLimit(0.05235988f * SphidaCursorCount));
@@ -1461,7 +1454,7 @@ void SphidaMenuDraw() {
         if (LanguageCode > 0) {
             line_x = list_rect[0] + 0x3A;
         }
-        for (int line = 0; line < 9; line++, line_y += 24.0f) {
+        for (int line = 0; line <= 8; line++, line_y += 24.0f) {
             SphidaScore->SetMovePosGyou(line, line_x, fptosi(line_y));
         }
         SphidaScore->DrawMsg();

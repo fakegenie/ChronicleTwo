@@ -1066,7 +1066,8 @@ int sgSysDrawGyoRace(SubGameInfo *info) {
         temp_f3 = width * (spA0.pos / 16.0f);
         lane = (int *)((u_char *)&RaceInfo + var_17 + 0x48);
         DrawMenuFillBox(41.0f + temp_f3, 35.0f + (10.0f * (float) *lane), width - temp_f3, 2.0f, 0x4A, 0x70, 0xD9, 0x8B);
-        DrawMenuFillBox(41.0f, (float) ((*lane * 0xA) + 0x23), 326.0f * (spA0.pos / 16.0f), 2.0f, 0x54, 0xE5, 0x8B, 0x29);
+        float filled = 326.0f * (spA0.pos / 16.0f);
+        DrawMenuFillBox(41.0f, (float) ((*lane * 0xA) + 0x23), filled, 2.0f, 0x54, 0xE5, 0x8B, 0x29);
         spC0.Set((int)(31.0f + (float) (int)(326.0f * (spA0.pos / 16.0f))), (*lane * 0xA) + 0x1C, 0x12, 0xC);
         if ((var_16 == hero_no) && (OmakeFlag == 0)) {
             spD0.Set(0x1EE, 0xC, 0x12, 0xC);

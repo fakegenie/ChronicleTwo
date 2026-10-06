@@ -1677,6 +1677,7 @@ void CEventScriptArg::BuildArgData(u32 *program) {
 #ifdef NONMATCHING
 int _DATA(RS_STACKDATA *stack, int argc) {
     CEventScriptArg *script = nowScriptArg;
+    char *source;
     if (script == NULL) {
         return 0;
     }
@@ -1731,7 +1732,7 @@ int _DATA(RS_STACKDATA *stack, int argc) {
                 arg->f = GetStackFloat__FP12RS_STACKDATA__2(stack++);
                 break;
             case RS_STR: {
-                char *source = GetStackString__FP12RS_STACKDATA__2(stack++);
+                source = GetStackString__FP12RS_STACKDATA__2(stack++);
                 CEventScriptArg *owner = nowScriptArg;
                 char *copy = NULL;
                 if (owner->memory != NULL) {
@@ -2089,7 +2090,6 @@ void CScreenEffect::SetSepiaTexture(mgCTexture *texture, u_long128 *image) {
         sepia_texture->image[0] = image;
     }
 }
-#ifdef NONMATCHING
 void CScreenEffect::CaptureSepiaScreen(void) {
     if (sepia_texture == NULL) {
         return;
@@ -2098,11 +2098,11 @@ void CScreenEffect::CaptureSepiaScreen(void) {
     mgGetFrameBackBuffer(&screen);
     mgStoreImage(&screen, sepia_texture->image[0]);
     u_char *pixels = (u_char *)sepia_texture->image[0];
-    for (int i = 0; i < mgScreenWidth * mgScreenHeight * 4; i += 4) {
+    for (int i = 0; i < mgScreenHeight * mgScreenWidth * 4; i += 4) {
         u_char *red = &pixels[i];
         u_char *green = &pixels[i + 1];
         u_char *blue = &pixels[i + 2];
-        int gray = fptoui(0.229f * (float)(u_int)*red + 0.587f * (float)(u_int)*green + 0.114f * (float)(u_int)*blue) & 0xFF;
+        int gray = (u_int)(0.229f * (float)(u_int)*red + 0.587f * (float)(u_int)*green + 0.114f * (float)(u_int)*blue) & 0xFF;
         if (gray > 0x40) {
             *red = (gray - 0x40) * 180 / 191 + 75;
             *green = (gray - 0x40) * 193 / 191 + 62;
@@ -2114,9 +2114,6 @@ void CScreenEffect::CaptureSepiaScreen(void) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/event_func", CaptureSepiaScreen__13CScreenEffectFv);
-#endif
 void CScreenEffect::SetSepiaFlag(int enabled) {
     if (sepia_texture != NULL) {
         sepia = enabled;
@@ -2144,16 +2141,16 @@ void CScreenEffect::CaptureMonoFlashScreen(void) {
     mgStoreImage(&screen, mono_flash_texture[1]->image[0]);
     u_char *positive = (u_char *)mono_flash_texture[0]->image[0];
     u_char *negative = (u_char *)mono_flash_texture[1]->image[0];
-    for (int i = 0; i < mgScreenWidth * mgScreenHeight * 4; i += 4) {
+    for (int i = 0; i < mgScreenHeight * mgScreenWidth * 4; i += 4) {
         u_char *red = &positive[i];
         u_char *green = &positive[i + 1];
         u_char *blue = &positive[i + 2];
-        *blue = *green = *red = fptoui(0.229f * (float)(u_int)*red + 0.587f * (float)(u_int)*green + 0.114f * (float)(u_int)*blue);
+        *red = *green = *blue = (u_int)(0.229f * (float)(u_int)*red + 0.587f * (float)(u_int)*green + 0.114f * (float)(u_int)*blue);
         red = &negative[i];
         green = &negative[i + 1];
         blue = &negative[i + 2];
-        char gray = fptoui(0.229f * (float)(u_int)*red + 0.587f * (float)(u_int)*green + 0.114f * (float)(u_int)*blue);
-        *blue = *green = *red = 255 - gray;
+        char gray = (u_int)(0.229f * (float)(u_int)*red + 0.587f * (float)(u_int)*green + 0.114f * (float)(u_int)*blue);
+        *red = *green = *blue = 255 - gray;
     }
 }
 #else
@@ -3043,45 +3040,43 @@ int _LOAD_CHARA_sub(int stackNo, char **name, int charaNo, u32 *pack, int mode) 
 int _LOAD_CHARA_sub(int a, char **b, int c, u32 *d) {
     return _LOAD_CHARA_sub(a, b, c, d, 0);
 }
-#ifdef NONMATCHING
 int _LOAD_CHARA(RS_STACKDATA *stack, int argc) {
     char *name[0x20];
     char directory[0x40];
     char fileName[0x20];
     int stackNo;
-    char *path;
     int charaNo;
     int mode;
-    if (argc != 5) {
-        switch (argc) {
-            case 1: {
-                ARG_DATA *args = FindArgData(GetStackInt__FP12RS_STACKDATA__2(stack));
-                if (args == NULL) {
-                    return 0;
-                }
-                stackNo = GetArgInt(args++);
-                path = GetArgString(args++);
-                name[0] = GetArgString(args++);
-                charaNo = GetArgInt(args);
-                mode = 0;
-                break;
-            }
-            case 4:
-                stackNo = GetStackInt__FP12RS_STACKDATA__2(stack++);
-                path = GetStackString__FP12RS_STACKDATA__2(stack++);
-                name[0] = GetStackString__FP12RS_STACKDATA__2(stack++);
-                charaNo = GetStackInt__FP12RS_STACKDATA__2(stack);
-                mode = 0;
-                break;
-            default:
+    char *path;
+    switch (argc) {
+        case 1: {
+            ARG_DATA *args = FindArgData(GetStackInt__FP12RS_STACKDATA__2(stack));
+            if (args == NULL) {
                 return 0;
+            }
+            stackNo = GetArgInt(args++);
+            path = GetArgString(args++);
+            name[0] = GetArgString(args++);
+            charaNo = GetArgInt(args);
+            mode = 0;
+            break;
         }
-    } else {
-        stackNo = GetStackInt__FP12RS_STACKDATA__2(stack++);
-        path = GetStackString__FP12RS_STACKDATA__2(stack++);
-        name[0] = GetStackString__FP12RS_STACKDATA__2(stack++);
-        charaNo = GetStackInt__FP12RS_STACKDATA__2(stack++);
-        mode = GetStackInt__FP12RS_STACKDATA__2(stack);
+        case 4:
+            stackNo = GetStackInt__FP12RS_STACKDATA__2(stack++);
+            path = GetStackString__FP12RS_STACKDATA__2(stack++);
+            name[0] = GetStackString__FP12RS_STACKDATA__2(stack++);
+            charaNo = GetStackInt__FP12RS_STACKDATA__2(stack);
+            mode = 0;
+            break;
+        case 5:
+            stackNo = GetStackInt__FP12RS_STACKDATA__2(stack++);
+            path = GetStackString__FP12RS_STACKDATA__2(stack++);
+            name[0] = GetStackString__FP12RS_STACKDATA__2(stack++);
+            charaNo = GetStackInt__FP12RS_STACKDATA__2(stack++);
+            mode = GetStackInt__FP12RS_STACKDATA__2(stack);
+            break;
+        default:
+            return 0;
     }
     u32 *pack = GetLoadBGBuff(path, NULL);
     if (pack == NULL) {
@@ -3104,9 +3099,6 @@ int _LOAD_CHARA(RS_STACKDATA *stack, int argc) {
     }
     return result;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/event_func", _LOAD_CHARA__FP12RS_STACKDATAi);
-#endif
 int _CHARA_ACTIVE(RS_STACKDATA *stack, int argCount) {
     int enable;
     int charaNo;
@@ -3395,10 +3387,10 @@ int _LOAD_IMG(RS_STACKDATA *stack, int argc) {
     int stackNo = GetStackInt__FP12RS_STACKDATA__2(stack++);
     char *fileName = GetStackString__FP12RS_STACKDATA__2(stack++);
     int imageNo = GetStackInt__FP12RS_STACKDATA__2(stack++);
-    int block = EventScene->event_texb + imageNo;
     if (EventScene->event_texb_num <= 0 || EventScene->event_texb_num < imageNo) {
         return 0;
     }
+    int block = EventScene->event_texb + imageNo;
     u_char *file = (u_char *)GetLoadBGBuff(fileName, &size);
     if (file == NULL) {
         return 0;
@@ -3954,6 +3946,7 @@ int _TRG_PAKU_ANIM(RS_STACKDATA *stack, int argc) {
 }
 #ifdef NONMATCHING
 int _RESET_CAMERA(RS_STACKDATA *stack, int argc) {
+    int mode;
     float follow[4];
     float followOffset[4];
     float charaPos[4];
@@ -3965,14 +3958,13 @@ int _RESET_CAMERA(RS_STACKDATA *stack, int argc) {
     mgCCameraFollow *referenceCamera;
     mgCCameraFollow *beforeCamera;
     CCharacter2 *chara;
-    float angle = 0.0f;
-    float height = 0.0f;
     float dx;
     float dy;
     float dz;
     float distance;
-    int mode;
     mode = GetStackInt__FP12RS_STACKDATA__2(stack++);
+    float height = 0.0f;
+    float angle = 0.0f;
     if (argc > 1) {
         angle = GetStackFloat__FP12RS_STACKDATA__2(stack++);
     }
@@ -6300,7 +6292,6 @@ int _SET_EVENT_DATA(RS_STACKDATA *stack, int argc) {
     }
     return 1;
 }
-#ifdef NONMATCHING
 int _STOPWATCH(RS_STACKDATA *stack, int argc) {
     CSaveData *saveData = GetSaveData();
     if (saveData == NULL) {
@@ -6326,7 +6317,7 @@ int _STOPWATCH(RS_STACKDATA *stack, int argc) {
             SetStack__FP12RS_STACKDATAi__2(stack++, elapsed / 3600);
             SetStack__FP12RS_STACKDATAi__2(stack++, elapsed % 3600 / 60);
             SetStack__FP12RS_STACKDATAi__2(stack++, elapsed % 60 * 100 / 60);
-            SetStack__FP12RS_STACKDATAi__2(stack, elapsed < 7261);
+            SetStack__FP12RS_STACKDATAi__2(stack++, elapsed < 7261);
             return 1;
         }
     }
@@ -6342,9 +6333,6 @@ int _STOPWATCH(RS_STACKDATA *stack, int argc) {
     }
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/event_func", _STOPWATCH__FP12RS_STACKDATAi);
-#endif
 int _SET_FUNC_ETC(RS_STACKDATA *stack, int argc) {
     u32 *flags;
 
@@ -8839,7 +8827,6 @@ int _OBJS_SET_EOH_FRAME_POS(RS_STACKDATA *stack, int argc) {
     seq->SetEohFramePos(eohNo, frameName, frames, offset);
     return 1;
 }
-#ifdef NONMATCHING
 int _OBJS_ADD_POS(RS_STACKDATA *stack, int argc) {
     float add[4];
     int index;
@@ -8861,7 +8848,7 @@ int _OBJS_ADD_POS(RS_STACKDATA *stack, int argc) {
             GetStackVector__FPfP12RS_STACKDATA(add, stack);
             stack += 3;
             if (argc >= 5) {
-                frame = GetStackInt__FP12RS_STACKDATA__2(stack);
+                frame = GetStackInt__FP12RS_STACKDATA__2(stack++);
             }
             break;
         default:
@@ -8874,9 +8861,6 @@ int _OBJS_ADD_POS(RS_STACKDATA *stack, int argc) {
     seq->AddPos(add, frame);
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/event_func", _OBJS_ADD_POS__FP12RS_STACKDATAi);
-#endif
 int _OBJS_ATTACH_CAMERA(RS_STACKDATA *stack, int argc) {
     CSceneObjSeq *seq;
     int slot;
@@ -10393,8 +10377,6 @@ int _EOH_SET_TEX_ANIM(RS_STACKDATA *stack, int argc) {
                 return EventObjHandleMother.SetTexAnim(no, GetStackInt__FP12RS_STACKDATA__2(stack + 1), GetStackString__FP12RS_STACKDATA__2(stack + 2));
             }
             return 0;
-        default:
-            return 0;
         case RS_STR: {
             if (argc == 2) {
                 return EventObjHandleMother.SetTexAnim(no, 1, GetStackString__FP12RS_STACKDATA__2(stack + 1));
@@ -10404,6 +10386,7 @@ int _EOH_SET_TEX_ANIM(RS_STACKDATA *stack, int argc) {
             return EventObjHandleMother.SetTexAnim(no, 0, offName) ? EventObjHandleMother.SetTexAnim(no, 1, onName) : 0;
         }
     }
+    return 0;
 }
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/event_func", _EOH_SET_TEX_ANIM__FP12RS_STACKDATAi);
@@ -12666,8 +12649,8 @@ int _CANCEL_NOW_LOADING(RS_STACKDATA *stack, int argc) {
 }
 #ifdef NONMATCHING
 int _ESM_INITIALIZE(RS_STACKDATA *stack, int argc) {
-    int texbOffset = 0;
     int stackNo;
+    int texbOffset = 0;
     mgCMemory *memory;
     stackNo = GetStackInt__FP12RS_STACKDATA__2(stack++);
     if (argc >= 2) {

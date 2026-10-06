@@ -1261,11 +1261,10 @@ void DrawMenuFillBox(mgCDrawPrim *prim, float x, float y, float width, float hei
     prim->Vertex(x + width, y + height, 0.0f);
     prim->End();
 }
-#ifdef NONMATCHING
 void GenarateRandamLine(int *origin, int width, int height, int *points, int count, int unused) {
     int rising = 1;
-    float progress;
     float sway;
+    float progress;
     int offset = 0;
     int i;
     for (i = 0; i < count; i++) {
@@ -1289,16 +1288,15 @@ void GenarateRandamLine(int *origin, int width, int height, int *points, int cou
             }
         }
     }
+    int y;
     int stride = GetRandI(7) + 4;
     for (i = 0; i < count && i + stride < count; i += stride) {
-        int y = points[i * 2 + 1];
-        points[i * 2 + 1] = points[((i + stride) << 1) + 1];
-        points[((i + stride) << 1) + 1] = y;
+        int j = ((i + stride) << 1) + 1;
+        y = points[i * 2 + 1];
+        points[i * 2 + 1] = points[j];
+        points[j] = y;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", GenarateRandamLine__FPiiiPiii);
-#endif
 void DrawRandamLine(mgCDrawPrim *prim, int *points, int smoothing, int count, u8 *color) {
     float source[1000][4];
     float smoothed[2000][4];
@@ -2027,37 +2025,38 @@ void MenuMainFrameDraw(int &loaded_tex, int unused) {
     prim->Vertex(fptosi(x4 + size), fptosi(y4 + 1.25f * size), 0);
     prim->End();
 }
-#ifdef NONMATCHING
 void MenuMainFrameImgDraw(int &loaded_tex_no) {
     mgRect<int> dest(0, 0, 0, 0);
     mgRect<int> source(0, 0, mgScreenWidth / 2, mgScreenHeight / 2);
     int alpha = (int)(128.0f * (MenuMainFrame_Display_Mode_Cnt / 10.0f));
     dest = MenuMainIMG_PutRect;
-    if (MenuMainFrame_Display_Mode == 1 || MenuMainFrame_Display_Mode == 0) {
+    switch (MenuMainFrame_Display_Mode) {
+    case 0:
+    case 1:
         if (MenuMainFrame_Display_Mode == 1) {
             alpha = 0x80;
         }
-    } else {
+        break;
+    default:
         dest.left = (int)(MenuMainFrame_Lenze_Pos[0] - 194.0f);
         dest.top = (int)(MenuMainFrame_Lenze_Pos[1] - 184.61539f);
+        break;
     }
     mgRect<int> screen(0, 0, mgScreenWidth, mgScreenHeight);
     DrawMenuMainFrmImg(loaded_tex_no, screen, source, 0x80, 0x80, 0x80, alpha, 0);
     dest.bottom += 1;
     DrawMenuMainFrmImg(loaded_tex_no, dest, source, 0x80, 0x80, 0x80, alpha, 0);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", MenuMainFrameImgDraw__FRi);
-#endif
 #ifdef NONMATCHING
 void DrawMenuWakuStep(void) {
-    float move[2][3] = {{-0.2f, 0.0f, 18.0f}, {0.2f, 18.0f, 0.0f}};
+    float move[6] = {-0.2f, 0.0f, 18.0f, 0.2f, 18.0f, 0.0f};
     int i;
     for (i = 0; i < 2; i++) {
         float *axis = &MenuWakuPutXY[i];
-        float *entry = move[i];
-        *axis += entry[0];
-        if (CalcMenuAdd(axis, entry[0], entry[1]) != 0) {
+        float *entry = &move[i * 3];
+        float rate = entry[0];
+        *axis += rate;
+        if (CalcMenuAdd(axis, rate, entry[1]) != 0) {
             *axis = entry[2];
         }
     }
@@ -2441,25 +2440,25 @@ MENUFORMPARTS_TYPE *CMenuPosDataForm::GetEnableEnterPart(void) {
 }
 #ifdef NONMATCHING
 int CMenuPosDataForm::GetNowPosRGBA(MENUFORMPARTS_TYPE *part, MENU_BASETEXINFO *tex_info, float *pos, u8 *rgba) {
-    MENU_PARTS_EFFECT_STRUCT1 *effect;
-    int i;
-    int k;
-    int n;
-    float center_x;
-    float center_y;
-    float angle;
-    float phase;
+    int dy;
+    int dx;
+    short color;
     float cos_angle;
     float sin_angle;
-    float scale_x;
+    float center_x;
+    float sway[4][2];
+    int k;
+    float phase;
+    MENU_PARTS_EFFECT_STRUCT1 *effect;
+    int i;
+    float center_y;
     float scale_y;
     float grow;
-    float shrink;
-    int dx;
-    int dy;
     float rot[4][4];
-    float sway[4][2];
-    short color;
+    int n;
+    float scale_x;
+    float angle;
+    float shrink;
 
     if (part == NULL) {
         return 0;
@@ -2515,8 +2514,8 @@ int CMenuPosDataForm::GetNowPosRGBA(MENUFORMPARTS_TYPE *part, MENU_BASETEXINFO *
             }
         } else if (effect->type == MENU_PARTS_EFFECT_STRETCH || effect->type == MENU_PARTS_EFFECT_STRETCH_REP) {
             grow = effect->param[0] / 3.0f;
-            scale_x = effect->param[4] + grow;
-            scale_y = effect->param[5] + grow;
+            scale_x = grow + effect->param[4];
+            scale_y = grow + effect->param[5];
             if (effect->type == MENU_PARTS_EFFECT_STRETCH_REP && grow > effect->param[1] / 2.0f) {
                 shrink = effect->param[1] - grow;
                 scale_x = (effect->param[4] - shrink) / 100.0f;
@@ -2540,14 +2539,10 @@ int CMenuPosDataForm::GetNowPosRGBA(MENUFORMPARTS_TYPE *part, MENU_BASETEXINFO *
             sway[2][1] = sin_angle;
             sway[3][0] = sin_angle;
             sway[3][1] = sin_angle;
-            pos[0] += effect->param[4] * sway[0][0];
-            pos[1] += effect->param[5] * sway[0][1];
-            pos[2] += effect->param[4] * sway[1][0];
-            pos[3] += effect->param[5] * sway[1][1];
-            pos[4] += effect->param[4] * sway[2][0];
-            pos[5] += effect->param[5] * sway[2][1];
-            pos[6] += effect->param[4] * sway[3][0];
-            pos[7] += effect->param[5] * sway[3][1];
+            for (k = 0; k < 4; k++) {
+                pos[k * 2] += effect->param[4] * sway[k][0];
+                pos[k * 2 + 1] += effect->param[5] * sway[k][1];
+            }
         }
     }
     return 1;
@@ -2670,7 +2665,8 @@ static void DrawItemIconEffect2(mgCDrawPrim *prim, mgCTexture *tex, MENUFORMPART
                 alpha = (int)(64.0f * sinf((3.1415927f / effect->param[1]) * effect->param[0]));
                 color = &star_color_table[(int)(3.0f * effect->param[4])];
                 prim->Color(color[0], color[1], color[2], alpha);
-                for (k = 0, n = 0; k < 4; k++, n += 2) {
+                n = 0;
+                for (k = 0; k < 4; k++, n += 2) {
                     dx = scale * ((float)center_x - corners[k][0]);
                     dy = scale * ((float)center_y - corners[k][1]);
                     corners[k][0] = center_x + dx * cos_angle - dy * sin_angle;
@@ -3253,7 +3249,7 @@ int CMenuPosDataForm::GetNextMovePos(int *pos) {
             target_pos = target[i];
             rate_now = rate[i];
             diff = (float)(target_pos - now[i]);
-            now[i] = (int)((float)now[i] + diff / rate_now);
+            now[i] = (int)(diff / rate_now + (float)now[i]);
             if ((float)abs(target_pos - now[i]) <= rate_now) {
                 if (mtype != MENUFORM_MTYPE_IR) {
                     if (diff > 0.0f) {
@@ -4533,10 +4529,10 @@ void MenuItemBrdItemIconEffectMalloc(mgCMemory *memory, MENUFORMPARTS_TYPE *part
 #ifdef NONMATCHING
 void CMenuPosDataManage::MallocPallet(mgCMemory *stack) {
     int i;
-    int j;
     int k;
     int grey;
     u8 *color;
+    int j;
 
     stack->Align64();
     texture_pair icon_tex = at_4526;
@@ -4569,7 +4565,7 @@ void CMenuPosDataManage::MallocPallet(mgCMemory *stack) {
             for (j = 0; j < 256; j++, color += 4) {
                 grey = (color[0] + color[1] + color[2]) / 3;
                 for (k = 1; k < 17; k++) {
-                    if (grey >= (k - 1) * 16 && grey < k * 16) {
+                    if (16 * (k - 1) <= grey && grey < k * 16) {
                         color[0] = (k - 1) * 16;
                         color[1] = (k - 1) * 16;
                         color[2] = (k - 1) * 16;
@@ -4580,9 +4576,9 @@ void CMenuPosDataManage::MallocPallet(mgCMemory *stack) {
             item_icon_tex[2][i]->clut = pallet[1][i];
             color = (u8 *)pallet[2][i];
             for (j = 0; j < 256; j++, color += 4) {
-                grey = (color[0] + color[1] + color[2]) / 3;
+                grey = (color[2] + color[0] + color[1]) / 3;
                 for (k = 1; k < 17; k++) {
-                    if (grey >= (k - 1) * 16 && grey < k * 16) {
+                    if (16 * (k - 1) <= grey && grey < k * 16) {
                         color[0] = 30.0f + 12.2f * k;
                         color[1] = 20.0f + 8.75f * k;
                         color[2] = 20.0f + 6.75f * k;
@@ -4637,25 +4633,25 @@ void CMenuPosDataManage::InitializeCMenuPosDataManage() {
 }
 #ifdef NONMATCHING
 int MenuCapture(int block, mgCMemory *stack, int draw) {
-    int half_w;
-    int half_h;
-    int tex_w;
-    int tex_h;
+    int pixel_num;
+    int b;
+    u8 *below;
     int pad_w;
     int pad_h;
-    u8 *dst;
-    u8 *src;
-    u8 *line;
-    u8 *below;
+    int y;
     int screen_w;
     int line_num;
-    int pixel_num;
-    int x;
-    int y;
-    int r;
-    int g;
-    int b;
+    u8 *line;
+    int half_w;
     mgCDrawPrim *prim;
+    int half_h;
+    int g;
+    u8 *src;
+    int tex_w;
+    int x;
+    int tex_h;
+    u8 *dst;
+    int r;
     mgCTextureManager *tex_manager;
 
     stack->Align64();

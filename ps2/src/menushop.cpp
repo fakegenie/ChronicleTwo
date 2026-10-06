@@ -170,7 +170,14 @@ void CShop::CheckEventItem() {
         cursor += 1;
     }
 }
-#ifdef NONMATCHING
+static inline void ReadPrice(CShop *shop, int item_no, int *buy, int *sell) {
+    if (buy) {
+        *buy = shop->price[item_no].buy;
+    }
+    if (sell) {
+        *sell = shop->price[item_no].sell;
+    }
+}
 void CShop::GetPrice(CGameDataUsed *item, int *buy, int *sell) {
     if (item == NULL) {
         return;
@@ -183,12 +190,7 @@ void CShop::GetPrice(CGameDataUsed *item, int *buy, int *sell) {
         *sell = 0;
     }
     if (item_id > 0) {
-        if (buy != NULL) {
-            *buy = price[item_id].buy;
-        }
-        if (sell != NULL) {
-            *sell = price[item_id].sell;
-        }
+        ReadPrice(this, item_id, buy, sell);
         if (NowSellMode == SHOP_SELL_MODE_DONY && buy != NULL) {
             *buy = 0;
         }
@@ -208,7 +210,7 @@ void CShop::GetPrice(CGameDataUsed *item, int *buy, int *sell) {
                 int box_item = item->GetGiftBoxItemNo(slot);
                 int box_price = 0;
                 if (box_item > 0) {
-                    box_price = price[box_item].sell;
+                    ReadPrice(this, box_item, NULL, &box_price);
                 }
                 *sell += box_price;
             }
@@ -228,9 +230,6 @@ void CShop::GetPrice(CGameDataUsed *item, int *buy, int *sell) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menushop", GetPrice__5CShopFP13CGameDataUsedPiPi);
-#endif
 int CShop::CheckMoney() {
     int money;
     if (NowSellMode == SHOP_SELL_MODE_MONEY) {
@@ -1641,7 +1640,6 @@ extern float QuestListTopY;
 extern float QuestCommentWinX;
 extern s16 QuestReactionCommentGyouNum;
 extern int menu_debug_questselect;
-#ifdef NONMATCHING
 int CMenuQuestView::KeyStep() {
     MenuCommonInfo->CheckSelectKey();
     int lr_key = MenuCommonInfo->CheckLRKey();
@@ -1673,7 +1671,7 @@ int CMenuQuestView::KeyStep() {
             if (menu_debug_questselect < 0) {
                 menu_debug_questselect = 0;
             }
-            if (menu_debug_questselect >= SelectMax()) {
+            if (SelectMax() <= menu_debug_questselect) {
                 menu_debug_questselect = SelectMax() - 1;
             }
             if (Menu_Memo_ViewMode == 1) {
@@ -1703,73 +1701,76 @@ int CMenuQuestView::KeyStep() {
         switch (step) {
         case 0: {
             int max = SelectMax();
-            int old_top = top;
+            int select_key = MenuListSelectKeyCheck(lr_key, 7);
             int old_select = select;
-            MenuKeySelectCheck(MenuListSelectKeyCheck(lr_key, 7), &select, &top, 0, max, 7, 0);
+            int old_top = top;
+            MenuKeySelectCheck(select_key, &select, &top, 0, max, 7, 0);
             if (old_select != select) {
                 MenuSePlay(0);
-                if (abs(old_top - top) >= 2) {
+                if (abs(old_top - top) > 1) {
                     jump = 1;
                 }
             }
             if (push & 1) {
                 if (Menu_Memo_ViewMode == 0) {
                     QUEST_PLAY_DATA *quest = QuestDataPtr->GetPlayQuestData(select);
-                    if (quest != NULL && quest->accepted != 0) {
-                        step = 1;
-                        QuestViewCommentFlag = 1;
-                        ActiveQuestInfo = QuestMan->GetQuestInfo(select);
-                        QuestCommentMes[0]->MakeMsg(ActiveQuestInfo->name);
-                        QuestCommentMes[0]->StepMsg();
-                        QuestCommentMes[1]->MakeMsg(ActiveQuestInfo->comment);
-                        QuestCommentMes[1]->StepMsg();
-                        char *reaction = ActiveQuestInfo->reaction[0];
-                        if (quest->cleared != 0) {
-                            reaction = ActiveQuestInfo->reaction[1];
-                        }
-                        QuestCommentMes[2]->MakeMsg(reaction);
-                        QuestCommentMes[2]->StepMsg();
-                        QuestReactionCommentGyouNum = 1;
-                        if (QuestCommentMes[2]->line_w[1] > 0) {
-                            QuestReactionCommentGyouNum = 2;
-                        }
-                        float width = 0.0f;
-                        for (int line = 0; line < 3; line++) {
-                            float line_w = QuestCommentMes[1]->line_w[line];
-                            if (width < line_w) {
-                                width = line_w;
-                            }
-                        }
-                        QuestCommentWinX = fptosi(mgScreenWidth - width) >> 1;
-                        UnderMsg(1);
+                    if (quest == NULL || quest->accepted == 0) {
+                        break;
                     }
+                    step = 1;
+                    QuestViewCommentFlag = 1;
+                    ActiveQuestInfo = QuestMan->GetQuestInfo(select);
+                    QuestCommentMes[0]->MakeMsg(ActiveQuestInfo->name);
+                    QuestCommentMes[0]->StepMsg();
+                    QuestCommentMes[1]->MakeMsg(ActiveQuestInfo->comment);
+                    QuestCommentMes[1]->StepMsg();
+                    char *reaction = ActiveQuestInfo->reaction[0];
+                    if (quest->cleared != 0) {
+                        reaction = ActiveQuestInfo->reaction[1];
+                    }
+                    QuestCommentMes[2]->MakeMsg(reaction);
+                    QuestCommentMes[2]->StepMsg();
+                    QuestReactionCommentGyouNum = 1;
+                    if (0 < QuestCommentMes[2]->line_w[1]) {
+                        QuestReactionCommentGyouNum = 2;
+                    }
+                    float width = 0.0f;
+                    for (int line = 0; line < 3; line++) {
+                        float line_w = QuestCommentMes[1]->line_w[line];
+                        if (width < line_w) {
+                            width = line_w;
+                        }
+                    }
+                    QuestCommentWinX = (int)(mgScreenWidth - width) >> 1;
+                    UnderMsg(1);
                 } else if (Menu_Memo_ViewMode == 1) {
                     ScmFlagCtrl = GetScoopDataTableIndex(select);
-                    if (ScmFlagCtrl != NULL) {
-                        SCOOP_INFO *info = ScoopMan->GetScoopInfo(ScmFlagCtrl->scoop_id);
-                        if (info != NULL && info->known != 0) {
-                            char photo_name[0x100];
-                            step = 1;
-                            QuestViewCommentFlag = 1;
-                            GetPhotoNameStr(ScmFlagCtrl->scoop_id, photo_name);
-                            QuestCommentMes[0]->MakeMsg(photo_name);
-                            QuestCommentMes[0]->StepMsg();
-                            QuestCommentMes[1]->MakeMsg(ScmFlagCtrl->text);
-                            QuestCommentMes[1]->StepMsg();
-                            float width = 0.0f;
-                            for (int line = 0; line < 3; line++) {
-                                float line_w = QuestCommentMes[1]->line_w[line];
-                                if (width < line_w) {
-                                    width = line_w;
-                                }
-                            }
-                            QuestCommentWinX = fptosi(mgScreenWidth - width) >> 1;
-                            UnderMsg(1);
+                    if (ScmFlagCtrl == NULL) {
+                        break;
+                    }
+                    SCOOP_INFO *info = ScoopMan->GetScoopInfo(ScmFlagCtrl->scoop_id);
+                    if (info == NULL || info->known == 0) {
+                        break;
+                    }
+                    char photo_name[0x100];
+                    step = 1;
+                    QuestViewCommentFlag = 1;
+                    GetPhotoNameStr(ScmFlagCtrl->scoop_id, photo_name);
+                    QuestCommentMes[0]->MakeMsg(photo_name);
+                    QuestCommentMes[0]->StepMsg();
+                    QuestCommentMes[1]->MakeMsg(ScmFlagCtrl->text);
+                    QuestCommentMes[1]->StepMsg();
+                    float width = 0.0f;
+                    for (int line = 0; line < 3; line++) {
+                        float line_w = QuestCommentMes[1]->line_w[line];
+                        if (width < line_w) {
+                            width = line_w;
                         }
                     }
-                } else {
-                    MenuSePlay(1);
+                    QuestCommentWinX = (int)(mgScreenWidth - width) >> 1;
+                    UnderMsg(1);
                 }
+                MenuSePlay(1);
             } else if (push & 2) {
                 FadeOutMenu(0x28, 0.0f);
                 MenuSePlay(5);
@@ -1791,7 +1792,7 @@ int CMenuQuestView::KeyStep() {
         break;
     }
     QuestTilePatternXY[0] += 0.5f;
-    if (QuestTilePatternXY[0] >= 0.0f) {
+    if (0.0f <= QuestTilePatternXY[0]) {
         QuestTilePatternXY[0] -= 128.0f;
     }
     float target = 0x52 - top * 0x22;
@@ -1812,9 +1813,6 @@ int CMenuQuestView::KeyStep() {
     QuestCursorPos[1] += ((float)((select - top) * 0x22 + 0x52) + 3.0f - QuestCursorPos[1]) / QuestMoveRate;
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menushop", KeyStep__14CMenuQuestViewFv);
-#endif
 extern "C" void *__ct__14CBaseMenuClassFv(void *);
 extern "C" void *__vt__14CMenuQuestView[];
 void MenuNPCQuestViewInit(mgCMemory *stack, int *tex_block, int view_mode) {

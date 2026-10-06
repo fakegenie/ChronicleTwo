@@ -1326,12 +1326,15 @@ int mgCVisualPrim::CreateRenderInfoPacket(u_int *packet, float (*matrix)[4], mgR
     u_int      *start;
     u_int      *write;
     mgCDrawEnv *environment;
-    u_int       tag[4] __attribute__((aligned(16))) = {0x10000007, 0, 0, 0x50000007};
     int         size;
 
     start = GetScrPad();
+    u_int tag[4] __attribute__((aligned(16)));
+    *(u_long128 *)tag = 0;
+    tag[0] = 0x10000007;
+    tag[3] = 0x50000007;
     *(u_long128 *)start = *(u_long128 *)tag;
-    *(u_int *)&giftag = 0x8002;
+    giftag.word0 = 0x8002;
     *(u_long128 *)&start[4] = *(u_long128 *)&giftag;
     *(u_long *)&start[8] = 1;
     *(u_long *)&start[10] = MG_GS_PRMODECONT;

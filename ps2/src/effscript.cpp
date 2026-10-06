@@ -3454,7 +3454,9 @@ int _MON_SE_PLAY(RS_STACKDATA *stack, int argc) {
             break;
         case 4:
             GetStackVector(position, stack);
-            sndGetVolPan(&volume, &pan, position, 160.0f, 1200.0f);
+            float near_distance = 160.0f;
+            float far_distance = 1200.0f;
+            sndGetVolPan(&volume, &pan, position, near_distance, far_distance);
             sndSePlayVPf(se_handle, se_id, volume, pan, 0);
             break;
         default:

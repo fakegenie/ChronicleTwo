@@ -329,15 +329,17 @@ static void CollisionFish(RACE_FISH_PARAM *fish, int count) {
         int lane = fish[index].lane;
         lane_fish[lane][lane_count[lane]++] = index;
     }
-    for (int j = 0; j < 6; ++j) {
-        RACE_FISH_PARAM *ahead = &fish[lane_fish[j][0]];
-        for (i = 1; i < lane_count[j]; ++i) {
-            RACE_FISH_PARAM *behind = &fish[lane_fish[j][i]];
+    int lane_no = 0;
+    do {
+        RACE_FISH_PARAM *ahead = &fish[lane_fish[lane_no][0]];
+        for (i = 1; i < lane_count[lane_no]; ++i) {
+            RACE_FISH_PARAM *behind = &fish[lane_fish[lane_no][i]];
             float limit = ahead->pos - 0.05f;
             if (limit < behind->pos) behind->pos = limit;
             ahead = behind;
         }
-    }
+        ++lane_no;
+    } while (lane_no < 6);
 }
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/gyoracesim", CollisionFish__FP15RACE_FISH_PARAMi);

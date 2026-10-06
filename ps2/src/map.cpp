@@ -1194,7 +1194,6 @@ int CMap::GetFixCameraPos(sceVu0FVECTOR pos, sceVu0FVECTOR out_camera_pos) {
     CCameraInfo *selected;
     int camera_no;
     int rect_no;
-    int rect_offset;
     CCameraInfo *camera;
 
     float         segment_length2;
@@ -1205,6 +1204,7 @@ int CMap::GetFixCameraPos(sceVu0FVECTOR pos, sceVu0FVECTOR out_camera_pos) {
     int           segment_no;
     int           projection_num;
     int           nearest_projection;
+    int           sum_no;
     sceVu0FVECTOR projection[8];
     sceVu0FVECTOR direction;
     sceVu0FVECTOR offset;
@@ -1220,8 +1220,8 @@ int CMap::GetFixCameraPos(sceVu0FVECTOR pos, sceVu0FVECTOR out_camera_pos) {
     }
     camera = camera_base;
     for (camera_no = 0; camera_no < camera_info_num; camera_no++, camera++) {
-        for (rect_no = 0, rect_offset = 0; rect_no < camera->rect_num; rect_offset += 4, rect_no++) {
-            CColFrame *rect = *(CColFrame **)((u8 *)camera + 0x94 + rect_offset);
+        for (rect_no = 0; rect_no < camera->rect_num; rect_no++) {
+            CColFrame *rect = camera->rect[rect_no];
             if (rect == NULL) break;
             if (rect->InsidePoint(pos) != 0) selected = camera;
         }
@@ -1234,14 +1234,13 @@ int CMap::GetFixCameraPos(sceVu0FVECTOR pos, sceVu0FVECTOR out_camera_pos) {
         projection_num = 0;
         nearest_projection = -1;
         for (segment_no = 0; segment_no < selected->pos_num - 1; segment_no++) {
-            float *segment = selected->pos[segment_no];
-            sceVu0SubVector(direction, selected->pos[segment_no + 1], segment);
-            sceVu0SubVector(offset, pos, segment);
+            sceVu0SubVector(direction, selected->pos[segment_no + 1], selected->pos[segment_no]);
+            sceVu0SubVector(offset, pos, selected->pos[segment_no]);
             segment_length2 = mgDistVector2(direction);
             weight = sceVu0InnerProduct(direction, offset) / segment_length2;
             if (!(weight < 0.0f) && weight <= 1.0f) {
                 sceVu0ScaleVector(projection[projection_num], direction, weight);
-                mgAddVector(projection[projection_num], segment);
+                mgAddVector(projection[projection_num], selected->pos[segment_no]);
                 if (nearest_projection >= 0) {
                     nearest_distance2 = mgDistVector2(pos, projection[nearest_projection]);
                     if (!(mgDistVector2(pos, projection[projection_num]) < nearest_distance2)) goto next_projection;
@@ -1253,15 +1252,8 @@ int CMap::GetFixCameraPos(sceVu0FVECTOR pos, sceVu0FVECTOR out_camera_pos) {
         }
 
         mgZeroVector(projection_sum);
-        int sum_offset;
-        int sum_no = 0;
-        if (0 < projection_num) {
-            sum_offset = 0;
-            do {
-                mgAddVector(projection_sum, (float *)((u8 *)projection + sum_offset));
-                sum_no++;
-                sum_offset += 0x10;
-            } while (sum_no < projection_num);
+        for (sum_no = 0; sum_no < projection_num; sum_no++) {
+            mgAddVector(projection_sum, projection[sum_no]);
         }
         sum_no = 0;
         if (projection_num > 0) {
@@ -1432,34 +1424,21 @@ void CMap::EffectStep() {
     effect_list.Step();
 }
 
-#ifdef NONMATCHING
 void CMap::AnimeStep(CObjAnimeEnv *env) {
     CFuncPointCheck check;
     CreateFuncCheck(&check);
-    {
-        char *parts = (char *)place_parts;
-        int parts_no;
-        for (parts_no = 0; parts_no < place_parts_num; parts_no++, parts += 0x310) {
-            ((CMapParts *)parts)->AnimeStep(&check, env);
+    CMapParts *parts = place_parts;
+    for (int parts_no = 0; parts_no < place_parts_num; parts_no++, parts++) {
+        parts->AnimeStep(&check, env);
+    }
+    if (obj_anime_num <= 0 || obj_anime == NULL) return;
+    CObjAnime *anime = obj_anime;
+    for (int anime_no = 0; anime_no < obj_anime_num; anime_no++, anime++) {
+        if (anime->func_point != NULL && anime->func_point->Check(&check) != 0) {
+            anime->Step(env);
         }
     }
-    if (obj_anime_num > 0) {
-        int animation_no = 0;
-        char *animation = (char *)obj_anime;
-        if (animation == NULL) return;
-        for (animation_no = 0; animation_no < obj_anime_num; animation_no++, animation += 0x30) {
-            if (((CObjAnime *)animation)->func_point != NULL) {
-                if (((CObjAnime *)animation)->func_point->Check(&check) != 0) {
-                    ((CObjAnime *)animation)->Step(env);
-                }
-            }
-        }
-    }
-    return;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/map", AnimeStep__4CMapFP12CObjAnimeEnv);
-#endif
 void CMap::Step() {
     char *parts = (char *)place_parts;
     int i;

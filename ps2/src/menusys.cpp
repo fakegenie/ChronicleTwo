@@ -413,6 +413,7 @@ extern s8 cmd_counter_1048;
 #ifdef NONMATCHING
 int CBaseMenuClass::MenuItemCommandSelect(int select_key, int push_button) {
     CGameDataUsed *used_data = MenuUserParam.used_data;
+    CItemUseTarget target;
     CUserDataManager *user = GetUserDataMan();
     MenuItemCmdRet.cmd = -1;
     int decided = 0;
@@ -433,7 +434,7 @@ int CBaseMenuClass::MenuItemCommandSelect(int select_key, int push_button) {
                 if (i >= 0 && i < MES_LINE_MAX) {
                     mes->line_color[i] = 0x80DC4848;
                 }
-                if (cmd_counter_1048 >= 26 && i >= 0 && i < MES_LINE_MAX) {
+                if (cmd_counter_1048 > 25 && i >= 0 && i < MES_LINE_MAX) {
                     mes->line_color[i] = 0x80686A6B;
                 }
             }
@@ -557,9 +558,8 @@ int CBaseMenuClass::MenuItemCommandSelect(int select_key, int push_button) {
                 } else {
                     MenuItemCmdRet.cmd = 1;
                     MenuItemCmdRet.item = &chara->active_item[active_slot];
-                    CGameDataUsed *active = MenuItemCmdRet.item;
-                    if (active->item_no == ask_para.item->item_no) {
-                        MenuItemCmdRet.unk_A = active->GetActiveSetNum() - active->GetNum();
+                    if (ask_para.item->item_no == MenuItemCmdRet.item->item_no) {
+                        MenuItemCmdRet.unk_A = MenuItemCmdRet.item->GetActiveSetNum() - MenuItemCmdRet.item->GetNum();
                         if (ask_para.item->GetNum() > MenuItemCmdRet.unk_A) {
                             MenuItemCmdRet.item_no = 10;
                         }
@@ -622,7 +622,6 @@ int CBaseMenuClass::MenuItemCommandSelect(int select_key, int push_button) {
                     if (cmd == 16) {
                         target_chara = MenuUserParam.chara[1];
                     }
-                    CItemUseTarget target;
                     target.SetPtr(0, target_chara);
                     MenuUseItemCheckFunc(ask_para.item, &target, 0);
                     if (MenuUsedNotErrorCode == 1) {
@@ -867,7 +866,7 @@ void CBaseMenuClass::SetItemCmdMsgPos(int *item_pos) {
             } else {
                 pos[0] -= 0x12;
                 pos[1] += 0x1C;
-                if (pos[1] + height >= 0x133) {
+                if (pos[1] + height > 0x132) {
                     pos[1] = pos[1] - height - 0x5E;
                     message->point_y = height * 3;
                 }
@@ -886,7 +885,7 @@ void CBaseMenuClass::SetItemCmdMsgPos(int *item_pos) {
                     }
                     MenuItemCommandDir = 2;
                 }
-                if (pos[0] + width >= 0x1E5) {
+                if (pos[0] + width > 0x1E4) {
                     pos[0] = 0x1D0 - width;
                     message->point_x = item_pos[0] + 0x1A - pos[0];
                 }
@@ -1107,11 +1106,10 @@ extern int trans_spectol_rgb;
 extern s8 spegetflag;
 extern s16 MenuSpectolTransPos;
 void TransSpectolDataSave(CGameDataUsed *item, int count);
-#ifdef NONMATCHING
 int CBaseMenuClass::IsSpectolTrans(int select_key, int push_button) {
-    int cancel = 0;
     CDC2Mes *message = MenuDCMsg[ask_para.mes_no];
     CMenuPosDataForm *form = MenuMesForm[ask_para.mes_no];
+    int cancel = 0;
     int result = 0;
     switch (step) {
         case 0:
@@ -1139,10 +1137,10 @@ int CBaseMenuClass::IsSpectolTrans(int select_key, int push_button) {
                             step = 1;
                             form->draw_flag = 0;
                             MenuSePlay(1);
-                            result = 2;
                             if (MenuCommonInfo->cursor_form != NULL) {
                                 MenuCommonInfo->cursor_form->draw_flag = 0;
                             }
+                            result = 2;
                         }
                         break;
                     }
@@ -1193,7 +1191,7 @@ int CBaseMenuClass::IsSpectolTrans(int select_key, int push_button) {
             }
             if (push_button & 1) {
                 SpectolBreakNum = MenuHowHaveMuchNum;
-                if (MenuUserDataManPtr->SearchSpaceUsedData() < 0 && MenuHowHaveMuchNum < ask_para.item->GetNum()) {
+                if (MenuUserDataManPtr->SearchSpaceUsedData() < 0 && ask_para.item->GetNum() > MenuHowHaveMuchNum) {
                     MenuSePlay(5);
                 } else {
                     MenuCommonInfo->how_much_form->draw_flag = 0;
@@ -1232,9 +1230,6 @@ int CBaseMenuClass::IsSpectolTrans(int select_key, int push_button) {
     }
     return result;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menusys", IsSpectolTrans__14CBaseMenuClassFii);
-#endif
 int CBaseMenuClass::IsSpectolFusion(int key, int command) {
     CDC2Mes *message;
     CMenuPosDataForm *form;
@@ -2225,9 +2220,9 @@ int MenuDataSwap(CGameDataUsed *destination, CGameDataUsed *source, int quantity
     if (destination == NULL || source == NULL) {
         return 0;
     }
+    int result = 1;
     int dst_no = destination->item_no;
-    s8 result = 1;
-    int src_no = source->item_no;
+    unsigned int src_no = source->item_no;
     int dst_type = GetItemDataType__Fi(dst_no);
     int src_type = GetItemDataType__Fi(src_no);
     int dst_used = destination->used_type;
@@ -2239,8 +2234,9 @@ int MenuDataSwap(CGameDataUsed *destination, CGameDataUsed *source, int quantity
         ((src_used == USED_ITEM_TYPE_ITEM && src_type != 0x1D && src_type != 0x1E && src_type != 0x15 &&
           src_type != 0x1A && src_type != 0x1B) ||
          (src_used == USED_ITEM_TYPE_ATTACH && src_type != 0x11 && src_type != 0x22))) {
+        int slot = destination->SetGiftBoxItem(src_no, -1);
         result = 4;
-        if (destination->SetGiftBoxItem(src_no, -1) >= 0) {
+        if (slot >= 0) {
             source->DeleteNum(1);
             result = 4;
         }
@@ -2255,7 +2251,7 @@ int MenuDataSwap(CGameDataUsed *destination, CGameDataUsed *source, int quantity
         } else if (source->CopyDataItem(destination) == 0) {
             result = 0;
         }
-    } else if (destination->CheckTypeEnableStack() && destination->GetNum() >= 2 && src_used == 0) {
+    } else if (destination->CheckTypeEnableStack() && destination->GetNum() > 1 && src_used == 0) {
         memcpy(source, destination, sizeof(CGameDataUsed));
         source->AddNum(-destination->GetNum(), 0);
         source->AddNum(quantity, 1);
@@ -2274,13 +2270,13 @@ int MenuDataSwap(CGameDataUsed *destination, CGameDataUsed *source, int quantity
         result = 5;
     } else {
         int had_dst = 0;
-        int had_src = 0;
         GameDataSwap(destination, source, 1);
-        if (dst_no > 0) {
-            had_dst = 1;
-        }
+        int had_src = 0;
         if (src_no > 0) {
             had_src = 1;
+        }
+        if (dst_no > 0) {
+            had_dst = 1;
         }
         s8 results[2] = {0, 2};
         results[0] = ret_tbl1_2511[had_src];
@@ -2506,7 +2502,7 @@ int CMenuKeyFunc::EnableSwapNowPos(MENU_SWAPITEM_INFO *swap) {
             if (common != NULL && common->active_set == 0) {
                 result = 1;
             } else {
-                if (chara == NULL || swap->no < 0 || swap->no >= 4) {
+                if (chara == NULL || swap->no < 0 || swap->no > 3) {
                     return 9;
                 }
                 CGameDataUsed *active = &chara->active_item[swap->no];
@@ -2515,7 +2511,7 @@ int CMenuKeyFunc::EnableSwapNowPos(MENU_SWAPITEM_INFO *swap) {
                 }
                 int num = active->GetNum();
                 if (common == NULL) {
-                    if (num >= 2) {
+                    if (num > 1) {
                         result = 4;
                     }
                 } else if (held_no != active->item_no) {
@@ -2595,7 +2591,7 @@ int CMenuKeyFunc::EnableSwapNowPos(MENU_SWAPITEM_INFO *swap) {
                 result = 5;
             } else if (used_type != USED_ITEM_TYPE_GIFT_BOX && used->CheckTypeEnableStack()) {
                 int num = used->GetNum();
-                if (held_used == 0 && num >= 2) {
+                if (held_used == 0 && num > 1) {
                     result = 4;
                 }
             }
@@ -5006,7 +5002,7 @@ void CommonSetMoveItemClass(int (*table)[4]) {
         move->from[3] = slot[3];
         if (move->from[0] == 0) {
             if (move->from[1] < 2) {
-                if (move->from[2] == 0) {
+                if (!move->from[2]) {
                     items[i] = &MenuUserParam.chara[slot[1]]->active_item[slot[3]];
                 } else if (move->from[2] == 1) {
                     items[i] = &MenuUserParam.chara[move->from[1]]->equip[move->from[3]];
@@ -5716,7 +5712,7 @@ void CMenuItemInfo::CalcCursorPosition(void) {
             pos[1] -= 8;
         } else if (arg_no == 1 || arg_no == 7) {
             int no = cursor;
-            if (cursor < 0 || cursor >= 2) {
+            if (cursor < 0 || cursor > 1) {
                 no = 0;
             }
             sprintf(name, at_5880, no);
@@ -6646,7 +6642,8 @@ void MenuItemDebugDraw(void) {
         u8 color[4] = {0x80, 0x80, 0x80, 0x80};
         int page = (CMenuItemInfoPt->debug_item_no - 1) / 64;
         for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++) {
+            int col;
+            for (col = 0; col < 8; col++) {
                 int item_no = page * 64 + 1 + row * 8 + col;
                 if (item_no == CMenuItemInfoPt->debug_item_no) {
                     int x = col * 32 + 24;
@@ -8395,7 +8392,7 @@ void CMenuItemInfo::CheckLoadItemNo() {
         SetMenuLoadItemNo(load_item_no);
     }
 }
-extern s8 MonicaRotationFlag;
+extern u8 MonicaRotationFlag;
 extern float MonicaRotationData[4];
 extern char at_8083[];
 int CMenuItemInfo::ModelReadStart(int mode, int check_item, int restart_read) {
@@ -8534,10 +8531,10 @@ void CMenuItemInfo::WeaponBuildCheck(CActionChara *chara, int chara_no, int tex_
 extern s8 cnttbl_8130[6];
 extern float robo_stand_pos_8151[][3];
 extern char at_8199[];
-#ifdef NONMATCHING
 int CMenuItemInfo::ModelReadEndCheck(void) {
+    int loaded = MenuLoadFileCheck(MenuCharaBuild2);
     int result = 0;
-    if (MenuLoadFileCheck(MenuCharaBuild2) && ReadBGSync() == 0) {
+    if (loaded && ReadBGSync() == 0) {
         int chara_tex_block = MenuArg.chara_tex_block;
         int load_tex_block = tex_block[1];
         switch (view_mode) {
@@ -8571,8 +8568,9 @@ int CMenuItemInfo::ModelReadEndCheck(void) {
                 break;
         }
         MenuCommonInfo->key_enable = 1;
+        int ready = MenuLoadFileCheck(MenuCharaBuild2);
         CActionChara *chara = MenuCharaBuild2[0]->chara;
-        if (MenuLoadFileCheck(MenuCharaBuild2)) {
+        if (ready) {
             chara_poly_form[0]->counter = cnttbl_8130[view_mode];
         } else {
             chara_poly_form[0]->counter = 13;
@@ -8581,8 +8579,10 @@ int CMenuItemInfo::ModelReadEndCheck(void) {
                 case 0:
                 case 1:
                     chara->UpdatePosition();
-                    for (int i = 0; i < chara->dynamic_anime_num; i++) {
-                        chara->dynamic_anime[i].ResetPosition();
+                    if (chara->dynamic_anime_num > 0) {
+                        for (int i = 0; i < chara->dynamic_anime_num; i++) {
+                            chara->dynamic_anime[i].ResetPosition();
+                        }
                     }
                     chara->SetRotation(0.0f, 0.0f, 0.0f);
                     if (MonicaRotationFlag) {
@@ -8637,9 +8637,6 @@ int CMenuItemInfo::ModelReadEndCheck(void) {
     }
     return result;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menusys", ModelReadEndCheck__13CMenuItemInfoFv);
-#endif
 void CMenuItemInfo::SearchEffectDisplayPosition(int *position, CGameDataUsed *item) {
     int item_index = GetSameAdrressUserData(item, 0);
     if (0 <= item_index) {
@@ -8954,7 +8951,6 @@ void MenuCharaStatusDraw(int &tex_block) {
         }
     }
 }
-#ifdef NONMATCHING
 void MenuItemInfoCursorDraw(int &tex_block) {
     if (MenuItemCursorInfo.enable == 0) {
         return;
@@ -9005,7 +9001,8 @@ void MenuItemInfoCursorDraw(int &tex_block) {
     }
     if (CMenuItemInfoPt->view_mode == 3) {
         float bob_x = 7.5f * wave;
-        put_rect.top = (int)(310.0f - 10.0f * wave);
+        float bob_y = 10.0f * wave;
+        put_rect.top = (int)(310.0f - bob_y);
         if (MenuItemCursorInfo.arrow[3] != 0) {
             put_rect.left = (int)(166.0f - bob_x);
             PrimQuad(prim, put_rect, left_rect);
@@ -9023,44 +9020,35 @@ void MenuItemInfoCursorDraw(int &tex_block) {
     if (MenuItemCursorInfo.chara_mark == 1) {
         float bob_x = 10.0f * wave;
         float bob_y = 7.0f * wave;
-        switch (CMenuItemInfoPt->view_mode) {
-            case 0:
-            case 1:
-                put_rect.left = (int)(70.0f - bob_x);
-                put_rect.top = (int)(190.0f + bob_y);
-                break;
-            case 2:
-            case 5:
-                put_rect.left = 0x14;
-                put_rect.top = 0x78;
-                break;
-            case 3:
-                put_rect.left = 0x5A;
-                put_rect.top = 0x82;
-                break;
-            case 4:
-                put_rect.left = (int)(70.0f - bob_x);
-                put_rect.top = (int)(230.0f + bob_y);
-                break;
+        int view = CMenuItemInfoPt->view_mode;
+        if (view == 0 || view == 1) {
+            put_rect.left = (int)(70.0f - bob_x);
+            put_rect.top = (int)(190.0f + bob_y);
+        } else if (view == 2 || view == 5) {
+            put_rect.left = 0x14;
+            put_rect.top = 0x78;
+        } else if (view == 3) {
+            put_rect.left = 0x5A;
+            put_rect.top = 0x82;
+        } else if (view == 4) {
+            put_rect.left = (int)(70.0f - bob_x);
+            put_rect.top = (int)(230.0f + bob_y);
         }
-        int right = put_rect.left + put_rect.right;
+        int put_x2 = put_rect.left + put_rect.bottom;
+        int put_y2 = put_rect.top + put_rect.right;
         int tex_right = up_rect.left + up_rect.right;
-        int bottom = put_rect.top + put_rect.bottom;
         int tex_bottom = up_rect.top + up_rect.bottom;
         prim->TextureCrd(up_rect.left, tex_bottom);
-        prim->Vertex(right, put_rect.top, 0);
+        prim->Vertex(put_x2, put_rect.top, 0);
         prim->TextureCrd(up_rect.left, up_rect.top);
         prim->Vertex(put_rect.left, put_rect.top, 0);
         prim->TextureCrd(tex_right, up_rect.top);
-        prim->Vertex(put_rect.left, bottom, 0);
+        prim->Vertex(put_rect.left, put_y2, 0);
         prim->TextureCrd(tex_right, tex_bottom);
-        prim->Vertex(right, bottom, 0);
+        prim->Vertex(put_x2, put_y2, 0);
     }
     prim->End();
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menusys", MenuItemInfoCursorDraw__FRi);
-#endif
 void CMenuItemInfo::KeyStepLocal(int select_key, int push_button, int flag) {
     int select = -1;
     if (GamePad__2.Down(0x400) && menu_debug_flag == 1) {
@@ -9561,14 +9549,10 @@ extern s8 MenuItemSelectMode;
 extern char *imgtbl_8945[];
 extern char at_9032[];
 extern char at_9033[];
-#ifdef NONMATCHING
 int CItemSelect::KeyStep(void) {
     int end = 0;
-    if (mode == MENU_ASK_MODE_CLOSE) {
-        if (alpha <= 0) {
-            end = 1;
-        }
-    } else if (mode == MENU_ASK_MODE_OPEN) {
+    switch (mode) {
+    case MENU_ASK_MODE_OPEN: {
         if (ReadBGSync() == 0) {
             mgCTextureManager *tex_manager = &mgTexManager;
             tex_manager->DeleteBlock(tex_block[1]);
@@ -9590,7 +9574,14 @@ int CItemSelect::KeyStep(void) {
             MenuCommonInfo->key_enable = 1;
             mode = MENU_ASK_MODE_NONE;
         }
-    } else {
+        break;
+    }
+    case MENU_ASK_MODE_CLOSE:
+        if (alpha <= 0) {
+            end = 1;
+        }
+        break;
+    default: {
         int select_key = MenuCommonInfo->CheckSelectKey();
         int push_button = MenuCommonInfo->CheckPushButton();
         int max = (int)(5.0f * line_num);
@@ -9602,7 +9593,7 @@ int CItemSelect::KeyStep(void) {
         } else if (select_key & MENU_SELECT_KEY_RIGHT) {
             if (old_cursor % 5 != 4) {
                 cursor = old_cursor + 1;
-                if (cursor >= max) {
+                if (max <= cursor) {
                     cursor = max - 1;
                 }
             }
@@ -9677,6 +9668,8 @@ int CItemSelect::KeyStep(void) {
         } else {
             MenuDCMsg[0]->MakeMsg(at_5132);
         }
+        break;
+    }
     }
 step_alpha:
     if (alpha_step < 0) {
@@ -9688,9 +9681,6 @@ step_alpha:
     DrawMenuWakuStep();
     return end;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menusys", KeyStep__11CItemSelectFv);
-#endif
 struct ItemSelectColor {
     u8 rgba[4];
 };
@@ -9721,8 +9711,9 @@ void CItemSelect::Draw(void) {
     prim->Color(0x80, 0x80, 0x80, alpha);
     mgRect<int> cell_rect;
     cell_rect.Set(0x111, 0, 0x2C, 0x37);
+    int line;
     int drawn = 0;
-    for (int line = 0; line < 50; line++) {
+    for (line = 0; line < 50; line++) {
         float y = item_rect.top + 55.0f * line;
         if (!(y <= 90.0f)) {
             float x = item_rect.left;
@@ -9746,7 +9737,7 @@ void CItemSelect::Draw(void) {
     mgRect<int> number_rect;
     number_rect.Set(0, 0xF4, 0xA, 0xD);
     int index = 0;
-    for (int line = 0; line < line_num && item_list[line * 5] != NULL; line++) {
+    for (int line = 0; line < item_num && item_list[line * 5] != NULL; line++) {
         icon_rect.left = 4.0f + item_rect.left;
         for (int column = 0; column < 5; column++, index++) {
             if (icon_rect.top <= 0.0f) {

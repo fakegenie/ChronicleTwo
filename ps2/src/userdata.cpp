@@ -964,24 +964,28 @@ int CGameDataUsed::IsSpectolTrans() {
     }
     return 0;
 }
-#ifdef NONMATCHING
 void CGameDataUsed::ToSpectolTrans(CGameDataUsed *attach, int num) {
+    int count;
+    char *name;
+    int level;
+    int bonus;
     if (attach != NULL) {
         attach->Init();
-        int count = GetNum();
+        count = GetNum();
         if (0 < num) {
             count = num;
         }
         ATTACH_USED *spectol = &attach->data.attach;
         spectol->spectol_item_no = item_no;
-        char *name = GetName(0);
-        int level = GetLevel();
+        name = GetName(0);
+        level = GetLevel();
         switch (used_type) {
-            case 3:
+            case 3: {
+                WEAPON_USED *weapon = &data.weapon;
                 if (level < 5) {
                     spectol->spectol_type = 3;
                     spectol->spectol_value = GetRandI(4) + 1;
-                    short bonus = GetRandI(4) + 1;
+                    bonus = GetRandI(4) + 1;
                     int slot = GetRandI(10);
                     if (slot < 8) {
                         spectol->attribute[slot] = bonus;
@@ -991,33 +995,46 @@ void CGameDataUsed::ToSpectolTrans(CGameDataUsed *attach, int num) {
                     spectol->special = 0;
                 } else {
                     spectol->spectol_type = 1;
-                    spectol->spectol_value = (u8)(s8)data.weapon.level;
-                    if (spectol->spectol_value >= 21) {
+                    spectol->spectol_value = (u8)(s8)weapon->level;
+                    if (spectol->spectol_value > 20) {
                         spectol->spectol_value = 20;
                     }
-                    spectol->special = data.weapon.special;
-                    spectol->level = data.weapon.level;
-                    spectol->status[0] = data.weapon.status[0];
-                    spectol->status[1] = fptosi(0.6f * (float)data.weapon.status[1]);
-                    for (int i = 0; i < 8; i++) {
-                        spectol->attribute[i] = fptosi(0.6f * (float)data.weapon.attribute[i]);
-                    }
+                    spectol->special = weapon->special;
+                    spectol->level = weapon->level;
+                    spectol->status[0] = weapon->status[0];
+                    spectol->status[1] = fptosi(0.6f * (float)weapon->status[1]);
+                    spectol->attribute[0] = fptosi(0.6f * (float)weapon->attribute[0]);
+                    spectol->attribute[1] = fptosi(0.6f * (float)weapon->attribute[1]);
+                    spectol->attribute[2] = fptosi(0.6f * (float)weapon->attribute[2]);
+                    spectol->attribute[3] = fptosi(0.6f * (float)weapon->attribute[3]);
+                    spectol->attribute[4] = fptosi(0.6f * (float)weapon->attribute[4]);
+                    spectol->attribute[5] = fptosi(0.6f * (float)weapon->attribute[5]);
+                    spectol->attribute[6] = fptosi(0.6f * (float)weapon->attribute[6]);
+                    spectol->attribute[7] = fptosi(0.6f * (float)weapon->attribute[7]);
                 }
                 break;
-            case 2:
+            }
+            case 2: {
                 spectol->level = 0;
-                spectol->status[0] = data.attach.status[0] * count;
-                spectol->status[1] = data.attach.status[1] * count;
-                for (int i = 0; i < 8; i++) {
-                    spectol->attribute[i] = data.attach.attribute[i] * count;
-                }
-                spectol->special = data.attach.special;
+                ATTACH_USED *source = &data.attach;
+                spectol->status[0] = source->status[0] * count;
+                spectol->status[1] = source->status[1] * count;
+                spectol->attribute[0] = source->attribute[0] * count;
+                spectol->attribute[1] = source->attribute[1] * count;
+                spectol->attribute[2] = source->attribute[2] * count;
+                spectol->attribute[3] = source->attribute[3] * count;
+                spectol->attribute[4] = source->attribute[4] * count;
+                spectol->attribute[5] = source->attribute[5] * count;
+                spectol->attribute[6] = source->attribute[6] * count;
+                spectol->attribute[7] = source->attribute[7] * count;
+                spectol->special = source->special;
                 spectol->spectol_type = 2;
                 spectol->spectol_value = count;
                 if (item_no == 0x17F) {
-                    spectol->spectol_value = data.attach.spectol_value;
+                    spectol->spectol_value = source->spectol_value;
                 }
                 break;
+            }
             case 6:
                 spectol->level = 0;
                 spectol->attribute[7] = 2;
@@ -1041,9 +1058,6 @@ void CGameDataUsed::ToSpectolTrans(CGameDataUsed *attach, int num) {
         attach->CheckParamLimmit();
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/userdata", ToSpectolTrans__13CGameDataUsedFP13CGameDataUsedi);
-#endif
 void CGameDataUsed::GetStatusParam(short *param) {
     if (param != NULL) {
         if (used_type == 3) {
@@ -3433,7 +3447,7 @@ int CUserDataManager::CheckItemLimmitOver() {
             if (0 < used->GetGiftBoxItemNum()) {
                 for (int k = 0; k < 3; k++) {
                     int gift = used->GetGiftBoxItemNo(k);
-                    if (0 < gift) {
+                    if (gift > 0) {
                         item_count[gift]++;
                     }
                 }
@@ -3442,16 +3456,15 @@ int CUserDataManager::CheckItemLimmitOver() {
     }
     CHARA_DATA *charas = GetCharaDataPtr(0);
     for (int chara = 0; chara < 2; chara++) {
-        CHARA_DATA *data = &charas[chara];
         for (int slot = 0; slot < 3; slot++) {
-            CGameDataUsed *active = &data->active_item[slot];
+            CGameDataUsed *active = &charas[chara].active_item[slot];
             int active_no = active->item_no;
             if (0 < active_no) {
                 item_count[active_no] += active->GetNum();
                 if (0 < active->GetGiftBoxItemNum()) {
                     for (int k = 0; k < 3; k++) {
                         int gift = active->GetGiftBoxItemNo(k);
-                        if (0 < gift) {
+                        if (gift > 0) {
                             item_count[gift]++;
                         }
                     }
@@ -3459,7 +3472,7 @@ int CUserDataManager::CheckItemLimmitOver() {
             }
         }
     }
-    for (int item_no = 1; item_no < 0x200; item_no++) {
+    for (unsigned int item_no = 1; item_no < 0x200; item_no++) {
         CDataCommon *common = GetCommonItemData(item_no);
         if (common != NULL && common->max_num < item_count[item_no]) {
             return item_no;

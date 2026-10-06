@@ -368,8 +368,9 @@ void TitleBootInit() {
     TitleScene->SetActive(2, 0);
     TitleMap = TitleScene->GetMap(TitleScene->active_map);
     u32 file_size;
-    if (LoadFile2(at_1222__4, DataBuffer.stAllocTest(1), (int *)&file_size, 0) != 0) {
-        textures->EnterIMGFile((u_char *)DataBuffer.Alloc(Align16Blocks(file_size)), 0x6A, NULL, NULL);
+    u32 bg_size;
+    if (LoadFile2(at_1222__4, DataBuffer.stAllocTest(1), (int *)&bg_size, 0) != 0) {
+        textures->EnterIMGFile((u_char *)DataBuffer.Alloc(Align16Blocks(bg_size)), 0x6A, NULL, NULL);
     }
     textures->EnterTexture(0x6A, at_1223__4, NULL, mgScreenWidth, mgScreenHeight, 0x20, 0, 0, 0);
     char lang_file[0x40];
@@ -1292,7 +1293,9 @@ void TitleModeDraw() {
     mgTexManager.ReloadTexture(0x40, (sceVif1Packet *)NULL);
     mgCDrawPrim prim;
     SetSpriteEnv(&prim, 0);
-    PrimQuad(Tex_Chronicle, 0.0f, 24.0f, mgRect<int>(0, 0, 0x200, 0x1A0), fptosi(TitleInfo->title_alpha), 0x80, 0x80, 0x80);
+    float title_x = 0.0f;
+    float title_y = 24.0f;
+    PrimQuad(Tex_Chronicle, title_x, title_y, mgRect<int>(0, 0, 0x200, 0x1A0), fptosi(TitleInfo->title_alpha), 0x80, 0x80, 0x80);
     mgRect<int> start_rect(start_button_tbl_1826[LanguageCode].left, start_button_tbl_1826[LanguageCode].top,
                            start_button_tbl_1826[LanguageCode].right, start_button_tbl_1826[LanguageCode].bottom);
     if (LanguageCode == 0) {
@@ -1351,7 +1354,7 @@ void TitleModeDraw() {
         row_y[0] = 0xD0 - TitleInfo->omake_num * 0x1B;
         row_y[1] = row_y[0] + 0x3C;
         cursor_goal_y = (float)row_y[TitleInfo->omake_select];
-        prim.Color(0x80, 0x80, 0x80, fptosi(TitleInfo->omake_alpha));
+        prim.Color(0x80, 0x80, 0x80, (int)TitleInfo->omake_alpha);
         if (OmakePlayEnableAttr & 2) {
             mgRect<int> dungeon_rect(0x5C, 0x100, 0xD2, 0x36);
             PrimQuad(&prim, 151.0f, (float)row_y[row++], dungeon_rect);
@@ -1458,10 +1461,13 @@ void TitleMapDraw() {
         }
         mgPreEndDraw(NULL);
         for (texture_group = 0; texture_group < 6; texture_group++) {
+            int i;
+            int block;
             int block_count = TitleScene->mds_list_set.GetTextureBlockNo(texture_group, texture_blocks, 128);
-            for (int i = 0; i < block_count; i++) {
-                int block = texture_blocks[block_count - i - 1];
-                if (0 != mgEndDrawReloadTexture(block, NULL) && texture_blocks[block_count - i - 1] == water_block) {
+            for (i = 0; i < block_count; i++) {
+                int index = block_count - i - 1;
+                block = texture_blocks[index];
+                if (0 != mgEndDrawReloadTexture(block, NULL) && texture_blocks[index] == water_block) {
                     WaveTable__3->CreateTexture(water);
                 }
                 mgEndDraw(block, NULL);
@@ -1508,7 +1514,7 @@ void TitleMapDraw() {
         }
         case 1:
             TitleCameraPhaseCounter++;
-            if ((u_int)TitleCameraPhaseCounter >= 251) {
+            if ((u_int)TitleCameraPhaseCounter > 250) {
                 follow->FollowOff();
                 TitleCameraPhaseCounter = 0;
                 TitleCameraAddAngle = 0.0f;

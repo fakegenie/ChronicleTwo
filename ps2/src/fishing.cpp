@@ -416,11 +416,9 @@ int sgInitFishing(SubGameInfo *info) {
     info->record_check = info->dungeon;
     return 1;
 }
-#ifdef NONMATCHING
 int sgRestartFishing(SubGameInfo *info) {
     CScene *scene = info->scene;
     u_long128 *buffer = ReadBuffer;
-    int rod_status[5];
 
     mgTexManager.DeleteBlock(EsaTexb);
     EsaStack.stack_used = 0;
@@ -445,7 +443,7 @@ int sgRestartFishing(SubGameInfo *info) {
         if (lure_no >= 0) {
             strcat(lure_path, lure_file[lure_no]);
             if (LoadFile2(lure_path, buffer, NULL, 0) != 0) {
-                Lure->LoadPack((u_int *)buffer, at_932__4, &EsaStack, &EsaStack, &EsaStack, EsaTexb, NULL);
+                Lure->LoadPackNoLine((u_int *)buffer, at_932__4, &EsaStack, &EsaStack, &EsaStack, EsaTexb, NULL);
             }
             LureFrame = Lure->CObjectFrame::frame;
         }
@@ -460,10 +458,24 @@ int sgRestartFishing(SubGameInfo *info) {
         char *esa_path = GetItemFilePath(info->esa_no, 0);
         if (esa_path != NULL) {
             if (*esa_path != 0 && LocalEsaNo >= 0) {
-                EsaChara = new (EsaStack.Alloc(0x68)) CCharacter2;
+                CCharacter2 *esa_chara;
+                if ((esa_chara = (CCharacter2 *)operator new(sizeof(CCharacter2), EsaStack.Alloc(0x68))) != NULL) {
+                    *(void ***)esa_chara = __vt__9mgCObject;
+                    esa_chara->Initialize();
+                    *(void ***)esa_chara = __vt__7CObject;
+                    esa_chara->Initialize();
+                    *(void ***)esa_chara = __vt__12CObjectFrame;
+                    esa_chara->Initialize();
+                    *(void ***)esa_chara = __vt__11CCharacter2;
+                    esa_chara->shadow_link.num = 0;
+                    esa_chara->shadow_link.dst_frame = 0;
+                    esa_chara->shadow_link.src_frame = 0;
+                    esa_chara->Initialize();
+                }
+                EsaChara = esa_chara;
                 EsaChara->Initialize();
                 if (LoadFile2(esa_path, buffer, NULL, 0) != 0) {
-                    EsaChara->LoadPack((u_int *)buffer, at_932__4, &EsaStack, &EsaStack, &EsaStack, EsaTexb, NULL);
+                    EsaChara->LoadPackNoLine((u_int *)buffer, at_932__4, &EsaStack, &EsaStack, &EsaStack, EsaTexb, NULL);
                 } else {
                     EsaChara = NULL;
                 }
@@ -474,8 +486,8 @@ int sgRestartFishing(SubGameInfo *info) {
     sndSeAllStop(8);
     if (sndSeCheck(FanSnd, 0) == 0) {
         mgCMemory sound_memory;
-        sound_memory.Init();
-        sound_memory.stSetBuffer(MotionBuff.stGetTop(), MotionBuff.stGetRest());
+        int sound_size = MotionBuff.stGetRest();
+        sound_memory.stSetBuffer(MotionBuff.stGetTop(), sound_size);
         u_int *sound_buffer = (u_int *)sound_memory.stAlloc64(0x4000);
         if (sound_buffer != NULL && LoadFile2(at_1058__3, sound_buffer, NULL, 0) != 0) {
             sndInitPort(8);
@@ -493,24 +505,23 @@ int sgRestartFishing(SubGameInfo *info) {
             MardanEventMap = 1;
         }
     }
+    int rod_status[5];
     save_data->user_data.GetRodStatus(rod_status);
     RodData.status[0] = rod_status[0];
     RodData.status[1] = rod_status[1];
     RodData.status[2] = rod_status[2];
     RodData.status[3] = rod_status[3];
     RodData.status[4] = rod_status[4];
-    float rate = 0.2f * ((float)RodData.status[3] / 100.0f) + 0.8f;
-    RodData.status[0] = fptosi(0.5f + (float)RodData.status[0] * rate);
-    RodData.status[1] = fptosi(0.5f + (float)RodData.status[1] * rate);
-    RodData.status[2] = fptosi(0.5f + (float)RodData.status[2] * rate);
-    CastDistSizeRate = 10.0f;
+    float rate = 0.2f * ((float)RodData.status[3] / 100.0f);
+    rate += 0.8f;
+    RodData.status[0] = (int)(0.5f + (float)RodData.status[0] * rate);
+    RodData.status[1] = (int)(0.5f + (float)RodData.status[1] * rate);
+    RodData.status[2] = (int)(0.5f + (float)RodData.status[2] * rate);
     RodData.status4_rate = (float)RodData.status[4] / 100.0f;
+    CastDist = 160.0f;
     SetWaterLevel(-100000.0f);
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/fishing", sgRestartFishing__FP11SubGameInfo);
-#endif
 int InitDataLoading(void) {
     SubGameInfo *info;
     CScene *scene;
@@ -758,7 +769,6 @@ int sgExitFishing(SubGameInfo *info) {
     BgmReadFlag = 0;
     return 1;
 }
-#ifdef NONMATCHING
 int sgLoopFishing(SubGameInfo *info) {
     CScene *scene = info->scene;
     CCharacter2 *chara = scene->GetCharacter(scene->player_chara);
@@ -771,7 +781,7 @@ int sgLoopFishing(SubGameInfo *info) {
                 if (fgLoopCnt < 3) {
                     return 0;
                 }
-                if (0 < scene->bg_load_step) {
+                while (0 < scene->bg_load_step) {
                     return 0;
                 }
                 fgLoopStep++;
@@ -859,9 +869,6 @@ int sgLoopFishing(SubGameInfo *info) {
     }
     return RetCode;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/fishing", sgLoopFishing__FP11SubGameInfo);
-#endif
 int sgLoopFishing2(SubGameInfo *info) {
     CScene *scene;
 
@@ -894,7 +901,6 @@ int sgLoopFishing2(SubGameInfo *info) {
     }
     return 0;
 }
-#ifdef NONMATCHING
 int sgDrawFishing(SubGameInfo *info) {
     sceVu0FMATRIX uki_matrix;
     sceVu0FMATRIX lure_matrix;
@@ -905,17 +911,17 @@ int sgDrawFishing(SubGameInfo *info) {
     mgCTextureManager *textures = &mgTexManager;
     textures->ReloadTexture(FishingTexb, (sceVif1Packet *)NULL);
     UkiRod->DrawDirect();
-    sceVu0FVECTOR hook_offset = {0.0f, -3.5f, 1.0f, 0.0f};
+    float hook_offset[4] = {0.0f, -3.5f, 1.0f, 0.0f};
     if (LureFrame != NULL && SetLurePose(LureFrame) != 0) {
         if (GetShowHari() != 0) {
             textures->ReloadTexture(EsaTexb, (sceVif1Packet *)NULL);
             mgDrawDirect(LureFrame);
         }
         LureFrame->GetLWMatrix(uki_matrix);
-        u_long128 lure_swap_row;
-        lure_swap_row = *(u_long128 *)uki_matrix[0];
+        sceVu0FVECTOR lure_swap_row;
+        *(u_long128 *)lure_swap_row = *(u_long128 *)uki_matrix[0];
         *(u_long128 *)uki_matrix[0] = *(u_long128 *)uki_matrix[2];
-        *(u_long128 *)uki_matrix[2] = lure_swap_row;
+        *(u_long128 *)uki_matrix[2] = *(u_long128 *)lure_swap_row;
         sceVu0ScaleVector(uki_matrix[2], uki_matrix[2], -1.0f);
         *(u_long128 *)lure_matrix[0] = *(u_long128 *)uki_matrix[0];
         *(u_long128 *)lure_matrix[1] = *(u_long128 *)uki_matrix[1];
@@ -930,10 +936,10 @@ int sgDrawFishing(SubGameInfo *info) {
             mgDrawDirect(HariFrame);
         }
         HariFrame->GetLWMatrix(uki_matrix);
-        u_long128 hari_swap_row;
-        hari_swap_row = *(u_long128 *)uki_matrix[1];
+        sceVu0FVECTOR hari_swap_row;
+        *(u_long128 *)hari_swap_row = *(u_long128 *)uki_matrix[1];
         *(u_long128 *)uki_matrix[1] = *(u_long128 *)uki_matrix[2];
-        *(u_long128 *)uki_matrix[2] = hari_swap_row;
+        *(u_long128 *)uki_matrix[2] = *(u_long128 *)hari_swap_row;
         sceVu0ScaleVector(uki_matrix[0], uki_matrix[0], -1.0f);
         *(u_long128 *)lure_matrix[0] = *(u_long128 *)uki_matrix[0];
         *(u_long128 *)lure_matrix[1] = *(u_long128 *)uki_matrix[1];
@@ -971,9 +977,6 @@ int sgDrawFishing(SubGameInfo *info) {
     DrawFishingLine();
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/fishing", sgDrawFishing__FP11SubGameInfo);
-#endif
 void DrawNumber(mgCDrawPrim *prim, int digit, int x, int y) {
 
     int tex_u = 0;
@@ -2448,10 +2451,9 @@ int CheckFishing(float *pos, CCPoly *polys, int count) {
     }
     return 0;
 }
-#ifdef NONMATCHING
 int CheckCasting(CScene *scene, float *position, float *direction) {
     mgVu0FBOX box;
-    CCPoly polys[0x400];
+    CCPoly poly_buffer[0x400];
     float end[4];
     float move_dir[4];
     float step_point[4];
@@ -2465,18 +2467,19 @@ int CheckCasting(CScene *scene, float *position, float *direction) {
     int hit_index[32];
 
     mgVectorMaxMin(box.max, box.min, position, direction);
-    box.max[3] = 1.0f;
     box.max[0] += 40.0f;
     box.max[1] += 2000.0f;
+    box.max[3] = 1.0f;
     box.max[2] += 40.0f;
     box.min[0] -= 40.0f;
     box.min[3] = 1.0f;
     box.min[1] -= 2000.0f;
     box.min[2] -= 40.0f;
+    CCPoly *polys = poly_buffer;
     int poly_count = scene->GetColPoly(polys, box, 0x400);
     direction[1] = 40.0f + position[1];
     sceVu0SubVector(move_dir, direction, position);
-    move_dir[3] = 0.0f;
+    move_dir[1] = 0.0f;
     *(u_long128 *)end = *(u_long128 *)direction;
     *(u_long128 *)from = *(u_long128 *)position;
     *(u_long128 *)to = *(u_long128 *)direction;
@@ -2508,9 +2511,6 @@ int CheckCasting(CScene *scene, float *position, float *direction) {
     }
     return CheckHits(polys, poly_count, from, to, 32, hit_index, hit_point, 0, 9) <= 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/fishing", CheckCasting__FP6CScenePfPf);
-#endif
 float GetRandamNumber(float center, float high, float floor) {
     float value = mgNRnd();
     value = center + value * ((high - center) / 3.0f);
@@ -2726,7 +2726,6 @@ int FishLoadBG(FISH_DATA *fish, u_long128 *buffer) {
     sprintf(path, at_2461, param->file_name);
     return LoadFileBG(path, buffer, 0) != 0;
 }
-#ifdef NONMATCHING
 void LineTensionStep(FISH_DATA *fish, int reel) {
     float tension_rate;
     int left_vibration;
@@ -2763,9 +2762,9 @@ void LineTensionStep(FISH_DATA *fish, int reel) {
             }
             break;
         case 1:
-            right_vibration = 0xDC;
             tension_rate += 0.03f * pull;
             fish->vigour -= 0.02f;
+            right_vibration = 0xDC;
             break;
         case 2:
             right_vibration = 0x64;
@@ -2811,9 +2810,6 @@ void LineTensionStep(FISH_DATA *fish, int reel) {
         snd_cnt_2495 = 0;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/fishing", LineTensionStep__FP9FISH_DATAi);
-#endif
 int GetAppearFish(int map_no, float *pos, FISH_PLACE *places, int max_places) {
     FISH_PLACE_MAP *map;
     int i;

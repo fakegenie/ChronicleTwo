@@ -779,9 +779,10 @@ void CAutoMapGen::CreatDummyRoot(int room_no) {
         }
         steps = iRand((int)d) + 1;
     } else {
-        side = kStepUp;
         if (dy < 0) {
             side = kStepDown;
+        } else {
+            side = kStepUp;
         }
         float d = (float)dy;
         if (d < 0.0f) {

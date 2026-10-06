@@ -245,7 +245,7 @@ extern CDC2Mes *GeoramaMes[5];
 extern signed char msgtbl_2587[5];
 extern signed char GeoramaMesForceMakeFlag;
 extern u8 GeoramaMesPosForceSetFlag;
-extern signed char GeoramaMesForceMakeFlag_PaintVer;
+extern unsigned char GeoramaMesForceMakeFlag_PaintVer;
 extern u8 MenuGeoramaCursorForceSetFlag;
 extern signed char MenuGeoStoneDonwLoadFlag;
 extern mgCMemory MenuGeoramaStack;
@@ -1053,9 +1053,9 @@ void MenuGeoramaAnalyzeDraw(int &tex_block, float *pos, int alpha) {
                     PrimQuad(prim, list_pos[0] - 19.0f, 17.0f + y, mgRect<int>(0x160, 0x132, 0x26, 0x1A));
                     short *button = maintopicbtn_1568[GeoRequestFlag->met[no]];
                     PrimQuad(prim, list_pos[0] - 30.0f, y - 9.0f, mgRect<int>(button[0], button[1], 0x1C, 0x26));
+                    y += 30.0f;
                     req_h += GeoramaReqMsgTexH[font_no];
                     font_no++;
-                    y += 30.0f;
                     for (int con = 0; 0 <= MenuEditAnalyzeDataSrc[no]->con_no[con]; con++) {
                         if (mgScreenWidth < y) {
                             break;
@@ -1092,7 +1092,7 @@ void MenuGeoramaAnalyzeDraw(int &tex_block, float *pos, int alpha) {
             if (CMenuGeoPt->list_pos[GEORAMA_VIEW_ANALYZE][0] < mgScreenWidth) {
                 MenuReloadTexture(tex_block, MenuArg.mes_tex_block);
                 for (int i = 0; GeoramaReqMsgFont[i] != NULL && i < 48; i++) {
-                    if (first_hidden >= 0 && first_hidden < i) {
+                    if (0 <= first_hidden && first_hidden < i) {
                         break;
                     }
                     if (GeoramaReqMsgFontDrawFlag[i] != 0) {
@@ -1304,7 +1304,7 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
     int size;
     int no;
 
-    if (town_no < 0 || town_no >= 5) {
+    if (town_no < 0 || town_no > 4) {
         map_no = 0;
         valid = 0;
     }
@@ -1320,9 +1320,9 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
             MenuEditAnalyzeDataSrc[no] = edit->GetAnalyzeData(map_no, no);
         }
     }
-    for (no = 0; MenuEditAnalyzeDataSrc[no] != NULL && no < 32; no++) {
-        GeoRequestFlag->met[no] =
-            edit->GetAnalyzeFlag(map_no, no, GeoRequestFlag->con_no[no], GeoRequestFlag->con_flag[no]);
+    for (int n = 0; MenuEditAnalyzeDataSrc[n] != NULL && n < 32; n++) {
+        GeoRequestFlag->met[n] =
+            edit->GetAnalyzeFlag(map_no, n, GeoRequestFlag->con_no[n], GeoRequestFlag->con_flag[n]);
     }
     analyze_percent = edit->GetAnalyzePercent(map_no);
     MenuAnalyzeData = &edit->analyze;
@@ -1332,6 +1332,7 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
     CSaveDataDungeon *dungeon = &save->save_dungeon;
     memset(floors, 0, sizeof(floors));
     PartsMakeOkTableNum = 0;
+    int *ok_table = PartsMakeOkTable;
     char *hatena = GetHatena();
     CScene *scene = GetMainScene();
     CEditMap *map = (CEditMap *)scene->GetMap(scene->active_map);
@@ -1366,7 +1367,7 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
             if (floor != NULL) {
                 if (!(floor->flag & DNG_FLOOR_FLAG_GEOSTONE_FOUND)) {
                     PartsMakeOkTableNum++;
-                    PartsMakeOkTable[PartsMakeOkTableNum] = parts->id;
+                    ok_table[PartsMakeOkTableNum] = parts->id;
                     PartsMakeOkTableNum++;
                 } else if (!(floor->flag & DNG_FLOOR_FLAG_GEOSTONE_READ)) {
                     floor_num++;
@@ -2344,19 +2345,20 @@ int CMenuGeorama::GetNowModeLoadPartsID() {
 }
 #ifdef NONMATCHING
 CEditPartsInfo *CMenuGeorama::GetNowSelectEditPartsInfo(int mode, int line) {
+    CEditPartsInfo *info = NULL;
     if (MenuMainMapInfo == NULL) {
         return NULL;
     }
     if (mode == GEORAMA_VIEW_STOCK) {
-        return MenuMainMapInfo->GetePartsInfo(stock_list[line].name);
+        info = MenuMainMapInfo->GetePartsInfo(stock_list[line].name);
     }
     else if (mode == GEORAMA_VIEW_MAKE) {
-        return MenuMainMapInfo->GetePartsInfo(make_list[line].name);
+        info = MenuMainMapInfo->GetePartsInfo(make_list[line].name);
     }
     else if (mode == GEORAMA_VIEW_CHECK_POINT) {
-        return MenuMainMapInfo->GetePartsInfo(house_list[line].name);
+        info = MenuMainMapInfo->GetePartsInfo(house_list[line].name);
     }
-    return NULL;
+    return info;
 }
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/editmenu", GetNowSelectEditPartsInfo__12CMenuGeoramaFii);
@@ -3598,9 +3600,9 @@ int CRemovalMenu::KeyStep() {
                 }
                 list_jump = 1;
                 list_scroll_dir = 0;
+                u8 *pack = (u8 *)GetPackFile((unsigned int *)read_b_g->buffer, at_2654, NULL);
                 int tex_block = MenuCommonInfo->tex_block[3];
-                mgTexManager.EnterIMGFile((u8 *)GetPackFile((unsigned int *)read_b_g->buffer, at_2654, NULL), tex_block,
-                                          NULL, NULL);
+                mgTexManager.EnterIMGFile(pack, tex_block, NULL, NULL);
                 mgTexManager.EnterIMGFile((u8 *)GetPackFile((unsigned int *)read_b_g->buffer, at_4256, NULL), tex_block,
                                           NULL, NULL);
                 Tex_Georama = mgTexManager.GetTexture(at_2656, tex_block);
@@ -3618,11 +3620,13 @@ int CRemovalMenu::KeyStep() {
                 }
                 remake = 1;
                 if (special_house == 1) {
-                    MenuMesForm[1]->x = 76.0f;
-                    MenuMesForm[1]->y = 160.0f;
+                    CMenuPosDataForm *form = MenuMesForm[1];
+                    form->x = 76.0f;
+                    form->y = 160.0f;
                     if (LanguageCode > 0) {
-                        MenuMesForm[1]->x = 54.0f;
-                        MenuMesForm[1]->y = 160.0f;
+                        form = MenuMesForm[1];
+                        form->x = 54.0f;
+                        form->y = 160.0f;
                     }
                     remake = 1;
                 }

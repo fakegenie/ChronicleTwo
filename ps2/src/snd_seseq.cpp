@@ -64,7 +64,6 @@ void sndCSeSeqData::Initialize(void) {
     event_num = 0;
     event = NULL;
 }
-#ifdef NONMATCHING
 void sndCSeSeqData::LoadSMF(char *smf, int size, mgCMemory *memory) {
     s16            format;
     s16            track_count;
@@ -72,21 +71,22 @@ void sndCSeSeqData::LoadSMF(char *smf, int size, mgCMemory *memory) {
     int            header_size;
     int            track_size;
     int            delta;
-    int            data_size;
     int            i;
     int            previous_status;
-    int            status;
     unsigned int   bytes;
     unsigned int   qwords;
-    char          *track_start;
     char          *cursor;
+    char          *track_start;
+    int            status;
+    int            data_size;
+    int            meta_size;
     sndSeSeqEvent *output;
 
     if (memcmp(smf, "MThd", 4) != 0) {
         return;
     }
     BigToLittle(&header_size, smf + 4, 4);
-    cursor = smf + header_size + 8;
+    cursor = (char *)(header_size + (int)smf + 8);
     BigToLittle(&format, smf + 8, 2);
     if (format != 0) {
         return;
@@ -117,7 +117,9 @@ void sndCSeSeqData::LoadSMF(char *smf, int size, mgCMemory *memory) {
             if (*cursor == SND_MIDI_META_END_OF_TRACK) {
                 break;
             }
-            cursor += (u8)cursor[1] + 2;
+            meta_size = (u8)cursor[1];
+            cursor += 2;
+            cursor += meta_size;
         } else {
             data_size = 0;
             switch (status & 0xF0) {
@@ -149,16 +151,14 @@ void sndCSeSeqData::LoadSMF(char *smf, int size, mgCMemory *memory) {
     output->status = 0;
     event_num = output + 1 - event;
     bytes = event_num * sizeof(sndSeSeqEvent);
-    qwords = bytes >> 4;
     if ((bytes & 0xF) != 0) {
         qwords = (bytes >> 4) + 1;
+    } else {
+        qwords = bytes >> 4;
     }
     memory->Alloc(qwords);
     tick_rate = division * 225 / 60;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/snd_seseq", LoadSMF__13sndCSeSeqDataFPciP9mgCMemory);
-#endif
 
 void sndCSeSeq::Initialize() {
     tick = 0;

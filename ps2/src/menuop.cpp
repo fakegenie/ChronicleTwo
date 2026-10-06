@@ -441,9 +441,9 @@ void MenuManualDraw() {
                 }
             }
         } else {
-            CPreSprite prim;
             ManualMovie->SwitchThread();
             textures->ReloadTexture(CManualPtr->tex_block[1], (sceVif1Packet *)NULL);
+            CPreSprite prim;
             prim.Initialize(NULL, NULL);
             prim.Preset2D();
             prim.AlphaBlendEnable(0);
@@ -504,6 +504,7 @@ void MenuManualDraw() {
             }
         }
         break;
+    case MANUAL_STEP_FADE_OUT:
     default:
         MenuPosData->FormDraw();
         break;
@@ -2756,14 +2757,14 @@ static inline MC_CARD_INFO *GetSubGameCard(CMemoryCardManager *manager) {
 }
 #ifdef NONMATCHING
 int SubGameSaveKey(void) {
-    MC_ERROR_INFO *error;
     MC_CARD_INFO *card;
-    CDC2Mes *window;
     int pushed;
+    CDC2Mes *window;
     int stepResult;
     int next;
-    int pressed;
+    MC_ERROR_INFO *error;
     int cursor;
+    int pressed;
     int answer;
     int slot;
     int slotNo;
@@ -2818,6 +2819,7 @@ int SubGameSaveKey(void) {
         case SUB_SAVE_CARD_READY:
             card = GetSubGameCard(MemoryCardPtr);
             if (stepResult != 0) {
+                int &exists = MemoryCardPtr->file_exists;
                 if (McCheckMCPs2(card) == 0) {
                     next = SUB_SAVE_CARD_ERROR;
                 } else if (card->formatted == 0) {
@@ -2827,14 +2829,14 @@ int SubGameSaveKey(void) {
                     if (SubGameSaveOrLoad == 1) {
                         next = SUB_SAVE_NO_DATA;
                     }
-                } else if (MemoryCardPtr->file_exists == 1) {
+                } else if (exists == 1) {
                     if (SubGameSaveOrLoad == 0) {
                         next = SUB_SAVE_OVERWRITE_ASK;
                     }
                     if (SubGameSaveOrLoad == 1) {
                         next = SUB_SAVE_LOAD_ASK;
                     }
-                } else if (MemoryCardPtr->file_exists == 2) {
+                } else if (exists == 2) {
                     next = SUB_SAVE_WRITE_FAILED_FULL;
                 } else {
                     if (SubGameSaveOrLoad == 0) {
@@ -2956,12 +2958,13 @@ int SubGameSaveKey(void) {
         case SUB_SAVE_FORMATTING:
             card = GetSubGameCard(MemoryCardPtr);
             if (stepResult != 0) {
-                if (McCheckMCPs2(card) == 0) {
-                    next = SUB_SAVE_CARD_ERROR;
-                } else if (card != NULL && card->formatted == 0) {
-                    next = SUB_SAVE_CARD_ERROR;
-                } else {
+                if (McCheckMCPs2(card) != 0) {
                     next = SUB_SAVE_DIR_MAKING;
+                    if (card != NULL && card->formatted == 0) {
+                        next = SUB_SAVE_CARD_ERROR;
+                    }
+                } else {
+                    next = SUB_SAVE_CARD_ERROR;
                 }
             }
             break;
@@ -3047,7 +3050,7 @@ int SubGameSaveKey(void) {
         case 1001:
             break;
     }
-    if (next >= 0) {
+    if (0 <= next) {
         slot = SubGameMCPort;
         slotNo = slot + 1;
         switch (next) {
@@ -3171,7 +3174,7 @@ int SubGameSaveKey(void) {
         MenuMainScene->fade.FadeOut(0x28, 0.0f, 0.0f, 0.0f);
     }
     SubSaveTileXY += 0.5f;
-    if (SubSaveTileXY >= 0.0f) {
+    if (0.0f <= SubSaveTileXY) {
         SubSaveTileXY -= 256.0f;
     }
     MenuDCMsg[0]->StepMsg();

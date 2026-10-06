@@ -7,9 +7,7 @@ menusys drafts primer=u64div
 monster drafts
 nd_meswin drafts
 snd_mngr primer=u64div
-automap primer=u64div
 dng_event primer=u64div
-menushop drafts
 menudraw primer=u64div
 menuchr primer=u64div drafts
 menuop primer=u64div
@@ -21,3 +19,12 @@ scenesnd primer=u64div
 title primer=u64div
 character primer=u64div
 event_func primer=u64div
+actionchara drafts
+sceneseq primer=u64div
+automap primer=u64div
+fishing primer=u64div
+sound primer=u64div
+pbuggy drafts
+menushop drafts primer=u64div
+menumap primer=u64div
+menumain primer=u64div

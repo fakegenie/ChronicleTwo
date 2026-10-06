@@ -508,7 +508,6 @@ int CMonsterMan::EntryRefer(int monster_id, mgCMemory *memory) {
     }
     return 1;
 }
-#ifdef NONMATCHING
 extern char at_1421__2[];
 extern char at_1422__2[];
 extern char at_1423[];
@@ -540,8 +539,7 @@ int CMonsterMan::LoadReferMonsterFile(int id, BASE_MONSTER_TBL *tbl, mgCMemory *
     }
     sprintf(config_path, at_1421__2, tbl->model);
     sprintf(path, at_1422__2, tbl->model);
-    textures = &mgTexManager;
-    textures->DeleteBlock(slot + 0x28);
+    (textures = &mgTexManager)->DeleteBlock(slot + 0x28);
     LoadFile(path, BuffReadData, &size);
     strcpy(textures->name_suffix, at_1423);
     entry->chara.Initialize();
@@ -582,9 +580,6 @@ int CMonsterMan::LoadReferMonsterFile(int id, BASE_MONSTER_TBL *tbl, mgCMemory *
     entry->id = id;
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/monster", LoadReferMonsterFile__11CMonsterManFiP16BASE_MONSTER_TBLP9mgCMemory);
-#endif
 #ifdef NONMATCHING
 CActiveMonster *CMonsterMan::SetActiveMonster(int refer_no, float *pos, float *rot, int param) {
     if (refer_no < 0 || refer_no >= MONSTER_REFER_MAX) {

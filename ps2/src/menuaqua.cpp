@@ -8,6 +8,7 @@ struct fish_prize_record;
 #include "mg_texture.hpp"
 #include "mg_camera.hpp"
 #include "gamedata.hpp"
+extern s8 aquarium_fish_maxtbl[];
 #include "userdata.hpp"
 #include "menucls1.hpp"
 #include "menucommon.hpp"
@@ -1903,7 +1904,7 @@ void CAquaMes::SetQuestionId(int id, int top, int num) {
                 strcat(format, at_2186__2);
             }
             sprintf(line, format, have);
-            strcpy(question_mes->name[i], line);
+            strcpy(question_mes->name[listed], line);
             listed++;
         }
         question_num = listed;
@@ -2615,7 +2616,6 @@ int CAquarium::LoadFish(int no, CGameDataUsed *data) {
     }
     return 0;
 }
-#ifdef NONMATCHING
 void CAquarium::SettingAqua() {
     int fish_num = aquarium_fish_maxtbl[m_aquarium_para->unk_0];
     int aqua_no = m_aquarium_para->unk_0;
@@ -2723,7 +2723,8 @@ void CAquarium::SettingAqua() {
     water = CreateWaterFrame(24, 16, water_min.v, water_max.v, &aqua_stack);
     if (water != NULL) {
         water->SetTexture(screen);
-        water->SetPosition(-34.0f, 47.0f, -21.5f);
+        float water_x = -34.0f;
+        water->SetPosition(water_x, 47.0f, -21.5f);
     }
     naka_stack.stack_used = 0;
     naka_stack.lock = 0;
@@ -2832,9 +2833,6 @@ void CAquarium::SettingAqua() {
     mode = 0;
     mes.help_draw = 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuaqua", SettingAqua__9CAquariumFv);
-#endif
 int CalcFishParam(BREEDFISH_USED *fish) {
     BREEDFISH_USED *body = (BREEDFISH_USED *)fish;
     int sum;
@@ -2864,19 +2862,18 @@ static int CombineParam(int a, int b) {
     }
     return result;
 }
-#ifdef NONMATCHING
 void CAquarium::CombineFish(int no1, int no2) {
+    BREEDFISH_USED *child_breed;
+    CAquaFish *fish2;
+    CGameDataUsed *data1;
     int total1;
+    BREEDFISH_USED *breed1;
+    CGameDataUsed *data2;
     int total2;
+    CAquaFish *fish1;
+    BREEDFISH_USED *breed2;
     int color;
     int life;
-    CGameDataUsed *data1;
-    CGameDataUsed *data2;
-    BREEDFISH_USED *breed1;
-    BREEDFISH_USED *breed2;
-    BREEDFISH_USED *child_breed;
-    CAquaFish *fish1;
-    CAquaFish *fish2;
     float center[4];
     float pos1[4];
     float pos2[4];
@@ -2969,9 +2966,6 @@ void CAquarium::CombineFish(int no1, int no2) {
     fish[no2]->Initialize();
     fish[no2] = NULL;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuaqua", CombineFish__9CAquariumFii);
-#endif
 int CAquarium::GetBattleTarget(int slot) {
     int round;
     int i;

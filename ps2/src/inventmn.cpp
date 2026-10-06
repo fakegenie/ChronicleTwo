@@ -4526,6 +4526,7 @@ void MakeMsgNetaName(CDC2Mes *message, CMenuPosDataForm *form, USER_PICTURE_INFO
 
 #ifdef NONMATCHING
 void MenuInventCreateCardDraw(int &tex_block, float *pos) {
+    int i;
     mgCTexture *texture = Tex_Hatsumei;
     if (texture != NULL) {
         MenuReloadTexture(tex_block, texture->block);
@@ -4542,7 +4543,6 @@ void MenuInventCreateCardDraw(int &tex_block, float *pos) {
         prim->Bilinear(1);
         prim->Begin(6);
         prim->Texture(texture);
-        int i;
         for (i = 0; i < 256; i++) {
             if (put_rect.top + put_rect.bottom >= 20) {
                 prim->Color(0x80, 0x80, 0x80, 0x80);
@@ -5252,56 +5252,57 @@ int MenuInventDebugKey() {
     }
     return 1;
 }
-#ifdef NONMATCHING
 void MenuInventDebugDraw() {
     DrawMenuFillBox(0x40, 0, 0, 0);
-    mgCTextureManager *tex_manager = &mgTexManager;
+    mgCTextureManager *texture_manager = &mgTexManager;
     mgCDrawPrim prim;
+    mgCTextureManager *tex_manager = texture_manager;
     CMenuFont font;
     char line[0x40];
     float scale[4];
     float position[4];
     char model_text[0x80];
     switch (CMenuInventPt->key_arg_no) {
-    case 0: {
-        int y = 80 - debug_invent_select * 20;
-        DrawMenuFillBox(270.0f, 80.0f, 220.0f, 300.0f, 0x80, 0, 0, 0);
-        tex_manager->ReloadTexture(MenuArg.mes_tex_block, (sceVif1Packet *)NULL);
-        for (int i = 0; i < pic_name_info_num; i++) {
-            if (y >= 80) {
-                sprintf(line, at_5153, pic_name_info_top[i].neta_id, pic_name_info_top[i].name);
-                font.SetStr(line);
-                font.SetPos(270, y);
+        case 0: {
+            int y = 80 - debug_invent_select * 20;
+            float top = 80.0f;
+            float left = 270.0f;
+            float width = 220.0f;
+            float height = 300.0f;
+            DrawMenuFillBox(left, top, width, height, 0x80, 0, 0, 0);
+            tex_manager->ReloadTexture(MenuArg.mes_tex_block, (sceVif1Packet *)NULL);
+            for (int i = 0; i < pic_name_info_num; i++) {
+                if (y >= 80) {
+                    sprintf(line, at_5153, pic_name_info_top[i].neta_id, pic_name_info_top[i].name);
+                    font.SetStr(line);
+                    font.SetPos(270, y);
+                    font.DrawDirect(font.str, font.pos_x, font.pos_y);
+                }
+                y += 20;
+                if (y >= 380) {
+                    break;
+                }
+            }
+            font.SetStr(at_5154);
+            font.SetPos(250, 80);
+            font.DrawDirect(font.str, font.pos_x, font.pos_y);
+            if (debug_invent_successflag != 0) {
+                font.SetStr(at_5155);
+                font.SetPos(20, 60);
                 font.DrawDirect(font.str, font.pos_x, font.pos_y);
             }
-            y += 20;
-            if (y >= 380) {
-                break;
+            if (CMenuInventPt->create_chara != NULL) {
+                CMenuInventPt->create_chara->GetScale(scale);
+                CMenuInventPt->create_chara->GetPosition(position);
+                sprintf(model_text, at_5156, scale[0], position[0], position[1], position[2]);
+                font.SetStr(model_text);
+                font.SetPos(40, 340);
+                font.DrawDirect(font.str, font.pos_x, font.pos_y);
             }
+            break;
         }
-        font.SetStr(at_5154);
-        font.SetPos(250, 80);
-        font.DrawDirect(font.str, font.pos_x, font.pos_y);
-        if (debug_invent_successflag != 0) {
-            font.SetStr(at_5155);
-            font.SetPos(20, 60);
-            font.DrawDirect(font.str, font.pos_x, font.pos_y);
-        }
-        if (CMenuInventPt->create_chara != NULL) {
-            CMenuInventPt->create_chara->GetScale(scale);
-            CMenuInventPt->create_chara->GetPosition(position);
-            sprintf(model_text, at_5156, scale[0], position[0], position[1], position[2]);
-            font.SetStr(model_text);
-            font.SetPos(40, 340);
-            font.DrawDirect(font.str, font.pos_x, font.pos_y);
-        }
-        break;
-    }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/inventmn", MenuInventDebugDraw__Fv);
-#endif
 int MenuInventPushKey(int pad, int pushed) {
     int mode = CMenuInventPt->key_arg_no;
     if (CMenuInventPt->mode <= 0) {

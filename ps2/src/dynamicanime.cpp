@@ -73,11 +73,11 @@ void CDynamicAnime::Step() {
     sceVu0FVECTOR   wind;
     DA_FIX_VERTEX  *fixed;
     DA_BIND_VERTEX *bound;
-    CDACollision   *volume;
     mgCFrame       *fixed_frame;
     float           stiffness;
     float           friction;
     int             hit;
+    CDACollision   *volume;
     int             i;
     int             j;
     int             iteration;
@@ -835,13 +835,13 @@ int dynCOLLISION_START(SPI_STACK *stack, int argc) {
     dynNowDA->NewCollisionTable(spiGetStackInt(stack), dynStack);
     return 1;
 }
-#ifdef NONMATCHING
 
+#ifdef NONMATCHING
 static int dynCOLLISION(SPI_STACK *stack, int count) {
     char       *kind;
     CDAColPipe *pipe;
 
-    kind = spiGetStackString(stack);
+    kind = spiGetStackString(stack++);
     if (kind == NULL) {
         return 0;
     }
@@ -850,12 +850,13 @@ static int dynCOLLISION(SPI_STACK *stack, int count) {
         if (pipe == NULL) {
             return 0;
         }
-        pipe->frame_id = spiGetStackInt(stack + 1);
-        spiGetStackVector(pipe->center, stack + 2);
-        spiGetStackVector(pipe->radius, stack + 5);
-        pipe->axis = spiGetStackInt(stack + 8);
+        pipe->frame_id = spiGetStackInt(stack++);
+        spiGetStackVector(pipe->center, stack);
+        spiGetStackVector(pipe->radius, stack + 3);
+        stack += 6;
+        pipe->axis = spiGetStackInt(stack++);
         if (count >= 10) {
-            pipe->friction = spiGetStackFloat(stack + 9);
+            pipe->friction = spiGetStackFloat(stack);
         }
         dynNowDA->SetCollision(dynColCount++, pipe);
         return 1;

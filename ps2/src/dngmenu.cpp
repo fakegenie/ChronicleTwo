@@ -392,17 +392,17 @@ void CDngFreeMap::DrawRoot(mgRect<float> rect, DNGMAP_ROOT_INFO *root, int shado
     float blue = 144.0f;
     mark = markOffsetTable_1092[0];
     if (mode == DNGMAP_MODE_EVENT) {
-        red = 128.0f;
         mark_level = 64.0f;
+        red = 128.0f;
         blue = 0.0f;
         green = 111.0f;
     }
     prim = GetMenuPrim();
     SetSpriteEnv(prim, 2);
     prim->Begin(1);
-    int r = fptosi(red);
-    int g = fptosi(green);
-    int b = fptosi(blue);
+    unsigned int r = fptosi(red);
+    unsigned int g = fptosi(green);
+    unsigned int b = fptosi(blue);
     prim->Color(r, g, b, alpha);
     if (shadow != 0) {
         prim->Color(0, 0, 0, fptosi(0.05f * (float)alpha));
@@ -525,7 +525,7 @@ void CDngFreeMap::DrawRoot(mgRect<float> rect, DNGMAP_ROOT_INFO *root, int shado
         prim->Color(0, 0, 0, fptosi(0.05f * (float)alpha));
     }
     prim->Texture(map_tex);
-    if (root->type != 0 && root->opened != 0 && root->show_mark != 0 && mark != NULL) {
+    if (root->type != 0 && (u8)root->opened != 0 && root->show_mark != 0 && mark != NULL) {
         int level = fptosi(mark_level);
         prim->Color(level, level, level, alpha);
         if (shadow != 0) {
@@ -756,19 +756,20 @@ int CheckGeoramaMateria(TRESURE_BOX_FLOOR_INFO *tresure, int floor, int *materia
     TRESURE_BOX_FLOOR *floor_info = &tresure->floor[floor];
     while (cursor < floor_info->group_num) {
         group_id = floor_info->group_id[cursor];
-        if (group_id >= 0) {
-            group = NULL;
-            for (g = 0; g < tresure->group_num; g++) {
-                if (group_id == tresure->group[g].group_id) {
-                    group = &tresure->group[g];
-                    break;
-                }
+        if (group_id < 0) {
+            break;
+        }
+        group = NULL;
+        for (g = 0; g < tresure->group_num; g++) {
+            if (group_id == tresure->group[g].group_id) {
+                group = &tresure->group[g];
+                break;
             }
-            k = 0;
-            if (group != NULL) {
-                for (; k < group->item_num; k++) {
-                    materia[materia_num++] = group->item[k].item_no;
-                }
+        }
+        k = 0;
+        if (group != NULL) {
+            for (; k < group->item_num; k++) {
+                materia[materia_num++] = group->item[k].item_no;
             }
         }
         cursor++;

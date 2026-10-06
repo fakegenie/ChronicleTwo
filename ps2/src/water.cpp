@@ -103,16 +103,29 @@ void CFireRaster::Step(void) {
         free_slot->life = 30;
     }
 }
-#ifdef NONMATCHING
+struct TextureFields {
+    short block;
+    short width;
+    short height;
+    short bpp;
+    char name[32];
+    int vram_size;
+    int image_blocks;
+    int clut_size;
+    u_long tex0;
+    u_long tex1;
+    u_long clamp;
+    u_long128 *image[4];
+    u_long128 *clut;
+    int swizzled;
+    mgCTexture *next;
+};
 void CFireRaster::SetTexture(mgCTexture *texture) {
     if (texture != NULL) {
-        this->texture = *texture;
+        *(TextureFields *)&this->texture = *(TextureFields *)texture;
         this->texture.tex0.bits.tcc = 0;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/water", SetTexture__11CFireRasterFP10mgCTexture);
-#endif
 #ifdef NONMATCHING
 void CFireRaster::Draw(float *position, float *scale) {
     mgCDrawPrim         prim;
@@ -235,9 +248,6 @@ void CThunderEffect::Init(void) {
 }
 #ifdef NONMATCHING
 void CWater::Hamon() {
-    float *next;
-    float *current;
-    float *cell;
     float  coefficient;
     float  center_coefficient;
     float  friction;
@@ -246,6 +256,8 @@ void CWater::Hamon() {
     int    row;
     int    column;
     int    index;
+    float *current;
+    float *next;
 
     if (height == height_a) {
         current = height_a;
@@ -261,9 +273,9 @@ void CWater::Hamon() {
     for (row = 1; row < rows - 1; row++) {
         for (column = 1; column < columns - 1; column++) {
             index = row * columns + column;
-            cell = &current[index];
+            float *cell = &current[index];
             old_height = next[index];
-            new_height = coefficient * (*(cell - columns) + (cell[-1] + cell[1] + cell[columns])) +
+            new_height = ((cell[-1] + cell[1] + cell[columns]) + *(cell - columns)) * coefficient +
                          (center_coefficient * cell[0] - old_height);
             next[index] = new_height - friction * (new_height - old_height);
         }

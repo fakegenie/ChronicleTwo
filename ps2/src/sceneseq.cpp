@@ -801,11 +801,9 @@ int scsMoveAHD(_SEN_CMR_SEQ *node, CSceneCmrSeq *owner) {
     owner->ahd_cnt++;
     return 1;
 }
-#ifdef NONMATCHING
 int scsMoveAHD2(_SEN_CMR_SEQ *node, CSceneCmrSeq *owner) {
     float angle_delta;
     int ended;
-    int moved;
     if (node->mode == SCENE_SEQ_EASE_IN_OUT) {
         ended = owner->ease_frame;
     } else {
@@ -844,7 +842,7 @@ int scsMoveAHD2(_SEN_CMR_SEQ *node, CSceneCmrSeq *owner) {
             owner->pos_ease_spd[3] = 1.0f;
         }
     } else if (owner->sync != 0) {
-        moved = 0;
+        int moved = 0;
         if (owner->ahd_cnt < owner->ease_frame &&
             (node->mode == SCENE_SEQ_EASE_IN_OUT || node->mode == SCENE_SEQ_EASE_IN)) {
             sceVu0AddVector(owner->pos_ease_spd, owner->pos_ease_spd, owner->pos_ease_acc);
@@ -883,7 +881,7 @@ int scsMoveAHD2(_SEN_CMR_SEQ *node, CSceneCmrSeq *owner) {
             owner->sync_dist += owner->dist_spd;
         }
     } else {
-        moved = 0;
+        int moved = 0;
         if (owner->ahd_cnt < owner->ease_frame &&
             (node->mode == SCENE_SEQ_EASE_IN_OUT || node->mode == SCENE_SEQ_EASE_IN)) {
             sceVu0AddVector(owner->pos_ease_spd, owner->pos_ease_spd, owner->pos_ease_acc);
@@ -928,9 +926,6 @@ int scsMoveAHD2(_SEN_CMR_SEQ *node, CSceneCmrSeq *owner) {
     owner->ahd_cnt++;
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/sceneseq", scsMoveAHD2__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
-#endif
 int scsSetSyncObj(_SEN_CMR_SEQ *seq, CSceneCmrSeq *owner) {
     owner->sync_obj = seq->frame;
     owner->sync_mode = seq->mode;

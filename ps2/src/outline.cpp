@@ -129,11 +129,11 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/outline", Draw__12COutLineDrawFff);
 static void DrawDivSprite(mgCDrawPrim *prim, mgRect<int> rect, mgCTexture *texture,
                           int *color, int dx, int dy, int z, int unused) {
     mgRect<int> area = rect;
-    sceVu0IVECTOR texcrd_end;
-    sceVu0IVECTOR texcrd_start;
-    sceVu0IVECTOR vertex_end;
     sceVu0IVECTOR vertex_start;
-    int offset_x = dx + mgScreenOffx * 16;
+    sceVu0IVECTOR vertex_end;
+    sceVu0IVECTOR texcrd_start;
+    unsigned int offset_x = dx + mgScreenOffx * 16;
+    sceVu0IVECTOR texcrd_end;
     int offset_y = dy + mgScreenOffy * 16;
     int block_height = mgScreenHeight * 16;
 
@@ -175,6 +175,7 @@ static void DrawDivSprite(mgCDrawPrim *prim, mgRect<int> rect, mgCTexture *textu
             y = y_end;
             packet[0] = *(u_long128 *)texcrd_start;
             packet[1] = *(u_long128 *)vertex_start;
+            y = y_end;
             packet[2] = *(u_long128 *)texcrd_end;
             packet[3] = *(u_long128 *)vertex_end;
         }

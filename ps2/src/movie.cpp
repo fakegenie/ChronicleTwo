@@ -1289,22 +1289,24 @@ int decBs0(VideoDec *dec) {
     return 1;
 }
 #ifdef NONMATCHING
+struct GifTagData {
+    u_long128 value;
+};
 void setImageTag(u32 *tag, void *data, int a, int width, int height) {
     sceGifPacket packet;
-    u_long128 giftag = at_1276__2;
-    sceGsTex0 tex0;
+    GifTagData giftag = *(GifTagData *)&at_1276__2;
     int x;
     int y;
     int blocks_x;
     int blocks_y;
-    int tile_x;
-    int tile_y;
+    unsigned int tile_x;
+    unsigned int tile_y;
 
     sceGifPkInit(&packet, (u_long128 *)(((u32)tag & 0xFFFFFFF) | 0x20000000));
     sceGifPkReset(&packet);
-    tex0 = mgTexManager.GetTexture(TexName, -1)->tex0;
+    sceGsTex0 tex0 = mgTexManager.GetTexture(TexName, -1)->tex0;
     sceGifPkCnt(&packet, 0, 0, 0);
-    sceGifPkOpenGifTag(&packet, giftag);
+    sceGifPkOpenGifTag(&packet, *(u_long128 *)&giftag);
     sceGifPkAddGsAD(&packet, 0x50, SCE_GS_SET_BITBLTBUF(0, 0, 0, tex0.TBP0, tex0.TBW, 0));
     sceGifPkAddGsAD(&packet, 0x52, SCE_GS_SET_TRXREG(16, 16));
     sceGifPkCloseGifTag(&packet);
@@ -1315,7 +1317,7 @@ void setImageTag(u32 *tag, void *data, int a, int width, int height) {
         tile_y = 0;
         for (y = 0; y < blocks_y; y++) {
             sceGifPkCnt(&packet, 0, 0, 0);
-            sceGifPkOpenGifTag(&packet, giftag);
+            sceGifPkOpenGifTag(&packet, *(u_long128 *)&giftag);
             sceGifPkAddGsAD(&packet, 0x51, SCE_GS_SET_TRXPOS(0, 0, tile_x, tile_y, 0));
             sceGifPkAddGsAD(&packet, 0x53, 0);
             sceGifPkCloseGifTag(&packet);
@@ -1328,9 +1330,9 @@ void setImageTag(u32 *tag, void *data, int a, int width, int height) {
         }
         tile_x += 0x10;
     }
-    giftag = at_1287__2;
+    GifTagData end_tag = *(GifTagData *)&at_1287__2;
     sceGifPkEnd(&packet, 0, 0, 0);
-    sceGifPkOpenGifTag(&packet, giftag);
+    sceGifPkOpenGifTag(&packet, *(u_long128 *)&end_tag);
     sceGifPkAddGsAD(&packet, 0x3F, 0);
     sceGifPkCloseGifTag(&packet);
     sceGifPkTerminate(&packet);

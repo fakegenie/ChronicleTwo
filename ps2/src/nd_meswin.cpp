@@ -123,6 +123,7 @@ extern char at_2394[];
 extern char at_2395[];
 extern char at_2396[];
 extern char at_2397[];
+extern char at_2398[];
 
 
 const int mes_newline = 0xFF00;
@@ -1514,336 +1515,315 @@ void ClsMes::MakeMesWinTbl_value(int value_no, int *x, int *y) {
         }
     }
 }
-#ifdef NONMATCHING
 void ClsMes::MakeMesWinTbl_str(char *str, int *x, int *y) {
-    char *suffix;
     int length;
     int position;
     int tag_no;
-    int handled;
+    char *suffix;
     int font_no;
-    int item_code;
+    unsigned short gaiji_no;
 
     length = strlen(str);
     position = 0;
     while (position < length) {
-        handled = 0;
-        if (strncmp(&str[position], "//", 2) == 0) {
+        if (strncmp(&str[position], at_2366, 2) == 0) {
             position += 2;
-            while (GetHalfFontNo__Fc(str[position]) != -2) {
+            for (;;) {
+                if (GetHalfFontNo__Fc(str[position]) == -2) {
+                    position++;
+                    break;
+                }
                 position++;
             }
-            position++;
-            handled = 1;
+            continue;
         }
-        if (handled == 0 && strncmp(&str[position], "[\x90\x94\x92\x6C", 5) == 0) {
+        if (strncmp(&str[position], at_2367, 5) == 0) {
             position += 5;
             tag_no = 0;
             suffix = &str[position];
-            if (strncmp(suffix, "\x82\x50]", 3) == 0) {
+            if (strncmp(suffix, at_2368, 3) == 0) {
                 tag_no = 1;
             }
-            if (strncmp(suffix, "\x82\x51]", 3) == 0) {
+            if (strncmp(suffix, at_2369, 3) == 0) {
                 tag_no = 2;
             }
-            if (strncmp(suffix, "\x82\x52]", 3) == 0) {
+            if (strncmp(suffix, at_2370, 3) == 0) {
                 tag_no = 3;
             }
-            if (strncmp(suffix, "\x82\x53]", 3) == 0) {
+            if (strncmp(suffix, at_2371, 3) == 0) {
                 tag_no = 4;
             }
-            if (strncmp(suffix, "\x82\x54]", 3) == 0) {
+            if (strncmp(suffix, at_2372, 3) == 0) {
                 tag_no = 5;
             }
-            if (strncmp(suffix, "\x82\x55]", 3) == 0) {
+            if (strncmp(suffix, at_2373, 3) == 0) {
                 tag_no = 6;
             }
-            if (strncmp(suffix, "\x82\x56]", 3) == 0) {
+            if (strncmp(suffix, at_2374, 3) == 0) {
                 tag_no = 7;
             }
-            if (strncmp(suffix, "\x82\x57]", 3) == 0) {
+            if (strncmp(suffix, at_2375, 3) == 0) {
                 tag_no = 8;
             }
-            if (strncmp(suffix, "\x82\x58]", 3) == 0) {
+            if (strncmp(suffix, at_2376, 3) == 0) {
                 tag_no = 9;
             }
-            if (strncmp(suffix, "\x82\x50\x82\x4F]", 5) == 0) {
+            if (strncmp(suffix, at_2377, 5) == 0) {
                 tag_no = 10;
             }
             if (tag_no != 0) {
-                position += tag_no < 10 ? 3 : 5;
-                handled = 1;
                 MakeMesWinTbl_value(tag_no - 1, x, y);
+                if (tag_no < 10) {
+                    position += 3;
+                } else {
+                    position += 5;
+                }
+                continue;
             }
         }
-        if (handled == 0 && strncmp(&str[position], "[Number", 7) == 0) {
+        if (strncmp(&str[position], at_2378, 7) == 0) {
             position += 7;
             tag_no = 0;
             suffix = &str[position];
-            if (strncmp(suffix, "1]", 2) == 0) {
+            if (strncmp(suffix, at_2379, 2) == 0) {
                 tag_no = 1;
             }
-            if (strncmp(suffix, "2]", 2) == 0) {
+            if (strncmp(suffix, at_2380, 2) == 0) {
                 tag_no = 2;
             }
-            if (strncmp(suffix, "3]", 2) == 0) {
+            if (strncmp(suffix, at_2381, 2) == 0) {
                 tag_no = 3;
             }
-            if (strncmp(suffix, "4]", 2) == 0) {
+            if (strncmp(suffix, at_2382, 2) == 0) {
                 tag_no = 4;
             }
-            if (strncmp(suffix, "5]", 2) == 0) {
+            if (strncmp(suffix, at_2383, 2) == 0) {
                 tag_no = 5;
             }
-            if (strncmp(suffix, "6]", 2) == 0) {
+            if (strncmp(suffix, at_2384, 2) == 0) {
                 tag_no = 6;
             }
-            if (strncmp(suffix, "7]", 2) == 0) {
+            if (strncmp(suffix, at_2385, 2) == 0) {
                 tag_no = 7;
             }
-            if (strncmp(suffix, "8]", 2) == 0) {
+            if (strncmp(suffix, at_2386, 2) == 0) {
                 tag_no = 8;
             }
-            if (strncmp(suffix, "9]", 2) == 0) {
+            if (strncmp(suffix, at_2387, 2) == 0) {
                 tag_no = 9;
             }
-            if (strncmp(suffix, "10]", 3) == 0) {
+            if (strncmp(suffix, at_2388, 3) == 0) {
                 tag_no = 10;
             }
             if (tag_no != 0) {
-                position += tag_no < 10 ? 2 : 3;
-                handled = 1;
                 MakeMesWinTbl_value(tag_no - 1, x, y);
+                if (tag_no < 10) {
+                    position += 2;
+                } else {
+                    position += 3;
+                }
+                continue;
             }
         }
-        if (handled == 0 && strncmp(&str[position], "[\x83\x41\x83\x43\x83\x65\x83\x80", 9) == 0) {
+        if (strncmp(&str[position], at_2389, 9) == 0) {
             position += 9;
             tag_no = 0;
             suffix = &str[position];
-            if (strncmp(suffix, "\x82\x50]", 3) == 0) {
+            if (strncmp(suffix, at_2368, 3) == 0) {
                 tag_no = 1;
+                MakeMesWinTbl_item(MES_CODE_ITEM_FIRST, x, y);
             }
-            if (strncmp(suffix, "\x82\x51]", 3) == 0) {
+            if (strncmp(suffix, at_2369, 3) == 0) {
                 tag_no = 2;
+                MakeMesWinTbl_item(0xFBFD, x, y);
             }
-            if (strncmp(suffix, "\x82\x52]", 3) == 0) {
+            if (strncmp(suffix, at_2370, 3) == 0) {
                 tag_no = 3;
+                MakeMesWinTbl_item(0xFBFC, x, y);
             }
-            if (strncmp(suffix, "\x82\x53]", 3) == 0) {
+            if (strncmp(suffix, at_2371, 3) == 0) {
                 tag_no = 4;
+                MakeMesWinTbl_item(0xFBFB, x, y);
             }
-            if (strncmp(suffix, "\x82\x54]", 3) == 0) {
+            if (strncmp(suffix, at_2372, 3) == 0) {
                 tag_no = 5;
+                MakeMesWinTbl_item(0xFBF2, x, y);
             }
-            if (strncmp(suffix, "\x82\x55]", 3) == 0) {
+            if (strncmp(suffix, at_2373, 3) == 0) {
                 tag_no = 6;
+                MakeMesWinTbl_item(0xFBF1, x, y);
             }
-            if (strncmp(suffix, "\x82\x56]", 3) == 0) {
+            if (strncmp(suffix, at_2374, 3) == 0) {
                 tag_no = 7;
+                MakeMesWinTbl_item(0xFBF0, x, y);
             }
-            if (strncmp(suffix, "\x82\x57]", 3) == 0) {
+            if (strncmp(suffix, at_2375, 3) == 0) {
                 tag_no = 8;
+                MakeMesWinTbl_item(0xFBEF, x, y);
             }
-            if (strncmp(suffix, "\x82\x58]", 3) == 0) {
+            if (strncmp(suffix, at_2376, 3) == 0) {
                 tag_no = 9;
+                MakeMesWinTbl_item(0xFBEE, x, y);
             }
-            if (strncmp(suffix, "\x82\x50\x82\x4F]", 5) == 0) {
+            if (strncmp(suffix, at_2377, 5) == 0) {
                 tag_no = 10;
+                MakeMesWinTbl_item(0xFBED, x, y);
             }
-            if (strncmp(suffix, "\x82\x50\x82\x50]", 5) == 0) {
+            if (strncmp(suffix, at_2390, 5) == 0) {
                 tag_no = 11;
+                MakeMesWinTbl_item(0xFBEC, x, y);
             }
-            if (strncmp(suffix, "\x82\x50\x82\x51]", 5) == 0) {
+            if (strncmp(suffix, at_2391, 5) == 0) {
                 tag_no = 12;
+                MakeMesWinTbl_item(0xFBEB, x, y);
             }
-            if (strncmp(suffix, "\x82\x50\x82\x52]", 5) == 0) {
+            if (strncmp(suffix, at_2392, 5) == 0) {
                 tag_no = 13;
+                MakeMesWinTbl_item(0xFBEA, x, y);
             }
-            if (strncmp(suffix, "\x82\x50\x82\x53]", 5) == 0) {
+            if (strncmp(suffix, at_2393, 5) == 0) {
                 tag_no = 14;
+                MakeMesWinTbl_item(0xFBE9, x, y);
             }
-            if (strncmp(suffix, "\x82\x50\x82\x54]", 5) == 0) {
+            if (strncmp(suffix, at_2394, 5) == 0) {
                 tag_no = 15;
+                MakeMesWinTbl_item(0xFBE8, x, y);
             }
-            if (strncmp(suffix, "\x82\x50\x82\x55]", 5) == 0) {
+            if (strncmp(suffix, at_2395, 5) == 0) {
                 tag_no = 16;
+                MakeMesWinTbl_item(MES_CODE_ITEM_LAST, x, y);
             }
             if (tag_no != 0) {
-                position += tag_no < 10 ? 3 : 5;
-                handled = 1;
-                switch (tag_no) {
-                    case 1:
-                        item_code = MES_CODE_ITEM_FIRST;
-                        break;
-                    case 2:
-                        item_code = 0xFBFD;
-                        break;
-                    case 3:
-                        item_code = 0xFBFC;
-                        break;
-                    case 4:
-                        item_code = 0xFBFB;
-                        break;
-                    case 5:
-                        item_code = 0xFBF2;
-                        break;
-                    case 6:
-                        item_code = 0xFBF1;
-                        break;
-                    case 7:
-                        item_code = 0xFBF0;
-                        break;
-                    case 8:
-                        item_code = 0xFBEF;
-                        break;
-                    case 9:
-                        item_code = 0xFBEE;
-                        break;
-                    case 10:
-                        item_code = 0xFBED;
-                        break;
-                    case 11:
-                        item_code = 0xFBEC;
-                        break;
-                    case 12:
-                        item_code = 0xFBEB;
-                        break;
-                    case 13:
-                        item_code = 0xFBEA;
-                        break;
-                    case 14:
-                        item_code = 0xFBE9;
-                        break;
-                    case 15:
-                        item_code = 0xFBE8;
-                        break;
-                    case 16:
-                        item_code = MES_CODE_ITEM_LAST;
-                        break;
+                if (tag_no < 10) {
+                    position += 3;
+                } else {
+                    position += 5;
                 }
-                MakeMesWinTbl_item(item_code, x, y);
+                continue;
             }
         }
-        if (handled == 0 && strncmp(&str[position], "[\x95\xB6\x8E\x9A\x97\xF1", 7) == 0) {
+        if (strncmp(&str[position], at_2396, 7) == 0) {
             position += 7;
             tag_no = 0;
             suffix = &str[position];
-            if (strncmp(suffix, "\x82\x50]", 3) == 0) {
+            if (strncmp(suffix, at_2368, 3) == 0) {
                 tag_no = 1;
             }
-            if (strncmp(suffix, "\x82\x51]", 3) == 0) {
+            if (strncmp(suffix, at_2369, 3) == 0) {
                 tag_no = 2;
             }
-            if (strncmp(suffix, "\x82\x52]", 3) == 0) {
+            if (strncmp(suffix, at_2370, 3) == 0) {
                 tag_no = 3;
             }
-            if (strncmp(suffix, "\x82\x53]", 3) == 0) {
+            if (strncmp(suffix, at_2371, 3) == 0) {
                 tag_no = 4;
             }
-            if (strncmp(suffix, "\x82\x54]", 3) == 0) {
+            if (strncmp(suffix, at_2372, 3) == 0) {
                 tag_no = 5;
             }
-            if (strncmp(suffix, "\x82\x55]", 3) == 0) {
+            if (strncmp(suffix, at_2373, 3) == 0) {
                 tag_no = 6;
             }
-            if (strncmp(suffix, "\x82\x56]", 3) == 0) {
+            if (strncmp(suffix, at_2374, 3) == 0) {
                 tag_no = 7;
             }
-            if (strncmp(suffix, "\x82\x57]", 3) == 0) {
+            if (strncmp(suffix, at_2375, 3) == 0) {
                 tag_no = 8;
             }
-            if (strncmp(suffix, "\x82\x58]", 3) == 0) {
+            if (strncmp(suffix, at_2376, 3) == 0) {
                 tag_no = 9;
             }
-            if (strncmp(suffix, "\x82\x50\x82\x4F]", 5) == 0) {
+            if (strncmp(suffix, at_2377, 5) == 0) {
                 tag_no = 10;
             }
-            if (strncmp(suffix, "\x82\x50\x82\x50]", 5) == 0) {
+            if (strncmp(suffix, at_2390, 5) == 0) {
                 tag_no = 11;
             }
-            if (strncmp(suffix, "\x82\x50\x82\x51]", 5) == 0) {
+            if (strncmp(suffix, at_2391, 5) == 0) {
                 tag_no = 12;
             }
-            if (strncmp(suffix, "\x82\x50\x82\x52]", 5) == 0) {
+            if (strncmp(suffix, at_2392, 5) == 0) {
                 tag_no = 13;
             }
-            if (strncmp(suffix, "\x82\x50\x82\x53]", 5) == 0) {
+            if (strncmp(suffix, at_2393, 5) == 0) {
                 tag_no = 14;
             }
-            if (strncmp(suffix, "\x82\x50\x82\x54]", 5) == 0) {
+            if (strncmp(suffix, at_2394, 5) == 0) {
                 tag_no = 15;
             }
-            if (strncmp(suffix, "\x82\x50\x82\x55]", 5) == 0) {
+            if (strncmp(suffix, at_2395, 5) == 0) {
                 tag_no = 16;
             }
             if (tag_no != 0) {
-                position += tag_no < 10 ? 3 : 5;
-                handled = 1;
                 MakeMesWinTbl_str(tag_no - 1, x, y);
+                if (tag_no < 10) {
+                    position += 3;
+                } else {
+                    position += 5;
+                }
+                continue;
             }
         }
-        if (handled == 0) {
-            font_no = GetAlphabeticalFontNo_cp(&str[position]);
-            if (font_no > 0) {
-                SetMesWinTbl(font_no, *x, *y);
-                position += 9;
-                *x += (int)(font_w * half_font_w_percent);
+        suffix = &str[position];
+        gaiji_no = GetAlphabeticalFontNo_cp(suffix);
+        if (0 < gaiji_no) {
+            SetMesWinTbl(gaiji_no, *x, *y);
+            *x += (int)(font_w * half_font_w_percent);
+            position += 9;
+            continue;
+        }
+        gaiji_no = GetFontGaijiFontNo(suffix);
+        if (gaiji_no) {
+            SetMesWinTbl(gaiji_no, *x, *y);
+            *x += font_w;
+            position += 2;
+            continue;
+        }
+        gaiji_no = GetGaijiFontNo(suffix);
+        if (0 < gaiji_no) {
+            SetMesWinTbl(gaiji_no, *x, *y);
+            *x += GetGaijiW(gaiji_no);
+            position += GetGaijiLen(gaiji_no);
+            continue;
+        }
+        if (strncmp(suffix, at_2397, 6) == 0) {
+            SetMesWinTbl(MES_CODE_PAGE, *x, *y);
+            *x = 0;
+            position += 6;
+            *y = 0;
+            continue;
+        }
+        font_no = GetHalfFontNo__Fc(*suffix);
+        if (font_no == -2) {
+            SetMesWinTbl(MES_CODE_NEWLINE, *x, *y);
+            *x = 0;
+            position++;
+            *y += font_h;
+        } else if (CheckHalfFont(font_no) != 0) {
+            SetMesWinTbl(font_no, *x, *y);
+            if (font_no == GetHalfFontNo__Fc(' ')) {
+                *x += font_w / 2;
             } else {
-                font_no = GetFontGaijiFontNo(&str[position]);
-                if (font_no != 0) {
-                    SetMesWinTbl(font_no, *x, *y);
-                    position += 2;
-                    *x += font_w;
-                } else {
-                    font_no = GetGaijiFontNo(&str[position]);
-                    if (font_no > 0) {
-                        SetMesWinTbl(font_no, *x, *y);
-                        *x += GetGaijiW(font_no);
-                        position += GetGaijiLen(font_no);
-                    } else if (strncmp(&str[position], "<page>", 6) == 0) {
-                        SetMesWinTbl(MES_CODE_PAGE, *x, *y);
-                        *x = 0;
-                        position += 6;
-                        *y = 0;
-                    } else {
-                        font_no = GetHalfFontNo__Fc(str[position]);
-                        if (font_no == -2) {
-                            SetMesWinTbl(MES_CODE_NEWLINE, *x, *y);
-                            *x = 0;
-                            position++;
-                            *y += font_h;
-                        } else if (CheckHalfFont(font_no) != 0) {
-                            SetMesWinTbl(font_no, *x, *y);
-                            if (font_no == GetHalfFontNo__Fc(' ')) {
-                                *x += font_w / 2;
-                            } else {
-                                *x += (int)(font_w * half_font_w_percent);
-                            }
-                            position++;
-                        } else {
-                            font_no = GetFontNo(&str[position]);
-                            if (font_no == -1) {
-                                font_no = GetFontNo("\x81\x48");
-                            }
-                            SetMesWinTbl(font_no, *x, *y);
-                            if (CheckKanjiFont(font_no) != 0) {
-                                *x += font_w;
-                            } else if (CheckKanjiFont(GetFontNo(&str[position + 2])) != 0) {
-                                *x += font_w;
-                            } else {
-                                *x += font_w;
-                            }
-                            position += 2;
-                        }
-                    }
-                }
+                *x += (int)(font_w * half_font_w_percent);
             }
+            position++;
+        } else {
+            font_no = GetFontNo(suffix);
+            if (font_no == -1) {
+                font_no = GetFontNo(at_2398);
+            }
+            SetMesWinTbl(font_no, *x, *y);
+            if (CheckKanjiFont(font_no) != 0) {
+                *x += font_w;
+            } else if (CheckKanjiFont(GetFontNo(suffix + 2)) != 0) {
+                *x += font_w;
+            } else {
+                *x += font_w;
+            }
+            position += 2;
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/nd_meswin", MakeMesWinTbl_str__6ClsMesFPcPiPi);
-#endif
 void ClsMes::MakeMesWinTbl_str(int i, int *a2, int *a3) { this->MakeMesWinTbl_str((char*)this + i*50 + 0x1E59, a2, a3); }
 int ClsMes::MakeMesWinTbl_item(int ref_code, int *x, int *y) {
     u16 *cursor;
@@ -2168,13 +2148,21 @@ int ClsMes::CalcSpaceW(int width, int char_width, unsigned short *text) {
     used_width = 0;
     while (1) {
         code = *text++;
-        if (code == MES_CODE_SPACE) {
+        switch (code) {
+        case MES_CODE_NEWLINE:
+        case MES_CODE_PAGE:
+        case MES_CODE_END:
+            if (spaces > 0) {
+                return (width - used_width) / spaces;
+            }
+            return -1;
+        case MES_CODE_SPACE:
             spaces++;
-        } else if (code == MES_CODE_END || code == MES_CODE_PAGE || code == MES_CODE_NEWLINE) {
-            break;
-        } else if (code >= MES_CODE_GAIJI && code < 0xFD32) {
+            continue;
+        }
+        if (code >= MES_CODE_GAIJI && code < 0xFD32) {
             used_width += GetGaijiW(code);
-        } else if (code >= 0xFFA0) {
+        } else if (code >= 0xFFA0 && code < 0x10000) {
             used_width += (int)(char_width * half_font_w_percent);
         } else if (code >= 0xFDE0 && code < 0xFDF8) {
             if (GetFontGaijiHankaku(code) != 0) {
@@ -2184,37 +2172,41 @@ int ClsMes::CalcSpaceW(int width, int char_width, unsigned short *text) {
             }
         } else if (code >= MES_CODE_MOVE_X && code < 0xFA00) {
             used_width += code - MES_CODE_MOVE_X;
-        } else if ((code < MES_CODE_COLOR_DEFAULT || code >= MES_CODE_GAIJI) &&
-                   (code < MES_CODE_COLOR_A || code >= 0xF600) &&
-                   code != MES_CODE_VOICE_1 && code != MES_CODE_VOICE_0 && code != MES_CODE_VOICE_2) {
-            if (CheckHalfFont(code) != 0) {
-                if (code == GetHalfFontNo__Fc(' ')) {
-                    used_width += char_width / 2;
-                } else {
-                    used_width += (int)(char_width * half_font_w_percent);
-                }
+        } else if (code >= MES_CODE_COLOR_DEFAULT && code <= 0xFCFF) {
+            continue;
+        } else if (code >= MES_CODE_COLOR_R && code <= 0xF5FF) {
+            continue;
+        } else if (code >= MES_CODE_COLOR_G && code <= 0xF4FF) {
+            continue;
+        } else if (code >= MES_CODE_COLOR_B && code <= 0xF3FF) {
+            continue;
+        } else if (code >= MES_CODE_COLOR_A && code <= 0xF2FF) {
+            continue;
+        } else if (code == MES_CODE_VOICE_1 || code == MES_CODE_VOICE_0) {
+            continue;
+        } else if (code == MES_CODE_VOICE_2) {
+            continue;
+        } else if (CheckHalfFont(code) != 0) {
+            if (code == GetHalfFontNo__Fc(' ')) {
+                used_width += char_width / 2;
             } else {
-                used_width += char_width;
+                used_width += (int)(char_width * half_font_w_percent);
             }
+        } else {
+            used_width += char_width;
         }
     }
-    if (spaces > 0) {
-        return (width - used_width) / spaces;
-    }
-    return -1;
 }
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/nd_meswin", CalcSpaceW__6ClsMesFiiPUs);
 #endif
-#ifdef NONMATCHING
 int ClsMes::MakeMesWinTbl(int mes_no) {
     unsigned short *text;
     short          *registered_name;
-    unsigned short  code;
-    short           name_code;
+    int             code;
+    int             name_code;
     int             x;
     int             y;
-    int             value_code;
 
     if (buff == NULL) {
         return 0;
@@ -2233,26 +2225,35 @@ int ClsMes::MakeMesWinTbl(int mes_no) {
             space_w = -1;
             justify_w = -1;
         }
-        if (code == MES_CODE_NEWLINE) {
+        switch (code) {
+        case MES_CODE_END:
+            SetMesWinTbl(MES_CODE_END, x, y);
+            return 1;
+        case MES_CODE_NEWLINE:
             SetMesWinTbl(MES_CODE_NEWLINE, x, y);
             x = 0;
             y += font_h;
-        } else if (code == MES_CODE_PAGE) {
+            continue;
+        case MES_CODE_PAGE:
             SetMesWinTbl(MES_CODE_PAGE, x, y);
             x = 0;
             y = 0;
-        } else if (code == MES_CODE_END) {
-            break;
-        } else if (code == MES_CODE_VOICE_1 || code == MES_CODE_VOICE_0 || code == MES_CODE_VOICE_2) {
+            continue;
+        case MES_CODE_VOICE_1:
+        case MES_CODE_VOICE_0:
+        case MES_CODE_VOICE_2:
             SetMesWinTbl(code, x, y);
-        } else if (code == MES_CODE_SPACE) {
+            continue;
+        case MES_CODE_SPACE:
             SetMesWinTbl(MES_CODE_SPACE, x, y);
             if (justify_w >= 0 || space_w >= 0) {
                 x += space_w;
             } else {
                 x += font_w / 2;
             }
-        } else if (code >= 0xFFA0) {
+            continue;
+        }
+        if (code >= 0xFFA0 && code < 0x10000) {
             SetMesWinTbl(GetAlphabeticalFontNo_us(code), x, y);
             x += (int)(font_w * half_font_w_percent);
         } else if (code >= 0xFDE0 && code < 0xFDF8) {
@@ -2261,8 +2262,15 @@ int ClsMes::MakeMesWinTbl(int mes_no) {
         } else if (code >= MES_CODE_GAIJI && code < 0xFD32) {
             SetMesWinTbl(code, x, y);
             x += GetGaijiW(code);
-        } else if ((code >= MES_CODE_COLOR_DEFAULT && code < MES_CODE_GAIJI) ||
-                   (code >= MES_CODE_COLOR_A && code < 0xF600)) {
+        } else if (code >= MES_CODE_COLOR_DEFAULT && code < MES_CODE_GAIJI) {
+            SetMesWinTbl(code, x, y);
+        } else if (code >= MES_CODE_COLOR_R && code < 0xF600) {
+            SetMesWinTbl(code, x, y);
+        } else if (code >= MES_CODE_COLOR_G && code < MES_CODE_COLOR_R) {
+            SetMesWinTbl(code, x, y);
+        } else if (code >= MES_CODE_COLOR_B && code < MES_CODE_COLOR_G) {
+            SetMesWinTbl(code, x, y);
+        } else if (code >= MES_CODE_COLOR_A && code < MES_CODE_COLOR_B) {
             SetMesWinTbl(code, x, y);
         } else if (code >= MES_CODE_JUSTIFY && code < MES_CODE_SPACE_W) {
             justify_w = (code - MES_CODE_JUSTIFY) * 4;
@@ -2290,38 +2298,30 @@ int ClsMes::MakeMesWinTbl(int mes_no) {
             }
         } else if (code >= 0xFAEA && code <= 0xFAF9) {
             MakeMesWinTbl_str(0xFAF9 - code, &x, &y);
-        } else if (code == 0xFBFF) {
+        } else if (code - 0xFB00 == 0xFF) {
             MakeMesWinTbl_value(&x, &y);
-        } else {
-            value_code = code - 0xFB00;
-            if (value_code >= 0xF3 && value_code < 0xFB) {
-                MakeMesWinTbl_value(0xFA - value_code, &x, &y);
-            } else if (value_code >= 0xDF && value_code < 0xE7) {
-                MakeMesWinTbl_value(0xEE - value_code, &x, &y);
-            } else if (MakeMesWinTbl_item(code, &x, &y) == 0) {
-                SetMesWinTbl(code, x, y);
-                if (CheckHalfFont(code) != 0) {
-                    if (code == GetHalfFontNo__Fc(' ')) {
-                        x += font_w / 2;
-                    } else {
-                        x += (int)(font_w * half_font_w_percent);
-                    }
-                } else if (CheckKanjiFont(code) != 0) {
-                    x += font_w;
-                } else if (CheckKanjiFont(*text) != 0) {
-                    x += font_w;
+        } else if (code - 0xFB00 >= 0xF3 && code - 0xFB00 < 0xFB) {
+            MakeMesWinTbl_value(0xFA - (code - 0xFB00), &x, &y);
+        } else if (code - 0xFB00 >= 0xDF && code - 0xFB00 < 0xE7) {
+            MakeMesWinTbl_value(0xEE - (code - 0xFB00), &x, &y);
+        } else if (MakeMesWinTbl_item(code, &x, &y) == 0) {
+            SetMesWinTbl(code, x, y);
+            if (CheckHalfFont(code) != 0) {
+                if (code == GetHalfFontNo__Fc(' ')) {
+                    x += font_w / 2;
                 } else {
-                    x += font_w;
+                    x += (int)(font_w * half_font_w_percent);
                 }
+            } else if (CheckKanjiFont(code) != 0) {
+                x += font_w;
+            } else if (CheckKanjiFont(*text) != 0) {
+                x += font_w;
+            } else {
+                x += font_w;
             }
         }
     }
-    SetMesWinTbl(MES_CODE_END, x, y);
-    return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/nd_meswin", MakeMesWinTbl__6ClsMesFi);
-#endif
 int ClsMes::MakeMesWinTbl(char *text) {
     if (text == NULL) {
         return 0;
@@ -2398,19 +2398,17 @@ void ClsMes::AddPage(int end, int page) {
         }
     }
 }
-#ifdef NONMATCHING
 void ClsMes::NeedMesWinWH(int mes_no) {
-    char            number[128];
     unsigned short *text;
-    unsigned short  code;
     int             y;
     int             line;
     int             page_index;
-    int             value_no;
-    int             number_value;
-    int             width;
+    unsigned short  code;
+    int             index;
     int             item_no;
     int             message;
+    int             width;
+    int             digits;
     int             i;
 
     if (buff == NULL) {
@@ -2430,85 +2428,149 @@ void ClsMes::NeedMesWinWH(int mes_no) {
             space_w = -1;
             justify_w = -1;
         }
-        if (code == MES_CODE_PAGE) {
+        switch (code) {
+        case MES_CODE_END:
             AddPage(line, page_index);
-            line++;
-            SetYokoHaba(line, 0);
-            y = 0;
-            page_index++;
-        } else if (code == MES_CODE_NEWLINE) {
+            text_h += font_h;
+            text_w = 0;
+            for (i = 0; i < MES_LINE_MAX; i++) {
+                if (line_w[i] >= 0 && text_w < line_w[i]) {
+                    text_w = line_w[i];
+                }
+            }
+            for (int n = 0; n < MES_LINE_MAX; n++) {
+                line_indent[n] = (text_w - line_w[n]) / 2;
+            }
+            page_num = page_index + 1;
+            return;
+        case MES_CODE_SPACE:
+            if (justify_w >= 0 || space_w >= 0) {
+                AddYokoHaba(line, space_w);
+            } else {
+                AddYokoHaba(line, font_w / 2);
+            }
+            continue;
+        case MES_CODE_NEWLINE:
             line++;
             SetYokoHaba(line, 0);
             y += font_h;
             if (text_h < y) {
                 text_h = y;
             }
-        } else if (code == MES_CODE_SPACE) {
-            if (justify_w >= 0 || space_w >= 0) {
-                AddYokoHaba(line, space_w);
-            } else {
-                AddYokoHaba(line, font_w / 2);
-            }
-        } else if (code == MES_CODE_END) {
-            break;
-        } else if ((code < MES_CODE_WAIT || code >= MES_CODE_NEWLINE) &&
-                   (code < MES_CODE_COLOR_DEFAULT || code >= MES_CODE_GAIJI) &&
-                   (code < MES_CODE_COLOR_A || code >= MES_CODE_JUSTIFY) &&
-                   code != MES_CODE_VOICE_1 && code != MES_CODE_VOICE_0 && code != MES_CODE_VOICE_2) {
+            continue;
+        case MES_CODE_PAGE:
+            AddPage(line, page_index);
+            line++;
+            SetYokoHaba(line, 0);
+            y = 0;
+            page_index++;
+            continue;
+        }
+        if ((code < MES_CODE_WAIT || code > 0xFEFF) &&
+            (code < MES_CODE_COLOR_DEFAULT || code > 0xFCFF) &&
+            (code < MES_CODE_COLOR_R || code > 0xF5FF) &&
+            (code < MES_CODE_COLOR_G || code > 0xF4FF) &&
+            (code < MES_CODE_COLOR_B || code > 0xF3FF) &&
+            (code < MES_CODE_COLOR_A || code > 0xF2FF) &&
+            (code < 0xF600 || code > 0xF6FF) &&
+            code != MES_CODE_VOICE_1 && code != MES_CODE_VOICE_0 && code != MES_CODE_VOICE_2) {
             if (code >= MES_CODE_JUSTIFY && code < MES_CODE_SPACE_W) {
                 justify_w = (code - MES_CODE_JUSTIFY) * 4;
                 space_w = CalcSpaceW(justify_w, font_w, text - 1);
-            } else if (code >= MES_CODE_SPACE_W && code < MES_CODE_MOVE_X) {
+                continue;
+            }
+            if (code >= MES_CODE_SPACE_W && code < MES_CODE_MOVE_X) {
                 space_w = code - MES_CODE_SPACE_W;
-            } else if (code >= MES_CODE_MOVE_X && code < 0xFA00) {
+                continue;
+            }
+            if (code >= MES_CODE_MOVE_X && code < 0xFA00) {
                 AddYokoHaba(line, code - MES_CODE_MOVE_X);
-            } else if (code == 0xFBFF || (code >= 0xFBF3 && code < 0xFBFB) ||
-                       (code >= 0xFBDF && code < MES_CODE_ITEM_LAST)) {
-                if (code == 0xFBFF) {
-                    number_value = value;
-                } else {
-                    if (code >= 0xFBF3 && code < 0xFBFB) {
-                        value_no = 0xFBFA - code;
+                continue;
+            }
+            index = code - 0xFB00;
+            if (index == 0xFF) {
+                char number[0x80];
+                if (value_zero != 0 || value != 0) {
+                    if (value_sign != 0 && value > 0) {
+                        sprintf(number, at_2109, value);
                     } else {
-                        value_no = 0xFBEE - code;
+                        sprintf(number, at_2110, value);
                     }
-                    number_value = values[value_no];
-                }
-                if (value_zero != 0 || number_value != 0) {
-                    if (value_sign != 0 && number_value > 0) {
-                        sprintf(number, "+%d\n", number_value);
-                    } else {
-                        sprintf(number, "%d\n", number_value);
-                    }
-                    width = (strlen(number) - 1) * font_w;
+                    digits = strlen(number) - 1;
                     if (value_half != 0) {
-                        width /= 2;
+                        AddYokoHaba(line, digits * font_w / 2);
+                    } else {
+                        AddYokoHaba(line, digits * font_w);
                     }
-                    AddYokoHaba(line, width);
                 }
-            } else if (code == MES_CODE_ITEM_FIRST || code == 0xFBFD || code == 0xFBFC ||
-                       code == 0xFBFB || code == 0xFBF2 || code == 0xFBF1 ||
-                       code == 0xFBF0 || code == 0xFBEF || code == 0xFBEE ||
-                       code == 0xFBED || code == 0xFBEC || code == 0xFBEB ||
-                       code == 0xFBEA || code == 0xFBE9 || code == 0xFBE8 ||
-                       code == MES_CODE_ITEM_LAST) {
+                continue;
+            }
+            if (index >= 0xF3 && index < 0xFB) {
+                char number[0x80];
+                index = 0xFA - index;
+                if (value_zero != 0 || values[index] != 0) {
+                    if (value_sign != 0 && values[index] > 0) {
+                        sprintf(number, at_2109, values[index]);
+                    } else {
+                        sprintf(number, at_2110, values[index]);
+                    }
+                    digits = strlen(number) - 1;
+                    if (value_half != 0) {
+                        AddYokoHaba(line, digits * font_w / 2);
+                    } else {
+                        AddYokoHaba(line, digits * font_w);
+                    }
+                }
+                continue;
+            }
+            if (code >= 0xFBDF && code < MES_CODE_ITEM_LAST) {
+                char number[0x80];
+                index = 0xEE - index;
+                if (value_zero != 0 || values[index] != 0) {
+                    if (value_sign != 0 && values[index] > 0) {
+                        sprintf(number, at_2109, values[index]);
+                    } else {
+                        sprintf(number, at_2110, values[index]);
+                    }
+                    digits = strlen(number) - 1;
+                    if (value_half != 0) {
+                        AddYokoHaba(line, digits * font_w / 2);
+                    } else {
+                        AddYokoHaba(line, digits * font_w);
+                    }
+                }
+                continue;
+            }
+            if (code == MES_CODE_ITEM_LAST || code == 0xFBE8 || code == 0xFBE9 || code == 0xFBEA ||
+                code == 0xFBEB || code == 0xFBEC || code == 0xFBED || code == 0xFBEE ||
+                code == 0xFBEF || code == 0xFBF0 || code == 0xFBF1 || code == 0xFBF2 ||
+                code == 0xFBFB || code == 0xFBFC || code == 0xFBFD || code == MES_CODE_ITEM_FIRST) {
                 item_no = GetItemNoFromFontNo(code);
-                message = -1;
-                if (item_no > 0 && item_no < 17) {
+                if (item_no <= 0) {
+                    message = -1;
+                } else if (item_no > 16) {
+                    message = -1;
+                } else {
                     message = item_mes[item_no - 1];
                 }
                 width = GetMesWidth_system(message);
                 if (width != -1) {
                     AddYokoHaba(line, width);
                 }
-            } else if (code >= 0xFAEA && code <= 0xFAF9) {
+                continue;
+            }
+            if (code >= 0xFAEA && code <= 0xFAF9) {
                 width = GetStrWidth(0xFAF9 - code);
                 if (width != -1) {
                     AddYokoHaba(line, width);
                 }
-            } else if (code >= 0xFFA0) {
+                continue;
+            }
+            if (code >= 0xFFA0 && code < 0x10000) {
                 AddYokoHaba(line, (int)(font_w * half_font_w_percent));
-            } else if (code >= 0xFDE0 && code < 0xFDF8) {
+                continue;
+            }
+            if (code >= 0xFDE0 && code < 0xFDF8) {
                 if (code == 0xFDF3) {
                     AddYokoHaba(line, (int)(2.0f * (font_w * half_font_w_percent)));
                 } else if (GetFontGaijiHankaku(code) != 0) {
@@ -2516,9 +2578,13 @@ void ClsMes::NeedMesWinWH(int mes_no) {
                 } else {
                     AddYokoHaba(line, (int)(2.0f * (font_w * half_font_w_percent)));
                 }
-            } else if (code >= MES_CODE_GAIJI && code < 0xFD32) {
+                continue;
+            }
+            if (code >= MES_CODE_GAIJI && code < 0xFD32) {
                 AddYokoHaba(line, GetGaijiW(code));
-            } else if (CheckHalfFont(code) != 0) {
+                continue;
+            }
+            if (CheckHalfFont(code) != 0) {
                 if (code == GetHalfFontNo__Fc(' ')) {
                     AddYokoHaba(line, font_w / 2);
                 } else {
@@ -2533,22 +2599,7 @@ void ClsMes::NeedMesWinWH(int mes_no) {
             }
         }
     }
-    AddPage(line, page_index);
-    text_h += font_h;
-    text_w = 0;
-    for (i = 0; i < MES_LINE_MAX; i++) {
-        if (line_w[i] >= 0 && text_w < line_w[i]) {
-            text_w = line_w[i];
-        }
-    }
-    for (i = 0; i < MES_LINE_MAX; i++) {
-        line_indent[i] = (text_w - line_w[i]) / 2;
-    }
-    page_num = page_index + 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/nd_meswin", NeedMesWinWH__6ClsMesFi);
-#endif
 void ClsMes::NeedMesWinWH(char *text) {
     char message[mes_buffer_size];
     char value_text[0x80];
@@ -2940,8 +2991,8 @@ void ClsMes::MakeMesWin_init(int reset_fade) {
 void ClsMes::MakeMesWin(int message) {
     int extra_width;
     int current_page;
-    int character_count;
     int index;
+    int character_count;
 
     if (message < 0) {
         if (mes_no == -2) {
@@ -2968,7 +3019,7 @@ void ClsMes::MakeMesWin(int message) {
                 for (index = 0; index < current_page + 1; index++) {
                     character_count += page_chars[index];
                 }
-                if (line_w[character_count - 1] >= text_w) {
+                if (text_w <= line_w[character_count - 1]) {
                     extra_width = 1;
                 }
             }
@@ -3027,8 +3078,8 @@ void ClsMes::MakeMesWin(char *str, int open, int reset_fade) {
     char text[512];
     int  extra_width;
     int  current_page;
-    int  character_count;
     int  index;
+    int  character_count;
 
     if (str != NULL) {
         PreMesMake(str, text);
@@ -3046,7 +3097,7 @@ void ClsMes::MakeMesWin(char *str, int open, int reset_fade) {
                 for (index = 0; index < current_page + 1; index++) {
                     character_count += page_chars[index];
                 }
-                if (line_w[character_count - 1] >= text_w) {
+                if (text_w <= line_w[character_count - 1]) {
                     extra_width = 1;
                 }
             }
@@ -3718,6 +3769,20 @@ void CalcWindowInRectFromOutRect(int type, RECT outer, RECT *inner) {
 void ClsMes::DrawMesWin() {
     RGBAQ_TYPE color;
     RGBAQ_TYPE shadow_color;
+
+    SetFuchi(fuchi);
+    text_x = 0;
+    text_y = 0;
+    color.b = 0x80;
+    color.g = 0x80;
+    color.r = 0x80;
+    color.a = alpha;
+    shadow_color.b = 0;
+    shadow_color.g = 0;
+    shadow_color.r = 0;
+    shadow_color.a = alpha * 0x40 / 128;
+    mgCDrawPrim frame_prim;
+    mgCDrawPrim sprite_prim;
     RECT       inner;
     RECT       outer;
     RECT       shadow;
@@ -3725,20 +3790,6 @@ void ClsMes::DrawMesWin() {
     int        dx;
     int        dy;
     int        select_y;
-
-    SetFuchi(fuchi);
-    text_x = 0;
-    text_y = 0;
-    color.r = 0x80;
-    color.g = 0x80;
-    color.b = 0x80;
-    color.a = alpha;
-    shadow_color.r = 0;
-    shadow_color.g = 0;
-    shadow_color.b = 0;
-    shadow_color.a = alpha * 0x40 / 128;
-    mgCDrawPrim frame_prim;
-    mgCDrawPrim sprite_prim;
     MySetPrim(&sprite_prim, MES_PRIM_SPRITE, 0);
     if (mes_no == -1) {
         return;

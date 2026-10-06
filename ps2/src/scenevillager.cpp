@@ -225,16 +225,13 @@ int CScene::DrawChara(int index, int pass) {
 int CScene::DrawCharaShadow(int index) {
     float light_dir[4][4];
     float light_color[4][4];
-    float direction[4];
-    float position[4];
-    float color[4];
     CCharacter2 *chara = GetCharacter(index);
 
     if (chara == NULL) {
         return 0;
     }
     mgGetLight(light_dir, light_color);
-    *(u_long128 *)direction = *(u_long128 *)at_988__3;
+    float direction[4] = {0.0f, 0.0f, 0.0f, 0.0f};
     direction[0] = light_dir[0][0];
     direction[1] = light_dir[1][0];
     direction[2] = light_dir[2][0];
@@ -246,8 +243,8 @@ int CScene::DrawCharaShadow(int index) {
     if (height < 0.8f) {
         direction[1] = 0.8f;
     }
-    *(u_long128 *)position = *(u_long128 *)at_991__4;
-    *(u_long128 *)color = *(u_long128 *)at_992__3;
+    float position[4] = {0.0f, -10.0f, 0.0f, 0.0f};
+    float color[4] = {0.0f, 1.0f, 0.0f, 0.0f};
     if (CheckDrawCharaShadow(index) == 0) {
         return 0;
     }

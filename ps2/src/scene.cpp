@@ -51,7 +51,6 @@ void InitVector(float *vector) {
     vector[2] = 0.0f;
     vector[3] = 1.0f;
 }
-#ifdef NONMATCHING
 float RandXYinViewArea(float min_dist, float max_dist, float view_angle, float *x, float *z) {
     float position[4];
     float reference[4];
@@ -64,8 +63,9 @@ float RandXYinViewArea(float min_dist, float max_dist, float view_angle, float *
     camera->GetPos(position);
     camera->GetRef(reference);
     sceVu0SubVector(direction, reference, position);
-    heading = atan2f(direction[0], direction[2]);
-    heading = f_rand(view_angle / -2.0f, view_angle / 2.0f) + heading;
+    float facing = atan2f(direction[0], direction[2]);
+    float spread = f_rand(view_angle / -2.0f, view_angle / 2.0f);
+    heading = spread + facing;
     distance = f_rand(min_dist, max_dist);
     *x = distance * sinf(heading);
     *z = distance * cosf(heading);
@@ -77,9 +77,6 @@ float RandXYinViewArea(float min_dist, float max_dist, float view_angle, float *
     height += position[1];
     return height;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/scene", RandXYinViewArea__FfffPfPf);
-#endif
 int CRipple::Birth(float *position) {
     if (active != 0) {
         return 0;

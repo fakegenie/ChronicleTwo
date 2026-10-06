@@ -1205,61 +1205,64 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/dng_event", SearchMapFlatPosition__FPfP11C
 #endif
 #ifdef NONMATCHING
 int GetDungeonEventPoint(float *out_pos, float *out_rot, int kind) {
-    CMap *map;
-    CMapParts *parts;
-    float rotation;
     float euler[4];
-    CTreasureBoxManager *boxes;
-    CTreasureBox *box;
-
     if (kind == DUNGEON_EVENT_POINT_PLAYER) {
         CCharacter2 *player = DngMainScene->GetCharacter(0);
         if (player == NULL) {
             return 0;
         }
         player->GetPosition(out_pos);
-        out_pos[0] = fptosi((80.0f + out_pos[0]) / 160.0f) * 160;
+        out_pos[0] = (int)((80.0f + out_pos[0]) / 160.0f) * 160;
         out_pos[1] = 0;
-        out_pos[2] = fptosi((80.0f + out_pos[2]) / 160.0f) * 160;
+        out_pos[2] = (int)((80.0f + out_pos[2]) / 160.0f) * 160;
         *out_rot = 0;
     }
     if (kind == DUNGEON_EVENT_POINT_WAY_20) {
-        map = DngMainScene->GetMap(DngMainScene->active_map);
+        CMapParts *parts[8];
+        float rotation[8];
+        CMap *map = DngMainScene->GetMap(DngMainScene->active_map);
         if (map == NULL) {
             return 0;
         }
-        if (SearchMapEventParts(0, &parts, &rotation, 8) <= 0) {
+        if (SearchMapEventParts(0, parts, rotation, 8) <= 0) {
             return 0;
         }
-        parts->GetPosition(out_pos);
-        *out_rot = rotation;
-        DngMainScene->event_parts_id = map->ConvertParts(parts);
-        EdEventInfo.dng_event_parts = parts;
+        CMapParts *found = parts[0];
+        found->GetPosition(out_pos);
+        *out_rot = rotation[0];
+        CSceneEventData *event = &DngMainScene->event_data;
+        event->map_event.parts_no = map->ConvertParts(found);
+        EdEventInfo.dng_event_parts = found;
         EdEventInfo.dng_event_found = 1;
     }
     if (kind == DUNGEON_EVENT_POINT_WAY_24) {
-        map = DngMainScene->GetMap(DngMainScene->active_map);
+        CMapParts *parts[16];
+        float rotation[16];
+        CMap *map = DngMainScene->GetMap(DngMainScene->active_map);
         if (map == NULL) {
             return 0;
         }
-        if (SearchMapEventParts(2, &parts, &rotation, 0x10) <= 0) {
+        if (SearchMapEventParts(2, parts, rotation, 0x10) <= 0) {
             return 0;
         }
-        parts->GetPosition(out_pos);
-        *out_rot = rotation;
-        DngMainScene->event_parts_id = map->ConvertParts(parts);
-        EdEventInfo.dng_event_parts = parts;
+        CMapParts *found = parts[0];
+        found->GetPosition(out_pos);
+        *out_rot = rotation[0];
+        CSceneEventData *event = &DngMainScene->event_data;
+        event->map_event.parts_no = map->ConvertParts(found);
+        EdEventInfo.dng_event_parts = found;
         EdEventInfo.dng_event_found = 1;
     }
     if (kind == DUNGEON_EVENT_POINT_TREASURE_BOX) {
-        boxes = DngMainScene->battle_area.treasure_box;
-        if (&DngMainScene->battle_area == NULL) {
+        DNG_BATTLE_AREA *area = &DngMainScene->battle_area;
+        if (area == NULL) {
             return 0;
         }
+        CTreasureBoxManager *boxes = area->treasure_box;
         if (boxes == NULL) {
             return 0;
         }
-        box = &boxes->box[boxes->near_box];
+        CTreasureBox *box = &boxes->box[boxes->near_box];
         if (box == NULL) {
             return 0;
         }
@@ -1690,24 +1693,22 @@ void AutoSetTreasureBox(void) {
         }
     }
 }
-#ifdef NONMATCHING
 int _FLS(SPI_STACK *stack, int argc) {
     FLS_FLOOR_ID = spiGetStackInt(stack++);
     spiGetStackInt(stack);
-    int floor = DngSaveDataDungeon->floor_id[DngSaveDataDungeon->stage_id];
-    if (floor == FLS_FLOOR_ID) {
+    int current_floor = DngSaveDataDungeon->floor_id[DngSaveDataDungeon->stage_id];
+    int floor = current_floor;
+    if (FLS_FLOOR_ID == floor) {
         ((CMonsterMan *)ActiveMonster)->locate.num = 0;
     }
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dng_event", _FLS__FP9SPI_STACKi);
-#endif
-#ifdef NONMATCHING
 int _FL(SPI_STACK *stack, int argc) {
     int i;
     int entry;
-    if (DngSaveDataDungeon->floor_id[DngSaveDataDungeon->stage_id] != FLS_FLOOR_ID) {
+    int current_floor = DngSaveDataDungeon->floor_id[DngSaveDataDungeon->stage_id];
+    int floor = current_floor;
+    if (FLS_FLOOR_ID != floor) {
         return 1;
     }
     {
@@ -1720,9 +1721,6 @@ int _FL(SPI_STACK *stack, int argc) {
     }
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dng_event", _FL__FP9SPI_STACKi);
-#endif
 int _FLE(SPI_STACK *stack, int argc) {
     FLS_FLOOR_ID = -1;
     return 1;

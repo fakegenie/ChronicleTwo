@@ -2402,17 +2402,14 @@ void EditDataSave(void) {
         }
     }
 }
-#ifdef NONMATCHING
 void EditDataLoad() {
-    EP_PLACE_INFO   placement;
-    CEditMap       *map;
     CEditData      *data;
     CSaveData      *save;
     CEditPartsInfo *info;
     int             slot;
     int             i;
 
-    map = (CEditMap *)MainScene__2->GetMap(MainScene__2->active_map);
+    CEditMap *map = (CEditMap *)MainScene__2->GetMap(MainScene__2->active_map);
     if (map != NULL) {
         data = GetSaveData()->GetEditData(MapNo);
         if (data != NULL && strcmp(map->Iam(), "CEditMap") == 0 && map != NULL) {
@@ -2426,10 +2423,11 @@ void EditDataLoad() {
             }
             save = GetSaveData();
             if (MapNo == 0 && save->GetBitFlag(0xFA) != 0 && save->GetBitFlag(0x3D) == 0) {
+                info = map->GetePartsInfoAtID(19);
                 sceVu0FVECTOR positions[2] = { { 54.0f, 0.0f, 454.0f, 0.0f }, { -103.0f, 0.0f, 397.0f, 0.0f } };
                 sceVu0FVECTOR rotation = { 0.0f, 0.0f, 0.0f, 0.0f };
-                info = map->GetePartsInfoAtID(19);
                 for (i = 0; i < 2; i++) {
+                    EP_PLACE_INFO placement;
                     if (map->CheckEditParts(info, positions[i], 0.0f, &placement) != 0) {
                         slot = map->BuildEditParts(19);
                         if (slot >= 0) {
@@ -2442,9 +2440,6 @@ void EditDataLoad() {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editloop", EditDataLoad__Fv);
-#endif
 void KeepEditAnalyze() {
     CEditData *edit_data = (CEditData *)GetSaveData()->GetEditData(MapNo);
     for (int entry = 0; entry < 16; entry++) {

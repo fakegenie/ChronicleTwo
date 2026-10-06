@@ -431,11 +431,11 @@ CColFrame *LoadCollisionFile(MDS_HEADER *header, mgCMemory *memory) {
     sceVu0FVECTOR  max;
     sceVu0FVECTOR  min;
     u_int          i;
+    int offset;
     MDTOBJ_HEADER *object;
     CColFrame     *frame;
-    int offset;
-    CColFrame     *frames;
     MDS_HEADER *base = header;
+    CColFrame     *frames;
     int            row;
     int            column;
 
@@ -446,7 +446,6 @@ CColFrame *LoadCollisionFile(MDS_HEADER *header, mgCMemory *memory) {
 
     frames = new ((u_long128 *)memory->Alloc(Align16Blocks(base->object_num * sizeof(CColFrame)) + 2)) CColFrame[base->object_num];
 
-    // The object records follow the scene header directly, one fixed-size record each.
     offset = 0;
     for (i = 0; i < base->object_num; offset += sizeof(CColFrame), i++) {
         object = (MDTOBJ_HEADER *)header;

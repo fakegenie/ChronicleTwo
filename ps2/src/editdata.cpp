@@ -404,7 +404,6 @@ int GetCulturePoint(CEditParts *parts, int) {
         return 0;
     return parts->info->cpoint[1];
 }
-#ifdef NONMATCHING
 int CEditMap::CultureAnalyzeParts(int no, int cpoint_no) {
     int related[0x200];
     CEditParts *parts = GetePlaceParts(no);
@@ -419,6 +418,8 @@ int CEditMap::CultureAnalyzeParts(int no, int cpoint_no) {
     switch (parts->info->cpoint[0]) {
     case 6:
         return GetCulturePoint(parts, cpoint_no);
+    default:
+        return 0;
     case 1: {
         int total = GetCulturePoint(parts, cpoint_no);
         int count = GetTerritoryParts(no, related, 0x200);
@@ -432,21 +433,18 @@ int CEditMap::CultureAnalyzeParts(int no, int cpoint_no) {
         for (int i = 0; i < count; i++) {
             CEditParts *other = GetePlaceParts(related[i]);
             if (other != NULL && other->info != NULL) {
-                int category = other->info->cpoint[0];
-                if (category == 4 || category == 3) {
+                switch (other->info->cpoint[0]) {
+                case 3:
+                case 4:
                     total += GetCulturePoint(other, cpoint_no);
+                    break;
                 }
             }
         }
         return total;
     }
-    default:
-        return 0;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editdata", CultureAnalyzeParts__8CEditMapFii);
-#endif
 int CEditMap::CultureAnalyze(int mode) {
     int total;
     int pass = 0;
@@ -459,28 +457,28 @@ int CEditMap::CultureAnalyze(int mode) {
     } while (pass <= 0);
     return total;
 }
-#ifdef NONMATCHING
 int CEditMap::GetOnOffParts(char *name, CMapParts **out_parts, CMapPiece **out_piece, int max) {
+    char *piece_cursor;
     int count;
     char part_name[0x40];
     char piece_name[0x40];
 
-    if (name == NULL) {
+    if (name == NULL || max <= 0) {
         return 0;
     }
     count = 0;
-    if (max <= 0) {
-        return 0;
-    }
     while (*name != 0) {
         if (count >= max) {
             return count;
         }
         char *part_cursor = part_name;
         part_name[0] = 0;
-        char *piece_cursor = piece_name;
+        piece_cursor = piece_name;
         piece_name[0] = 0;
-        while (*name != '/' && *name != ';' && *name != 0) {
+        for (;;) {
+            if (*name == '/' || *name == ';' || *name == 0) {
+                break;
+            }
             *part_cursor = *name;
             name++;
             part_cursor++;
@@ -490,7 +488,7 @@ int CEditMap::GetOnOffParts(char *name, CMapParts **out_parts, CMapPiece **out_p
         out_piece[count] = NULL;
         if (*name == 0) {
             count++;
-            return count;
+            break;
         }
         if (*name != '/') {
             name++;
@@ -498,7 +496,10 @@ int CEditMap::GetOnOffParts(char *name, CMapParts **out_parts, CMapPiece **out_p
             continue;
         }
         name++;
-        while (*name != ';' && *name != 0) {
+        for (;;) {
+            if (*name == ';' || *name == 0) {
+                break;
+            }
             *piece_cursor = *name;
             name++;
             piece_cursor++;
@@ -509,21 +510,18 @@ int CEditMap::GetOnOffParts(char *name, CMapParts **out_parts, CMapPiece **out_p
         }
         if (*name == 0) {
             count++;
-            return count;
+            break;
         }
         name++;
         count++;
     }
     return count;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editdata", GetOnOffParts__8CEditMapFPcPP9CMapPartsPP9CMapPiecei);
-#endif
 #ifdef NONMATCHING
 void CEditMap::PartsOnOff(int map_no, CEditData *data) {
     CMapParts *parts[0x10];
     CMapPiece *pieces[0x10];
-    int i;
+    int off_index;
 
     if (data == NULL) {
         return;
@@ -543,11 +541,11 @@ void CEditMap::PartsOnOff(int map_no, CEditData *data) {
             }
         }
         int off_count = GetOnOffParts(request->off_parts, parts, pieces, 0x10);
-        for (i = 0; i < off_count; i++) {
-            if (pieces[i] != NULL) {
-                pieces[i]->Show((u8)((flag != 0) ^ 1));
-            } else if (parts[i] != NULL) {
-                parts[i]->Show((u8)((flag != 0) ^ 1));
+        for (off_index = 0; off_index < off_count; off_index++) {
+            if (pieces[off_index] != NULL) {
+                pieces[off_index]->Show((u8)((flag != 0) ^ 1));
+            } else if (parts[off_index] != NULL) {
+                parts[off_index]->Show((u8)((flag != 0) ^ 1));
             }
         }
     }

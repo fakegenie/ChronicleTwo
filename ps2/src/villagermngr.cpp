@@ -203,15 +203,14 @@ void CVillagerMngr::Step() {
                         villager->parts_mode = 0;
                         break;
                     }
-                    int ex_step = villager->ex_step;
-                    if (ex_step == VLGR_EX_STEP_OUT) goto check_motion;
-                    switch (ex_step) {
+                    switch (villager->ex_step) {
                     case VLGR_EX_STEP_IN:
-                    check_motion: {
+                    case VLGR_EX_STEP_OUT:
                         int motion = villager->now_motion;
-                        if (motion != VLGR_MOTION_CAMERA_OUT && motion != VLGR_MOTION_CAMERA && motion != VLGR_MOTION_CAMERA_IN) villager->ex_step = VLGR_EX_STEP_END;
+                        if (motion != VLGR_MOTION_CAMERA_OUT && motion != VLGR_MOTION_CAMERA && motion != VLGR_MOTION_CAMERA_IN) {
+                            villager->ex_step = VLGR_EX_STEP_END;
+                        }
                         break;
-                    }
                     }
                     if (villager->ex_time == 0) {
                         mgGetDirFromCamera(camera_direction, villager->pos);

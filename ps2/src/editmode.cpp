@@ -1902,9 +1902,9 @@ void DrawEditSystem(int block, CScene *scene, float *pos, int edit) {
                     int balance = map->BalanceCheck();
                     float target[4];
                     GetBalanceHeight(scene, target);
-                    int focused = 0;
                     float cursor[4];
                     *(u_long128 *)cursor = *(u_long128 *)eCurPos;
+                    int focused = 0;
                     for (int i = 0; i < 4; i++) {
                         float *color = colors[balance * 2];
                         prim.Color(color);

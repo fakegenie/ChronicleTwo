@@ -300,16 +300,13 @@ void CFadeInOut::CaptureScreen(void) {
     mgGetFrameBackBuffer(&back_buffer);
     mgStoreImage(&back_buffer, cross_texture->image[0]);
 }
-#ifdef NONMATCHING
 
 void DivSpriteScreen(mgCDrawPrim &prim) {
     int           x;
     int           y;
 
     prim.BeginPrim2(MG_PRIM_SPRITE, 0x43, 0, 2);
-    sceVu0IVECTOR offset = { 0, 0, 0, 0 };
-    offset[0] = mgScreenOffx * 16;
-    offset[1] = mgScreenOffy * 16;
+    sceVu0IVECTOR offset = { mgScreenOffx * 16, mgScreenOffy * 16, 0, 0 };
     sceVu0IVECTOR vertex = { 0, 0, 0, 0 };
     sceVu0IVECTOR uv = { 0, 0, 0, 0 };
     for (x = 0; x < mgScreenWidth; x += 64) {
@@ -331,19 +328,13 @@ void DivSpriteScreen(mgCDrawPrim &prim) {
     }
     prim.EndPrim2();
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/effectlist", DivSpriteScreen__FR11mgCDrawPrim);
-#endif
-#ifdef NONMATCHING
 
 void DivSpriteScreen(mgCDrawPrim &prim, int left, int right, int jagged_left) {
     int           row_height;
     int           row;
 
     prim.BeginPrim2(MG_PRIM_TRIANGLE_STRIP, 0x43, 0, 2);
-    sceVu0IVECTOR offset = { 0, 0, 0, 0 };
-    offset[0] = mgScreenOffx * 16;
-    offset[1] = mgScreenOffy * 16;
+    sceVu0IVECTOR offset = { mgScreenOffx * 16, mgScreenOffy * 16, 0, 0 };
     row_height = mgScreenHeight / 16;
     sceVu0IVECTOR vertex = { 0, 0, 0, 0 };
     sceVu0IVECTOR uv = { 0, 0, 0, 0 };
@@ -378,9 +369,6 @@ void DivSpriteScreen(mgCDrawPrim &prim, int left, int right, int jagged_left) {
     }
     prim.EndPrim2();
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/effectlist", DivSpriteScreen__FR11mgCDrawPrimiii);
-#endif
 void CFadeInOut::Draw(void) {
     u_char prim[0x120];
     u_char prim2[0x120];

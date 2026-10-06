@@ -1513,7 +1513,8 @@ void CHitEffectImage::DrawBord(void) {
     prim.Texture(TEX_SystemEffect2);
     prim.AlphaTestEnable(1);
     BattleEffectPrim *spark = this->spark;
-    for (int i = 0; i < spark_num; i++) {
+    int i;
+    for (i = 0; i < spark_num; i++) {
         if (spark->life > 0) {
             prim.Color(0x80, 0x80, 0x80, fptosi(128.0f * spark->alpha));
             int w = tex_rect.right - 1;
@@ -1567,7 +1568,8 @@ void CHitEffectImage::DrawSpark(float size) {
     prim.Begin(1);
 
     BattleEffectPrim *spark = this->spark;
-    for (int i = 0; i < spark_num; i++) {
+    int i;
+    for (i = 0; i < spark_num; i++) {
         if (spark->life > 0) {
             prim.Color(0x80, 0x80, 0x80, 0x80);
             tip[0] = spark->pos[0] + spark->velocity[0] * size;
@@ -1635,8 +1637,9 @@ void CFlushEffect::Draw(void) {
 #ifdef NONMATCHING
 void CFlushEffect::Step() {
     if (active != 0) {
-        if (follow != NULL) {
-            follow->GetWorldPosition0(pos);
+        mgCFrame *frame;
+        if ((frame = follow) != NULL) {
+            frame->GetWorldPosition0(pos);
         }
         size += grow;
         alpha = alpha - fptosi(fade_speed);
