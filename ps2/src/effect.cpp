@@ -12,7 +12,6 @@
 #include "effect.hpp"
 #include <cstring>
 
-extern "C" int fptosi(float value);
 #include <cstdlib>
 #include <cmath>
 

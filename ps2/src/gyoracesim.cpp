@@ -14,7 +14,6 @@ struct FISH_STATS {
     float unknownB;
 };
 
-extern "C" int fptosi(float value);
 extern int jrand;
 extern int ia[56];
 extern grFISH_DATA fish_data[18];
@@ -29,7 +28,6 @@ void FishModifyParam(grFISH_PARAM *param, float *out, float average);
 void CharacterBonus(grFISH_PARAM *param, RACE_FISH_PARAM *fish, int count);
 void RndFishParam(RACE_FISH_PARAM *fish);
 #include "crandom.hpp"
-#include <cstring>
 
 int GetRaceDivision(float distance);
 float GetCourseR(float position, float lane);

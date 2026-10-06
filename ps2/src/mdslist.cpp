@@ -20,6 +20,7 @@
 #include "scriptinterpreter.hpp"
 #include <cstring>
 #include <cstdio>
+#include "vtables.hpp"
 
 extern "C" int strcasecmp(const char *left, const char *right);
 extern int now_mds_num;
@@ -32,10 +33,6 @@ extern u_int *pcp_file;
 extern int pcpAllScissor;
 extern SPI_TAG_PARAM pcp_tag[];
 CCharacter2 *CreateChara(u_int *pack, char *config, mgCMemory *memory);
-extern "C" void *__vt__9mgCObject[];
-extern "C" void *__vt__7CObject[];
-extern "C" void *__vt__12CObjectFrame[];
-extern "C" void *__vt__11CCharacter2[];
 
 extern char at_754[];
 

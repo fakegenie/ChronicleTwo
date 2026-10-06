@@ -41,7 +41,6 @@ extern u8 isFrameEnd;
 extern u32 frd;
 extern u8 isCountVblank;
 extern int Cb;
-extern sceDmaChan *DmaCH2;
 extern int MpegW;
 extern int MpegH;
 extern VideoDec videoDec;

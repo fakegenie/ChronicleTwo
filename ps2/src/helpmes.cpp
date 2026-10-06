@@ -14,20 +14,10 @@ extern "C" void *__ct__6ClsMesFv(void *);
 extern char at_799__6[15];
 extern char at_800__5[30];
 #include "mglib.hpp"
-#include "mainloop.hpp"
 #include "snd_mngr.hpp"
-#include "nd_meswin.hpp"
 #include "mg_texture.hpp"
-#include "dataread.hpp"
 #include "mg_memory.hpp"
-#include <cstdio>
-#include <cstring>
 
-extern HELP_MES_INFO HelpMesInfo;
-extern int ShowOffOnce;
-extern int WindowMode;
-extern ClsMes HelpMes;
-extern int LanguageCode;
 extern char HelpMesBuff[0x1000];
 extern int InitFlag__2;
 

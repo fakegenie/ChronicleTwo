@@ -4,7 +4,6 @@
 #include "editparts.hpp"
 #include "mdslist.hpp"
 
-extern "C" int fptosi(float value);
 
 const int kPartsInfoWallValueOffset = 0x1A4;
 const int kFenceEndAOffset = 0xA0;

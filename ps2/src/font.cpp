@@ -69,7 +69,6 @@ extern char at_996__3[];
 extern char at_997__3[];
 extern const unsigned char at_1543[6];
 extern mgRect<int> at_817__4;
-extern "C" int fptosi(float value);
 
 // Code (.text)
 int GetGaijiW(int code) {
@@ -720,21 +719,13 @@ void CFont::CalcDrawWH(char *text, int *width, int *height) {
 #pragma optimization_level 4
 void CFont::DrawDirect(char *text, int x, int y) {
     SetPos(x, y);
-    union {
-        mgCDrawPrim prim;
-        struct {
-            u8 padding[0x110];
-            int size_x;
-            int size_y;
-            u8 tail[8];
-        } sizes;
-    } local;
-    MySetPrim(&local.prim, 1, 0);
+    mgCDrawPrim prim;
+    MySetPrim(&prim, 1, 0);
 
-    int height = fptosi(*(float *)((u8 *)this + 0xB4));
-    local.sizes.size_x = fptosi(*(float *)((u8 *)this + 0xB0)) * 16;
-    local.sizes.size_y = height * 16;
-    (&local.prim)->Begin(6);
+    int height = fptosi(offset_y);
+    prim.offset_x = fptosi(offset_x) * 16;
+    prim.offset_y = height * 16;
+    prim.Begin(6);
     int len = strlen(text);
     int pen_x = 0;
     int pen_y = 0;
@@ -749,13 +740,13 @@ void CFont::DrawDirect(char *text, int x, int y) {
             cursor = (s8 *)text + pos;
             font_no = GetAlphabeticalFontNo_cp((char *)cursor);
             if (0 < font_no) {
-                DrawChar(&local.prim, font_no, pos_x + pen_x, pos_y + pen_y, 1, color, (int)alpha);
+                DrawChar(&prim, font_no, pos_x + pen_x, pos_y + pen_y, 1, color, (int)alpha);
                 pen_x += clearance_w / 2;
                 pos += 9;
             } else {
                 gaiji = GetFontGaijiFontNo((char *)cursor);
                 if (gaiji != 0) {
-                    DrawChar(&local.prim, gaiji & 0xFFFF, pos_x + pen_x, pos_y + pen_y, 1, color,
+                    DrawChar(&prim, gaiji & 0xFFFF, pos_x + pen_x, pos_y + pen_y, 1, color,
                              (int)alpha);
                     if (GetFontGaijiHankaku(gaiji) != 0) {
                         pen_x += clearance_w / 2;
@@ -766,7 +757,7 @@ void CFont::DrawDirect(char *text, int x, int y) {
                 } else {
                     gaiji_no = GetGaijiFontNo((char *)cursor);
                     if (gaiji_no >= 0xFD00 && gaiji_no < 0xFD32) {
-                        DrawGaiji(&local.prim, gaiji_no, pos_x + pen_x, pos_y + pen_y);
+                        DrawGaiji(&prim, gaiji_no, pos_x + pen_x, pos_y + pen_y);
                         pen_x += GetGaijiW(gaiji_no);
                         pos += GetGaijiLen(gaiji_no);
                     } else {
@@ -776,12 +767,12 @@ void CFont::DrawDirect(char *text, int x, int y) {
                             pos += 1;
                             pen_y += clearance_h;
                         } else if (CheckHalfFont(half) != 0) {
-                            DrawChar(&local.prim, half, pos_x + pen_x, pos_y + pen_y, 1, color,
+                            DrawChar(&prim, half, pos_x + pen_x, pos_y + pen_y, 1, color,
                                      (int)alpha);
                             pen_x += clearance_w / 2;
                             pos += 1;
                         } else {
-                            DrawChar(&local.prim, (char *)cursor, pos_x + pen_x, pos_y + pen_y);
+                            DrawChar(&prim, (char *)cursor, pos_x + pen_x, pos_y + pen_y);
                             if (CheckKanjiFont(GetFontNo((char *)cursor)) != 0) {
                                 pen_x += clearance_w;
                             } else if (CheckKanjiFont(GetFontNo((char *)cursor + 2)) != 0) {
@@ -796,7 +787,7 @@ void CFont::DrawDirect(char *text, int x, int y) {
             }
         } while (pos < len);
     }
-    (&local.prim)->End();
+    prim.End();
 }
 #pragma optimization_level reset
 void CFont::Preset(s32 preset) {
@@ -832,8 +823,8 @@ void CFont::Init() {
     draw_w = 16;
     draw_h = 20;
     mini = 0;
-    unk_b0 = 0.0f;
-    unk_b4 = 0.0f;
+    offset_x = 0.0f;
+    offset_y = 0.0f;
 }
 
 // Initialised data (.data)

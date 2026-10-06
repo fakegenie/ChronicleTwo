@@ -13,7 +13,6 @@
 #include "dataread.hpp"
 #include <cstring>
 
-extern "C" int fptosi(float value);
 extern "C" void __ct__11mgCDrawPrimFv(void *);
 
 void DivSpriteScreen(mgCDrawPrim &prim);

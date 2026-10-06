@@ -57,7 +57,6 @@ extern "C" float GetHeight__15mgCCameraFollowFv(CCameraControl *camera);
 extern "C" void EyeCamera__FP9mgCCameraP11CCharacter2i(mgCCameraFollow *, CCharacter2 *, int);
 extern "C" void InitEyeCamera__FP11CCharacter2P14CCameraControl(CCharacter2 *chara,
                                                                 CCameraControl *camera);
-extern DEBUG_INFO DebugInfo;
 extern "C" void GetPos__9mgCCameraFPf(CCameraControl *camera, float *out);
 extern "C" void SetPos__9mgCCameraFPf(mgCCameraFollow *camera, float *pos);
 extern "C" void SetNextPos__9mgCCameraFPf(mgCCameraFollow *camera, float *pos);
@@ -83,30 +82,13 @@ extern int CharaMotionMode;
 extern int CharaMotionModeCnt;
 extern int FixCameraChgCnt;
 extern int ViewMode;
-extern CGamePad GamePad__2;
 
 #include <cmath>
-#include <cstring>
 #include <libvu0.h>
 
-#include "cameracontrol.hpp"
-#include "character.hpp"
 #include "dng_event.hpp"
-#include "editmap.hpp"
 #include "effscript.hpp"
-#include "gamepad.hpp"
 #include "gameutil.hpp"
-#include "helpmes.hpp"
-#include "inventmn.hpp"
-#include "mainloop.hpp"
-#include "mg_math.hpp"
-#include "mglib.hpp"
-#include "padcontrol.hpp"
-#include "photo.hpp"
-#include "savedata.hpp"
-#include "scenesnd.hpp"
-#include "sphida.hpp"
-#include "userdata.hpp"
 
 #ifdef NONMATCHING
 static int           LadderMode;           /**< End of the ladder the player entered. */

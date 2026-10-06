@@ -4,7 +4,6 @@
 #include "mg_memory.hpp"
 #include "editcoll.hpp"
 
-extern "C" int fptosi(float value);
 
 struct CollisionRow {
     float value[4];
@@ -13,8 +12,6 @@ struct CollisionRow {
 #pragma global_optimizer off
 #include <libvu0.h>
 
-#include "mg_math.hpp"
-#include "mg_memory.hpp"
 
 // Code (.text)
 #ifdef NONMATCHING

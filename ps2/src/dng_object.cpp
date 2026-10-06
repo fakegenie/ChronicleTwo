@@ -51,7 +51,6 @@ union CopyVector {
     float f[4];      /**< Floating point components. */
     u_long128 word;  /**< The same components as a quadword. */
 };
-extern "C" int fptosi(float value);
 extern "C" void *__ct__11mgCDrawPrimFv(void *);
 extern "C" void *__ct__12mgCFrameAttrFv(void *);
 extern float at_1112[4];

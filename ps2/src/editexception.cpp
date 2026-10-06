@@ -19,7 +19,6 @@
 #include "scene.hpp"
 #include "editexception.hpp"
 
-extern "C" int fptosi(float value);
 extern char at_917__5[];
 extern char at_918__4[];
 extern char at_919__6[];
@@ -27,8 +26,6 @@ extern char at_920__5[];
 extern char at_921__4[];
 extern char at_1143__2[];
 extern char at_1259[];
-extern void *__vt__9mgCVisual[];
-extern void *__vt__11mgC3DSprite[];
 extern mgVec4 at_1327;
 extern mgVec4 at_1328__2;
 extern mgVec4 at_1329;
@@ -51,7 +48,6 @@ extern int thunder_count;
 extern CGeyserEffect *GeyserEffect;
 extern int FirePowderFlag;
 extern FirePowder *fire_powder;
-extern mgCTextureManager mgTexManager;
 extern int GeyserEffectTexb;
 extern mgCFrame *GeyserFrame;
 extern int GeyserRndSeed;
@@ -80,30 +76,19 @@ static inline u32 align16_blocks(u32 bytes) {
     }
     return bytes >> 4;
 }
-#include "mg_math.hpp"
-#include "mg_memory.hpp"
+#include "vtables.hpp"
 #include "mg_frame.hpp"
 #include "mg_drawenv.hpp"
-#include "mg_texture.hpp"
 #include "mg_tanime.hpp"
 #include "mg_camera.hpp"
-#include "mapparts.hpp"
-#include "mdslist.hpp"
 #include "map.hpp"
-#include "mapload.hpp"
 #include "editmap.hpp"
 #include "editparts.hpp"
 #include "scenesnd.hpp"
 #include "savedata.hpp"
-#include "mainloop.hpp"
-#include "dataread.hpp"
-#include "event_func.hpp"
 #include "snd_mngr.hpp"
-#include "mglib.hpp"
 
 #include <cmath>
-#include <cstdlib>
-#include <cstring>
 
 extern s32 rea_chara_id;
 extern s32 rea_mtn_step;
@@ -114,14 +99,11 @@ extern s32 fade_cnt;
 extern s32 sound_flag;
 extern s32 sound_cnt;
 extern s32 FirePowderFlag;
-extern FirePowder *fire_powder;
 extern s32 FirePowderTexb;
 extern mgC3DSprite *SpriteVis;
 extern mgCFrame *FirePowFrame;
 extern s32 GeyserEffectFlag;
-extern CGeyserEffect *GeyserEffect;
 extern s32 GeyserEffectTexb;
-extern mgCFrame *GeyserFrame;
 extern s32 GeyserRndSeed;
 
 // Code (.text)

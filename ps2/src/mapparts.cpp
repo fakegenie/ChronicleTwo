@@ -36,16 +36,10 @@ union PartsVector {
 };
 extern char at_244[];
 #include <cmath>
-#include <cstring>
 #include <libvu0.h>
 
-#include "collision.hpp"
 #include "intersection.hpp"
-#include "mdslist.hpp"
-#include "mg_math.hpp"
-#include "mg_memory.hpp"
-#include "mglib.hpp"
-#include "occlusion.hpp"
+#include "vtables.hpp"
 
 /**
  *
@@ -80,12 +74,6 @@ struct PartsPieceNode {
     void **vptr; /**< Virtual method table of the list node. */
     u_char unk_c4[0xC];
 };
-extern "C" void *__vt__17CList_9CMapPiece_[];
-extern "C" void *__vt__9mgCObject[];
-extern "C" void *__vt__7CObject[];
-extern "C" void *__vt__12CObjectFrame[];
-extern "C" void *__vt__9CMapPiece[];
-extern "C" void *__vt__17CList_9CObjAnime_[];
 extern "C" void AssignFuncAnime__9CObjAnimeFP10CFuncPointP9CMapParts(void *, CFuncPoint *, CMapParts *);
 
 #undef sceVu0ApplyMatrix

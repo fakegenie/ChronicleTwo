@@ -117,7 +117,6 @@ int menu_dtype_init(CMenuPosDataForm *form, SPI_STACK *stack, int argc);
 extern "C" MENU_FORM_ACTION
     *menu_spi_form_action_info;
 
-extern "C" int fptosi(float value);
 
 int CompGameData(int itemA, int itemB);
 

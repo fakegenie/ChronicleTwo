@@ -51,7 +51,6 @@
 #include <cstring>
 extern "C" void *__ct__11mgCDrawPrimFv(void *);
 
-extern "C" int fptosi(float value);
 extern int FLS_FLOOR_ID;
 extern char at_1082__2[];
 extern char at_1248[];
@@ -244,7 +243,7 @@ void MessageTaskManager::Step(void) {
 
     current = this->mes;
     if (current != NULL && !(this->flag & 1)) {
-        line = (MESSAGE_TASK *)this->top;
+        line = this->top;
         if (line != NULL) {
             if (line->count <= 0) {
                 current->fukidashi_pos = line->slot;
@@ -276,19 +275,16 @@ void MessageTaskManager::Print(char *text, int count, int fukidashi_pos, int pri
     MESSAGE_TASK *prev;
     MESSAGE_TASK *next;
     int i;
-    int byte_offset;
 
     if (this->mes != NULL) {
         node = NULL;
         i = 0;
-        byte_offset = 0;
         do {
-            if (*(char **)((u8 *)this + byte_offset + 8) == NULL) {
-                node = (MESSAGE_TASK *)((u8 *)this + i * 0x90 + 8);
+            if (task[i].message == NULL) {
+                node = &task[i];
                 break;
             }
             i += 1;
-            byte_offset += 0x90;
         } while (i < 6);
         if (node != NULL) {
             strcpy(node->text, text);
@@ -297,7 +293,7 @@ void MessageTaskManager::Print(char *text, int count, int fukidashi_pos, int pri
             node->slot = fukidashi_pos;
             node->time = count;
             node->count = 0;
-            head = (MESSAGE_TASK *)this->top;
+            head = this->top;
             if (head == NULL) {
                 this->top = node;
                 node->next = NULL;
@@ -326,7 +322,7 @@ void MessageTaskManager::Clear(void) {
 
     current = this->mes;
     if (current != NULL) {
-        line = (MESSAGE_TASK *)this->top;
+        line = this->top;
         if (line != NULL) {
             if (line->time > 0) {
                 current->draw_speed = current->GetDrawSpeedDef();
@@ -472,124 +468,76 @@ void CGeoStone::Initialize(void) {
     this->flag = 0;
 }
 void CRandomCircle::Draw(float *view_pos) {
-    int id;
-    int flag_offset;
-    int pos_offset;
-
-    pos_offset = 0;
-    flag_offset = 0;
-    id = 0;
+    int id = 0;
     do {
-        if (*(int *)((u8 *)this + flag_offset + 0x30) != 0 &&
-            mgDistVector(view_pos, (float *)((u8 *)this + pos_offset)) < 1000.0f) {
-            ((CCharacter2 *)&this->model)->SetPosition((float *)((u8 *)this + pos_offset));
-            ((CCharacter2 *)&this->model)->SetRotation(0.0f, 0.0f, 0.0f);
-            ((CCharacter2 *)&this->model)->DrawDirect();
+        if (active[id] != 0 && mgDistVector(view_pos, pos[id]) < 1000.0f) {
+            model.SetPosition(pos[id]);
+            model.SetRotation(0.0f, 0.0f, 0.0f);
+            model.DrawDirect();
         }
         id += 1;
-        flag_offset += 4;
-        pos_offset += 0x10;
     } while (id < 3);
 }
 void CRandomCircle::Step() {
-    ((CCharacter2 *)((u8 *)this + 0x40))->Step();
+    model.Step();
 }
 void CRandomCircle::DrawSymbol(CMiniMapSymbol *symbol_drawer) {
-    int id;
-    int flag_offset;
-    int pos_offset;
-
-    pos_offset = 0;
-    flag_offset = 0;
-    id = 0;
+    int id = 0;
     do {
-        if (*(int *)((u8 *)this + flag_offset + 0x30) != 0) {
-            (symbol_drawer)->DrawSymbol((float *)((u8 *)this + pos_offset), 2);
+        if (active[id] != 0) {
+            symbol_drawer->DrawSymbol(pos[id], 2);
         }
         id += 1;
-        flag_offset += 4;
-        pos_offset += 0x10;
     } while (id < 3);
 }
-int CRandomCircle::CheckArea(float *pos, float radius) {
-    int id;
-    int flag_offset;
-    int pos_offset;
-
-    pos_offset = 0;
-    flag_offset = 0;
-    id = 0;
-loop:
-    if (*(int *)((u8 *)this + flag_offset + 0x30) != 0 &&
-        mgDistVector((float *)((u8 *)this + pos_offset), pos) < radius) {
-        return 0;
-    }
-    id += 1;
-    flag_offset += 4;
-    pos_offset += 0x10;
-    if (id >= 3) {
-        return 1;
-    }
-    goto loop;
+int CRandomCircle::CheckArea(float *check_pos, float radius) {
+    int id = 0;
+    do {
+        if (active[id] != 0 && mgDistVector(pos[id], check_pos) < radius) {
+            return 0;
+        }
+        id += 1;
+    } while (id < 3);
+    return 1;
 }
 int CRandomCircle::GetPosition(float *out, int id) {
     if (id == -1) {
-        if (this->hit == -1) {
+        if (hit == -1) {
             return 0;
         }
-        sceVu0CopyVector(out, (float *)((u8 *)this + this->hit * 0x10));
+        sceVu0CopyVector(out, pos[hit]);
         return 1;
     }
     if (id < 0 || id >= 3) {
         return 0;
     }
-    sceVu0CopyVector(out, (float *)((u8 *)this + id * 0x10));
+    sceVu0CopyVector(out, pos[id]);
     return 1;
 }
-int CRandomCircle::CheckEvent(float *pos) {
-    int id;
-    int flag_offset;
-    int pos_offset;
-
-    pos_offset = 0;
-    flag_offset = 0;
-    id = 0;
-next_circle:
-    if ((*(int *)((u8 *)this + flag_offset + 0x30) != 0) &&
-        (mgDistVector(((float *)((u8 *)this + pos_offset)), pos) <= 20.0f)) {
-        hit = id;
-        return id;
-    }
-    id += 1;
-    flag_offset += 4;
-    pos_offset += 0x10;
-    if (id >= 3) {
-        hit = -1;
-        return -1;
-    }
-    goto next_circle;
+int CRandomCircle::CheckEvent(float *check_pos) {
+    int id = 0;
+    do {
+        if (active[id] != 0 && mgDistVector(pos[id], check_pos) <= 20.0f) {
+            hit = id;
+            return id;
+        }
+        id += 1;
+    } while (id < 3);
+    hit = -1;
+    return -1;
 }
-int CRandomCircle::SetCircle(float *pos) {
-    int flag_offset;
-    int id;
-    int pos_offset;
-
-    flag_offset = 0;
-    id = 0;
-loop:
-    if (*(int *)((u8 *)this + flag_offset + 0x30) == 0) {
-        pos_offset = id << 4;
-        sceVu0CopyVector((float *)((u8 *)this + pos_offset), pos);
-        *(float *)((pos_offset + (int)this) + 0xC) = 1.0f;
-        this->active[id] = 1;
-        return id;
-    }
-    id += 1;
-    flag_offset += 4;
-    if (id >= 3) {
-        return -1;
-    }
-    goto loop;
+int CRandomCircle::SetCircle(float *circle_pos) {
+    int id = 0;
+    do {
+        if (active[id] == 0) {
+            sceVu0CopyVector(pos[id], circle_pos);
+            pos[id][3] = 1.0f;
+            active[id] = 1;
+            return id;
+        }
+        id += 1;
+    } while (id < 3);
+    return -1;
 }
 void CRandomCircle::Clear() {
     active[0] = 0;
@@ -598,7 +546,7 @@ void CRandomCircle::Clear() {
     hit = -1;
 }
 void CRandomCircle::Initialize() {
-    ((CCharacter2 *)((u8 *)this + 0x40))->Initialize();
+    model.Initialize();
     this->active[0] = 0;
     this->active[1] = 0;
     this->active[2] = 0;
@@ -644,21 +592,21 @@ void CTreasureBox::DrawShadow(float *view_pos, float *light_direction) {
 void CTreasureBoxManager::SetLargeModel(CCharacter2 *model, int value) {
     mgCFrame *frame;
     mgCFrame *found;
-    u8 *entry;
+    CTreasureBox *entry;
     int i;
 
-    *(int *)this = value;
-    *(CCharacter2 **)((u8 *)this + 0xA94) = model;
+    tex_block = value;
+    this->model = model;
     frame = model->CObjectFrame::frame;
     if (frame != NULL) {
         found = frame->SearchFrame(at_1274__2);
         if (found != NULL) {
-            entry = (u8 *)this + 0x10;
-            for (i = 0; i < 0x18; i++) {
-                *(mgCFrame **)(entry + 0x64) = found;
-                *(mgCFrame **)(entry + 0x68) = frame;
-                *(CCharacter2 **)(entry + 0x6C) = model;
-                entry += 0x70;
+            entry = box;
+            for (i = 0; i < TREASURE_BOX_MAX; i++) {
+                entry->lid_frame = found;
+                entry->frame = frame;
+                entry->model = model;
+                entry++;
             }
         }
     }
@@ -668,27 +616,24 @@ void CTreasureBoxManager::SetCollisionModel(u32 *pack, mgCMemory *memory) {
 }
 void CTreasureBoxManager::PutTreasureBox(int index, float *position, float angle, int param, int value1, int value2, int value3, int value4) {
     int i;
-    int byte_offset;
     CTreasureBox *chest;
 
     if (index == -1) {
         i = 0;
-        byte_offset = 0;
         do {
-            chest = (CTreasureBox *)((u8 *)this + byte_offset + 0x10);
-            if (chest->state == 0) {
+            chest = &box[i];
+            if (chest->state == TREASURE_BOX_STATE_NONE) {
                 index = i;
                 break;
             }
             i += 1;
-            byte_offset += 0x70;
-        } while (i < 0x18);
+        } while (i < TREASURE_BOX_MAX);
     }
-    if (index < 0 || index >= 0x18) {
+    if (index < 0 || index >= TREASURE_BOX_MAX) {
         return;
     }
-    chest = (CTreasureBox *)((u8 *)this + index * 0x70 + 0x10);
-    chest->state = 1;
+    chest = &box[index];
+    chest->state = TREASURE_BOX_STATE_UNOPENED;
     chest->SetPosition(position);
     chest->SetRotation(0.0f, angle, 0.0f);
     chest->flags = param;
@@ -700,59 +645,48 @@ void CTreasureBoxManager::PutTreasureBox(int index, float *position, float angle
 int CTreasureBoxManager::CheckArea(float *pos, float radius) {
     float chest_pos[4];
     int i;
-    int byte_offset;
     CTreasureBox *slot;
 
-    byte_offset = 0;
     i = 0;
-loop:
-    slot = (CTreasureBox *)((u8 *)this + byte_offset + 0x10);
-    if (slot->state != 0) {
-        slot->GetPosition(chest_pos);
-        if (mgDistVector(chest_pos, pos) < radius) {
-            return 0;
+    do {
+        slot = &box[i];
+        if (slot->state != TREASURE_BOX_STATE_NONE) {
+            slot->GetPosition(chest_pos);
+            if (mgDistVector(chest_pos, pos) < radius) {
+                return 0;
+            }
         }
-    }
-    i += 1;
-    byte_offset += 0x70;
-    if (i >= 0x18) {
-        return 1;
-    }
-    goto loop;
+        i += 1;
+    } while (i < TREASURE_BOX_MAX);
+    return 1;
 }
 void CTreasureBoxManager::DrawMiniMapSymbol(CMiniMapSymbol *symbol_drawer) {
     float chest_pos[4];
     int i;
-    int byte_offset;
     CTreasureBox *slot;
 
-    byte_offset = 0;
     i = 0;
     do {
-        slot = (CTreasureBox *)((u8 *)this + byte_offset + 0x10);
-        if (slot->state == 1) {
+        slot = &box[i];
+        if (slot->state == TREASURE_BOX_STATE_UNOPENED) {
             slot->GetPosition(chest_pos);
-            (symbol_drawer)->DrawSymbol(chest_pos, 1);
+            symbol_drawer->DrawSymbol(chest_pos, 1);
         }
         i += 1;
-        byte_offset += 0x70;
-    } while (i < 0x18);
+    } while (i < TREASURE_BOX_MAX);
 }
 void CTreasureBoxManager::Draw(float *view_pos) {
     int i;
-    int byte_offset;
     CTreasureBox *slot;
 
-    byte_offset = 0;
     i = 0;
     do {
-        slot = (CTreasureBox *)((u8 *)this + byte_offset + 0x10);
-        if (slot->state != 0) {
-            (slot)->Draw(view_pos);
+        slot = &box[i];
+        if (slot->state != TREASURE_BOX_STATE_NONE) {
+            slot->Draw(view_pos);
         }
         i += 1;
-        byte_offset += 0x70;
-    } while (i < 0x18);
+    } while (i < TREASURE_BOX_MAX);
 }
 void CTreasureBoxManager::DrawShadow(float *view_pos) {
     float light_direction[4][4];
@@ -764,34 +698,29 @@ void CTreasureBoxManager::DrawShadow(float *view_pos) {
         shadow_direction[1] = 0.8f;
     }
     int i;
-    int byte_offset;
     CTreasureBox *slot;
 
     i = 0;
-    byte_offset = 0;
     do {
-        slot = (CTreasureBox *)((u8 *)this + byte_offset + 0x10);
-        if (slot->state != 0) {
+        slot = &box[i];
+        if (slot->state != TREASURE_BOX_STATE_NONE) {
             slot->DrawShadow(view_pos, shadow_direction);
         }
         i += 1;
-        byte_offset += 0x70;
-    } while (i < 0x18);
+    } while (i < TREASURE_BOX_MAX);
 }
 int CTreasureBoxManager::PickupCollision( float *pos, CCPoly *polys, mgVu0FBOX box, int flag) {
     int count;
     int i;
     CTreasureBox *slot;
-    int byte_offset;
     float chest_pos[4];
     float rotation[4];
 
-    byte_offset = 0;
     i = 0;
     count = 0;
     do {
-        slot = (CTreasureBox *)((u8 *)this + byte_offset + 0x10);
-        if (slot->state != 0) {
+        slot = &this->box[i];
+        if (slot->state != TREASURE_BOX_STATE_NONE) {
             slot->GetPosition(chest_pos);
             if (mgDistVector(chest_pos, pos) <= 40.0f) {
                 this->col_frame->SetPosition(chest_pos);
@@ -801,46 +730,38 @@ int CTreasureBoxManager::PickupCollision( float *pos, CCPoly *polys, mgVu0FBOX b
             }
         }
         i += 1;
-        byte_offset += 0x70;
-    } while (i < 0x18);
+    } while (i < TREASURE_BOX_MAX);
     return count;
 }
 int CTreasureBoxManager::MimicCount() {
     int count;
     int i;
-    u8 *slot;
-    u8 *entry;
-    int byte_offset;
+    CTreasureBox *slot;
 
     count = 0;
     i = 0;
-    byte_offset = 0;
     do {
-        entry = (u8 *)this + byte_offset;
-        slot = entry + 0x10;
-        if (*(s8 *)(entry + 0x64) == 1 && (*(int *)(slot + 0x58) & 0x100)) {
+        slot = &box[i];
+        if (slot->state == TREASURE_BOX_STATE_UNOPENED && (slot->flags & TREASURE_BOX_FLAG_MIMIC)) {
             count += 1;
         }
         i += 1;
-        byte_offset += 0x70;
-    } while (i < 0x18);
+    } while (i < TREASURE_BOX_MAX);
     return count;
 }
 int CTreasureBoxManager::CheckEvent(float *pos, float radius) {
     float chest_pos[4];
     float nearest;
     int i;
-    int byte_offset;
     CTreasureBox *slot;
     float distance;
 
     this->near_box = -1;
     nearest = 9999.0f;
-    byte_offset = 0;
     i = 0;
     do {
-        slot = (CTreasureBox *)((u8 *)this + byte_offset + 0x10);
-        if (slot->state == 1) {
+        slot = &box[i];
+        if (slot->state == TREASURE_BOX_STATE_UNOPENED) {
             slot->GetPosition(chest_pos);
             distance = mgDistVector(chest_pos, pos);
             if (distance < radius && nearest > distance) {
@@ -849,8 +770,7 @@ int CTreasureBoxManager::CheckEvent(float *pos, float radius) {
             }
         }
         i += 1;
-        byte_offset += 0x70;
-    } while (i < 0x18);
+    } while (i < TREASURE_BOX_MAX);
     return this->near_box;
 }
 int GetGateKeyIndex(int floor, int level) {
@@ -958,9 +878,9 @@ void BattleAreaBGMCtrl(void) {
         distance = ActiveMonster->IsBattleStyleDist();
     }
     if (distance <= 340.0f) {
-        *(s16 *)((u8 *)player + 0x75E) = 1;
+        ((CActionChara *)player)->unk_75e = 1;
     } else {
-        *(s16 *)((u8 *)player + 0x75E) = 0;
+        ((CActionChara *)player)->unk_75e = 0;
     }
     if (!(state->pause_flag & 0x4000) && state->boss_map == 0) {
         phase = state->battle_bgm_state;

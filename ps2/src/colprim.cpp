@@ -10,8 +10,6 @@
 #include "colprim.hpp"
 
 #include "character.hpp"
-#include "mg_frame.hpp"
-#include "mg_math.hpp"
 #include "scenesnd.hpp"
 #include <cstring>
 

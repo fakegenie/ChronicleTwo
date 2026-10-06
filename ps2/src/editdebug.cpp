@@ -13,19 +13,15 @@
 #include "dataread.hpp"
 #include "cameracontrol.hpp"
 #include "editloop.hpp"
-#include "editmap.hpp"
 #include "font.hpp"
-#include "gamepad.hpp"
 #include "mainloop.hpp"
 #include "map.hpp"
 #include "mapjump.hpp"
 #include "menuaqua.hpp"
 #include "mg_drawprim.hpp"
-#include "mg_memory.hpp"
 #include "mg_math.hpp"
 #include "savedata.hpp"
 #include "scenesnd.hpp"
-#include "scriptinterpreter.hpp"
 #include "userdata.hpp"
 #include <cstdio>
 
@@ -36,9 +32,7 @@ extern int EditDebugFlag;
 extern int EditDebugTexb;
 extern int Select;
 extern int LEditFlag;
-#include <cstring>
 
-extern CGamePad GamePad__2;
 extern int EditDebugFlag, EditDebugTexb, Select, SelTAG, sg_type, map_jump;
 extern int save_no, load_no, condition, map_flag_no, LEditFlag, LightType, DirLightNo, fish_num;
 extern int EventNo;

@@ -32,7 +32,6 @@
 #include "scriptinterpreter.hpp"
 #include "visualmotion.hpp"
 #include "character.hpp"
-extern "C" int fptosi(float value);
 
 extern CCharacter2 *nowChr;
 extern u32 *pack_file;
@@ -53,7 +52,6 @@ extern CHRINFO_SEQ *now_seq_ptr;
 extern CHRINFO_SEQ_HEADER *now_seqhd_ptr;
 extern unsigned int *eff_pack_ptr;
 extern int eff_pack_size;
-extern mgCTextureManager mgTexManager;
 extern int alloc_vertex_num;
 extern char alloc_vertex[25][16];
 extern char at_1395[14];
@@ -135,29 +133,9 @@ int _SKIN_IMG_END(SPI_STACK *stack, int argc);
 int _SKIN_MODEL(SPI_STACK *stack, int argc);
 int _LOD_MODEL_START(SPI_STACK *stack, int argc);
 int _LOD_MODEL_END(SPI_STACK *stack, int argc);
-#include "character.hpp"
 
-#include <cmath>
-#include <cstdio>
-#include <cstring>
 #include <libvu0.h>
 
-#include "dataread.hpp"
-#include "dynamicanime.hpp"
-#include "effect.hpp"
-#include "gameutil.hpp"
-#include "mg_dataset.hpp"
-#include "mg_frame.hpp"
-#include "mg_math.hpp"
-#include "mg_memory.hpp"
-#include "mg_sprite.hpp"
-#include "mg_texture.hpp"
-#include "mglib.hpp"
-#include "outline.hpp"
-#include "scriptinterpreter.hpp"
-#include "snd_mngr.hpp"
-#include "swordeffect.hpp"
-#include "visualmotion.hpp"
 
 
 
@@ -2309,7 +2287,7 @@ void CCharacter2::ExecEntryEffect(CHRINFO_KEY_SET *key_set) {
     count = 0;
     while (node != 0) {
 
-        if (strcmp((char *)node->effect + 0x1BC, (char *)now_key) == 0) {
+        if (strcmp(node->effect->motion_name, (char *)now_key) == 0) {
             entry_effect[count].effect = node->effect;
             entry_effect[count].active = 1;
             count++;
@@ -2323,12 +2301,12 @@ void CCharacter2::CtrlEffect() {
             continue;
         if (entry_effect[i].running != 0)
             continue;
-        CEffectManager *manager = entry_effect[i].effect;
+        CHARA_EFFECT_MANAGER *manager = entry_effect[i].effect;
         CHRINFO_KEY_SET *motion = now_key;
         float progress = (frame - (float)motion->start_frame) /
                        ((float)motion->end_frame - (float)motion->start_frame);
 
-        if (progress > *(float *)((u8 *)manager + 0x1DC)) {
+        if (progress > manager->start_ratio) {
             manager->Run();
             entry_effect[i].running = 1;
         }

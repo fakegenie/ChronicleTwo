@@ -66,7 +66,6 @@ extern CHitEffectImage *battle_effect;
 extern "C" void __ct__11mgCDrawPrimFv(void *);
 extern "C" void __ct__10mgCTextureFv(void *);
 extern mgCMemory BuffTextureData;
-extern mgCMemory BuffWorkData;
 #ifndef NONMATCHING
 extern unsigned int gyore_snd_id;
 extern int hero_no;
@@ -857,7 +856,6 @@ int sgCharaDrawGyoRace(SubGameInfo *info) {
     } while (j < 0x60);
     return 0;
 }
-extern "C" int fptosi(float);
 static void DivSpriteScreen(mgCDrawPrim &prim) {
     int strip_height;
     int screen_width;

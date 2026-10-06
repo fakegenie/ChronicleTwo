@@ -36,7 +36,6 @@
 #include <cstring>
 #include <cmath>
 #include <libvu0.h>
-extern CScene *nowScene__2;
 extern ACTION_DAMAGE *LastCInfo2__2;
 extern int (*ext_func__3[256])(RS_STACKDATA *, int);
 extern float at_1181__3[4];
@@ -110,7 +109,6 @@ struct AccumeSlot {
     int unk_320;
     int unk_324;
 };
-extern "C" int fptosi(float);
 extern "C" int fptoui(float);
 void ParabolicInitialVector(float *result, float *from, float *to, float gravity, float flight_time);
 

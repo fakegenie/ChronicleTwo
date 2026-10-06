@@ -27,6 +27,7 @@
 #include "gamepad.hpp"
 #include "mg_math.hpp"
 #include <cmath>
+#include "vtables.hpp"
 
 /**
  *
@@ -79,7 +80,6 @@ struct GradeRows { signed char v[2]; /**< Grade for each row. */ };
 extern CMenuInvent *CMenuInventPt;
 extern CInventUserData *InventUserDataPtr;
 extern CDC2AlbumData *InventAlbumPtr;
-extern int menu_debug_flag;
 extern signed char InventInNetaEffectNum;
 extern short MenuItemCmdArgPos;
 extern int maxtbl_5171;
@@ -108,8 +108,6 @@ extern CActionChara *MenuActionChara[7];
 extern short NetaMemoID[512];
 extern int NetaMemoStr[512];
 extern short NetaMemoStrNum;
-extern CMenuPosDataForm *GiftBoxViewForm;
-extern "C" int fptosi(float);
 extern "C" void *__ct__9CMenuFontFv(void *);
 extern "C" int neta_sort__FiiiPi(int, int, int);
 enum { K_COMMAND_HANDLED = -1 };
@@ -1631,11 +1629,6 @@ void CMenuInvent::AttachFormInfo() {
     }
     AttachMessageForm();
 }
-extern void *__vt__9mgCObject[];
-extern void *__vt__7CObject[];
-extern void *__vt__12CObjectFrame[];
-extern void *__vt__11CCharacter2[];
-extern void *__vt__12CActionChara[];
 extern "C" void *__ct__10CRunScriptFv(void *);
 
 static inline int StackBlocks(int bytes) {
@@ -2319,7 +2312,6 @@ int CMenuInvent::ItemCmdAfter(int command, ITEMCMD_RET_PARA *para) {
 }
 
 
-extern CGamePad GamePad__2;
 /**
  *
  * Stores the path prefix used for an inventory asset.
@@ -5038,8 +5030,6 @@ extern char at_5013[];
 extern char at_5014[];
 extern char at_5015[];
 extern char at_5016[];
-extern u8 itemmenu_chr_rotflag;
-extern int *menu_randam_line_draw_postbl;
 
 #ifdef NONMATCHING
 inline CMenuInvent::CMenuInvent() {

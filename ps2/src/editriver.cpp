@@ -10,7 +10,6 @@
 #include "mdslist.hpp"
 #include "collision.hpp"
 
-extern "C" int fptosi(float value);
 
 // Code (.text)
 int CEditMap::PlaceRiver(float *pos) {

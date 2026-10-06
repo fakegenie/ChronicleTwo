@@ -35,7 +35,6 @@ extern char at_905__4[];
 extern char at_906__4[];
 extern char *MenuBigNum[];
 extern signed char *sn_944[];
-extern CItemUseTarget MenuUsedTarget;
 extern char at_1328[];
 extern char at_1512__3[];
 extern char at_1513__3[];
@@ -143,8 +142,8 @@ CMenuFont::CMenuFont() {
     SetClearance(0x10, 0x14);
     SetFuchi(5);
     SetColor(0x80686A6BU);
-    *(int *)&unk_b0 = 0;
-    *(int *)&unk_b4 = 0;
+    *(int *)&offset_x = 0;
+    *(int *)&offset_y = 0;
 }
 void MenuMesInit(ClsMes *mes) {
     int a, b, c, d, e;
@@ -265,8 +264,8 @@ void MenuMesInit(ClsMes *mes) {
         }
         mes->draw_off_x = 0.0f;
         mes->draw_off_y = 0.0f;
-        *(int *)&mes->unk_b0 = 0;
-        *(int *)&mes->unk_b4 = 0;
+        *(int *)&mes->offset_x = 0;
+        *(int *)&mes->offset_y = 0;
     }
 }
 CDC2Mes::CDC2Mes() {

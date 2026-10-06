@@ -12,26 +12,18 @@
 #include "scene.hpp"
 #include "editmap.hpp"
 #include "editevent.hpp"
-#include "dataread.hpp"
 #include "cameracontrol.hpp"
 #include "editloop.hpp"
-#include "editmap.hpp"
 #include "editparts.hpp"
 #include "gamedata.hpp"
 #include "mainloop.hpp"
 #include "mapjump.hpp"
 #include "menumain.hpp"
-#include "mg_math.hpp"
-#include "mg_texture.hpp"
 #include "mglib.hpp"
 #include "nd_meswin.hpp"
 #include "padcontrol.hpp"
-#include "runscript.hpp"
-#include "savedata.hpp"
-#include "scenesnd.hpp"
 #include "snd_mngr.hpp"
 #include "userdata.hpp"
-#include "vlgr_info.hpp"
 #include <cstring>
 
 int LoadIntNPC(GeoFuncParam *param, RS_STACKDATA *stack, int mode);
@@ -51,8 +43,6 @@ extern char at_888__3[];
 extern char at_1175__2[];
 
 extern "C" float mgGetProjection__Fv();
-extern mgCTextureManager mgTexManager;
-#include <cstdio>
 #include <cmath>
 
 static int CheckPlaceBurnParts(GeoFuncParam *param, RS_STACKDATA *args, int argc);

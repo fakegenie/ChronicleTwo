@@ -11,8 +11,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include "mglib.hpp"
-#include "snd_mngr.hpp"
 #include <libmc.h>
 
 extern CScene *MovieScene__2;

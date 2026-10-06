@@ -32,12 +32,8 @@
 #include "menuaqua.hpp"
 #include "common.h"
 #include "menuchr.hpp"
+#include "vtables.hpp"
 
-extern void *__vt__9mgCObject[];
-extern void *__vt__7CObject[];
-extern void *__vt__12CObjectFrame[];
-extern void *__vt__11CCharacter2[];
-extern void *__vt__12CActionChara[];
 extern "C" void *__ct__10CRunScriptFv(void *);
 
 static inline CActionChara *NewMenuActionChara(mgCMemory *stack) {
@@ -401,8 +397,6 @@ extern char at_5561[];
 extern char at_5839[];
 extern char at_5893[];
 extern int tbl_5848[];
-extern void *__vt__12CMosBookMenu[];
-extern CDC2Mes *MenuDCMsg[9];
 extern MemoryList at_1083__2;
 extern char at_1104__4[];
 extern char at_1131__3[];
@@ -410,7 +404,6 @@ extern char at_1132__5[];
 extern char at_1133__4[];
 extern char at_1134__3[];
 extern char at_1135__3[];
-extern "C" int fptosi(float value);
 extern "C" char at_1319[11];
 extern "C" char at_1361[];
 extern char at_2287[];
@@ -449,7 +442,6 @@ extern char at_1284__4[];
 extern char at_1285__2[];
 extern char *tbl_1233[4];
 extern u32 *MenuCharaChangeCLUT;
-extern void *__vt__14CMenuMosSelect[];
 extern "C" void *__ct__7CDC2MesFv(void *mes);
 extern "C" void *__ct__6ClsMesFv(void *mes);
 extern "C" void *__ct__12CObjectFrameFv(void *frame);
@@ -656,7 +648,6 @@ union MenuPositionVector {
 extern "C" MenuPositionVector at_1372__2;
 extern "C" char at_1402__3[];
 extern CMenuChrCngMenu *ChrChangMenuPt;
-extern void *__vt__15CMenuChrCngMenu[];
 extern int MenuCharaChangePosDataCfgBuffer;
 extern int tbl_2483[];
 extern "C" char at_2595__2[];
@@ -736,7 +727,7 @@ void SetMenuLoadItemNo(int who) {
         case 1: {
             CHARA_DATA *chara = userData->GetCharaDataPtr(who);
             do {
-                MenuLoadItemNo[count] = *(short *)((u8 *)chara + count * 0x6C + 0x172);
+                MenuLoadItemNo[count] = chara->equip[count].item_no;
                 count++;
             } while (count < 5);
             break;
@@ -5446,18 +5437,18 @@ int MenuNPCLoadCheck(CActionChara *chara, mgCMemory *memory, int texBlock) {
 }
 void CMenuCostumeSel::UpdateCostumeList(int mode, unsigned long charaFlag) {
     WornCostumes worn;
-    u8 *chara_data;
+    CHARA_DATA *chara_data;
     int kind;
     int index;
 
-    chara_data = (u8 *)GetUserDataMan()->GetCharaDataPtr(0);
+    chara_data = GetUserDataMan()->GetCharaDataPtr(0);
     if (mode == 0) {
         this->costume_num[0] = GetCostumeList(charaFlag, 6, this->costume_list[1]);
         this->costume_num[1] = GetCostumeList(charaFlag, 5, this->costume_list[0]);
         this->costume_num[2] = GetCostumeList(charaFlag, 7, this->costume_list[2]);
     }
     if (mode == 1) {
-        chara_data = (u8 *)GetUserDataMan()->GetCharaDataPtr(1);
+        chara_data = GetUserDataMan()->GetCharaDataPtr(1);
         this->costume_num[0] = GetCostumeList(charaFlag, 9, this->costume_list[1]);
         this->costume_num[1] = GetCostumeList(charaFlag, 8, this->costume_list[0]);
         this->costume_num[2] = GetCostumeList(charaFlag, 10, this->costume_list[2]);
@@ -5466,9 +5457,9 @@ void CMenuCostumeSel::UpdateCostumeList(int mode, unsigned long charaFlag) {
         return;
     }
     worn = *(WornCostumes *)at_4967__2;
-    worn.id[0] = *(short *)((u8*)chara_data + 0x24A);
-    worn.id[1] = *(short *)((u8*)chara_data + 0x322);
-    worn.id[2] = *(short *)((u8*)chara_data + 0x2B6);
+    worn.id[0] = chara_data->equip[2].item_no;
+    worn.id[1] = chara_data->equip[4].item_no;
+    worn.id[2] = chara_data->equip[3].item_no;
     for (kind = 0; kind < 3; kind++) {
         this->costume_select[kind] = 0;
         for (index = 0; index < this->costume_num[kind]; index++) {
@@ -5948,8 +5939,6 @@ void CMenuCostumeSel::Draw() {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuchr", Draw__15CMenuCostumeSelFv);
 #endif
-extern void *__vt__15CMenuCostumeSel[];
-extern u_long CostumeOptionEnv;
 extern "C" void *__ct__15mgCCameraFollowFffff(void *camera, float distance, float height, float angle,
                                                float speed);
 #ifdef STATEMATCHING

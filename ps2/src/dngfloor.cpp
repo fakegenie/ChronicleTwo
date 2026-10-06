@@ -42,7 +42,6 @@ extern int search_tbl_1366[4][3];
 extern int search_tbl_1370[4][3];
 extern int search_tbl_1372[4][3];
 extern char *fl_t_1467[2];
-extern "C" int fptosi(float value);
 extern float at_938__5;
 extern DNGMAP_ROOM_INFO *tree_spi_roominfo;
 extern DNGMAP_ROOT_INFO *tree_spi_rootinfo;

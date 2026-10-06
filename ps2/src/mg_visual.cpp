@@ -10,11 +10,9 @@
 #include "mg_visual.hpp"
 
 #include <cstring>
+#include "vtables.hpp"
 
 extern u_char texflush_dma__2[0x30];
-extern "C" void *__vt__9mgCVisual[];
-extern "C" void *__vt__12mgCVisualMDT[];
-extern "C" void *__vt__15mgCVisualFixMDT[];
 
 struct VisualScratchMemory {
     u_char pad_00[0x1C];

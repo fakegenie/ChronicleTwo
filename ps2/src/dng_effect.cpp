@@ -35,7 +35,6 @@
 #include <cstring>
 #include <cstdlib>
 
-extern "C" int fptosi(float);
 extern "C" mgCDrawPrim *__ct__11mgCDrawPrimFv(mgCDrawPrim *);
 extern "C" mgCFrameAttr *__ct__12mgCFrameAttrFv(mgCFrameAttr *);
 extern char at_2882[];

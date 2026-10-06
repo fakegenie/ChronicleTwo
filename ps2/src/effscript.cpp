@@ -17,15 +17,10 @@
 #include "runscript_opcodes.hpp"
 #include <cstring>
 
-extern "C" int fptosi(float value);
 extern "C" void __ct__10CRunScriptFv(void *);
 extern "C" void *Alloc__9mgCMemoryFi(mgCMemory *, int);
 extern "C" void Delete__8CColPrimFi(void *, int);
 extern "C" void Free__9mgCMemoryFP1(void *, void *);
-extern void *__vt__9mgCObject[];
-extern void *__vt__7CObject[];
-extern void *__vt__12CObjectFrame[];
-extern void *__vt__11CCharacter2[];
 /**
  *
  * Effect vector viewed as four floats or a quadword.
@@ -44,10 +39,10 @@ union EffectVector {
 #include "dataread.hpp"
 #include "snd_mngr.hpp"
 #include "event_func.hpp"
+#include "vtables.hpp"
 
 extern "C" _EFF_SCRIPT *now_script;
 extern "C" int (*ext_func__4[256])(RS_STACKDATA *, int);
-extern CColPrimMan ColPrimMan;
 EFF_SPT_BASE_DEF *GetEffSptBaseDefPtr(int index);
 int SetEffectScript(CRunScript *script, char *program, mgCMemory *memory);
 void SetEffectScriptFunc();

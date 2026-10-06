@@ -15,13 +15,13 @@
 #include "mdslist.hpp"
 #include "mapload.hpp"
 #include <cstring>
+#include "vtables.hpp"
 
 union EditVector {
     float values[4];
     u_long128 quad;
 };
 
-extern "C" int fptosi(float value);
 
 const int kPartsInfoColorCountOffset = 0x1C;
 const int kPartsInfoRepaintOffset = 0x20;
@@ -258,7 +258,7 @@ int CEditMap::GetPoly(int mode, CCPoly *polys, mgVu0FBOX &box, int max) {
     max -= total;
     polys += total;
     for (i = 0; i < edit_parts_max; i++, part++) {
-        int is_free = *(signed char *)((u_char *)part + 0x70) == 0;
+        int is_free = (s8)part->name[0] == 0;
         if (is_free) {
             continue;
         }
@@ -332,7 +332,7 @@ CEditPartsInfo *CEditMap::GetePartsInfoAtPlaceID(int index) {
 int CEditMap::eNewPlaceParts() {
     int i;
     for (i = 0; i < edit_parts_max; i++) {
-        int is_free = *(signed char *)((u_char *)&edit_parts[i] + 0x70) == 0;
+        int is_free = (s8)edit_parts[i].name[0] == 0;
         if (is_free) {
             return i;
         }
@@ -367,7 +367,7 @@ CEditParts *CEditMap::GetePlaceParts(char *name) {
     i = 0;
     for (; i < edit_parts_max; i++) {
         slot = (CEditParts *)((char *)edit_parts + offset);
-        int is_free = *(signed char *)((u_char *)slot + 0x70) == 0;
+        int is_free = (s8)slot->name[0] == 0;
         if (!is_free) {
             if (slot->state != 0) {
                 if (slot->info != 0) {
@@ -544,7 +544,7 @@ int CEditMap::GetSameParts(int index) {
     offset = 0;
     for (; i < edit_parts_max; i++) {
         CEditParts *slot = (CEditParts *)((char *)edit_parts + offset);
-        int is_free = *(signed char *)((u_char *)slot + 0x70) == 0;
+        int is_free = (s8)slot->name[0] == 0;
         if (!is_free) {
             if (slot->state == 0) {
                 if (slot->info == info) {
@@ -967,9 +967,9 @@ int CEditMap::GetNearParts(CEditPartsInfo *info, float *pos, float angle, CEditP
     }
     part = edit_parts;
     mgCreateMatrixPY__FPA4_fPff(area_matrix, pos, angle);
-    ((float *)info)[0x6C / 4] = 1.0f;
-    ((float *)info)[0x5C / 4] = 1.0f;
-    info_bounds = (float *)((u8 *)info + 0x50);
+    info->box.min[3] = 1.0f;
+    info->box.max[3] = 1.0f;
+    info_bounds = info->box.max;
     mgApplyMatrix__FPfPfPA4_fPfPf(area_max, area_min, area_matrix, info_bounds, info_bounds + 4);
     area_max[0] += 55.0f;
     area_max[2] += 55.0f;
@@ -979,7 +979,7 @@ int CEditMap::GetNearParts(CEditPartsInfo *info, float *pos, float angle, CEditP
     i = 0;
     out_offset = 0;
     for (; i < edit_parts_max; i++, part++) {
-        int is_free = *(signed char *)((u_char *)part + 0x70) == 0;
+        int is_free = (s8)part->name[0] == 0;
         if (is_free) {
             continue;
         }
@@ -989,7 +989,7 @@ int CEditMap::GetNearParts(CEditPartsInfo *info, float *pos, float angle, CEditP
         if (part->info == 0) {
             continue;
         }
-        bounds = (float *)((u8 *)part->info + 0x50);
+        bounds = part->info->box.max;
         part->GetPosition(part_pos);
         part->GetRotation(part_rotation);
         mgCreateMatrixPY__FPA4_fPff(part_matrix, part_pos, part_rotation[1]);
@@ -1019,7 +1019,7 @@ int CEditMap::GetNearParts(mgVu0FBOX &box, CEditParts **out, int max) {
     out_offset = 0;
     part = edit_parts;
     for (i = 0; i < edit_parts_max; i++, part++) {
-        int is_free = *(signed char *)((u_char *)part + 0x70) == 0;
+        int is_free = (s8)part->name[0] == 0;
         if (is_free) {
             continue;
         }
@@ -1029,7 +1029,7 @@ int CEditMap::GetNearParts(mgVu0FBOX &box, CEditParts **out, int max) {
         if (part->info == 0) {
             continue;
         }
-        bounds = (float *)((u8 *)part->info + 0x50);
+        bounds = part->info->box.max;
         part->GetPosition(pos);
         part->GetRotation(rotation);
         mgCreateMatrixPY__FPA4_fPff(matrix, pos, rotation[1]);
@@ -1637,7 +1637,7 @@ int CEditMap::PreDraw(float *pos) {
     CreateFuncCheck__4CMapFP15CFuncPointCheck(this, &check);
     part = edit_parts;
     for (i = 0; i < edit_parts_max; i++, part++) {
-        int is_free = *(signed char *)((u_char *)part + 0x70) == 0;
+        int is_free = (s8)part->name[0] == 0;
         if (!is_free) {
             StepFuncPoint__9CMapPartsFR15CFuncPointCheck((CMapParts *)part, check);
         }
@@ -1667,7 +1667,7 @@ int CEditMap::DrawSub(int mode) {
     total = 0;
     i = 0;
     for (; i < edit_parts_max; i++, part++) {
-        int is_free = *(signed char *)((u_char *)part + 0x70) == 0;
+        int is_free = (s8)part->name[0] == 0;
         if (!is_free && part->state == 1) {
             CopyFuncPointCheck__9CMapPartsFR15CFuncPointCheck((CMapParts *)part, check);
             if (i == focus_parts) {
@@ -1706,10 +1706,6 @@ int CEditMap::DrawSub(int mode) {
 int emapEDIT_RIVER(SPI_STACK *stack, int argc) {
     return 1;
 }
-extern "C" void *__vt__9mgCObject[];
-extern "C" void *__vt__7CObject[];
-extern "C" void *__vt__12CObjectFrame[];
-extern "C" void *__vt__9CMapPiece[];
 int emapRIVER_PARTS_NAME(SPI_STACK *stack, int argc) {
     int index = spiGetStackInt(stack++);
     if (index < 0 || index >= EDIT_MAP_RIVER_PARTS_MAX) {

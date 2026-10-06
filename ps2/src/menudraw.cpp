@@ -27,6 +27,7 @@ extern "C" int sprintf(...);
 #include <cstdlib>
 #include <cmath>
 #include <cstring>
+#include "vtables.hpp"
 
 /**
  *
@@ -507,7 +508,6 @@ extern float MenuItemBrdScrlCurLen;
 
 
 
-extern "C" int fptosi(float value);
 
 extern "C" unsigned int fptoui(float value);
 
@@ -640,7 +640,7 @@ void Init_MENUFORM_MAKEBRD_INFO(MENUFORM_MAKEBRD_INFO *board) {
 void GetMenuItemIconTexGetXY(int item_no, mgRect<int> &rect) {
     int icon_no = GetItemIconNo(item_no);
     if (item_no == 0x38 && MenuMainScene != 0 &&
-            GetTimeBand(*(float *)((u8 *)MenuMainScene + 0x2F6C)) == 2) {
+            GetTimeBand(MenuMainScene->time) == 2) {
         icon_no++;
     }
     rect.right = rect.bottom = 32;
@@ -4398,7 +4398,7 @@ int NowUseNeedItemCheck(CUserDataManager *manager) {
     }
     needs = 0;
     in_battle = 0;
-    if ((*(u16 *)((u8 *)GetMainScene() + 0x2F9C) & 4) != 0) {
+    if ((GetMainScene()->battle_area.floor_status & 4) != 0) {
         in_battle = 1;
     }
     active_chara = manager->active_chr_no;
@@ -5140,11 +5140,6 @@ void CRepairManager::SetRepairData(mgCMemory *memory, int block, unsigned int *p
     SetStack(memory, 1);
     keep = 1;
 }
-extern void *__vt__9mgCObject[];
-extern void *__vt__7CObject[];
-extern void *__vt__12CObjectFrame[];
-extern void *__vt__11CCharacter2[];
-extern void *__vt__12CActionChara[];
 extern "C" void *__ct__10CRunScriptFv(void *);
 
 void CRepairManager::GeneratePoly(float *pos, int block) {

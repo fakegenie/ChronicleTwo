@@ -35,6 +35,7 @@ extern s8 aquarium_fish_maxtbl[];
 #include <cstdlib>
 #include <cmath>
 #include <cstring>
+#include "vtables.hpp"
 
 /**
  *
@@ -277,10 +278,6 @@ extern u16 aqua_frame_sizetbl_2934[3];
 extern s16 AquaBattleBubble_Generate_Wait;
 extern int AquaBattleBubble_Generate_Counter;
 extern CBubble *AquaBattleBubble;
-extern "C" void *__vt__9mgCObject[];
-extern "C" void *__vt__7CObject[];
-extern "C" void *__vt__12CObjectFrame[];
-extern "C" void *__vt__11CCharacter2[];
 extern "C" aqua_quad at_2975;
 extern "C" aqua_quad at_2976;
 extern "C" aqua_quad at_3016;
@@ -329,7 +326,6 @@ extern float v4orig_4376[4];
 extern short t_4408[];
 extern "C" char at_4519[];
 extern float ambient[4];
-extern int menu_debug_flag;
 extern s16 menu_debug_select;
 extern int langTbl_3630[2][2];
 extern s8 menu_max_tbl_3720[3];
@@ -390,7 +386,6 @@ extern "C" aqua_fish_info aquafish_info[];
 
 extern aqua_food_info esa_info[10];
 
-extern "C" int fptosi(float value);
 
 static int GetFishPath(int item_no, char *out);
 

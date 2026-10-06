@@ -20,7 +20,6 @@
 
 enum { kMiniMapInfoCount = 18, kHealingCooldown = 0x708, kStepUp = 1, kStepDown = 2, kStepRight = 4, kStepLeft = 8, kTermRightMargin = 21, kDoorPartsBegin = 0xE8, kDoorPartsEnd = 0xF0, kDoorPartsLast = kDoorPartsEnd - 1 };
 extern MINIMAP_SYMBOL_INFO symbol_table[];
-extern "C" int fptosi(float value);
 extern int cax;
 extern int cay;
 extern CAutoMapGen * auto_map;

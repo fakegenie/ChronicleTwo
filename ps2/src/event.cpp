@@ -31,27 +31,12 @@ extern char at_820__4[];
 extern char at_1002__4[];
 extern char D_0037B038[];
 
-#include "character.hpp"
-#include "dataread.hpp"
 #include "dng_main.hpp"
 #include "editloop.hpp"
 #include "effectlist.hpp"
-#include "event_func.hpp"
-#include "mainloop.hpp"
 #include "mapselect.hpp"
-#include "menucommon.hpp"
-#include "mg_camera.hpp"
-#include "mg_memory.hpp"
-#include "mglib.hpp"
-#include "nd_meswin.hpp"
 #include "padcontrol.hpp"
 #include "runscript.hpp"
-#include "savedata.hpp"
-#include "scenesnd.hpp"
-#include "snd_mngr.hpp"
-#include "sound.hpp"
-#include <cstdio>
-#include <cstring>
 
 extern int cnt_1056;
 

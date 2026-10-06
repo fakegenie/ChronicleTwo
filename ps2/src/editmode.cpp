@@ -25,7 +25,6 @@
 #include "mg_dataset.hpp"
 #include <cmath>
 
-extern "C" int fptosi(float);
 extern "C" int GetBuildPartsNum__9CSaveDataFi(CSaveData *save, int parts_no);
 static void InitBalanceDraw(CScene *scene);
 static int CheckFocusBalanceParts(CEditMap *map, int index, float *cursor);
@@ -60,7 +59,6 @@ extern int PlaceRiverCnt;
 extern int RemoveMtnCnt;
 extern int SysMesCnt;
 extern int SysMesNo;
-extern "C" UNDO_DATA UndoData;
 extern "C" int EditModeNo;
 extern "C" int HighSpeedMoveCnt;
 extern "C" int MagnetEnable;
@@ -73,7 +71,6 @@ extern "C" int eCurRot;
 extern "C" int PlacePartsFlag;
 extern "C" int RemainPartsNum;
 extern "C" float WallPutPos[4];
-extern "C" CEditParts::WallInfo WallInfo;
 extern "C" int __as__9mgVu0FBOXFR9mgVu0FBOX(...);
 extern "C" int GroundBalance__8CEditMapFi(CEditMap *, int);
 extern "C" int UpdateHouse__8CEditMapFv(CEditMap *);

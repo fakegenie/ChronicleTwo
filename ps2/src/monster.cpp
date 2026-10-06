@@ -45,7 +45,6 @@
 extern mgCTextureManager mgTexManager;
 extern short gift_item_tbl[][3];
 extern int LanguageCode;
-extern "C" int fptosi(float value);
 extern char *dung_progtxt_notlift_mons[];
 union EffectVector { float f[4]; u_long128 qw; };
 struct HitRectangle { int left; int top; int right; int bottom; } __attribute__((aligned(16)));

@@ -13,7 +13,6 @@
 /** Vertical blanks counted since start-up, kept non-negative. */
 // Small uninitialised data (.sbss)
 static volatile int vcount__2;
-extern int MainThreadPriority;
 extern "C" int VSyncCallBack__Fi__2(int);
 extern const unsigned char at_846__DATA[];
 extern const unsigned char at_847__DATA[];

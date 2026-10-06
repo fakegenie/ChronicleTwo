@@ -38,8 +38,6 @@
 #include "userdata.hpp"
 #include "dng_main.hpp"
 
-#include <cmath>
-#include <cstdio>
 #include <cstring>
 
 extern int wep_effect_cnt;
@@ -69,58 +67,31 @@ extern "C" float viewAngleH__2;
 extern "C" float viewAngleV__2;
 extern char at_3589[];
 extern CWeaponElement wep_effect[8];
-extern "C" int fptosi(float value);
-#include "actionchara.hpp"
-#include "automap.hpp"
-#include "cameracontrol.hpp"
 #include "charasetup.hpp"
 #include "collision.hpp"
 #include "colprim.hpp"
 #include "dataread.hpp"
 #include "dbg_font.hpp"
-#include "dng_debug.hpp"
-#include "dng_effect.hpp"
-#include "dng_event.hpp"
-#include "dng_hud.hpp"
 #include "dng_object.hpp"
-#include "dng_status.hpp"
 #include "editexception.hpp"
-#include "effscript.hpp"
-#include "event.hpp"
-#include "event_func.hpp"
 #include "eventedit.hpp"
 #include "funcpoint.hpp"
 #include "gamedata.hpp"
 #include "gamepad.hpp"
 #include "helpmes.hpp"
-#include "mainloop.hpp"
-#include "maintex.hpp"
 #include "map.hpp"
-#include "mapload.hpp"
 #include "mapselect.hpp"
 #include "menumain.hpp"
-#include "mg_camera.hpp"
-#include "mg_drawprim.hpp"
-#include "mg_math.hpp"
-#include "mg_texture.hpp"
-#include "mglib.hpp"
-#include "monster.hpp"
 #include "nd_meswin.hpp"
 #include "nowload.hpp"
 #include "padcontrol.hpp"
-#include "photo.hpp"
 #include "pot.hpp"
 #include "prespr.hpp"
-#include "savedata.hpp"
-#include "savedatadungeon.hpp"
-#include "sceneevent.hpp"
-#include "scenesnd.hpp"
 #include "screeneffect.hpp"
 #include "snd_mngr.hpp"
 #include "sphida.hpp"
 #include "subgame.hpp"
 #include "sysmes.hpp"
-#include "userdata.hpp"
 #include "wavetable.hpp"
 
 // Small uninitialised data (.sbss)
@@ -172,7 +143,6 @@ int  EventScriptSetup(SYSTEM_SCRIPT_INFO *script);
 int  ChangeSetUnit(int dir);
 void InitEyeCamera(CActionChara *chara);
 int  IsRunDeadEvent(CActionChara *chara);
-extern CGamePad GamePad__2;
 extern int debug_cursor;
 extern int debug_mons_no;
 extern int debug_mons_cur;

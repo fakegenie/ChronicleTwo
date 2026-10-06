@@ -28,13 +28,13 @@
 #include "quest.hpp"
 #include "inventmn.hpp"
 #include "editmenu.hpp"
+#include "vtables.hpp"
 
 mgCMemory MenuLocalStack;
 
 CInventUserData *GetInventUserDataPtr();
 
 extern "C" int CheckRobotCore__16CUserDataManagerFv(CUserDataManager *);
-extern "C" int fptosi(float value);
 extern "C" int AddYarikomiMedal__16CUserDataManagerFi(CUserDataManager *, int);
 extern "C" void *__ct__18CScriptInterpreterFv(void *);
 extern "C" void SetTag__18CScriptInterpreterFP13SPI_TAG_PARAM(void *, SPI_TAG_PARAM *);
@@ -1387,7 +1387,6 @@ extern char at_2117__2[];
 extern char at_2118__2[];
 extern "C" void *__ct__14CBaseMenuClassFv(void *);
 extern "C" void *__ct__13CGameDataUsedFv(void *);
-extern "C" void *__vt__9CShopMenu[];
 void MenuShopInit(mgCMemory *stack, int *tex_block, int arg) {
     int cfg_size;
     CMenuPosDataForm *form;
@@ -1821,8 +1820,6 @@ int CMenuQuestView::KeyStep() {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/menushop", KeyStep__14CMenuQuestViewFv);
 #endif
-extern "C" void *__ct__14CBaseMenuClassFv(void *);
-extern "C" void *__vt__14CMenuQuestView[];
 void MenuNPCQuestViewInit(mgCMemory *stack, int *tex_block, int view_mode) {
     Menu_Memo_ViewMode = 0;
     if (view_mode == 1) {
@@ -1851,7 +1848,6 @@ void MenuNPCQuestViewInit(mgCMemory *stack, int *tex_block, int view_mode) {
 int MenuNPCQuestViewKey() {
     return MenuQuestView->KeyStep();
 }
-extern int menu_debug_flag;
 extern s8 randam_checktbl[];
 extern short tbl_2469[7][12];
 extern short at_2470[12];

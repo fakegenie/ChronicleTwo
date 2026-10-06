@@ -2,7 +2,6 @@
 #include "drawwin.hpp"
 #include "nd_meswin.hpp"
 #include "mg_drawenv.hpp"
-#include "nd_meswin.hpp"
 #include "mg_drawprim.hpp"
 #include "menudraw.hpp"
 

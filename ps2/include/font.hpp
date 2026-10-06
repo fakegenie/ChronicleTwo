@@ -175,8 +175,8 @@ public:
     s32 draw_w;             /**< Width a full-width character is drawn at. */
     s32 draw_h;             /**< Height a character is drawn at. */
     s32 mini;               /**< Non-zero to draw with the small font texture. */
-    float unk_b0;
-    float unk_b4;
+    float offset_x;
+    float offset_y;
 
     /**
      *
