@@ -1857,35 +1857,23 @@ int CActionChara::RoboTankMoveIF(int mode) {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/actionchara", RoboTankMoveIF__12CActionCharaFi);
 #endif
-#ifdef NONMATCHING
 int CActionChara::RoboBikeMoveIF(int mode) {
     sceVu0FVECTOR position;
     sceVu0FVECTOR leg_rotation;
-    sceVu0FVECTOR rotation;
     sceVu0FVECTOR movement;
-    sceVu0FVECTOR target_position;
-    sceVu0FVECTOR direction = { 0.0f, 0.0f, 1.0f, 1.0f };
-    sceVu0FMATRIX matrix;
-    CActionChara *leg;
+    sceVu0FVECTOR rotation;
+    int           poly_count;
     CActionChara *arm;
     CActionChara *target;
     CMap         *map;
     float         stick_x;
     float         stick_y;
-    float         steering;
     float         target_angle;
-    int           poly_count;
-    CCPoly        polys[128];
-    mgVu0FBOX     box;
-    sceVu0FVECTOR wheel_rotation;
-    sceVu0FVECTOR front_wheel_position;
-    sceVu0FVECTOR back_wheel_position;
-    sceVu0FVECTOR front_hit;
-    sceVu0FVECTOR back_hit;
-    sceVu0FVECTOR slope_rotation = { 0.0f, 0.0f, 0.0f, 1.0f };
-    sceVu0FVECTOR old_velocity;
-    mgCFrame     *wheel;
+    CActionChara *leg;
     float         slope_angle;
+    mgCFrame     *front_wheel;
+    mgCFrame     *back_wheel;
+    mgCFrame     *tilt;
 
     leg = SearchChara("leg");
     if (leg == NULL) {
@@ -1929,15 +1917,16 @@ int CActionChara::RoboBikeMoveIF(int mode) {
         sound_info.loop_se->SeLoopPlayStop(sound_info.se_bank, 16, 3, 12);
     }
     if (GamePad__2.On(PAD_L1) != 0) {
-        steering = leg_rotation[1] + 0.8f * (0.034906585f * -stick_x * accele.speed);
+        leg_rotation[1] += 0.8f * (0.034906585f * -stick_x * accele.speed);
     } else {
-        steering = leg_rotation[1] + 0.2f * (0.034906585f * -stick_x * accele.speed);
+        leg_rotation[1] += 0.2f * (0.034906585f * -stick_x * accele.speed);
     }
-    leg_rotation[1] = steering;
     leg_rotation[1] = mgAngleLimit(leg_rotation[1]);
     leg->SetRotation(leg_rotation);
     if (leg != NULL) {
         leg->GetRotation(rotation);
+        sceVu0FVECTOR direction = { 0.0f, 0.0f, 1.0f, 1.0f };
+        sceVu0FMATRIX matrix;
         sceVu0UnitMatrix(matrix);
         sceVu0RotMatrixY(matrix, matrix, rotation[1]);
         sceVu0ApplyMatrix(movement, matrix, direction);
@@ -1959,10 +1948,12 @@ int CActionChara::RoboBikeMoveIF(int mode) {
     if (lock_on != 0) {
         target = (CActionChara *)nowScene__2->GetCharacter(target_no);
         if (target != NULL && target->chara_kind == ACTION_KIND_SCRIPT) {
+            sceVu0FVECTOR target_position;
+            sceVu0FVECTOR target_rotation;
             target->GetPosition(target_position);
             target_angle = atan2f(target_position[0] - position[0], target_position[2] - position[2]);
-            GetRotation(rotation);
-            target_angle -= rotation[1];
+            GetRotation(target_rotation);
+            target_angle -= target_rotation[1];
             if (target_angle < -3.1415927f) {
                 target_angle += 6.2831855f;
             }
@@ -1971,16 +1962,25 @@ int CActionChara::RoboBikeMoveIF(int mode) {
             }
             arm = SearchChara("arm");
             if (arm != NULL) {
-                arm->SetRotation(0.0f, unitRotation(arm->CObjectFrame::frame, target_angle, 3.0f), 0.0f);
+                target_angle = unitRotation(arm->CObjectFrame::frame, target_angle, 3.0f);
+                arm->SetRotation(0.0f, target_angle, 0.0f);
             }
         }
     } else {
         arm = SearchChara("arm");
         if (arm != NULL) {
-            arm->SetRotation(0.0f, unitRotation(arm->CObjectFrame::frame, 0.0f, 8.0f), 0.0f);
+            float arm_angle = unitRotation(arm->CObjectFrame::frame, 0.0f, 8.0f);
+            arm->SetRotation(0.0f, arm_angle, 0.0f);
         }
     }
     map = nowScene__2->GetMap(nowScene__2->active_map);
+    CCPoly        polys[128];
+    mgVu0FBOX     box;
+    sceVu0FVECTOR wheel_rotation;
+    sceVu0FVECTOR front_hit;
+    sceVu0FVECTOR back_hit;
+    sceVu0FVECTOR front_wheel_position;
+    sceVu0FVECTOR back_wheel_position;
 
     box.max[0] = 50.0f + position[0];
     box.min[0] = position[0] - 50.0f;
@@ -1991,14 +1991,14 @@ int CActionChara::RoboBikeMoveIF(int mode) {
     box.max[3] = 1.0f;
     box.min[3] = 1.0f;
     poly_count = map->GetColPoly(polys, box, 128);
-    wheel = SearchObject("f_tire");
-    if (wheel != NULL) {
-        wheel->SetRotType(2);
-        wheel->GetRotation(wheel_rotation);
+    front_wheel = SearchObject("f_tire");
+    if (front_wheel != NULL) {
+        front_wheel->SetRotType(2);
+        front_wheel->GetRotation(wheel_rotation);
         wheel_rotation[2] += 0.034906585f * -accele.speed;
         wheel_rotation[2] = mgAngleLimit(wheel_rotation[2]);
-        wheel->SetRotation(wheel_rotation);
-        wheel->GetWorldPosition0(front_wheel_position);
+        front_wheel->SetRotation(wheel_rotation);
+        front_wheel->GetWorldPosition0(front_wheel_position);
         front_wheel_position[1] = 50.0f + position[1];
         if (CheckHitVertical(polys, poly_count, front_wheel_position, -100.0f, front_hit, 1) < 0) {
             sceVu0CopyVector(front_hit, front_wheel_position);
@@ -2008,14 +2008,14 @@ int CActionChara::RoboBikeMoveIF(int mode) {
             front_hit[1] = position[1] - 20.0f;
         }
     }
-    wheel = SearchObject("b_tire");
-    if (wheel != NULL) {
-        wheel->SetRotType(2);
-        wheel->GetRotation(wheel_rotation);
+    back_wheel = SearchObject("b_tire");
+    if (back_wheel != NULL) {
+        back_wheel->SetRotType(2);
+        back_wheel->GetRotation(wheel_rotation);
         wheel_rotation[2] += 0.034906585f * -accele.speed;
         wheel_rotation[2] = mgAngleLimit(wheel_rotation[2]);
-        wheel->SetRotation(wheel_rotation);
-        wheel->GetWorldPosition0(back_wheel_position);
+        back_wheel->SetRotation(wheel_rotation);
+        back_wheel->GetWorldPosition0(back_wheel_position);
         back_wheel_position[1] = 50.0f + position[1];
         if (CheckHitVertical(polys, poly_count, back_wheel_position, -100.0f, back_hit, 1) < 0) {
             sceVu0CopyVector(back_hit, back_wheel_position);
@@ -2030,12 +2030,13 @@ int CActionChara::RoboBikeMoveIF(int mode) {
     back_hit[3] = 1.0f;
     back_hit[1] = 0.0f;
     slope_angle = atan2f(front_hit[1], mgDistVector(back_hit));
-    wheel = SearchObject("katamuki");
-    if (wheel != NULL) {
-        slope_rotation[0] = slope_angle;
-        wheel->SetRotType(2);
-        wheel->SetRotation(slope_rotation);
+    tilt = SearchObject("katamuki");
+    if (tilt != NULL) {
+        sceVu0FVECTOR slope_rotation = { slope_angle, 0.0f, 0.0f, 1.0f };
+        tilt->SetRotType(2);
+        tilt->SetRotation(slope_rotation);
     }
+    sceVu0FVECTOR old_velocity;
     sceVu0CopyVector(old_velocity, velocity);
     movement[1] = old_velocity[1];
     sceVu0CopyVector(velocity, movement);
@@ -2043,9 +2044,6 @@ int CActionChara::RoboBikeMoveIF(int mode) {
     RockOn();
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/actionchara", RoboBikeMoveIF__12CActionCharaFi);
-#endif
 #ifdef NONMATCHING
 int CActionChara::RoboAirMoveIF(int unk, int mode) {
     sceVu0FVECTOR position;
@@ -2702,28 +2700,32 @@ void CActionChara::SetHold() {
         prog_no = -1;
     }
 }
-#ifdef NONMATCHING
+static inline float MoveCheckRadius(float width) {
+    return 4.0f + 2.0f * width;
+}
 void CActionChara::RunScript(CScene *scene, RUN_SCRIPT_ENV *env) {
+    int               pallet_u;
+    int               history;
     CBattleCharaInfo *battle;
-    CTreasureBoxManager *treasure;
     CSphida          *sphida;
-    CMap             *map;
-    ACTION_DAMAGE    *entry;
-    CColPrim         *reversed;
-    float             frame;
-    float             target_distance;
     int               count;
-    int               foot;
-    int               index;
+    float             frame;
+    int               effect;
     int               pallet_no;
     int               target;
-    DNG_BATTLE_AREA  *area;
-    int               history;
-    int               pallet_u;
     int               pallet_v;
+    int               index;
+    int               foot;
+    ACTION_DAMAGE    *entry;
+    DNG_BATTLE_AREA  *area;
+    CColPrim         *reversed;
+    CTreasureBoxManager *treasure;
+    CMap             *map;
+    float             target_distance;
 
-    action_info.chara = this;
     nowScene__2 = scene;
+    area = &scene->battle_area;
+    action_info.chara = this;
     action_info.camera = (mgCCameraFollow *)scene->GetCamera(scene->GetCameraID("MainCam"));
     action_info.env = env;
     sceVu0FVECTOR adjusted_velocity = { 0.0f, 0.0f, 0.0f, 0.0f };
@@ -2793,7 +2795,6 @@ void CActionChara::RunScript(CScene *scene, RUN_SCRIPT_ENV *env) {
     box.max[3] = 1.0f;
     box.min[3] = 1.0f;
     count = map->GetColPoly(polys, box, 128);
-    area = &scene->battle_area;
     treasure = area->treasure_box;
     if (treasure != NULL) {
         count += treasure->PickupCollision(position, &polys[count], box, 128 - count);
@@ -2802,7 +2803,7 @@ void CActionChara::RunScript(CScene *scene, RUN_SCRIPT_ENV *env) {
     if (sphida != NULL) {
         count += sphida->PickupCollision(position, &polys[count], box, 128 - count);
     }
-    move_check.radius = 4.0f + 2.0f * body_width;
+    move_check.radius = MoveCheckRadius(body_width);
     MoveCheck(position, adjusted_velocity, new_position, &move_check, polys, count, 1);
     adjusted_velocity[0] = new_position[0] - position[0];
     adjusted_velocity[2] = new_position[2] - position[2];
@@ -2872,9 +2873,9 @@ void CActionChara::RunScript(CScene *scene, RUN_SCRIPT_ENV *env) {
     if (pallet_no >= 0) {
         pallet_u = pallet_no % 2;
         pallet_v = pallet_no / 2;
-        for (index = 0; index < 3; index++) {
-            if (sword_effect[index] != NULL) {
-                sword_effect[index]->SetTexture(pallet_u * 64, pallet_v * 32, 64, 32);
+        for (effect = 0; effect < 3; effect++) {
+            if (sword_effect[effect] != NULL) {
+                sword_effect[effect]->SetTexture(pallet_u * 64, pallet_v * 32, 64, 32);
             }
         }
     }
@@ -2898,9 +2899,6 @@ void CActionChara::RunScript(CScene *scene, RUN_SCRIPT_ENV *env) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/actionchara", RunScript__12CActionCharaFP6CSceneP14RUN_SCRIPT_ENV);
-#endif
 int CActionChara::CheckReleaseTimming(int id) {
     if (id == -1) {
         return release_timing;

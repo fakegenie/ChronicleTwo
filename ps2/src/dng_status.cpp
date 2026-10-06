@@ -195,7 +195,6 @@ void DrawActiveItemCursor(int x, int y, float alpha) {
     sprite.Vertex(corner);
     sprite.End();
 }
-#ifdef NONMATCHING
 void DrawMainUnitStatusBord(float rate) {
     struct charge_position_data {
         int value[7][2];
@@ -210,52 +209,60 @@ void DrawMainUnitStatusBord(float rate) {
         s16 value[7][2];
     };
 
+    SP_RGBA           color;
     CPreSprite sprite;
     CPreSprite spare;
-    extern s8         init_1024;
-    mgRect<int> whp_max_glyph;
-    int               hp_max;
-    mgRect<int> item_glyph;
+    charge_position_data charge_position;
+    charge_glyph_data charge_glyph;
+    status_mask_data status_mask;
     status_glyph_data status_glyph;
+    mgRect<int> item_glyph;
+    mgRect<int> hp_now_glyph;
+    mgRect<int> hp_max_glyph;
+    mgRect<int> whp_now_glyph;
+    mgRect<int> whp_max_glyph;
+    mgRect<int> second_whp_now_glyph;
+    mgRect<int> second_whp_max_glyph;
+    int               whp0[2];
+    int               whp1[2];
+    int               abs0[2];
+    int               abs1[2];
+    int               element;
     int               top_right;
     float             hp_rate;
-    charge_glyph_data charge_glyph;
-    int               second_weapon_y;
-    status_mask_data status_mask;
-    charge_position_data charge_position;
+    int               second_weapon_no;
     int               pulse;
-    mgRect<int> hp_now_glyph;
     int               bottom_right;
     int               charge_max;
-    mgRect<int> whp_now_glyph;
-    int               red;
-    mgRect<int> hp_max_glyph;
-    float             whp_rate[2];
-    mgRect<int> second_whp_now_glyph;
+    int               green;
     int               status_x;
-    mgRect<int> second_whp_max_glyph;
+    int               red;
     int               blue;
     CBattleCharaInfo *info;
-    int               status_attr;
-    int               whp[2][2];
-    s16               second_weapon_no;
-    int               number_x;
-    int               abs[2][2];
-    SP_RGBA           color;
-    int               gauge_left;
-    int               green;
     int               charge_now;
+    int               status_attr;
+    int               number_x;
+    int               gauge_left;
     CActionChara     *character;
+    int               weapon_no;
     CGameDataUsed    *active_items;
-    s16               weapon_no;
-    int               second_weapon_x;
+    int               second_weapon_y;
     int               event_running;
-    float             flash[1];
     int               index;
-    extern float      palanim_1023;
+    int               charge;
+    int               bit;
     int               gauge_right;
     int               width;
     int               item_x;
+    int               weapon_x;
+    int               second_weapon_x;
+    float             whp_rate[2];
+    float             flash[1];
+    int               hp_max;
+    int               hp_now;
+    int               alpha;
+    extern s8         init_1024;
+    extern float      palanim_1023;
 
     color.r = 0x80;
     color.g = 0x80;
@@ -265,8 +272,8 @@ void DrawMainUnitStatusBord(float rate) {
     weapon_y = (int)(80.0f * rate) - 72;
     int hp_y;
     hp_y = weapon_y;
+    weapon_x = 280;
     second_weapon_x = 580 - (int)(300.0f * rate);
-    int weapon_x = 280;
     second_weapon_y = 8;
     if (SubGameRunning() != 0) {
         weapon_y = -72;
@@ -281,13 +288,12 @@ void DrawMainUnitStatusBord(float rate) {
     }
     info = GetBattleCharaInfo();
     hp_max = info->GetMaxHp_i();
-    int hp_now;
     hp_now = info->GetNowHp_i();
-    info->GetNowWhp(0, whp[0]);
-    info->GetNowWhp(1, whp[1]);
+    info->GetNowWhp(0, whp0);
+    info->GetNowWhp(1, whp1);
     hp_rate = (float)hp_now / (float)hp_max;
-    whp_rate[0] = (float)whp[0][0] / (float)whp[0][1];
-    whp_rate[1] = (float)whp[1][0] / (float)whp[1][1];
+    whp_rate[0] = (float)whp0[0] / (float)whp0[1];
+    whp_rate[1] = (float)whp1[0] / (float)whp1[1];
     if (!init_1024) {
         palanim_1023 = 0.0f;
         init_1024 = 1;
@@ -334,14 +340,15 @@ void DrawMainUnitStatusBord(float rate) {
         }
     }
     DrawActiveItemCursor(DngStatus.active_item * 42 + 68, hp_y + 38, DngStatus.cursor_fade);
-    for (index = 0, item_x = 0; index < 3; index++, active_items++, item_x += 41) {
+    for (index = 0, item_x = 0; index < 3; index++) {
         if (active_items->GetNum() > 1) {
             item_glyph.Set(0, 0xE8, 12, 12);
             PrintV__FiiiP10mgCTexture9mgRect_i_iiiP7SP_RGBA(item_x + 64, hp_y + 45, active_items->GetNum(), TEX_SystenFrame, &item_glyph, 2, 1, 10, NULL);
         }
+        active_items++;
+        item_x += 41;
     }
     charge_max = info->GetMagicSwordCounterMax();
-    int element;
     element = info->GetMagicSwordElem();
     charge_now = info->GetMagicSwordCounterNow();
     extern charge_position_data at_1048__2__DATA;
@@ -353,15 +360,13 @@ void DrawMainUnitStatusBord(float rate) {
     sprite.Preset2D();
     sprite.Begin(MG_PRIM_SPRITE);
     sprite.Texture(TEX_SystenFrame);
-    int alpha;
-    alpha = (int)(128.0f * rate);
-    sprite.Color(0x80, 0x80, 0x80, alpha);
-    for (index = 0; index < charge_max; index++) {
-        if (index < charge_now) {
-            sprite.SetIRect(charge_position.value[index][0], charge_position.value[index][1], 10, 10,
+    sprite.Color(0x80, 0x80, 0x80, alpha = (int)(128.0f * rate));
+    for (charge = 0; charge < charge_max; charge++) {
+        if (charge < charge_now) {
+            sprite.SetIRect(charge_position.value[charge][0], charge_position.value[charge][1], 10, 10,
                               charge_glyph.value[element][0], charge_glyph.value[element][1]);
         } else {
-            sprite.SetIRect(charge_position.value[index][0], charge_position.value[index][1], 10, 10, 0xD0, 0xD8);
+            sprite.SetIRect(charge_position.value[charge][0], charge_position.value[charge][1], 10, 10, 0xD0, 0xD8);
         }
     }
     sprite.End();
@@ -378,9 +383,9 @@ void DrawMainUnitStatusBord(float rate) {
         sprite.Begin(MG_PRIM_SPRITE);
         sprite.Texture(TEX_StatusIcon);
         sprite.Color(0x80, 0x80, 0x80, alpha);
-        for (index = 0; index < 7; index++) {
-            if (status_attr & status_mask.value[index]) {
-                sprite.SetIRect(status_x, 74, 24, 24, status_glyph.value[index][0], status_glyph.value[index][1]);
+        for (bit = 0; bit < 7; bit++) {
+            if (status_attr & status_mask.value[bit]) {
+                sprite.SetIRect(status_x, 74, 24, 24, status_glyph.value[bit][0], status_glyph.value[bit][1]);
                 status_x += 26;
             }
         }
@@ -392,9 +397,9 @@ void DrawMainUnitStatusBord(float rate) {
     blue = 0x80;
     if (hp_rate < 0.2f) {
         pulse = (int)(-64.0f * flash[0]);
-        red = pulse + 0x80;
-        green = 0x80 - pulse;
-        blue = 0x80 - pulse;
+        red += pulse;
+        green -= pulse;
+        blue -= pulse;
     }
     sprite.Initialize(NULL, NULL);
     sprite.Preset2D();
@@ -407,7 +412,7 @@ void DrawMainUnitStatusBord(float rate) {
         if (top_right < 50) {
             top_right = 50;
         }
-        if (bottom_right >= 212) {
+        if (bottom_right > 211) {
             bottom_right = 211;
         }
         sprite.TextureCrd(0x46, 0xA2);
@@ -424,26 +429,28 @@ void DrawMainUnitStatusBord(float rate) {
     PrintV__FiiiP10mgCTexture9mgRect_i_iiiP7SP_RGBA(161, hp_y + 14, hp_now, TEX_SystenFrame, &hp_now_glyph, 5, 1, 10, NULL);
     hp_max_glyph.Set(0, 0xE8, 12, 12);
     PrintV__FiiiP10mgCTexture9mgRect_i_iiiP7SP_RGBA(221, hp_y + 14, hp_max, TEX_SystenFrame, &hp_max_glyph, 5, 0, 10, NULL);
-    second_weapon_no = info->equip[1].item_no;
     weapon_no = info->equip[0].item_no;
+    second_weapon_no = info->equip[1].item_no;
     if (whp_rate[0] < 0.2f) {
-        if (whp[0][0] <= 0) {
+        if (whp0[0] <= 0) {
             pulse = (int)(-64.0f * flash[0]);
             color.r = pulse + 0x80;
             color.g = 0x80 - pulse;
             color.b = 0x80 - pulse;
+            color.a = 0x80;
         } else {
             pulse = (int)(-64.0f * flash[0]);
             color.r = 0x80 - pulse;
             color.g = 0x80 - pulse;
             color.b = 0x80 - pulse;
+            color.a = 0x80;
         }
     } else {
         color.r = 0x80;
         color.g = 0x80;
         color.b = 0x80;
+        color.a = 0x80;
     }
-    color.a = 0x80;
     sprite.Preset2D();
     sprite.Begin(MG_PRIM_SPRITE);
     sprite.Color(color.r, color.g, color.b, color.a);
@@ -453,18 +460,19 @@ void DrawMainUnitStatusBord(float rate) {
         sprite.Texture(TEX_DummyIcon2);
         sprite.SetIStretch(weapon_x + 4, weapon_y + 10, 28, 35, 0, 0, 31, 31);
         sprite.Texture(TEX_SystenFrame);
-        if (whp[0][0] <= 0) {
+        if (whp0[0] <= 0) {
             sprite.SetIRect(weapon_x + 20, weapon_y + 28, 14, 16, 0x50, 0xBA);
         }
     }
     sprite.End();
     number_x = weapon_x + 76;
     whp_now_glyph.Set(0, 0xE8, 12, 12);
-    PrintV__FiiiP10mgCTexture9mgRect_i_iiiP7SP_RGBA(number_x - 61, weapon_y + 19, whp[0][0], TEX_SystenFrame, &whp_now_glyph, 5, 1, 10, &color);
+    PrintV__FiiiP10mgCTexture9mgRect_i_iiiP7SP_RGBA(number_x - 61, weapon_y + 19, whp0[0], TEX_SystenFrame, &whp_now_glyph, 5, 1, 10, &color);
     whp_max_glyph.Set(0, 0xE8, 12, 12);
-    PrintV__FiiiP10mgCTexture9mgRect_i_iiiP7SP_RGBA(number_x - 4, weapon_y + 19, whp[0][1], TEX_SystenFrame, &whp_max_glyph, 5, 0, 10, &color);
+    PrintV__FiiiP10mgCTexture9mgRect_i_iiiP7SP_RGBA(number_x - 4, weapon_y + 19, whp0[1], TEX_SystenFrame, &whp_max_glyph, 5, 0, 10, &color);
+    width = (int)(95.0f * whp_rate[0]);
     gauge_left = weapon_x + 36;
-    gauge_right = gauge_left + (int)(95.0f * whp_rate[0]);
+    gauge_right = gauge_left + width;
     sprite.Preset2D();
     sprite.Begin(MG_PRIM_TRIANGLE_STRIP);
     sprite.Color(0x80, 0x80, 0x80, 0x80);
@@ -477,9 +485,8 @@ void DrawMainUnitStatusBord(float rate) {
     sprite.TextureCrd(0x4E, 0xB6);
     sprite.Vertex(gauge_right, weapon_y + 9, 0);
     sprite.End();
-    info->GetNowAbs(0, abs[0]);
-    gauge_left = weapon_x + 38;
-    gauge_right = gauge_left + (int)(95.0f * ((float)abs[0][0] / (float)abs[0][1]));
+    info->GetNowAbs(0, abs0);
+    gauge_right = (gauge_left = weapon_x + 38) + (int)(95.0f * ((float)abs0[0] / (float)abs0[1]));
     sprite.Preset2D();
     sprite.Begin(MG_PRIM_TRIANGLE_STRIP);
     sprite.TextureCrd(0x46, 0xB6);
@@ -492,23 +499,25 @@ void DrawMainUnitStatusBord(float rate) {
     sprite.Vertex(gauge_right, weapon_y + 13, 0);
     sprite.End();
     if (whp_rate[1] < 0.2f) {
-        if (whp[1][0] <= 0) {
+        if (whp1[0] <= 0) {
             pulse = (int)(-64.0f * flash[0]);
             color.r = pulse + 0x80;
             color.g = 0x80 - pulse;
             color.b = 0x80 - pulse;
+            color.a = 0x80;
         } else {
             pulse = (int)(-64.0f * flash[0]);
             color.r = 0x80 - pulse;
             color.g = 0x80 - pulse;
             color.b = 0x80 - pulse;
+            color.a = 0x80;
         }
     } else {
         color.r = 0x80;
         color.g = 0x80;
         color.b = 0x80;
+        color.a = 0x80;
     }
-    color.a = 0x80;
     sprite.Preset2D();
     sprite.Begin(MG_PRIM_SPRITE);
     sprite.Color(color.r, color.g, color.b, color.a);
@@ -518,13 +527,14 @@ void DrawMainUnitStatusBord(float rate) {
         sprite.Texture(TEX_DummyIcon2);
         sprite.SetIStretch(second_weapon_x + 170, second_weapon_y + 10, 28, 35, 32, 0, 31, 31);
         sprite.Texture(TEX_SystenFrame);
-        if (whp[1][0] <= 0) {
+        if (whp1[0] <= 0) {
             sprite.SetIRect(second_weapon_x + 186, weapon_y + 28, 14, 16, 0x50, 0xBA);
         }
     }
     sprite.End();
+    width = (int)(95.0f * whp_rate[1]);
     gauge_left = second_weapon_x + 74;
-    gauge_right = gauge_left + (int)(95.0f * whp_rate[1]);
+    gauge_right = gauge_left + width;
     sprite.Preset2D();
     sprite.Begin(MG_PRIM_TRIANGLE_STRIP);
     sprite.TextureCrd(0x46, 0xB2);
@@ -536,9 +546,8 @@ void DrawMainUnitStatusBord(float rate) {
     sprite.TextureCrd(0x4E, 0xB6);
     sprite.Vertex(gauge_right, second_weapon_y + 51, 0);
     sprite.End();
-    info->GetNowAbs(1, abs[1]);
-    gauge_left = second_weapon_x + 76;
-    gauge_right = gauge_left + (int)(95.0f * ((float)abs[1][0] / (float)abs[1][1]));
+    info->GetNowAbs(1, abs1);
+    gauge_right = (gauge_left = second_weapon_x + 76) + (int)(95.0f * ((float)abs1[0] / (float)abs1[1]));
     sprite.Initialize(NULL, NULL);
     sprite.Preset2D();
     sprite.Begin(MG_PRIM_TRIANGLE_STRIP);
@@ -553,9 +562,9 @@ void DrawMainUnitStatusBord(float rate) {
     sprite.End();
     number_x = second_weapon_x + 142;
     second_whp_now_glyph.Set(0, 0xE8, 12, 12);
-    PrintV__FiiiP10mgCTexture9mgRect_i_iiiP7SP_RGBA(number_x - 61, second_weapon_y + 28, whp[1][0], TEX_SystenFrame, &second_whp_now_glyph, 5, 1, 10, &color);
+    PrintV__FiiiP10mgCTexture9mgRect_i_iiiP7SP_RGBA(number_x - 61, second_weapon_y + 28, whp1[0], TEX_SystenFrame, &second_whp_now_glyph, 5, 1, 10, &color);
     second_whp_max_glyph.Set(0, 0xE8, 12, 12);
-    PrintV__FiiiP10mgCTexture9mgRect_i_iiiP7SP_RGBA(number_x - 4, second_weapon_y + 28, whp[1][1], TEX_SystenFrame, &second_whp_max_glyph, 5, 0, 10, &color);
+    PrintV__FiiiP10mgCTexture9mgRect_i_iiiP7SP_RGBA(number_x - 4, second_weapon_y + 28, whp1[1], TEX_SystenFrame, &second_whp_max_glyph, 5, 0, 10, &color);
     if (rate < 1.0f || SubGameRunning() != 0) {
         return;
     }
@@ -579,9 +588,6 @@ void DrawMainUnitStatusBord(float rate) {
     WarningGage2.rate[2] = whp_rate[1];
     WarningGage2.layout = WARNING_GAGE_LAYOUT_MAIN;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dng_status", DrawMainUnitStatusBord__Ff);
-#endif
 
 void DrawRoboUnitStatusBord(float rate) {
     int               color[4];

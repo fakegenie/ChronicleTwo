@@ -2446,8 +2446,6 @@ mgCFrame *CreateChangeFrame(mgLoadData *data, mgCFrame *target) {
     return source;
 }
 
-#ifdef NONMATCHING
-
 static int _SKIN_MOTION(SPI_STACK *stack, int count) {
     int                 deform_index;
     unsigned char      *matrix_file;
@@ -2459,18 +2457,18 @@ static int _SKIN_MOTION(SPI_STACK *stack, int count) {
     int                 visual_count;
     mgCFrame           *root;
     unsigned char      *weight_file;
-    int                 frame_num;
-    mgCTextureManager  *tex_manager;
-    unsigned char      *model_file;
-    char               *weight_name;
     mgCFrame          **frame_list;
-    int                 skin_id;
+    mgCTextureManager  *tex_manager;
     int                 image_count;
+    unsigned char      *model_file;
     int                 index;
+    int                 frame_num;
+    CCharacter2        *chara;
     char               *matrix_name;
+    char               *weight_name;
     int                 image_index;
     unsigned char      *image;
-    CCharacter2        *chara;
+    int                 skin_id;
 
     if (nowChr->CObjectFrame::frame == NULL) {
         return 0;
@@ -2487,14 +2485,14 @@ static int _SKIN_MOTION(SPI_STACK *stack, int count) {
     }
     if (nowChr->shape_anime == 0) {
         model_file = (unsigned char *)GetPackFile(pack_file, skin_mds_name, NULL);
-        chara = nowChr;
         mgCreateVisualType visual_type[64];
+        chara = nowChr;
         visual_count = 0;
         deform_index = 0;
         for (index = 0; index < chara->deform_frame_num; index++) {
-            if (chara->deform_frame[deform_index] != NULL) {
+            if (nowChr->deform_frame[deform_index]) {
                 visual_type[visual_count].type = MG_VISUAL_CREATE_MOTION_MDT;
-                visual_type[visual_count].name = chara->deform_frame[deform_index]->name;
+                visual_type[visual_count].name = nowChr->deform_frame[deform_index]->name;
                 deform_index++;
                 visual_count++;
             }
@@ -2532,12 +2530,12 @@ static int _SKIN_MOTION(SPI_STACK *stack, int count) {
         load.visual_type = visual_type;
         load.memory = base_stack;
         root_skin_frame = CreateChangeFrame(&load, nowChr->CObjectFrame::frame);
-        if (root_skin_frame == NULL) {
+        if (!root_skin_frame) {
             return 0;
         }
+        root = nowChr->CObjectFrame::frame;
         frame_num = root_skin_frame->frame_num;
         frame_list = root_skin_frame->frame_list;
-        root = nowChr->CObjectFrame::frame;
         for (frame_index = 0; frame_index < frame_num; frame_index++) {
             source_frame = frame_list[frame_index];
             if (source_frame != NULL && NULL != source_frame->visual) {
@@ -2568,9 +2566,6 @@ static int _SKIN_MOTION(SPI_STACK *stack, int count) {
     }
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/character", _SKIN_MOTION__FP9SPI_STACKi);
-#endif
 int _LOD_MODEL_START(SPI_STACK *stack, int argc) {
     int count = spiGetStackInt(stack);
     if (count <= 0) {

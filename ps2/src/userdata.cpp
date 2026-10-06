@@ -3795,7 +3795,7 @@ int CBattleCharaInfo::GetPalletNo(int slot) {
 }
 #ifdef NONMATCHING
 void CBattleCharaInfo::RefreshParamater() {
-    if (chara_data == NULL) {
+    if (chara_data == NULL && chara_data == NULL) {
         return;
     }
     memset(weapon_param, 0, 0x40);
@@ -3805,8 +3805,8 @@ void CBattleCharaInfo::RefreshParamater() {
     if (user_data != NULL) {
         now_npc = user_data->NowPartyCharaID();
     }
-    CGameDataUsed *equipment = equip;
     CScene *scene = GetMainScene();
+    CGameDataUsed *equipment = equip;
     if (chara_type == BATTLE_CHARA_HUMAN) {
         float weapon_rate[2] = {1.0f, 1.0f};
         short status[10];
@@ -3814,7 +3814,7 @@ void CBattleCharaInfo::RefreshParamater() {
             weapon_rate[0] = 1.5f;
             weapon_rate[1] = 1.5f;
         }
-        defence = (u16)((CHARA_DATA *)chara_data)->defence;
+        defence = *(u16 *)&((CHARA_DATA *)chara_data)->defence;
         int i = 0;
         while (i < 2) {
             WEAPON_USED *weapon0 = &equipment[i].data.weapon;
@@ -3839,8 +3839,8 @@ void CBattleCharaInfo::RefreshParamater() {
     } else if (chara_type == BATTLE_CHARA_ROBO) {
         int capacity;
         robo_hp_drain = 0.006f * ((float)CheckNowRoboUseCapacity((ROBO_DATA *)chara_data, &capacity) / (float)capacity);
-        defence = ((ROBO_DATA *)chara_data)->GetDefenceVol();
         WEAPON_USED *weapon = &equipment->data.weapon;
+        defence = ((ROBO_DATA *)chara_data)->GetDefenceVol();
         for (int i = 0; i < 2; i++) {
             param->status[0] = weapon->level;
             param->status[1] = weapon->status[0];
@@ -3863,22 +3863,22 @@ void CBattleCharaInfo::RefreshParamater() {
         if (user_data->monster_box.IsChange(0xB) != 0) {
             monster_rate = 1.25f;
         }
-        MOS_CHANGE_PARAM *monster = (MOS_CHANGE_PARAM *)chara_data;
-        weapon_param[0].status[0] = fptosi(monster_rate * (float)monster->GetAttackVol(-1));
-        weapon_param[0].status[1] = fptosi(monster_rate * (float)monster->GetAttackVol(-1));
-        defence = fptosi(monster_rate * (float)monster->GetDefenceVol(-1));
-        weapon_param[0].status[2] = 0;
-        weapon_param[0].status[3] = 0;
-        weapon_param[0].status[4] = 0;
-        weapon_param[0].status[5] = 0;
-        weapon_param[0].status[6] = 0;
-        weapon_param[0].status[7] = 0;
-        weapon_param[0].status[8] = 0;
-        weapon_param[0].status[9] = 0;
+        param->status[0] = fptosi(monster_rate * (float)((MOS_CHANGE_PARAM *)chara_data)->GetAttackVol(-1));
+        param->status[1] = fptosi(monster_rate * (float)((MOS_CHANGE_PARAM *)chara_data)->GetAttackVol(-1));
+        defence = fptosi(monster_rate * (float)((MOS_CHANGE_PARAM *)chara_data)->GetDefenceVol(-1));
+        param->status[2] = 0;
+        param->status[3] = 0;
+        param->status[4] = 0;
+        param->status[5] = 0;
+        param->status[6] = 0;
+        param->status[7] = 0;
+        param->status[8] = 0;
+        param->status[9] = 0;
     }
     if (scene != NULL) {
-        BattleParamater_Time = scene->time;
-        BattleParamater_TimeBand = GetTimeBand(scene->time);
+        float time = scene->time;
+        BattleParamater_Time = time;
+        BattleParamater_TimeBand = GetTimeBand(time);
     }
 }
 #else
