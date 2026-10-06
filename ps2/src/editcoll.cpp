@@ -14,20 +14,28 @@ struct CollisionRow {
 
 
 // Code (.text)
-#ifdef NONMATCHING
 int ClipBoxXZ(float *max_a, float *min_a, float *max_b, float *min_b) {
-    // VU0's sticky sign flag rejects the boxes when either X or Z gap is negative.
-    if (max_a[0] - min_b[0] < 0.0f || max_a[2] - min_b[2] < 0.0f) {
-        return 0;
+    int flags;
+    asm {
+        lqc2 vf10, 0(max_a)
+        lqc2 vf11, 0(min_a)
+        lqc2 vf1, 0(max_b)
+        lqc2 vf2, 0(min_b)
+        vnop
+        vnop
+        vnop
+        ctc2.ni zero, vi16
+        vsub.xz vf25, vf10, vf2
+        vsub.xz vf25, vf1, vf11
+        vnop
+        vnop
+        vnop
+        vnop
+        vnop
+        cfc2.ni flags, vi16
     }
-    if (max_b[0] - min_a[0] < 0.0f || max_b[2] - min_a[2] < 0.0f) {
-        return 0;
-    }
-    return 1;
+    return (flags & 0x80) == 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editcoll", ClipBoxXZ__FPfPfPfPf);
-#endif
 #pragma global_optimizer reset
 
 #ifdef NONMATCHING
