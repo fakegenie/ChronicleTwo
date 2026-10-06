@@ -4928,7 +4928,7 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
                             int new_item_no = name_message->item_mes[info->select_no + 1];
                             BuildUpWeaponTrans(info->weapon, new_item_no);
                             int weapon_tex_block = tex_block[1];
-                            mgCTextureManager *textures = &mgTexManager;
+                            mgCTextureManager *textures = tex_manager;
                             textures->DeleteBlock(weapon_tex_block);
                             strcpy(textures->name_suffix, at_4956);
                             MenuActionCharaBuffer[0].stReset();
