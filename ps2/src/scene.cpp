@@ -37,7 +37,6 @@ extern char noname_1381[8];
 extern char noname_1692[8];
 extern char noname_1709[8];
 
-// Code (.text)
 float f_rand(float min_value, float max_value) {
     return min_value + (((max_value - min_value) * (float) rand()) / 2147483648.0f);
 }
@@ -1575,19 +1574,15 @@ void CScene::SetNowSubMapNo(int now_sub_map_no) {
     this->now_sub_map_no = now_sub_map_no;
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/scene", at_1503__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/scene", at_1504__3__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/scene", at_853__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/scene", at_1117__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/scene", at_1171__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/scene", __vt__6CScene__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/scene", noname_1188__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/scene", noname_1242__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/scene", noname_1294__DATA);
@@ -1595,8 +1590,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/scene", noname_1381__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/scene", noname_1692__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/scene", noname_1709__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(init_1519, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(sun_func_1518, 0x1C0);

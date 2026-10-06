@@ -65,7 +65,6 @@ extern GAME_PROGRESS_INFO ProgressInfo[GAME_PROGRESS_MAX];
 extern GAME_PROGRESS_INFO *giGamePI;
 extern mgCMemory *giStack;
 
-// Code (.text)
 CVillagerPlaceInfo *GetVlgrPlaceInfo(int index) {
     if (index < 0 || index >= PlaceInfoNum) {
         return NULL;
@@ -501,12 +500,10 @@ extern "C" void __sinit_vlgr_info_cpp() {
                       sizeof(CVillagerPlace), VLGR_PLACE_MAX);
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/vlgr_info", ni_tag__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/vlgr_info", tag__9__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/vlgr_info", gi_tag__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/vlgr_info", at_214__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/vlgr_info", at_250__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/vlgr_info", at_351__DATA);
@@ -540,10 +537,8 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/vlgr_info", at_555__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/vlgr_info", at_556__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/vlgr_info", at_557__DATA);
 
-// Static initialiser table (.ctor)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/vlgr_info", D_0037B098__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(PlaceInfoNum, 0x4);
 INCLUDE_BSS(PlaceInfo, 0x4);
 INCLUDE_BSS(VlgrInfoNum, 0x4);
@@ -565,6 +560,5 @@ INCLUDE_BSS(vpiInfo, 0x4);
 INCLUDE_BSS(giGamePI, 0x4);
 INCLUDE_BSS(giStack, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(VlgrPlace, 0x1000);
 INCLUDE_BSS(ProgressInfo, 0xC00);

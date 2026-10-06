@@ -94,7 +94,6 @@ extern s16 NameRegistMax;
 extern s16 gettbl0_2012[12];
 extern s64 at_2031__3;
 
-// Code (.text)
 void SetEventKeyword(char *target, char *topic, int code) {
     Nameregi_Target.keyword[0] = 0;
     Nameregi_Target.keyword[1] = 0;
@@ -1779,10 +1778,8 @@ void CNameRegiMenu::DrawMessage() {
     }
 }
 
-// Static initialiser (.init)
 extern "C" void __sinit_nameregi_cpp() { NameRegiStack.Init(); }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nameregi", Sfida_default_Name__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nameregi", ALPHA_TABLE1__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nameregi", ALPHA_TABLE2__DATA);
@@ -1810,7 +1807,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nameregi", table_1819__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nameregi", tex_commtbl_1822__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nameregi", gettbl0_2012__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nameregi", at_892__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nameregi", at_893__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nameregi", at_1281__6__DATA);
@@ -1824,13 +1820,10 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nameregi", at_1288__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nameregi", at_1747__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nameregi", at_1748__2__DATA);
 
-// Static initialiser table (.ctor)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nameregi", D_0037B084__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nameregi", __vt__13CNameRegiMenu__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nameregi", NameRegistMax__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nameregi", HIRA_TABLE1__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nameregi", HIRA_TABLE2__DATA);
@@ -1850,7 +1843,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nameregi", get_Htable_1806__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nameregi", at_1807__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nameregi", at_2031__3__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(NameRegiCode, 0x4);
 INCLUDE_BSS(NameRegiMenuPtr, 0x4);
 INCLUDE_BSS(OldReloadTexNumber, 0x4);
@@ -1865,7 +1857,6 @@ INCLUDE_BSS(at_1684__3, 0x8);
 INCLUDE_BSS(at_1686, 0x8);
 INCLUDE_BSS(at_1693__2, 0x8);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(Nameregi_Target, 0x50);
 INCLUDE_BSS(NameRegiTopic, 0x40);
 INCLUDE_BSS(NameRegiStack, 0x30);

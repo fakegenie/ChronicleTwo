@@ -36,7 +36,6 @@ extern char at_699[];
 extern char at_698[];
 extern char at_697[];
 
-// Code (.text)
 void runerror(const char *message) {
     fprintf(stderr, at_168, message);
     exit(-1);
@@ -726,7 +725,6 @@ void rsSetStack(RS_STACKDATA *data, int value) {
     }
 }
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/runscript", at_168__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/runscript", at_173__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/runscript", at_183__2__DATA);

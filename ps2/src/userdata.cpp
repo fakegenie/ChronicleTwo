@@ -82,7 +82,6 @@ extern DEBUG_ITEM dbg_set2_5775[];
 extern DEBUG_ITEM dbg_set3_5776[];
 extern DEBUG_ITEM subgame1_5788[];
 
-// Code (.text)
 CUserDataManager *GetUserDataMan() {
     CSaveData *save = GetSaveData();
     return save != NULL ? &save->user_data : NULL;
@@ -2985,7 +2984,6 @@ int CUserDataManager::SetChrEquip(int chara, int item_no) {
 }
 int CUserDataManager::SetChrEquipDirect(int chara_no, int item_no) {
 
-
     if (item_no <= 0) {
         return 0;
     }
@@ -5015,12 +5013,10 @@ void DebugGetItem(CUserDataManager *user_data, int mode) {
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/userdata", DebugGetItem__FP16CUserDataManageri);
 #endif
 
-// Static initialiser (.init)
 extern "C" void __sinit_userdata_cpp() {
     BattleParamater.Initialize();
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/userdata", mos_henge_param__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/userdata", basefish_1288__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/userdata", symbol_tbl_1338__DATA);
@@ -5045,7 +5041,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/userdata", dbg_set2_5775__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/userdata", dbg_set3_5776__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/userdata", subgame1_5788__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/userdata", at_896__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/userdata", at_897__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/userdata", at_898__2__DATA);
@@ -5130,10 +5125,8 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/userdata", at_3333__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/userdata", at_3334__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/userdata", at_4442__DATA);
 
-// Static initialiser table (.ctor)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/userdata", D_0037B004__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/userdata", f_2005__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/userdata", aquarium_fish_maxtbl__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/userdata", use_limmit_table_2558__DATA);
@@ -5143,13 +5136,11 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/userdata", tbl1_5167__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/userdata", tbl2_5168__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/userdata", dbg_set1_5774__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(FishGamePreEquip, 0x4);
 INCLUDE_BSS(BattleParamater_Time, 0x4);
 INCLUDE_BSS(BattleParamater_TimeBand, 0x4);
 INCLUDE_BSS(at_5773, 0x8);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(word_1327, 0x70);
 INCLUDE_BSS(temp_1510, 0x40);
 INCLUDE_BSS(at_2061, 0x20);

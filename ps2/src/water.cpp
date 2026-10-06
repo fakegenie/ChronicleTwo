@@ -11,72 +11,56 @@
 #include <cmath>
 #include <cstdlib>
 
-
-
 #ifdef NONMATCHING
-/**
- * Transform, clipping and surface parameters unpacked into the water microprogram.
- */
 struct WaterRenderPacket {
-    u_int         dma[4];             /**< DMA count tag. */
-    u_int         vif[4];             /**< Double-buffer setup and unpack codes. */
-    u_long128     clear[3];           /**< Cleared microprogram parameters. */
-    u_int         render_word;        /**< Last render info parameter word. */
-    float         render_params[3];   /**< First three render info parameters. */
-    sceVu0FMATRIX world_screen;       /**< Surface-to-screen transform. */
-    sceVu0FMATRIX world;              /**< Surface-to-world transform. */
+    u_int         dma[4];
+    u_int         vif[4];
+    u_long128     clear[3];
+    u_int         render_word;
+    float         render_params[3];
+    sceVu0FMATRIX world_screen;
+    sceVu0FMATRIX world;
     u_long128     unk_e0[9];
-    sceVu0FVECTOR guard_max;          /**< Upper clip bounds. */
-    sceVu0FVECTOR guard_min;          /**< Lower clip bounds. */
-    sceVu0FVECTOR fog;                /**< Fog coefficients. */
-    sceVu0FVECTOR screen_size;        /**< Screen width and last scanline. */
-    sceVu0FVECTOR screen_offset;      /**< GS screen origin. */
-    sceVu0FVECTOR color;              /**< Surface colour. */
-    sceVu0FVECTOR surface_params;     /**< Microprogram values and blue/alpha colour. */
-    u_int         start[4];           /**< Microprogram call. */
-    u_int         state_dma[4];       /**< DMA count tag for the drawing state. */
-    u_int         flags[4];           /**< Microprogram drawing flags. */
-    u_int         direct[4];          /**< VIF direct code. */
-    u_int         giftag[4];          /**< GIF tag for the GS state writes. */
-    u_int         prmode_cont[4];     /**< PRMODECONT register write. */
-    u_int         prmode[4];          /**< PRMODE register write. */
-    u_int         fog_color[4];       /**< FOGCOL register write. */
+    sceVu0FVECTOR guard_max;
+    sceVu0FVECTOR guard_min;
+    sceVu0FVECTOR fog;
+    sceVu0FVECTOR screen_size;
+    sceVu0FVECTOR screen_offset;
+    sceVu0FVECTOR color;
+    sceVu0FVECTOR surface_params;
+    u_int         start[4];
+    u_int         state_dma[4];
+    u_int         flags[4];
+    u_int         direct[4];
+    u_int         giftag[4];
+    u_int         prmode_cont[4];
+    u_int         prmode[4];
+    u_int         fog_color[4];
 } __attribute__((aligned(16)));
 STATIC_ASSERT(sizeof(WaterRenderPacket) == 0x260);
 
-/**
- * Header of one grid strip, followed by its positions and slope vectors.
- */
 struct WaterStripPacket {
-    u_int     dma[4];       /**< DMA count tag and VIF unpack code. */
-    sceGifTag giftag;        /**< Triangle-strip GIF tag. */
-    u_int     counts[4];    /**< Position and slope vector counts. */
+    u_int     dma[4];
+    sceGifTag giftag;
+    u_int     counts[4];
 } __attribute__((aligned(16)));
 STATIC_ASSERT(sizeof(WaterStripPacket) == 0x30);
 
-/**
- * DMA control tag with space for two inline VIF codes.
- */
 struct WaterDmaTag {
-    u_int command;    /**< DMA command and quadword count. */
-    u_int address;    /**< DMA transfer address. */
-    u_int vif[2];     /**< Inline VIF codes. */
+    u_int command;
+    u_int address;
+    u_int vif[2];
 };
 STATIC_ASSERT(sizeof(WaterDmaTag) == 0x10);
 
-/**
- * Flushes the water microprogram and returns from its DMA chain.
- */
 struct WaterFinishPacket {
-    WaterDmaTag dma;      /**< Count tag for the flush code. */
-    u_int       flush[4]; /**< VIF flush command. */
-    WaterDmaTag ret;      /**< Return tag. */
+    WaterDmaTag dma;
+    u_int       flush[4];
+    WaterDmaTag ret;
 };
 STATIC_ASSERT(sizeof(WaterFinishPacket) == 0x30);
 #endif
 
-
-// Code (.text)
 void CFireRaster::Step(void) {
     FireRasterParticle *free_slot = 0;
     int i = 0;
@@ -165,7 +149,6 @@ void CFireRaster::Draw(float *position, float *scale) {
             world_position[0] = wisp->position[0] * scale[0];
             world_position[1] = wisp->position[1] * scale[1];
             world_position[2] = wisp->position[2] * scale[2];
-            // The patch dimensions scale while its centre follows the unscaled wisp offset.
             sceVu0AddVector(world_position, position, wisp->position);
             world_position[3] = 1.0f;
             if (mgTransWorldPrim3DSprite(top_left, bottom_right, world_position,
@@ -586,7 +569,6 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
             slope[row][column][1] = current[column] - current[column + 1];
         }
     }
-    // Fade the distortion into the fixed edges of the surface.
     for (row = 0; row < rows; row++) {
         slope[row][columns - 1][3] = 0.0f;
         slope[row][0][3] = 0.0f;
@@ -767,13 +749,10 @@ void CWaterFrame::Initialize(void) {
     mgCFrame::Initialize();
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/water", prog_vif_351__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/water", progf_vif_352__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/water", __vt__11CWaterFrame__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/water", __vt__6CWater__DATA);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(at_287__2, 0x10);

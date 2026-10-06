@@ -8,7 +8,6 @@
 #include "mg_tanime.hpp"
 #include "mglib.hpp"
 
-// Code (.text)
 void COutLineDraw::Initialize() {
     mgZeroVector(unk_10.max);
     mgZeroVector(unk_10.min);
@@ -321,10 +320,8 @@ static void DrawDivSprite4(mgCDrawPrim *prim, mgRect<int> rect, mgCTexture *text
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/outline", DrawDivSprite4__FP11mgCDrawPrim9mgRect_i_P10mgCTexturePiii);
 #endif
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/outline", at_338__DATA);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(at_299__2, 0x10);
 INCLUDE_BSS(at_300__2, 0x10);
 INCLUDE_BSS(at_325, 0x10);

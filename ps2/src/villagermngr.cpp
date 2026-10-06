@@ -9,7 +9,6 @@
 
 #include <cmath>
 
-// Code (.text)
 void CVillagerPlace::ProgressInfo::Init() {
     progress = 0;
     place[0][1] = NULL;
@@ -151,14 +150,9 @@ int CVillagerMngr::CheckStay(int chara_id) {
     return villager->stay;
 }
 #ifdef NONMATCHING
-/**
- *
- * Villager position vector viewed as floats or a quadword.
- *
- */
 union VillagerVector {
-    float v[4];     /**< Position components. */
-    u_long128 qw;   /**< The same position as one quadword. */
+    float v[4];
+    u_long128 qw;
 };
 
 void CVillagerMngr::Step() {
@@ -427,5 +421,4 @@ int CVillagerMngr::GetTalkRect(int chara_id, float *rect) {
     return is_empty ^ 1;
 }
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/villagermngr", at_513__DATA);

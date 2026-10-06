@@ -7,11 +7,8 @@
 #include <cstdio>
 #include <cstring>
 
-/** Number of initialized party-character entries. */
 extern int NpcBaseDataTotalNum;
-/** Party-character entries loaded from the NPC script. */
 extern NPC_BASE_DATA NpcBaseData[180];
-/** Next free party-character entry while the NPC script runs. */
 extern u8 npc_spi_count_num;
 extern const char at_838__4[];
 extern const char at_898__4[];
@@ -22,20 +19,13 @@ extern signed char typetbl_853[16];
 extern char path_885[0x40];
 extern char infocfg_886[];
 extern const char at_847__3[];
-// Code (.text)
 extern SPI_TAG_PARAM npc_spitag[3];
 
-/**
- * Records the number of party characters declared by the NPC script.
- */
 int _NPC_NUM(SPI_STACK *stack, int argument_count) {
     NpcBaseDataTotalNum = spiGetStackInt(stack);
     return 1;
 }
 
-/**
- * Reads one party-character record from the NPC script's stack.
- */
 int _NPC_INFO(SPI_STACK *stack, int argument_count) {
     NPC_BASE_DATA *data = &NpcBaseData[npc_spi_count_num++];
     int id = spiGetStackInt(stack++);
@@ -141,12 +131,10 @@ NPC_BASE_DATA *GetPartyNPCData(int chara_no) {
     return 0;
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/npccfg", npc_spitag__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/npccfg", typetbl_853__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/npccfg", infocfg_886__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/npccfg", at_838__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/npccfg", at_839__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/npccfg", at_840__4__DATA);
@@ -156,10 +144,8 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/npccfg", at_899__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/npccfg", at_900__5__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/npccfg", at_901__3__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(NpcBaseDataTotalNum, 0x4);
 INCLUDE_BSS(npc_spi_count_num, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(NpcBaseData, 0x2600);
 INCLUDE_BSS(path_885, 0x40);

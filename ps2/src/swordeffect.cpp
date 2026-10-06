@@ -334,5 +334,4 @@ void CSWordAfterEffect::Copy(CSWordAfterEffect &dst, mgCMemory *memory) {
     }
 }
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/swordeffect", at_356__DATA);

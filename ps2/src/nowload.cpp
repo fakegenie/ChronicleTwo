@@ -18,17 +18,7 @@
 #include <cstring>
 #include <cstdio>
 
-/**
- *
- * Pause information initialized without an active scene or event skip.
- *
- */
 struct PauseState : PAUSE_INFO {
-    /**
-     *
-     * Clears the pause scene and event skip state.
-     *
-     */
     PauseState() {
         scene = NULL;
         event_skip = 0;
@@ -85,9 +75,6 @@ extern float ProgBarWidthStep;
 extern int bgm_status[7];
 extern unsigned char SkipImage[0x2800];
 
-
-
-// Code (.text)
 void SwitchNowLoadingThread() {
     RotateThreadReadyQueue(10);
 }
@@ -163,13 +150,8 @@ void NowLoadingLoop(void *unused) {
 void CancelNowLoading() {
     cancel_now_loading = 1;
 }
-/**
- *
- * Twelve words of loading screen data copied as floats.
- *
- */
 struct LoadingMemoryWords {
-    float words[12]; /**< Loading screen words. */
+    float words[12];
 };
 void CreateNowLoading(NowLoadingInfo *info) {
     char name[0x40];
@@ -511,9 +493,6 @@ void SCElogoFade(int fade_out, mgCMemory *memory) {
 }
 #pragma opt_strength_reduction reset
 
-// Static initialiser (.init)
-
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nowload", at_832__7__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nowload", at_863__5__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nowload", at_864__3__DATA);
@@ -524,12 +503,8 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nowload", at_1003__5__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nowload", at_1068__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nowload", at_1069__6__DATA);
 
-// Static initialiser table (.ctor)
-
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nowload", LoopStep__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(TheadID__3, 0x4);
 INCLUDE_BSS(ProgBarWidth, 0x4);
 INCLUDE_BSS(ProgBarWidthStep, 0x4);
@@ -549,7 +524,6 @@ INCLUDE_BSS(play_time_count, 0x4);
 INCLUDE_BSS(wave_status, 0x4);
 INCLUDE_BSS(start_vcount, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(ThreadStack__3, 0x1000);
 INCLUDE_BSS(SkipImage, 0x2800);
 INCLUDE_BSS(bgm_status, 0x20);

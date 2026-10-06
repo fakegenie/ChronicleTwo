@@ -8,7 +8,6 @@
 
 extern char at_453[0xB];
 
-// Code (.text)
 void InitSV_CONFIG_OPTION(SV_CONFIG_OPTION *config) {
     if (config != NULL) {
         memset(config, 0, sizeof(SV_CONFIG_OPTION));
@@ -384,5 +383,4 @@ CGyoRaceData *CSubGameData::GetGyoRaceData() {
     return &this->gyorace;
 }
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/savedata", at_453__DATA);

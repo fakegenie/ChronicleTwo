@@ -33,15 +33,10 @@ int TakeBombCheck(void);
 int TakeBomb(void);
 int ThrowBomb(float *velocity);
 int NowPutBomb(void);
-/**
- *
- * Sprite state embedded in an effect script object.
- *
- */
 struct EffectScriptSpriteState {
     u_char padding[0x30];
-    u_char sprite[0x1C]; /**< Sprite state bytes. */
-    void *sprite_vtable; /**< Sprite virtual method table. */
+    u_char sprite[0x1C];
+    void *sprite_vtable;
 };
 extern void *__vt__9mgCVisual[];
 extern void *__vt__11mgC3DSprite[];
@@ -120,14 +115,9 @@ extern char at_1304__9[];
 extern char at_1305__6[];
 extern char at_1306__7[];
 extern char at_1307__7[];
-/**
- *
- * Buggy effect vector viewed as floats or a quadword.
- *
- */
 union BuggyQuad {
-    float values[4]; /**< Floating point components. */
-    u_long128 quadword; /**< The same components as one quadword. */
+    float values[4];
+    u_long128 quadword;
 };
 extern "C" BuggyQuad at_1193;
 extern "C" BuggyQuad at_1074__4;
@@ -146,7 +136,6 @@ extern int BombEffHandle;
 extern int BombImpact;
 extern int reload_cnt_1350;
 
-// Code (.text)
 int sgInitBuggy(SubGameInfo *info) {
     CScene *scene;
     mgCMemory *stack;
@@ -1221,13 +1210,11 @@ void BombCheck(CScene *scene) {
     }
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/pbuggy", at_1047__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/pbuggy", at_1048__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/pbuggy", at_1074__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/pbuggy", at_1193__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/pbuggy", at_942__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/pbuggy", at_943__5__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/pbuggy", at_944__4__DATA);
@@ -1269,10 +1256,8 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/pbuggy", at_1433__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/pbuggy", at_1434__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/pbuggy", at_1435__3__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/pbuggy", BuggyHP__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(BuggyChara, 0x4);
 INCLUDE_BSS(PorcussChara, 0x4);
 INCLUDE_BSS(MucchoChara, 0x4);
@@ -1314,7 +1299,6 @@ INCLUDE_BSS(test_1254, 0x4);
 INCLUDE_BSS(init_1255, 0x4);
 INCLUDE_BSS(reload_cnt_1350, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(StarbullPos, 0x10);
 mgCMemory EffectBuff;
 INCLUDE_BSS(BuggyVelo, 0x10);

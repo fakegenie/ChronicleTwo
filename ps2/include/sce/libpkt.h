@@ -1,12 +1,7 @@
 #pragma once
 
-/* Vendor SDK declarations. The reconstruction is given no system include path at all — only the
-   game's own headers — which is why this is reached with quotes rather than as <libpkt.h>. */
-
 #include "common.h"
 
-/* A cursor over a buffer the caller supplies, plus the tag currently left open so that closing it
-   can write the length nobody knew when it was opened. */
 struct sceVif1Packet {
     u_int *pCurrent;
     u_int *pBase;
@@ -15,9 +10,6 @@ struct sceVif1Packet {
     u_int *reserved[4];
 };
 
-/* The GIF channel's own packet, laid out the same way and driven by the same open/close pairs.
-   The reconstruction reaches only its base, which is the address the DMA channel is handed once
-   the packet is closed. */
 struct sceGifPacket {
     u_long128 *pCurrent;
     u_long128 *pBase;

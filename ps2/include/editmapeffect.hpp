@@ -3,4 +3,3 @@
 #include "common.h"
 
 #include "editmap.hpp"
-

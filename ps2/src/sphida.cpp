@@ -30,7 +30,6 @@ extern char at_1221__5[];
 #include <cstdlib>
 #include <cmath>
 
-// Code (.text)
 GOLF_CLUB_DEF *GetSphidaClubDef(int club) {
     if (club < 9 || club > 14) {
         return 0;
@@ -911,10 +910,8 @@ void CSphida::DrawMiniMapSymbol(CMiniMapSymbol *symbol) {
     }
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sphida", GolfClubDef__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sphida", at_940__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sphida", at_1088__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sphida", at_1089__2__DATA);
@@ -922,5 +919,4 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sphida", at_1090__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sphida", at_1138__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sphida", at_1221__5__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(Sphida, 0x4);

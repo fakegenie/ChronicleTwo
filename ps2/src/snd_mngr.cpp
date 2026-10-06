@@ -55,13 +55,12 @@ static void SetVolSeSeq(int index, int vol);
 static int GetPortBankNo(unsigned int snd_id, int *port, int *bank);
 
 #ifdef NONMATCHING
-static int         EnableSndMngr = 1;                      /**< Enables loading sound banks. */
+static int         EnableSndMngr = 1;
 
 static void CSndStepWait();
 static char *GetLine(char **col, char *text, char *end);
 #endif
 
-// Code (.text)
 int CLoopSeMngr::Create(int sequence_count, mgCMemory *memory) {
     unsigned int byte_count;
     unsigned int quadwords;
@@ -255,9 +254,6 @@ static u32 GetPortNo(u32 sound_id) {
 static u32 GetBankNo(u32 sound_id) {
     return (sound_id >> 16) & 0xFF;
 }
-/**
- * Finds the loaded bank identified by a sound ID.
- */
 static sndBankInfo *GetBankInfo(unsigned int snd_id) {
     sndPortInfo *info;
     int          port_no;
@@ -275,9 +271,6 @@ static sndBankInfo *GetBankInfo(unsigned int snd_id) {
     return &info->bank[bank_no];
 }
 
-/**
- * Finds a sound effect in the bank identified by a sound ID.
- */
 static sndSeInfo *GetSeInfo(unsigned int snd_id, int se_no) {
     sndBankInfo  *bank;
 
@@ -539,9 +532,6 @@ static int CSndStep() {
     return stepped;
 }
 
-/**
- * Delays briefly before stepping the sound driver.
- */
 static void CSndStepWait() {
     int delay;
 
@@ -633,9 +623,6 @@ int sndGetSeDefVol(u32 se_id, int index) {
     return 0;
 }
 
-/**
- * Identifies the driver's voice-capable music ports.
- */
 static int IsBgmPort(int port) {
     if (port == 0 || port == 11) {
         return 1;
@@ -1434,9 +1421,6 @@ void sndSqRePlay(int port, int sq_no) {
     sndSignalSema();
 }
 
-/**
- * Reads a line of tab or space separated columns into text buffers.
- */
 static char *GetLine(char **col, char *text, char *end) {
     char crlf[] = { '\r', '\n' };
     int  column;
@@ -1703,9 +1687,6 @@ void sndStopSeSeq(int port_no) {
     }
 }
 
-/**
- * Starts a sound-effect sequence on a free player.
- */
 static int PlaySeSeq(unsigned int snd_id, sndCSeSeqData *data, int vol) {
     sndCSeSeq   *player;
     sndPortInfo *info;
@@ -1747,9 +1728,6 @@ static void StopSeSeq(int seq_id) {
     }
 }
 
-/**
- * Sets the volume of a sound-effect sequence player.
- */
 static void SetVolSeSeq(int index, int vol) {
     sndCSeSeq  *player;
 
@@ -1839,9 +1817,6 @@ void sndStreamClose() {
     sndSignalSema();
 }
 
-
-
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/snd_mngr", at_732__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/snd_mngr", at_816__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/snd_mngr", at_896__DATA);
@@ -1865,8 +1840,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/snd_mngr", at_1636__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/snd_mngr", at_1679__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/snd_mngr", at_1680__DATA);
 
-
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/snd_mngr", EnableSndMngr__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/snd_mngr", snd_sema_id__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/snd_mngr", MasterVol__DATA);
@@ -1874,7 +1847,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/snd_mngr", MasterVolFade__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/snd_mngr", snd_old_vsync__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/snd_mngr", at_1469__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(ReverbType, 0x8);
 INCLUDE_BSS(ReverbDepthe, 0x8);
 INCLUDE_BSS(init_snd, 0x8);
@@ -1882,7 +1854,6 @@ INCLUDE_BSS(feMasterVol, 0x8);
 INCLUDE_BSS(fnowMasterVol, 0x8);
 INCLUDE_BSS(fstpMasterVol, 0x8);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(PortVolf, 0x40);
 INCLUDE_BSS(MicPos, 0x10);
 INCLUDE_BSS(MicDir, 0x10);
