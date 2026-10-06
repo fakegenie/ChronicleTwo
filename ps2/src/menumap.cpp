@@ -43,11 +43,11 @@ extern float SfidaBGXY;
 extern CDC2Mes *SphidaMenuMes;
 extern CDC2Mes *SphidaMenuQus;
 extern CDC2Mes *SphidaScore;
-extern char SphidaMenuQusDrawFlag;
-extern char SphidaInfoMsgDrawFlag;
+extern unsigned char SphidaMenuQusDrawFlag;
+extern unsigned char SphidaInfoMsgDrawFlag;
 extern mgCTexture *SphidaTex2;
 extern mgCTexture *SphidaCursor;
-extern char SphidaCursorDrawFlag;
+extern unsigned char SphidaCursorDrawFlag;
 extern float SphidaCursorY;
 extern int SphidaCursorCount;
 extern short SphidaMenuPhase;
@@ -1352,43 +1352,44 @@ void SphidaMenuDraw() {
         return;
     }
     CalcMenu1((float)(SphidaSelect[1] * -0x18), &SphidaScoreListY, 4.0f, 3.5f, SfidaMoveInitFlag);
+    mgCTextureManager *textures = &mgTexManager;
     mgCDrawPrim *prim = GetMenuPrim();
     if (SphidaTex2 != NULL) {
-        mgTexManager.ReloadTexture(SphidaTex2->block, (sceVif1Packet *)NULL);
-        mgRect<int> tile(0x100, 0x100, 0x100, 0x100);
-        DrawMenuTilePattern(prim, SphidaTex2, SfidaBGXY, SfidaBGXY, tile, 0, NULL);
+        textures->ReloadTexture(SphidaTex2->block, (sceVif1Packet *)NULL);
+        DrawMenuTilePattern(prim, SphidaTex2, SfidaBGXY, SfidaBGXY, mgRect<int>(0x100, 0x100, 0x100, 0x100), 0, NULL);
     }
     SPHIDA_PLAYER_DATA *player = SubSphidaData->GetPlayerData(0);
     clip.Set(0, 0, 0, 0);
     if (SphidaTex != NULL) {
-        mgTexManager.ReloadTexture(SphidaTex->block, (sceVif1Packet *)NULL);
+        textures->ReloadTexture(SphidaTex->block, (sceVif1Packet *)NULL);
         if (LanguageCode == 0) {
             DrawSubGameTitle(SphidaTex, 1, 0x1E, 0x1E, 0xCA);
         } else {
             DrawSubGameTitle(SphidaTex, 1, 0x18, 0x1A, 0xDE);
         }
-        mgRect<int> title(0, 0xB6, 0xB4, 0x1C);
-        PrimQuad(prim, SphidaTex, 45.0f, 41.0f, title, 0x80, 0x80, 0x80, 0x80);
+        PrimQuad(prim, SphidaTex, 45.0f, 41.0f, mgRect<int>(0, 0xB6, 0xB4, 0x1C), 0x80, 0x80, 0x80, 0x80);
         if (LanguageCode == 0) {
+            float label_x = 118.0f;
             DrawSubGameTitle(SphidaTex, 0, 0x5A, mgScreenHeight - 0x13E, 0x66);
-            mgRect<int> score_label(0x6C, 0x9E, 0x30, 0x18);
-            PrimQuad(prim, SphidaTex, 118.0f, mgScreenHeight - 0x133, score_label, 0x80, 0x80, 0x80, 0x80);
+            PrimQuad(prim, SphidaTex, label_x, mgScreenHeight - 0x133, mgRect<int>(0x6C, 0x9E, 0x30, 0x18), 0x80, 0x80, 0x80, 0x80);
         } else {
+            float label_x = 98.0f;
             DrawSubGameTitle(SphidaTex, 0, 0x46, mgScreenHeight - 0x13E, 0x86);
-            mgRect<int> score_label(0, 0x5C, 0x50, 0x18);
-            PrimQuad(prim, SphidaTex, 98.0f, mgScreenHeight - 0x133, score_label, 0x80, 0x80, 0x80, 0x80);
+            PrimQuad(prim, SphidaTex, label_x, mgScreenHeight - 0x133, mgRect<int>(0, 0x5C, 0x50, 0x18), 0x80, 0x80, 0x80, 0x80);
         }
         list_rect[2] = 0x15E;
         list_rect[3] = 0xE0;
         list_rect[0] = (mgScreenWidth - list_rect[2]) >> 1;
         list_rect[1] = mgScreenHeight - 0x104;
         int scroll[2];
-        scroll[1] = fptosi(25.75f);
+        float bar_h = 25.75f;
+        scroll[1] = (int)bar_h;
         CalcMenu1(3.21875f * (float)SphidaSelect[1], &SphidaScoreListBarY, 3.0f, 0.0f, SfidaMoveInitFlag);
         scroll[0] = fptosi(SphidaScoreListBarY);
         DrawSubGameScrlList(SphidaTex, list_rect, scroll);
         clip.Set(list_rect[0] + 4, list_rect[1] + 0xE, list_rect[0] + list_rect[2], list_rect[1] + list_rect[3] - 0x10);
         SetMenuScissor(clip);
+        int line_x = list_rect[0] + 0x16;
         int y = fptosi((float)(list_rect[1] + 0x22) + SphidaScoreListY);
         for (int rank = 0; rank < 0x40; rank++, y += 0x18, player++) {
             mgRect<int> digits(0, 0xEC, 0x12, 0x14);
@@ -1398,37 +1399,34 @@ void SphidaMenuDraw() {
             prim->Color(0x80, 0x80, 0x80, 0x80);
             PrimDrawNumber(prim, rank + 1, 1, list_rect[0] + 0x32, y - 0x14, digits, -2, 0);
             int suffix_x = list_rect[0] + 0x32 + (GetNumberKeta(rank + 1) - 1) * 9;
-            mgRect<int> rank_suffix(0xC6, 0xEC, 0x12, 0x14);
-            PrimQuad(prim, suffix_x, y - 0x14, rank_suffix);
+            PrimQuad(prim, suffix_x, y - 0x14, mgRect<int>(0xC6, 0xEC, 0x12, 0x14));
             if (player->name[0] == 0 && player->name[1] == 0) {
-                mgRect<int> no_score(0xB4, 0xEC, 0x12, 0x14);
-                PrimQuad(prim, list_rect[0] + 0xD2, y - 0x14, no_score);
+                PrimQuad(prim, list_rect[0] + 0xD2, y - 0x14, mgRect<int>(0xB4, 0xEC, 0x12, 0x14));
             } else {
                 PrimDrawNumber(prim, player->total_score, 1, list_rect[0] + 0xFC, y - 0x14, digits, -2, 0);
                 float unit_x = 260.0f + list_rect[0];
                 if (CheckNowEurope()) {
                     unit_x = 264.0f + list_rect[0];
                 }
-                mgRect<int> unit(0x4A, 0x88, 0x34, 0x16);
-                PrimQuad(prim, unit_x, (float)y - 20.0f, unit);
+                PrimQuad(prim, unit_x, (float)y - 20.0f, mgRect<int>(0x4A, 0x88, 0x34, 0x16));
             }
             prim->End();
-            DrawSubGameUnderLine(SphidaTex, list_rect[0] + 0x16, y, list_rect[2] - 0x34);
+            DrawSubGameUnderLine(SphidaTex, line_x, y, list_rect[2] - 0x34);
         }
         ResetMenuScissor();
     }
     if (SphidaCursorDrawFlag && SphidaCursor != NULL) {
-        mgTexManager.ReloadTexture(SphidaCursor->block, (sceVif1Packet *)NULL);
+        textures->ReloadTexture(SphidaCursor->block, (sceVif1Packet *)NULL);
         CalcMenu1((float)(list_rect[1] + 0xD + (SphidaSelect[0] - SphidaSelect[1]) * 0x18), &SphidaCursorY, 4.0f, 3.2f, 0);
         SphidaCursorCount++;
-        if (SphidaCursorCount > 59999998) {
+        if (SphidaCursorCount > 60000000) {
             SphidaCursorCount = 0;
         }
         float cursor_x = (float)(list_rect[0] - 0xC) + 8.0f * cosf(mgAngleLimit(0.05235988f * SphidaCursorCount));
         PrimQuad(prim, SphidaCursor, cursor_x, SphidaCursorY + 4.0f * sinf(mgAngleLimit(0.10471976f * SphidaCursorCount)),
                  menu_long_hand, 0x80, 0x80, 0x80, 0x80);
     }
-    mgTexManager.ReloadTexture(MenuArg.mes_tex_block, (sceVif1Packet *)NULL);
+    textures->ReloadTexture(MenuArg.mes_tex_block, (sceVif1Packet *)NULL);
     SphidaMenuMes->DrawMsg();
     if (SphidaScore != NULL) {
         clip.left += 0xA;
@@ -1442,13 +1440,15 @@ void SphidaMenuDraw() {
                 top = 0;
             }
         }
+        float line_y = (float)(list_rect[1] + 0x22) + SphidaScoreListY - 20.0f;
+        float offset = 24.0f * top;
+        line_y = line_y + offset;
         int line_x = list_rect[0] + 0x30;
-        float line_y = (float)(list_rect[1] + 0x22) + SphidaScoreListY - 20.0f + 24.0f * top;
         if (LanguageCode > 0) {
             line_x = list_rect[0] + 0x3A;
         }
-        for (int line = 0; line <= 8; line++, line_y += 24.0f) {
-            SphidaScore->SetMovePosGyou(line, line_x, fptosi(line_y));
+        for (int line = 0; line < 9; line_y += 24.0f, line++) {
+            SphidaScore->SetMovePosGyou(line, line_x, (int)(line_y));
         }
         SphidaScore->DrawMsg();
         ResetMenuScissor();
@@ -1517,7 +1517,6 @@ int SphidaScoreViewKey() {
     }
     return 0;
 }
-#ifdef NONMATCHING
 void SphidaScoreViewDraw() {
     mgCTextureManager *textures = &mgTexManager;
     mgRect<int> hole_digits;
@@ -1561,11 +1560,13 @@ void SphidaScoreViewDraw() {
         prim->Texture(SphidaTex_Sys);
         prim->Color(128, 128, 128, 128);
         if (LanguageCode == 0) {
+            float left_x = 42.0f;
+            float right_x = 110.0f;
             label_left.Set(0, 0, 0x24, 0x26);
             label_y = mgScreenHeight - 0x4C;
-            PrimQuad(prim, 42.0f, (float)label_y, label_left);
+            PrimQuad(prim, left_x, (float)label_y, label_left);
             label_right.Set(0x24, 0, 0x5A, 0x26);
-            PrimQuad(prim, 110.0f, (float)(mgScreenHeight - 0x4C), label_right);
+            PrimQuad(prim, right_x, mgScreenHeight - 0x4C, label_right);
             PrimDrawNumber(prim, hole_no, 0, 0x6A, mgScreenHeight - 0x4A, hole_digits, -2, 0);
         } else if (LanguageCode > 0) {
             label_wide.Set(0, 0, 0x88, 0x26);
@@ -1611,9 +1612,6 @@ void SphidaScoreViewDraw() {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menumap", SphidaScoreViewDraw__Fv);
-#endif
 
 extern "C" void __sinit_menumap_cpp() {
     WorldMapStack.Init();

@@ -84,14 +84,14 @@ public:
     CShop() { memset(this, 0, sizeof(CShop)); }
 
     int GetItemNo(int no) {
-        if (no < 0 || no >= item_num) {
+        if (no < 0 || item_num <= no) {
             return 0;
         }
         return item_no[no];
     }
 
     int GetHaveNum(int no) {
-        if (no < 0 || no >= item_num) {
+        if (no < 0 || item_num <= no) {
             return 0;
         }
         return have_num[no];
