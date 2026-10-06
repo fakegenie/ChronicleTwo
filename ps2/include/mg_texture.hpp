@@ -144,9 +144,18 @@ public:
     int vram_size;
     int image_blocks;
     int clut_size;
-    sceGsTex0 tex0;
-    sceGsTex1 tex1;
-    sceGsClamp clamp;
+    union {
+        u_long tex0_value;
+        sceGsTex0 tex0;
+    };
+    union {
+        u_long tex1_value;
+        sceGsTex1 tex1;
+    };
+    union {
+        u_long clamp_value;
+        sceGsClamp clamp;
+    };
     u_long128 *image[MG_TEXTURE_LEVEL_MAX];
     u_long128 *clut;
     int swizzled;

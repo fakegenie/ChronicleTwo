@@ -51,43 +51,7 @@ extern u_long128 **user_prog_adr;
 extern int user_prog_num;
 extern int font_cons;
 extern int font_draw_flag;
-struct mgFrameTex0 {
-    union {
-        u_long value;
-        struct {
-            u_long tbp0 : 14;
-            u_long tbw : 6;
-            u_long psm : 6;
-            u_long tw : 4;
-            u_long th : 4;
-            u_long tcc : 1;
-            u_long tfx : 2;
-            u_long cbp : 14;
-            u_long cpsm : 4;
-            u_long csm : 1;
-            u_long csa : 5;
-            u_long cld : 3;
-        } bits;
-    };
-};
-struct mgFrameTextureCopy {
-    short block;
-    short width;
-    short height;
-    short bpp;
-    char name[0x20];
-    u_int vram_size;
-    u_int image_blocks;
-    u_int clut_size;
-    u_long tex0;
-    u_long tex1;
-    u_long clamp;
-    float image[4];
-    u_int clut;
-    u_int swizzled;
-    u_int next;
-};
-extern mgFrameTextureCopy frame_tex;
+extern mgCTexture frame_tex;
 extern mgCTexture fixz_tex[2];
 extern float at_863[4];
 extern float at_1389[4];
@@ -736,7 +700,6 @@ void mgBeginDrawShadow(mgCTexture *shadow, mgCTexture *unused) {
         prim.End();
     }
 }
-#ifdef NONMATCHING
 void mgEndDrawShadow(mgCTexture *shadow, mgCTexture *unused) {
     if (shadow != NULL) {
         mgCTexture texture = *shadow;
@@ -759,11 +722,11 @@ void mgEndDrawShadow(mgCTexture *shadow, mgCTexture *unused) {
         prim.Begin(SCE_GS_PRIM_SPRITE);
         prim.Color(128, 128, 128, 128);
         prim.Texture(&texture);
-        alpha.bits.fix = 64;
         alpha.bits.a = SCE_GS_ALPHA_ZERO;
         alpha.bits.b = SCE_GS_ALPHA_CD;
         alpha.bits.c = SCE_GS_ALPHA_AS;
         alpha.bits.d = SCE_GS_ALPHA_CD;
+        alpha.bits.fix = 64;
         prim.Direct(SCE_GS_ALPHA_1, *(u_long *)&alpha);
         texa.TA0 = 48;
         texa.TA1 = 128;
@@ -781,9 +744,6 @@ void mgEndDrawShadow(mgCTexture *shadow, mgCTexture *unused) {
         prim.End();
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mglib", mgEndDrawShadow__FP10mgCTextureP10mgCTexture);
-#endif
 void mgSetRenderInfo(float fov, float clip_near, float clip_far) {
     mgRenderInfo.SetRenderInfo(fov, mgScreenWidth, mgScreenHeight, clip_near, clip_far,
                                mgScreenZDepth, 2096.0f / (3.0f * (float)mgScreenWidth));
@@ -1047,17 +1007,17 @@ void mgSetPkFrameBuffer(int fbp, int width, int height, int psm) {
             bpp = 16;
             break;
     }
-    ((mgCTexture *)&frame_tex)->Initialize();
+    frame_tex.Initialize();
     frame_tex.width = width;
     frame_tex.height = height;
     frame_tex.bpp = bpp;
     frame_tex.vram_size = bpp * (width * height) / 8 / 256;
     frame_tex.clut_size = 0;
-    ((mgFrameTex0 *)&frame_tex.tex0)->value = 0;
+    frame_tex.tex0_value = 0;
     frame_tex.image_blocks = frame_tex.vram_size;
-    ((mgFrameTex0 *)&frame_tex.tex0)->bits.tbp0 = fbp << 5;
-    ((mgFrameTex0 *)&frame_tex.tex0)->bits.tbw = width / 64;
-    ((mgFrameTex0 *)&frame_tex.tex0)->bits.psm = psm;
+    frame_tex.tex0.bits.tbp0 = fbp << 5;
+    frame_tex.tex0.bits.tbw = width / 64;
+    frame_tex.tex0.bits.psm = psm;
     width_shift = 0;
     height_shift = 0;
     for (size = width; size > 1; size >>= 1) {
@@ -1080,17 +1040,17 @@ void mgSetPkFrameBuffer(int fbp, int width, int height, int psm) {
     if (height != size) {
         height_shift++;
     }
-    ((mgFrameTex0 *)&frame_tex.tex0)->bits.tw = width_shift;
-    ((mgFrameTex0 *)&frame_tex.tex0)->bits.th = height_shift;
-    ((mgFrameTex0 *)&frame_tex.tex0)->bits.tcc = 1;
-    ((mgFrameTex0 *)&frame_tex.tex0)->bits.tfx = 0;
+    frame_tex.tex0.bits.tw = width_shift;
+    frame_tex.tex0.bits.th = height_shift;
+    frame_tex.tex0.bits.tcc = 1;
+    frame_tex.tex0.bits.tfx = 0;
     *(u_long *)&frame_tex.tex1 = 0x261;
 }
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mglib", mgSetPkFrameBuffer__Fiiii);
 #endif
 void mgGetFrameBuffer(mgCTexture *texture) {
-    *(mgFrameTextureCopy *)texture = frame_tex;
+    *texture = frame_tex;
 }
 void mgGetFrameBackBuffer(mgCTexture *texture) {
     u_char *draw_env;
@@ -1099,7 +1059,7 @@ void mgGetFrameBackBuffer(mgCTexture *texture) {
     } else {
         draw_env = (u_char *)&mgDBuff.draw0.frame1;
     }
-    *(mgFrameTextureCopy *)texture = frame_tex;
+    *texture = frame_tex;
     texture->tex0.TBP0 = (*(u_short *)draw_env & 0x1FF) * 32;
 }
 mgCDrawEnv *mgGetpDrawEnv(int which) {
