@@ -2797,13 +2797,13 @@ void DngTreeMapDraw() {
         MenuSaveDraw();
     }
 }
-int CBaseMenuClass::IsCreateObject(int a, int b) {
+int CBaseMenuClass::IsCreateObject(int select_key, int push_button) {
     return 1;
 }
-int CBaseMenuClass::IsMakeObject(int a, int b) {
+int CBaseMenuClass::IsMakeObject(int select_key, int push_button) {
     return 0;
 }
-int CBaseMenuClass::IsAskExtend(int a, int b) {
+int CBaseMenuClass::IsAskExtend(int select_key, int push_button) {
     return 0;
 }
 int CBaseMenuClass::ItemCmdAfter(int command, ITEMCMD_RET_PARA *para) {

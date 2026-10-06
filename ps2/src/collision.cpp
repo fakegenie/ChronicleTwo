@@ -23,11 +23,11 @@ struct CollisionQuad {
 struct CollisionTri {
     CollisionQuad q[5];
 };
-static inline u_int Align16Blocks(u_int n) {
-    if (n & 0xF) {
-        return (n >> 4) + 1;
+static inline u_int Align16Blocks(u_int bytes) {
+    if (bytes & 0xF) {
+        return (bytes >> 4) + 1;
     }
-    return n >> 4;
+    return bytes >> 4;
 }
 void CCollisionMDT::Copy(CCollisionMDT &dest, mgCMemory *memory) {
     int i;

@@ -287,11 +287,11 @@ int _MENU_EXE_RESET_TEXINFO(SPI_STACK *stack, int argc);
 
 int _MENU_DEBUG_PRINTF(SPI_STACK *stack, int argc);
 
-static inline unsigned int align16_blocks(unsigned int n) {
-    if (n & 0xF) {
-        return (n >> 4) + 1;
+static inline unsigned int align16_blocks(unsigned int bytes) {
+    if (bytes & 0xF) {
+        return (bytes >> 4) + 1;
     }
-    return n >> 4;
+    return bytes >> 4;
 }
 
 #include "common.h"

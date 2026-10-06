@@ -37,10 +37,10 @@ extern "C" void *__construct_new_array(void *, void *(*)(void *), void *, u_int,
 extern "C" void *__ct__10mgCTextureFv(void *);
 extern "C" void *__ct__15mgCTextureBlockFv(void *);
 extern "C" void *Alloc__9mgCMemoryFi(mgCMemory *, int);
-static inline u_int align16_blocks(u_int n) {
-    if (n & 0xF)
-        return (n >> 4) + 1;
-    return n >> 4;
+static inline u_int align16_blocks(u_int bytes) {
+    if (bytes & 0xF)
+        return (bytes >> 4) + 1;
+    return bytes >> 4;
 }
 
 #pragma schedule off

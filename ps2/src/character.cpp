@@ -77,11 +77,11 @@ union VisualTypeData {
 };
 
 extern VisualTypeData at_1575;
-static inline u32 DynAnimeAlign16Blocks(u32 n) {
-    if (n & 0xF) {
-        return (n >> 4) + 1;
+static inline u32 DynAnimeAlign16Blocks(u32 bytes) {
+    if (bytes & 0xF) {
+        return (bytes >> 4) + 1;
     }
-    return n >> 4;
+    return bytes >> 4;
 }
 
 extern SPI_TAG_PARAM tag[];

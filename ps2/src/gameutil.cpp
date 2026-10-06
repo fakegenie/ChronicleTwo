@@ -263,7 +263,7 @@ Mot_List *MotionProc(mgCFrame *root, float time, Mot_List *list, mgCCamera *came
             }
 
             break;
-        case MOTION_KEY_UNK_33:
+        case MOTION_KEY_VISIBLE_TREE:
             if (list->values[key][0] < 1.0f) {
                 frame->attr->draw = MG_FRAME_DRAW_SKIP_CHILDREN;
             } else {
@@ -429,7 +429,7 @@ Mot_List *MotionProc(mgCFrame *root, unsigned int from_frame, unsigned int to_fr
             }
 
             break;
-        case MOTION_KEY_UNK_33:
+        case MOTION_KEY_VISIBLE_TREE:
             if (list->values[key][0] < 1.0f) {
                 frame->attr->draw = MG_FRAME_DRAW_SKIP_CHILDREN;
             } else {
