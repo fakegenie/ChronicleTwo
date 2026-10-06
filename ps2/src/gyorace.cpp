@@ -1051,7 +1051,7 @@ int sgSysDrawGyoRace(SubGameInfo *info) {
 
     mgCTextureManager *textures = &mgTexManager;
     scene = info->scene;
-    textures->ReloadTexture( *(int *)((u_char *)GetSystemMessage() + 0x22A4), (sceVif1Packet *)0);
+    textures->ReloadTexture( GetSystemMessage()->texture_block, (sceVif1Packet *)0);
     Jikkyou(info);
     gyo_mes->Step();
     gyo_mes->DrawMesWin();

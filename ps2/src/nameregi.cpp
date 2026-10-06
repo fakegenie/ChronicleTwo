@@ -1765,7 +1765,7 @@ void CNameRegiMenu::DrawSelectedWord() {
 void CNameRegiMenu::DrawMessage() {
     RGBAQ_TYPE color;
     u8 prim[0x128];
-    MenuReloadTexture(OldReloadTexNumber, *(int *)((u8 *)MenuDCMsg[6] + 0x22A4));
+    MenuReloadTexture(OldReloadTexNumber, MenuDCMsg[6]->texture_block);
     __ct__11mgCDrawPrimFv(prim);
     SetSpriteEnv((mgCDrawPrim *)prim, 0);
     *(s64 *)&color = at_2031__3;

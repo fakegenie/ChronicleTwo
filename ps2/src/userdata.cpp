@@ -1678,8 +1678,8 @@ void CFishAquarium::FishIntoAquarium(int tank, int slot, CGameDataUsed *fish) {
     }
     ((CGameDataUsed *)entry)->CopyGameData(fish);
     if (tank == 1) {
-        *(int *)((u8 *)entry + 0x50) = GetMainScene()->day;
-        *(float *)((u8 *)entry + 0x54) = GetMainScene()->time;
+        entry->data.fish.tank_day = GetMainScene()->day;
+        entry->data.fish.tank_hour = GetMainScene()->time;
     }
 }
 int CFishAquarium::GetAquariumFishNum(int tank) {
