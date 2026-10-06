@@ -870,7 +870,7 @@ public:
 
     u32 GetSpecialStatus(int weapon);
 
-    s16 GetPalletNo(int weapon);
+    int GetPalletNo(int weapon);
 
     void RefreshParamater();
 

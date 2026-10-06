@@ -197,68 +197,65 @@ void DrawActiveItemCursor(int x, int y, float alpha) {
 }
 #ifdef NONMATCHING
 void DrawMainUnitStatusBord(float rate) {
-    SP_RGBA           color;
-    CPreSprite sprite;
-    CPreSprite spare;
-    extern float      palanim_1023;
-    extern s8         init_1024;
-    CActionChara     *character;
-    CBattleCharaInfo *info;
-    CGameDataUsed    *active_items;
-    int               hp_max;
-
     struct charge_position_data {
         int value[7][2];
     };
-    charge_position_data charge_position;
-
     struct charge_glyph_data {
         int value[4][2];
     };
-    charge_glyph_data charge_glyph;
-
     struct status_mask_data {
         int value[7];
     };
-    status_mask_data status_mask;
-
     struct status_glyph_data {
         s16 value[7][2];
     };
-    status_glyph_data status_glyph;
-    mgRect<int> item_glyph;
-    mgRect<int> hp_now_glyph;
-    mgRect<int> hp_max_glyph;
-    mgRect<int> whp_now_glyph;
+
+    CPreSprite sprite;
+    CPreSprite spare;
+    extern s8         init_1024;
     mgRect<int> whp_max_glyph;
-    mgRect<int> second_whp_now_glyph;
-    mgRect<int> second_whp_max_glyph;
-    int               whp[2][2];
-    int               abs[2][2];
-    int               second_weapon_y;
-    int               event_running;
+    int               hp_max;
+    mgRect<int> item_glyph;
+    status_glyph_data status_glyph;
+    int               top_right;
     float             hp_rate;
+    charge_glyph_data charge_glyph;
+    int               second_weapon_y;
+    status_mask_data status_mask;
+    charge_position_data charge_position;
+    int               pulse;
+    mgRect<int> hp_now_glyph;
+    int               bottom_right;
+    int               charge_max;
+    mgRect<int> whp_now_glyph;
+    int               red;
+    mgRect<int> hp_max_glyph;
     float             whp_rate[2];
+    mgRect<int> second_whp_now_glyph;
+    int               status_x;
+    mgRect<int> second_whp_max_glyph;
+    int               blue;
+    CBattleCharaInfo *info;
+    int               status_attr;
+    int               whp[2][2];
+    s16               second_weapon_no;
+    int               number_x;
+    int               abs[2][2];
+    SP_RGBA           color;
+    int               gauge_left;
+    int               green;
+    int               charge_now;
+    CActionChara     *character;
+    CGameDataUsed    *active_items;
+    s16               weapon_no;
+    int               second_weapon_x;
+    int               event_running;
     float             flash[1];
     int               index;
-    int               item_x;
-    int               charge_max;
-    int               charge_now;
-    int               status_attr;
-    int               status_x;
-    int               width;
-    int               top_right;
-    int               bottom_right;
-    int               red;
-    int               green;
-    int               blue;
-    int               pulse;
-    int               gauge_left;
+    extern float      palanim_1023;
     int               gauge_right;
-    int               second_weapon_x;
-    int               number_x;
-    s16               weapon_no;
-    s16               second_weapon_no;
+    int               width;
+    int               item_x;
 
     color.r = 0x80;
     color.g = 0x80;
@@ -275,6 +272,7 @@ void DrawMainUnitStatusBord(float rate) {
         weapon_y = -72;
         weapon_x = 280;
         second_weapon_x = 580;
+        second_weapon_y = 8;
     }
     event_running = 0;
     character = (CActionChara *)DngMainScene->GetCharacter(0);
