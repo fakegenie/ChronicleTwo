@@ -4732,7 +4732,6 @@ extern char at_4957[];
 #ifdef NONMATCHING
 int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
     mgCMemory *load_stack = &MenuCharaLoadStack;
-    int close = 0;
     mgCMemory work;
     MENU_ASKMODE_PARA *para = &ask_para;
     if (!init_4683) {
@@ -4745,6 +4744,8 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
     float position[4];
     int size;
     switch (para->ask_mode) {
+        case 0:
+            break;
         case 1:
             switch (step) {
                 case 0:
@@ -4788,6 +4789,7 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
             CActionChara *chara = MenuActionChara[0];
             CDC2Mes *name_message = MenuDCMsg[6];
             CDC2Mes *message = MenuDCMsg[7];
+            int close = 0;
             switch (step) {
                 case 0: {
                     int old_select = info->select_no;
@@ -4809,11 +4811,10 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
                         MenuSePlay(SYSTEM_SE_CURSOR);
                     }
                     MenuWeaponStatusInfoFormSet(info->weapon, data);
-                    if (push_button == MENU_PUSH_BUTTON_CANCEL) {
-                        info->mode = 0;
-                        MenuSePlay(5);
-                        close = 1;
-                    } else if (push_button == 8 || push_button == 4 || push_button == 1) {
+                    switch (push_button) {
+                    case 1:
+                    case 4:
+                    case 8:
                         if (info->enable[select] == 1) {
                             if (CheckBuildUpMonsterCondition(data)) {
                                 ExeScript(at_4950);
@@ -4829,25 +4830,22 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
                         } else {
                             MenuSePlay(5);
                         }
+                        break;
+                    case MENU_PUSH_BUTTON_CANCEL:
+                        info->mode = 0;
+                        MenuSePlay(5);
+                        close = 1;
+                        break;
                     }
                     break;
                 }
                 case 1: {
                     int choice = message->YesNoCursor();
-                    if (push_button == MENU_PUSH_BUTTON_CANCEL) {
-                        if (MenuCommonInfo->cursor_form != NULL) {
-                            MenuCommonInfo->cursor_form->draw_flag = 1;
-                        }
-                        MenuSePlay(5);
-                        step = 0;
-                    } else if (push_button == 8 || push_button == 4 || push_button == 1) {
-                        if (choice != 0) {
-                            if (MenuCommonInfo->cursor_form != NULL) {
-                                MenuCommonInfo->cursor_form->draw_flag = 1;
-                            }
-                            MenuSePlay(5);
-                            step = 0;
-                        } else {
+                    switch (push_button) {
+                    case 1:
+                    case 4:
+                    case 8:
+                        if (choice == 0) {
                             MenuSePlay(SYSTEM_SE_DECIDE);
                             BuildEndFlag_4703 = 0;
                             info->mode = 0;
@@ -4862,7 +4860,15 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
                             load_stack->Alloc(QuadwordsFor(size + 0x800));
                             itemmenu_chr_rotflag = 0;
                             step++;
+                            break;
                         }
+                    case MENU_PUSH_BUTTON_CANCEL:
+                        if (MenuCommonInfo->cursor_form != NULL) {
+                            MenuCommonInfo->cursor_form->draw_flag = 1;
+                        }
+                        MenuSePlay(5);
+                        step = 0;
+                        break;
                     }
                     if (push_button != 0) {
                         mes_form->draw_flag = 0;
@@ -4972,8 +4978,6 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
             }
             break;
         }
-        case 0:
-            break;
     }
     return 0;
 }
