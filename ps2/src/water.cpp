@@ -361,11 +361,11 @@ void CWater::SetSize(int x, int z, mgCMemory *memory) {
     height = height_a;
     unk_50 = 0;
 }
-void CWater::SetParam(float wave_speed, float wave_damping, float param_48, float param_4c) {
+void CWater::SetParam(float wave_speed, float wave_damping, float param0, float param1) {
     speed = wave_speed;
     damping = wave_damping;
-    unk_48 = param_48;
-    unk_4c = param_4c;
+    surface_param0 = param0;
+    surface_param1 = param1;
 }
 void CWater::SetColor(u_char red, u_char green, u_char blue, u_char alpha) {
     color[0] = red;
@@ -383,8 +383,8 @@ CWater::CWater() {
     color[3] = 128;
     speed = 0.1f;
     damping = 0.015f;
-    unk_48 = 0;
-    unk_4c = 0;
+    surface_param0 = 0;
+    surface_param1 = 0;
 }
 #ifdef NONMATCHING
 int CWater::CreateRenderInfoPacket(u_int *packet, float (*matrix)[4], mgRENDER_INFO *info) {
@@ -435,8 +435,8 @@ int CWater::CreateRenderInfoPacket(u_int *packet, float (*matrix)[4], mgRENDER_I
     color[2] = this->color[2];
     color[3] = this->color[3];
     *(u_long128 *)render->color = *(u_long128 *)color;
-    color[0] = unk_48;
-    color[1] = unk_4c;
+    color[0] = surface_param0;
+    color[1] = surface_param1;
     *(u_long128 *)render->surface_params = *(u_long128 *)color;
     render->vif[3] = MG_VIF_UNPACK_V4_32 | (((u_int)(cursor + 16 - render->vif) / 4 - 1) << MG_VIF_NUM_SHIFT);
     cursor[16] = cursor[17] = cursor[18] = 0;

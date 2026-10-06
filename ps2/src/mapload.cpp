@@ -497,7 +497,7 @@ void CMap::GetLightInfo(CMapLightingInfo *out_info, float *ratio, int num) {
                 work[0] = list[i]->fog.r;
                 work[1] = list[i]->fog.g;
                 work[2] = list[i]->fog.b;
-                work[3] = list[i]->fog.unk_b;
+                work[3] = list[i]->fog.a;
                 sceVu0ScaleVector(work, work, ratio[i]);
                 mgAddVector(fog_color, work);
                 work[0] = list[i]->fog.near_dist;
@@ -543,7 +543,7 @@ void CMap::GetLightInfo(CMapLightingInfo *out_info, float *ratio, int num) {
     out_info->fog.r = fog_color[0];
     out_info->fog.g = fog_color[1];
     out_info->fog.b = fog_color[2];
-    out_info->fog.unk_b = fog_color[3];
+    out_info->fog.a = fog_color[3];
     out_info->fog.near_dist = fog[0];
     out_info->fog.far_dist = fog[1];
     out_info->fog.far_value = fog[2];

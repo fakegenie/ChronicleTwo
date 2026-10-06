@@ -105,7 +105,7 @@ struct mgFOG_PARAM {
     u_char r;           /**< Red component of the fog colour. */
     u_char g;           /**< Green component of the fog colour. */
     u_char b;           /**< Blue component of the fog colour. */
-    u_char unk_b;
+    u_char a;
     union {
         struct {
     float offset;       /**< Constant term of the fog value as a function of the reciprocal of depth. */
