@@ -776,22 +776,11 @@ int EditLoop() {
     CameraCtrlParam    *camera_param;
     CameraCtrlParam    *default_param;
     SubGameInfo        *current_subgame;
-    PAUSE_INFO          menu_pause;
-    PAUSE_INFO          pause;
     sceVu0FVECTOR       position;
     sceVu0FVECTOR       ground_position;
     sceVu0FVECTOR       closest;
     sceVu0FVECTOR       line_start;
     sceVu0FVECTOR       line_end;
-    sceVu0FVECTOR       load_position = {1400.0f, -6.0f, -218.0f, 1.0f};
-    sceVu0FVECTOR       talk_position;
-    sceVu0FVECTOR       talk_height;
-    sceVu0FVECTOR       villager_position;
-    sceVu0FVECTOR       edit_position;
-    sceVu0FVECTOR       return_position;
-    sceVu0FVECTOR       camera_position;
-    sceVu0FVECTOR       camera_reference;
-    int                 stay[32];
     char               *map_name;
     float               time_rate;
     float               projection;
@@ -801,6 +790,7 @@ int EditLoop() {
     int                 light_band;
     int                 next_sub_map;
     int                 finish;
+    int                 light_check;
     int                 wait_for_map;
     int                 menu_mode;
     int                 open_menu;
@@ -848,6 +838,7 @@ int EditLoop() {
     if (PauseFlag == 0 && IsLightingEditMode() == 0) {
         map = MainScene__2->GetMap(MainScene__2->active_map);
         if (map != NULL) {
+            light_check = 1;
             map->now_time = MainScene__2->time;
             light_band = map->GetNowTimeLightBand();
             if (GamePad__2.On2(PAD_RIGHT) != 0) {
@@ -861,7 +852,7 @@ int EditLoop() {
             }
             if (GamePad__2.Down2(PAD_DOWN) != 0) {
                 show_time_step = 30;
-                time_step = time_step == 0;
+                time_step = !time_step;
             }
             if (LoopMode == EDIT_LOOP_WAIT_READ) {
                 if (ReadBGSync() == 0) {
@@ -870,13 +861,14 @@ int EditLoop() {
             } else if (GetSaveData()->time_stop == 0 && time_step != 0 &&
                        ControlMode == EDIT_CONTROL_PLAYER && LoopMode == EDIT_LOOP_WALK) {
                 time_rate = 1.0f;
-                if (GetSaveData() != NULL && GetSaveData()->config.fast_time != 0) {
+                light_check = 1;
+                if (GetSaveData() != NULL && GetSaveData()->GetConfig()->fast_time != 0) {
                     time_rate = 1.5f;
                 }
                 MainScene__2->TimeStep(time_rate);
             }
             map->now_time = MainScene__2->time;
-            if (light_band != map->GetNowTimeLightBand() && map->time_cfade != 0) {
+            if (light_check != 0 && light_band != map->GetNowTimeLightBand() && map->time_cfade != 0) {
                 MainScene__2->fade.CaptureScreen();
                 MainScene__2->fade.CrossFade(10, 0.8f);
             }
@@ -888,7 +880,7 @@ int EditLoop() {
         wait_for_map = 1;
     }
     map_name = MainScene__2->GetMapName(MainScene__2->active_map);
-    if (LoopCounter >= 3 && LoopMode == EDIT_LOOP_WALK && map_name != NULL && strcmp(map_name, "m01") == 0) {
+    while (LoopCounter >= 3 && LoopMode == EDIT_LOOP_WALK && map_name != NULL && strcmp(map_name, "m01") == 0) {
         chara = MainScene__2->GetCharacter(MainScene__2->player_chara);
         if (chara != NULL) {
             chara->GetPosition(position);
@@ -896,6 +888,7 @@ int EditLoop() {
             ground_position[1] = 0.0f;
             line_start[3] = 1.0f;
             line_end[3] = 1.0f;
+            sceVu0FVECTOR load_position = {1400.0f, -6.0f, -218.0f, 1.0f};
             next_sub_map = -1;
             if (MainScene__2->LoadMapBGStep(NULL) == 0) {
                 line_start[0] = 1900.0f;
@@ -1023,7 +1016,18 @@ int EditLoop() {
                 SubMapLoadBG = 1;
             }
         }
+        break;
     }
+    PAUSE_INFO          menu_pause;
+    PAUSE_INFO          pause;
+    sceVu0FVECTOR       camera_reference;
+    sceVu0FVECTOR       talk_position;
+    sceVu0FVECTOR       camera_position;
+    sceVu0FVECTOR       talk_height;
+    sceVu0FVECTOR       villager_position;
+    int                 stay[32];
+    sceVu0FVECTOR       edit_position;
+    sceVu0FVECTOR       return_position;
     if (SubMapLoadStep() != 0) {
         while (wait_for_map != 0 && SubMapLoadStep() != 0) {
         }
