@@ -429,3 +429,17 @@ only functions present in both objects can be replaced, the plain build keeps th
 - Retail's `in = x / 10` kept in a register and later updated with `+ y` comes from a named local for `x / 10` and `y + local` written at each use.
 - In a `drafts` unit, unused local declarations in a draft can change the objdiff state compile of later `STATEMATCHING` functions. Removing `HumanMoveIF`'s dead `abs_x` and `abs_z` put `HumanGunMoveIF` back to 100%.
 - Retail branch labels in perm's `-1` listing can show an offset 8 bytes past the real target. Check the instruction there before reading odd control flow into it.
+- `if (p != NULL) { } else if (p == NULL) { return; }` gives retail's `bnez body; beqz ret; nop` double test and turns on the unfilled delay-slot style for the whole function (`RefreshParamater` went from 41 aligned words to 2).
+- When retail reaches a small table gp-relative (`addiu sN,gp,X`), the extern needs a size, such as `extern T sym[1];`. An unsized `extern T sym[];` compiles to `lui/addiu` (`DebugGetItem`).
+- In a unit that is not in `state_units.txt`, a0 and a1 left unused around float-to-int conversions can still mean the unit needs `primer=u64div`, but only after `fptosi()` is changed to `(int)` casts. `userdata` showed nothing until both changes were in.
+- Running perm over `xf|||float(x)` for every float literal in calls took `TitleModeKey` from 113 to 19 aligned words.
+- `charas += chara;` in an outer loop reproduces retail's self-accumulating `addu s6,s6,s1`; `&charas[chara]` does not (`CheckItemLimmitOver`).
+- Retail's `code - 0xFF04 < 2` came from `(unsigned)(code - X) <= 1`. An `int code` gives the `andi` mask at a `u16` parameter, and copying the pointer parameter to a local (`p = text`) fixed its register (`CalcSpaceW`).
+- Splitting `new = (sum) * k + rest` into `new = sum; new = new * k; new += rest;` fixed `mul.s` operand order (`Hamon`).
+- `if (n <= 0) { s = 0; } else { s = 0; for (...) }` reproduces retail's `bgtz body; b exit` loop guard with the zeroing duplicated in both paths.
+- Register mismatches inside loops were often fixed by declaring the loop's locals at the top of the enclosing block without initialisers, then letting perm shuffle the order (`DrawOneItem`, `CMenuCostumeSel::Draw`, `CMenuEffect::Step`).
+- A float abs `if (x < 0.0f) x = -x;` and the ternary `x = (x < 0.0f) ? -x : x;` schedule differently. The ternary gave retail's scheduling for the code after it.
+- `p->f++` on a float allocates FP temporaries differently from `p->f += 1.0f`. `x >= 70.0f` compiles to `c.lt.s x,70; bc1t`, while `70.0f <= x` gives retail's `c.le.s 70,x; bc1f`.
+- A compound assignment `now[i] += rate_now` (int += float) forces a fresh `lwc1` of `now[i]` where `now[i] = (int)((float)now[i] + rate_now)` reuses an earlier load. Adding an int to a float field through a named int local fixed an `add.s` operand order.
+- Retail's sign extension of `tbp` came from reading the union member twice (`tex->tex0_value & 0x3FFF`) instead of through a `u_long` local.
+- For functions that differ in length, a difflib/LCS diff of retail against draft instructions is much more useful than a word-by-word count.
