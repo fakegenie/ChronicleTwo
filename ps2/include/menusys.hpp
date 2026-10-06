@@ -88,13 +88,13 @@ struct MENU_ASKMODE_PARA {
     s16 unk_6;
     int cmd_msg[8];
     u32 cmd_color[8];
-    s16 unk_48[8];
+    s16 cmd_shade[8];
     s16 cmd_mark[8];
     s16 arg0;
     s16 arg1;
     s16 unk_6C;
     s16 unk_6E;
-    s16 unk_70;
+    s16 ask_mode;
     s32 unk_74;
     CMenuPosDataForm *form;
     CGameDataUsed *item;
