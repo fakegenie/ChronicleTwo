@@ -149,7 +149,14 @@ asm int mgClipInBoxW(float *max0, float *min0, float *max1, float *min1) {
     jr ra
     sltiu v0, v0, 0x1
 }
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgAddVector__FPfPf);
+asm void mgAddVector(float *vector, float *add) {
+    .set noreorder
+    lqc2 vf15, 0x0(a0)
+    lqc2 vf16, 0x0(a1)
+    vadd.xyzw vf15, vf15, vf16
+    jr ra
+    sqc2 vf15, 0x0(a0)
+}
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgSubVector__FPfPf);
 void mgNormalizeVector(float *out, float *in, float length) {
     sceVu0FVECTOR unit;
