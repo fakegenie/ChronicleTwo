@@ -3407,7 +3407,6 @@ void MenuMonsterBoxInit(mgCMemory *stack, int *tex_block, int mode) {
 }
 #ifdef NONMATCHING
 int CMenuMosSelect::KeyStep() {
-    sceVu0FVECTOR effectPos;
     int size;
     int i;
     int keys = MenuCommonInfo->CheckSelectKey();
@@ -3417,7 +3416,6 @@ int CMenuMosSelect::KeyStep() {
     CDC2Mes *command = MenuDCMsg[5];
     int showInfo = 0;
     int action;
-
     switch (mode) {
         case 1:
             if (fadeEnd) {
@@ -3507,7 +3505,7 @@ int CMenuMosSelect::KeyStep() {
                                 action = 5;
                             } else {
                                 select_badge = &badge[select];
-                                if (select_badge == NULL || !select_badge->enable) {
+                                if (select_badge == NULL || (select_badge != NULL && !select_badge->enable)) {
                                     MenuSePlay(5);
                                     select_badge = NULL;
                                 } else {
@@ -3569,7 +3567,7 @@ int CMenuMosSelect::KeyStep() {
                             if (BuildUpWeaponInfo.select_no < 0) {
                                 BuildUpWeaponInfo.select_no = 0;
                             }
-                            if (!(BuildUpWeaponInfo.select_no < BuildUpWeaponInfo.select_num)) {
+                            if (BuildUpWeaponInfo.select_num <= BuildUpWeaponInfo.select_no) {
                                 BuildUpWeaponInfo.select_no = BuildUpWeaponInfo.select_num - 1;
                             }
                             if (oldSelect != BuildUpWeaponInfo.select_no) {
@@ -3641,6 +3639,7 @@ int CMenuMosSelect::KeyStep() {
                                 effect.LoadPack((u_int *)effect_data, at_3692, &effect_stack, &effect_stack, &effect_stack,
                                                 tex_block[2], NULL);
                                 effect.SetScale(1.5f, 1.5f, 1.5f);
+                                sceVu0FVECTOR effectPos;
                                 monster->GetPosition(effectPos);
                                 effectPos[1] += 10.2f;
                                 effectPos[0] -= 3.4f;
@@ -3693,6 +3692,7 @@ int CMenuMosSelect::KeyStep() {
                                 if (place != NULL) {
                                     CGameDataUsed reward;
                                     reward.Init();
+                                    int sel = select;
                                     reward.item_no = 0x17F;
                                     reward.used_type = USED_ITEM_TYPE_ATTACH;
                                     reward.item_type = 0x22;
@@ -3704,7 +3704,7 @@ int CMenuMosSelect::KeyStep() {
                                     for (i = 0; i < 10; i++) {
                                         param[i] = select_badge->class_level + 3;
                                     }
-                                    param[convert_table_3430[select]] += select_badge->class_level * 2;
+                                    param[convert_table_3430[ sel ]] += select_badge->class_level * 2;
                                     place->CopyGameData(&reward);
                                     ExeScript(at_3695);
                                 } else {
@@ -3734,7 +3734,7 @@ int CMenuMosSelect::KeyStep() {
                             break;
                         case 20: {
                             int cursor = info->AddMsgCursor2(0, select_badge->class_level, 0);
-                            view_monster = monster_progress_tbl[select_badge->progress * (1 + MONSTER_PROGRESS_LEVEL_NUM) + 1 + cursor];
+                            view_monster = (monster_progress_tbl + 1 + select_badge->progress * 5)[cursor] ;
                             switch (buttons) {
                                 case 1:
                                     if (GetUserDataMan()->active_chr_no == USER_CHARA_MONSTER &&
@@ -3854,9 +3854,9 @@ int CMenuMosSelect::KeyStep() {
                     info->MsgPreset(6);
                     MonsterNameTable names = at_3511;
                     for (i = 0; i < select_badge->class_level + 1; i++) {
-                        names.name[i] = GetMonsterName(monster_progress_tbl[select_badge->progress * (1 + MONSTER_PROGRESS_LEVEL_NUM) + 1 + i]);
+                        names.name[i] = GetMonsterName((monster_progress_tbl + select_badge->progress * 5 + 1)[i] );
                         if (GetUserDataMan()->active_chr_no == USER_CHARA_MONSTER &&
-                            monster_progress_tbl[select_badge->progress * (1 + MONSTER_PROGRESS_LEVEL_NUM) + 1 + i] == GetUserDataMan()->monster_id &&
+                            (monster_progress_tbl + select_badge->progress * 5 + 1)[i]  == GetUserDataMan()->monster_id &&
                             i >= 0 && i < 20) {
                             info->line_color[i] = 0x80202020;
                         }
@@ -3882,7 +3882,7 @@ int CMenuMosSelect::KeyStep() {
                     FadeOutMenu(40, 0.0f);
                     mode = 2;
                     MOS_CHANGE_PARAM *chosen = select_badge;
-                    s16 monsterNo = monster_progress_tbl[chosen->progress * (1 + MONSTER_PROGRESS_LEVEL_NUM) + 1 + info->GetMsgCursor()];
+                    s16 monsterNo = (monster_progress_tbl + 1 + chosen->progress * 5)[info->GetMsgCursor()];
                     chosen->monster_id = monsterNo;
                     view_monster = monsterNo;
                     load_monster = -1;
@@ -3908,7 +3908,7 @@ int CMenuMosSelect::KeyStep() {
                 case 30: {
                     BuildUpWeaponInfo.unk_0 = 1;
                     step = 10;
-                    int monsterNo = monster_progress_tbl[select_badge->progress * (1 + MONSTER_PROGRESS_LEVEL_NUM) + 1 + select_badge->class_level];
+                    int monsterNo = (monster_progress_tbl + 1 + select_badge->progress * 5)[select_badge->class_level];
                     level_num = get_monster_tbl_bajjilevel(level_monster, select, monsterNo, select_badge->class_level + 1);
                     MonsterNameTable names = at_3529;
                     ExeScript(at_3703);
