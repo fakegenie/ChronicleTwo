@@ -8074,7 +8074,7 @@ void MenuWeaponBuildUpDraw(int &tex_block) {
     } else if (BuildUpWeaponInfo.unk_0 == 1) {
         top_y = 80;
     }
-    if (mes == NULL) {
+    if (MenuDCMsg[6] == NULL) {
         return;
     }
     MenuReloadTexture(tex_block, Tex_BuildUpBoard->block);
