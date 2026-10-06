@@ -469,39 +469,49 @@ void mgCFrame::ClearChildFlag() {
 #pragma schedule reset
 
 #pragma global_optimizer off
-#ifdef NONMATCHING
 void mgCFrame::GetLocalMatrix(float (*matrix)[4]) {
-    if (!use_srt) {
-        sceVu0CopyMatrix(matrix, trans_matrix);
-        return;
-    }
-
-    for (int row = 0; row < 3; row++) {
-        for (int component = 0; component < 4; component++) {
-            matrix[row][component] = trans_matrix[row][component] * scale[component];
-        }
-    }
-    sceVu0CopyVector(matrix[3], trans_matrix[3]);
     sceVu0FVECTOR translation;
-    if (rot_type & MG_FRAME_ROT_LOCAL_ORIGIN) {
-        sceVu0CopyVector(translation, matrix[3]);
-        mgZeroVectorW(matrix[3]);
-    }
-    if (rot_type & MG_FRAME_ROT_APPLY) {
-        if (rotation[0] != 0.0f) sceVu0RotMatrixX(matrix, matrix, rotation[0]);
-        if (rotation[1] != 0.0f) sceVu0RotMatrixY(matrix, matrix, rotation[1]);
-        if (rotation[2] != 0.0f) sceVu0RotMatrixZ(matrix, matrix, rotation[2]);
-    }
-    if (rot_type & MG_FRAME_ROT_LOCAL_ORIGIN) {
-        sceVu0AddVector(matrix[3], translation, position);
+
+    if (use_srt) {
+        float *factor;
+        float (*trans)[4];
+        trans = trans_matrix;
+        factor = scale;
+        asm {
+            lqc2 vf10, 0x0(factor)
+            lqc2 vf1, 0x0(trans)
+            lqc2 vf2, 0x10(trans)
+            lqc2 vf3, 0x20(trans)
+            lqc2 vf4, 0x30(trans)
+            vmul.xyzw vf1, vf1, vf10
+            vmul.xyzw vf2, vf2, vf10
+            vmul.xyzw vf3, vf3, vf10
+            vmulw.xyzw vf4, vf4, vf0w
+            sqc2 vf1, 0x0(matrix)
+            sqc2 vf2, 0x10(matrix)
+            sqc2 vf3, 0x20(matrix)
+            sqc2 vf4, 0x30(matrix)
+        }
+        if (rot_type & MG_FRAME_ROT_LOCAL_ORIGIN) {
+            sceVu0CopyVector(translation, matrix[3]);
+            mgZeroVectorW(matrix[3]);
+        }
+        if (rot_type & MG_FRAME_ROT_APPLY) {
+            if (rotation[0] != 0.0f) sceVu0RotMatrixX(matrix, matrix, rotation[0]);
+            if (rotation[1] != 0.0f) sceVu0RotMatrixY(matrix, matrix, rotation[1]);
+            if (rotation[2] != 0.0f) sceVu0RotMatrixZ(matrix, matrix, rotation[2]);
+        }
+        if (rot_type & MG_FRAME_ROT_LOCAL_ORIGIN) {
+            sceVu0AddVector(matrix[3], translation, position);
+            matrix[3][3] = 1.0f;
+        } else {
+            sceVu0AddVector(matrix[3], matrix[3], position);
+            matrix[3][3] = 1.0f;
+        }
     } else {
-        sceVu0AddVector(matrix[3], matrix[3], position);
+        sceVu0CopyMatrix(matrix, trans_matrix);
     }
-    matrix[3][3] = 1.0f;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_frame", GetLocalMatrix__8mgCFrameFPA4_f);
-#endif
 #pragma global_optimizer reset
 
 #pragma global_optimizer off
@@ -561,40 +571,79 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_frame", GetBBoardMatrix__8mgCFrameFiPA4
 #endif
 #pragma global_optimizer reset
 
-#pragma optimization_level 3
-#pragma global_optimizer off
 #ifdef NONMATCHING
 void mgCFrame::GetLWMatrix(float (*matrix)[4]) {
+    sceVu0FMATRIX parent_matrix;
+    sceVu0FMATRIX local;
+
     if (reference) changed = 1;
     if (!changed) {
-        mgCFrame *ancestor = parent;
-        while (ancestor != NULL && !ancestor->changed) ancestor = ancestor->parent;
-        if (ancestor == NULL) {
+        mgCFrame *frame = parent;
+        if (frame == NULL) {
             sceVu0CopyMatrix(matrix, lw_matrix);
             return;
+        }
+        while (frame != NULL) {
+            if (frame->changed) break;
+            frame = frame->parent;
+            if (frame == NULL) {
+                sceVu0CopyMatrix(matrix, lw_matrix);
+                return;
+            }
         }
     }
 
     ClearChildFlag();
-    sceVu0FMATRIX local;
     GetLocalMatrix(local);
     if (parent == NULL) {
         sceVu0CopyMatrix(lw_matrix, local);
+        sceVu0CopyMatrix(matrix, lw_matrix);
+        changed = 0;
     } else {
-        sceVu0FMATRIX parent_matrix;
         parent->GetLWMatrix(parent_matrix);
-        sceVu0MulMatrix(lw_matrix, parent_matrix, local);
+        float (*right)[4] = local;
+        float (*left)[4] = parent_matrix;
+        float (*out)[4] = lw_matrix;
+        asm {
+            lqc2 vf5, 0x0(right)
+            lqc2 vf1, 0x0(left)
+            lqc2 vf2, 0x10(left)
+            lqc2 vf3, 0x20(left)
+            lqc2 vf4, 0x30(left)
+            vmulax.xyzw ACC, vf1, vf5x
+            vmadday.xyzw ACC, vf2, vf5y
+            vmaddaz.xyzw ACC, vf3, vf5z
+            vmaddw.xyzw vf20, vf4, vf5w
+            lqc2 vf6, 0x10(right)
+            lqc2 vf7, 0x20(right)
+            lqc2 vf8, 0x30(right)
+            vmulax.xyzw ACC, vf1, vf6x
+            vmadday.xyzw ACC, vf2, vf6y
+            vmaddaz.xyzw ACC, vf3, vf6z
+            vmaddw.xyzw vf21, vf4, vf6w
+            vmulax.xyzw ACC, vf1, vf7x
+            vmadday.xyzw ACC, vf2, vf7y
+            vmaddaz.xyzw ACC, vf3, vf7z
+            vmaddw.xyzw vf22, vf4, vf7w
+            vmulax.xyzw ACC, vf1, vf8x
+            vmadday.xyzw ACC, vf2, vf8y
+            vmaddaz.xyzw ACC, vf3, vf8z
+            vmaddw.xyzw vf23, vf4, vf8w
+            sqc2 vf20, 0x0(out)
+            sqc2 vf21, 0x10(out)
+            sqc2 vf22, 0x20(out)
+            sqc2 vf23, 0x30(out)
+            sqc2 vf20, 0x0(matrix)
+            sqc2 vf21, 0x10(matrix)
+            sqc2 vf22, 0x20(matrix)
+            sqc2 vf23, 0x30(matrix)
+        }
+        changed = 0;
     }
-    sceVu0CopyMatrix(matrix, lw_matrix);
-    changed = 0;
 }
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_frame", GetLWMatrix__8mgCFrameFPA4_f);
 #endif
-
-#pragma optimization_level reset
-
-#pragma global_optimizer reset
 
 #pragma global_optimizer off
 #ifdef NONMATCHING
