@@ -1684,33 +1684,29 @@ USER_PICTURE_INFO *CMenuInvent::GetPhotoInfoFromMode(int *slot_count) {
 void CMenuInvent::InitNetaCircle(int show) {
     CMenuPosDataForm **panel;
     int i = 0;
-    int byte_offset = 0;
-    u8 *entry;
     do {
         if (show == 0) {
             CancelNetaCircle(0);
             neta_select_state[i] = -1;
 
-            *(int *)((u8 *)this + 0x610 + byte_offset) = -1;
+            neta_select_index[i] = -1;
             unk_622[i] = 0;
         }
 
-        entry = (u8 *)this + byte_offset;
-        panel = (CMenuPosDataForm **)(entry + 0xEF0);
+        panel = &neta_form[i];
         if (*panel != 0) {
             (*panel)->SetRGBACalcParam(3, 0x7F, 0x80);
             if (show == 0) {
                 (*panel)->draw_flag = 0;
             } else {
                 (*panel)->draw_flag = 1;
-                CMenuPosDataForm *label = *(CMenuPosDataForm **)(entry + 0xF00);
+                CMenuPosDataForm *label = neta_name_form[i];
                 if (label != 0) {
                     label->SetAction(at_2313);
                 }
             }
         }
         i++;
-        byte_offset += 4;
     } while (i < 3);
 }
 #ifdef NONMATCHING
