@@ -1272,7 +1272,7 @@ int CActionChara::HumanMoveIF() {
     float         motion_speed;
     float         abs_x;
     float         abs_z;
-    s8            boss;
+    int           boss;
     GetPosition(position);
     GetRotation(rotation);
     sceVu0CopyVector(move_velocity, velocity);
@@ -1382,16 +1382,11 @@ int CActionChara::HumanMoveIF() {
                 if (relative_angle > 3.1415927f) {
                     relative_angle -= 6.2831855f;
                 }
-                abs_x = move_x;
-                if (abs_x < 0.0f) {
-                    abs_x = -abs_x;
-                }
-                abs_z = move_z;
-                if (abs_z < 0.0f) {
-                    abs_z = -abs_z;
-                }
-                motion_speed = abs_x;
-                if (abs_x <= abs_z) {
+                abs_x = move_x < 0.0f ? -move_x : move_x;
+                abs_z = move_z < 0.0f ? -move_z : move_z;
+                if (abs_x > abs_z) {
+                    motion_speed = abs_x;
+                } else {
                     motion_speed = abs_z;
                 }
                 if (relative_angle > -1.0f && relative_angle < 1.0f) {
