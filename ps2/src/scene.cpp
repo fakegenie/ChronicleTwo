@@ -228,7 +228,6 @@ int CParticle::Step(void) {
     pos[2] += speed[2];
     return 1;
 }
-#ifdef STATEMATCHING
 void CParticle::Draw(void) {
     if (active != 0) {
         mgCDrawPrim prim;
@@ -269,9 +268,6 @@ void CParticle::Draw(void) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/scene", Draw__9CParticleFv);
-#endif
 void CParticle::Init(void) {
     active = 0;
     InitVector(pos);

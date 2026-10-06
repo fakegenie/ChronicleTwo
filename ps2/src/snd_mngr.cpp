@@ -1188,7 +1188,6 @@ void sndSetSeVolf(unsigned int snd_id, int se_no, float vol, int voice) {
     sndSetSeVol(snd_id, se_no, volume, voice);
 }
 
-#ifdef STATEMATCHING
 void sndSetSePanf(unsigned int snd_id, int se_no, float pan, int voice) {
     int driver_pan;
 
@@ -1201,9 +1200,6 @@ void sndSetSePanf(unsigned int snd_id, int se_no, float pan, int voice) {
     }
     sndSetSePan(snd_id, se_no, driver_pan, voice);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/snd_mngr", sndSetSePanf__FUiifi);
-#endif
 
 void sndSetSePitch(unsigned int snd_id, int se_no, int pitch, int voice) {
     sndPortInfo *info;

@@ -2076,7 +2076,6 @@ void CScreenEffect::SetSepiaTexture(mgCTexture *texture, u_long128 *image) {
         sepia_texture->image[0] = image;
     }
 }
-#ifdef STATEMATCHING
 void CScreenEffect::CaptureSepiaScreen(void) {
     if (sepia_texture == NULL) {
         return;
@@ -2101,9 +2100,6 @@ void CScreenEffect::CaptureSepiaScreen(void) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/event_func", CaptureSepiaScreen__13CScreenEffectFv);
-#endif
 void CScreenEffect::SetSepiaFlag(int enabled) {
     if (sepia_texture != NULL) {
         sepia = enabled;

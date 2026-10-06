@@ -841,7 +841,6 @@ void CCharacter2::ResetFloor() {
     }
 }
 
-#ifdef STATEMATCHING
 void CCharacter2::NormalDrive() {
     float  frame_step;
     float  motion_speed = 1.2f;
@@ -920,9 +919,6 @@ void CCharacter2::NormalDrive() {
         motion_status = CHARA_MOTION_STATUS_START;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/character", NormalDrive__11CCharacter2Fv);
-#endif
 void CCharacter2::ShadowStep() {
     int i;
     mgCFrame *source;

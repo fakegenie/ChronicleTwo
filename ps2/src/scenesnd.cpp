@@ -132,7 +132,6 @@ void CScene::InitLooSeMngr() {
 CScene::BGM_INFO *CScene::GetActiveBgmInfo() {
     return &bgm[bgm_no];
 }
-#ifdef STATEMATCHING
 void CScene::PlayBGM(int bgm_no, int vol, float volf) {
     if (skip_play_bgm != 0) {
         skip_play_bgm = 0;
@@ -155,9 +154,6 @@ void CScene::PlayBGM(int bgm_no, int vol, float volf) {
         info->fade_speed = 0.0f;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/scenesnd", PlayBGM__6CSceneFiif);
-#endif
 void CScene::PauseBGM(void) {
     BGM_INFO *info = GetActiveBgmInfo();
     if (info->play_no >= 0) {

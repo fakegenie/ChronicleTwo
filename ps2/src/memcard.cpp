@@ -1981,7 +1981,6 @@ int CMemoryCardManager::GetSaveFileInfoFromMc(int index, int *step) {
     }
     return 0;
 }
-#ifdef NONMATCHING
 int CMemoryCardManager::GetAllSaveFileInfo() {
     McSaveDirPattern pattern;
     int result;
@@ -2006,9 +2005,12 @@ int CMemoryCardManager::GetAllSaveFileInfo() {
             break;
         case 1:
             if (sceMcSync(1, &command, &result) != 0) {
-                if (command != 0xD) {
-                    McError(result);
-                    return 1;
+                switch (command) {
+                    case 0xD:
+                        break;
+                    default:
+                        McError(result);
+                        return 1;
                 }
                 ReadFileNo_2290 = 0;
                 dir_entries = 0;
@@ -2045,9 +2047,6 @@ int CMemoryCardManager::GetAllSaveFileInfo() {
     }
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/memcard", GetAllSaveFileInfo__18CMemoryCardManagerFv);
-#endif
 int McCheckMCPs2(MC_CARD_INFO *info) {
     if (info == NULL) {
         return 0;

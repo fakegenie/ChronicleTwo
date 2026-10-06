@@ -376,7 +376,6 @@ void CSound::DEL_PORT(int port) {
     }
 }
 
-#ifdef STATEMATCHING
 void CSound::SQ_Play(int port, int seq_no, int volume) {
     void *sequence;
 
@@ -397,9 +396,6 @@ void CSound::SQ_Play(int port, int seq_no, int volume) {
     ezMidi(port + 0x30, 0);
     ezMidi(port, 0);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/sound", SQ_Play__6CSoundFiii);
-#endif
 
 void CSound::SQ_RePlay(int port) {
     if (midi_state.port[port].sequence_count > 0) {
@@ -517,7 +513,6 @@ void CSound::SE_Stop(int port, int bank, int program, int key, int id) {
     }
 }
 
-#ifdef STATEMATCHING
 void CSound::Step() {
     int port;
 
@@ -552,9 +547,6 @@ void CSound::Step() {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/sound", Step__6CSoundFv);
-#endif
 
 void CSound::Stop(int port) {
     ezMidi(port + 0x20, 0);

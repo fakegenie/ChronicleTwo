@@ -111,8 +111,7 @@ void CFireRaster::SetTexture(mgCTexture *texture) {
         this->texture.tex0.bits.tcc = 0;
     }
 }
-#ifdef NONMATCHING
-void CFireRaster::Draw(float *position, float *scale) {
+void CFireRaster::Draw(sceVu0FVECTOR position, float *scale) {
     mgCDrawPrim         prim;
     FireRasterParticle *wisp;
     int                 top_left[4];
@@ -214,9 +213,6 @@ void CFireRaster::Draw(float *position, float *scale) {
     }
     prim.End();
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/water", Draw__11CFireRasterFPfPf);
-#endif
 void CFireRaster::Initialize(void) {
     int index = 0;
     do {

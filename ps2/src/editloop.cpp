@@ -89,6 +89,14 @@ extern int LockChara;
 extern int EditModeChgCnt;
 extern int EditModeChgEvent;
 extern int EditModeChgFlag;
+extern u_long128 * main_pkt1;
+extern u_long128 * main_pkt2;
+extern int FixCharaBuffSize;
+extern int DataPktMode;
+extern mgCMemory buf0;
+extern mgCMemory buf1;
+extern mgCMemory data_buf__2[2];
+extern mgCMemory init_dbuf[2];
 
 #include <libvu0.h>
 #include "charasetup.hpp"
@@ -120,20 +128,12 @@ extern int EventSquareJump;
 extern int EditDrawFlag;
 extern int PauseFlag;
 extern int PreEditMenuCnt;
-extern u_long128 * main_pkt1;
-extern u_long128 * main_pkt2;
 extern u_long128 * MenuDataBuf;
 extern int MenuDataSize;
-extern int FixCharaBuffSize;
 extern u_long128 * CrossFadeBuff;
 extern MENU_INIT_ARG * MenuInfo;
-extern int DataPktMode;
 extern CWaveTable WaveTable;
 extern sceVu0FVECTOR CharaOldPos;
-extern mgCMemory buf0;
-extern mgCMemory buf1;
-extern mgCMemory data_buf__2[2];
-extern mgCMemory init_dbuf[2];
 extern mgCMemory WorkBuffer;
 extern mgCMemory MenuBuffer__2;
 extern mgCMemory ChrEffBuffer;
@@ -214,7 +214,6 @@ void EditModeChgStep(CScene *scene) {
         }
     }
 }
-#ifdef NONMATCHING
 void SetDataPacket(int mode) {
     u_long128 *buffer;
     int        size;
@@ -222,7 +221,8 @@ void SetDataPacket(int mode) {
     if (mode == 0) {
         buffer = read_buffer - 5000;
         init_dbuf[0].stSetBuffer(buffer, 5000);
-        init_dbuf[1].stSetBuffer(buffer - 5000, 5000);
+        buffer -= 5000;
+        init_dbuf[1].stSetBuffer(buffer, 5000);
         mgInitVif1Packet(main_pkt1, main_pkt2, 160000);
         mgSetPacketBuffer(&buf0, &buf1);
         mgSetDataBuffer(&init_dbuf[0], &init_dbuf[1], 1);
@@ -255,9 +255,6 @@ void SetDataPacket(int mode) {
     printf("Data ADR %x,%x\n", data_buf__2[0].stack + data_buf__2[0].stack_used, data_buf__2[1].stack + data_buf__2[1].stack_used);
     DataPktMode = mode;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editloop", SetDataPacket__Fi);
-#endif
 void PreExitLoop(CScene *scene) {
     BurnEditParts();
     EditDataSave();

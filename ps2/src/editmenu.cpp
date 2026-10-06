@@ -3405,7 +3405,6 @@ int MenuGeoramaCheckPointPush(CMenuGeorama *menu, int keys, int pushed) {
     }
     return 0;
 }
-#ifdef STATEMATCHING
 int MenuGeoramaAnalyzeSelect(CMenuGeorama *menu, int keys, int pushed) {
     int old_top = menu->top;
     int max = menu->GetNowViewModeMax(GEORAMA_VIEW_ANALYZE);
@@ -3447,9 +3446,6 @@ int MenuGeoramaAnalyzeSelect(CMenuGeorama *menu, int keys, int pushed) {
     }
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editmenu", MenuGeoramaAnalyzeSelect__FP12CMenuGeoramaii);
-#endif
 int MenuGeoramaPaintSelect(CMenuGeorama *menu, int keys, int pushed) {
     int done = 0;
     int step = 0;
@@ -3997,7 +3993,6 @@ int CRemovalMenu::KeyStep() {
     }
     return closed;
 }
-#ifdef STATEMATCHING
 void MenuRemovalInit(mgCMemory *stack, int *arg) {
     int size;
 
@@ -4061,10 +4056,6 @@ void MenuRemovalInit(mgCMemory *stack, int *arg) {
     }
     MenuArg.result[0] = 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editmenu", MenuRemovalInit__FP9mgCMemoryPi);
-#endif
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editmenu", Initialize__19CCharaFrameMatchingFv);
 int MenuRemovalKey() {
     return RemovalMenuPtr->KeyStep();
 }
