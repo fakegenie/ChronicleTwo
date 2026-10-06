@@ -1572,8 +1572,8 @@ void CMenuInvent::LoadCharaCheck() {
             poly_chr_form[0]->SetActionCharaPtr(NULL, tex_block[1], -1);
         }
         MenuLoadInfo.mode = 1;
-        MenuLoadInfo.unk_2 = 1;
-        MenuLoadInfo.unk_3 = 0;
+        MenuLoadInfo.load_all = 1;
+        MenuLoadInfo.chara_no = 0;
         MenuLoadInfo.unk_6[1] = 0;
         SetMenuLoadItemNo(0);
         size = MenuItemCharaDataLoad(load_stack, 0, MenuCharaBuild2, 0);
@@ -2194,9 +2194,9 @@ void CMenuInvent::EnterDataMenu(u8 *pack) {
     MenuMoveItemPtr->AttachForm();
 }
 int CMenuInvent::ItemCmdAfter(int command, ITEMCMD_RET_PARA *para) {
-    if (para->unk_2 >= -1) {
+    if (para->menu_cmd >= -1) {
         MenuSePlay(para->cmd);
-        signed char result = para->unk_2;
+        signed char result = para->menu_cmd;
         switch (result) {
             case 0:
             case 1: {
