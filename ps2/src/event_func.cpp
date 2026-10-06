@@ -4273,7 +4273,7 @@ int _AUTO_SET_MONSTER(RS_STACKDATA *stack, int argc) {
     float position[4];
     float direction[4];
     int monsterNo;
-    int param;
+    int locate_param;
     if (GetNowLoopNo() != 2) {
         return 0;
     }
@@ -4290,9 +4290,9 @@ int _AUTO_SET_MONSTER(RS_STACKDATA *stack, int argc) {
         stack += 3;
     }
     if (argc == 8) {
-        param = GetStackInt(stack);
+        locate_param = GetStackInt(stack);
     }
-    AutoSetMonster(monsterNo, position, direction, param);
+    AutoSetMonster(monsterNo, position, direction, locate_param);
     return 1;
 }
 int _LOAD_DUNGEON_MAP_FILE(RS_STACKDATA *stack, int argc) {
@@ -4970,12 +4970,12 @@ int _DNGMAP_LOAD(RS_STACKDATA *stack, int argc) {
     if (texCount <= 0 || texCount < fileIndex) {
         return 0;
     }
-    int param1 = GetStackInt(arg++);
-    int param2 = GetStackInt(arg++);
-    int param3 = GetStackInt(arg);
+    int dngNo = GetStackInt(arg++);
+    int userRoomNo = GetStackInt(arg++);
+    int nextRoomNo = GetStackInt(arg);
     memory->Align64();
     if (memory->stAlloc64(EventDngMap.LoadDngInfo(
-            memory, texBase + fileIndex, param1, param2, param3)) == 0) {
+            memory, texBase + fileIndex, dngNo, userRoomNo, nextRoomNo)) == 0) {
         return 0;
     }
 
@@ -9887,7 +9887,7 @@ int _GET_BGM_NO(RS_STACKDATA *stack, int argc) {
     return 1;
 }
 int _GET_MASTER_VOL(RS_STACKDATA *stack, int argc) {
-    SetStack(stack, EventScene->GetActiveBgmInfo()->unk_c);
+    SetStack(stack, EventScene->GetActiveBgmInfo()->master_vol);
     return 1;
 }
 int _SET_MASTER_VOL(RS_STACKDATA *stack, int argc) {
@@ -9896,7 +9896,7 @@ int _SET_MASTER_VOL(RS_STACKDATA *stack, int argc) {
 
     volume = GetStackFloat(stack);
     scene = EventScene;
-    scene->GetActiveBgmInfo()->unk_c = volume;
+    scene->GetActiveBgmInfo()->master_vol = volume;
     scene->SetVolfBGM(scene->GetActiveBgmInfo()->volf);
     return 1;
 }
@@ -11587,9 +11587,9 @@ int _SWE_START_EFFECT(RS_STACKDATA *stack, int argc) {
     CCharacter2 *chara;
     char *fromName;
     char *toName;
-    int param8C;
-    int frames;
-    int param90;
+    int length;
+    int fade_time;
+    int hold_time;
     CSWordAfterEffect **effectSlot;
     mgCFrame *fromFrame;
     mgCFrame *toFrame;
@@ -11607,9 +11607,9 @@ int _SWE_START_EFFECT(RS_STACKDATA *stack, int argc) {
     }
     fromName = GetStackString(stack++);
     toName = GetStackString(stack++);
-    param8C = GetStackInt(stack++);
-    frames = GetStackInt(stack++);
-    param90 = GetStackInt(stack);
+    length = GetStackInt(stack++);
+    fade_time = GetStackInt(stack++);
+    hold_time = GetStackInt(stack);
     if (chara->CObjectFrame::frame == NULL) {
         return 0;
     }
@@ -11622,7 +11622,7 @@ int _SWE_START_EFFECT(RS_STACKDATA *stack, int argc) {
     if ((toFrame = chara->CObjectFrame::frame->SearchFrame(toName)) == NULL) {
         return 0;
     }
-    (*effectSlot)->StartEffect(fromFrame, toFrame, param8C, frames, param90);
+    (*effectSlot)->StartEffect(fromFrame, toFrame, length, fade_time, hold_time);
     return 1;
 }
 int _SET_CHARA_TYPE(RS_STACKDATA *stack, int argc) {
@@ -12831,8 +12831,8 @@ static int _ESM_SET_VECT2(RS_STACKDATA *stack, int argc) {
     return ret;
 }
 static int _ESM_SET_TARGET_ID(RS_STACKDATA *stack, int argc) {
-    int param1;
-    int param2;
+    int userId;
+    int slot;
     int ret;
 
     if (EventEffectScript == NULL) {
@@ -12843,9 +12843,9 @@ static int _ESM_SET_TARGET_ID(RS_STACKDATA *stack, int argc) {
             ret = EventEffectScript->SetScriptTargetId(GetStackInt(stack), -1, -1);
             break;
         case 3:
-            param1 = GetStackInt(stack++);
-            param2 = GetStackInt(stack++);
-            ret = EventEffectScript->SetScriptTargetId(GetStackInt(stack), param1, param2);
+            userId = GetStackInt(stack++);
+            slot = GetStackInt(stack++);
+            ret = EventEffectScript->SetScriptTargetId(GetStackInt(stack), userId, slot);
             break;
         default:
             ret = 0;

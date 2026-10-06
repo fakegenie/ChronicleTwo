@@ -409,7 +409,7 @@ void SetEditMenuEnv(void) {
         form->y = 0;
     }
 }
-int MenuGeoramaInit(mgCMemory *stack, int arg) {
+int MenuGeoramaInit(mgCMemory *stack, int open_type) {
     int size;
     int num;
     int sub_num;

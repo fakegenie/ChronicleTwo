@@ -54,7 +54,7 @@ public:
     int               time_light_num;
     int               def_foot;
     int               sky_info;
-    float             unk_dc;
+    float             sky_height;
     float             sun_angle;
     int               lens_flare;
     int               all_scissor;

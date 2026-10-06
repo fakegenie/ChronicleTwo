@@ -112,7 +112,7 @@ STATIC_ASSERT(sizeof(MENU_ASKMODE_PARA) == 0x94);
 
 struct ITEMCMD_RET_PARA {
     s16 cmd;
-    s8 unk_2;
+    s8 menu_cmd;
     s8 chara;
     s16 result;
     s16 item_no;

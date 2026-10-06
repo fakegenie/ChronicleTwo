@@ -212,7 +212,7 @@ void CScene::GetSunPosition(float *pos) {
     sceVu0Normalize(pos, pos);
     sceVu0ScaleVector(pos, pos, 5000.0f);
     pos[0] += camera_pos[0];
-    pos[1] += map->unk_dc;
+    pos[1] += map->sky_height;
     pos[2] += camera_pos[2];
 }
 void CScene::GetMoonPosition(float *pos) {
@@ -248,7 +248,7 @@ void CScene::DrawSky(int sky_index) {
         }
         map = GetMap(active_map);
         if (map != NULL && map->sky_info != 0) {
-            camera_info[1] = map->unk_dc;
+            camera_info[1] = map->sky_height;
             memset(&lighting, 0, sizeof(lighting));
             map->GetLightInfo(&lighting);
             map->GetLightingRatio(lighting_ratio);

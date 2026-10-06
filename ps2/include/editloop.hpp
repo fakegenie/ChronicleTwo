@@ -43,7 +43,7 @@ int EditMapJump(int map_no);
 
 int EditGotoInterior(int map_no, int delete_villager);
 
-int EditExitInterior(int arg);
+int EditExitInterior(int interior_no);
 
 void EditDataSave();
 

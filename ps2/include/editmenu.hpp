@@ -287,7 +287,7 @@ int ConvGeoramaDataNo(int data_no);
 
 void CheckMenuLine(int *select, int *top, int num, int line_num);
 
-int MenuGeoramaInit(mgCMemory *stack, int arg);
+int MenuGeoramaInit(mgCMemory *stack, int open_type);
 
 int MenuGeoramaKey();
 

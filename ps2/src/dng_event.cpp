@@ -903,7 +903,7 @@ void BattleAreaBGMCtrl(void) {
                     DngMainScene->PauseBGM();
                 }
                 scene = DngMainScene;
-                DngMainScene->GetActiveBgmInfo()->unk_c = 1.0f - fade;
+                DngMainScene->GetActiveBgmInfo()->master_vol = 1.0f - fade;
                 scene->SetVolfBGM(scene->GetActiveBgmInfo()->volf);
                 state->battle_bgm_vol = fade;
                 return;
@@ -915,7 +915,7 @@ void BattleAreaBGMCtrl(void) {
                     sndSeStop(EdEventInfo.snd_id[4], 0, 0);
                     DngMainScene->RePlayBGM();
                     scene = DngMainScene;
-                    DngMainScene->GetActiveBgmInfo()->unk_c = 0.0f;
+                    DngMainScene->GetActiveBgmInfo()->master_vol = 0.0f;
                     scene->SetVolfBGM(scene->GetActiveBgmInfo()->volf);
                 } else {
                     sndSetSeVolf(EdEventInfo.snd_id[4], 0, fade, 0);
@@ -923,14 +923,14 @@ void BattleAreaBGMCtrl(void) {
                 state->battle_bgm_vol = fade;
                 return;
             case 4:
-                rate = DngMainScene->GetActiveBgmInfo()->unk_c;
+                rate = DngMainScene->GetActiveBgmInfo()->master_vol;
                 rate += 0.033333335f;
                 if (!(rate < 1.0f)) {
                     state->battle_bgm_state = 0;
                     rate = 1.0f;
                 }
                 scene = DngMainScene;
-                DngMainScene->GetActiveBgmInfo()->unk_c = rate;
+                DngMainScene->GetActiveBgmInfo()->master_vol = rate;
                 scene->SetVolfBGM(scene->GetActiveBgmInfo()->volf);
                 break;
         }

@@ -49,8 +49,8 @@ float LimitTime(float time) {
     }
     return time;
 }
-float SubTime(float a, float b) {
-    float t = LimitTime(a - b);
+float SubTime(float time, float sub) {
+    float t = LimitTime(time - sub);
     if (t <= 12.0f) return t;
     return 24.0f - t;
 }
@@ -729,7 +729,7 @@ int CFuncPointMngr::GetLight(float *sphere, CFuncPoint *out_lights, int max, CFu
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/funcpoint", GetLight__14CFuncPointMngrFPfP10CFuncPointiP15CFuncPointChecki);
 #endif
-void CFuncPointMngr::Step(int i, CFuncPointCheck *c) { this->UpdateFlag(i, c); }
+void CFuncPointMngr::Step(int type, CFuncPointCheck *check) { this->UpdateFlag(type, check); }
 int CFuncPointMngr::UpdateFlag(int type, CFuncPointCheck *check) {
     CFuncPoint *first;
     CFuncPoint *next;

@@ -448,11 +448,11 @@ void MonsterBookDraw();
 
 struct MENU_LOAD_INFO {
     signed char mode;
-    signed char unk_1;
-    signed char unk_2;
-    signed char unk_3;
-    signed char unk_4;
-    signed char unk_5;
+    signed char alternate_model;
+    signed char load_all;
+    signed char chara_no;
+    signed char request_phase;
+    signed char load_phase;
     signed char unk_6[2];
 };
 STATIC_ASSERT(sizeof(MENU_LOAD_INFO) == 8);

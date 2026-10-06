@@ -1555,10 +1555,10 @@ int CMenuChrCngMenu::KeyChangeMain() {
                 InitMenuBGReadInfo2(MenuCharaBuild2[i]);
             }
             change_chara = select;
-            MenuLoadInfo.unk_3 = select;
+            MenuLoadInfo.chara_no = select;
             MenuLoadInfo.mode = 2;
-            MenuLoadInfo.unk_4 = -1;
-            MenuLoadInfo.unk_5 = 0;
+            MenuLoadInfo.request_phase = -1;
+            MenuLoadInfo.load_phase = 0;
             MenuLoadInfo.unk_6[1] = 1;
             ReEquipFishingGameWeapon();
             MenuCharaLoadStack.stack_used = 0;
@@ -1568,12 +1568,12 @@ int CMenuChrCngMenu::KeyChangeMain() {
             switch (change_chara) {
                 case 0:
                 case 1:
-                    MenuLoadInfo.unk_2 = 1;
-                    MenuLoadInfo.unk_4 = -1;
+                    MenuLoadInfo.load_all = 1;
+                    MenuLoadInfo.request_phase = -1;
                     MenuItemCharaDataLoad(&MenuCharaLoadStack, change_chara, MenuCharaBuild2, 1);
                     break;
                 case 2:
-                    MenuLoadInfo.unk_2 = 1;
+                    MenuLoadInfo.load_all = 1;
                     MenuCharaLoadStack.Alloc(blocks_for(MenuItemRoboDataLoad(&MenuCharaLoadStack, MenuCharaBuild2, 1)));
                     break;
             }
@@ -1603,7 +1603,7 @@ int CMenuChrCngMenu::KeyChangeMain() {
             }
             last_select = select;
             MenuSePlay(se_sndtbl_1749[select]);
-            if (MenuLoadInfo.unk_1 == 1) {
+            if (MenuLoadInfo.alternate_model == 1) {
                 EditCharaPrepare();
             }
             if (GetMenuLoopType() == 1 && FxScriptMan != NULL) {
@@ -2161,7 +2161,7 @@ int CMenuChrCngMenu::CheckChrChange() {
                 if (GetMenuLoopType() == 1) {
                     chara->effect_man = FxScriptMan;
                 }
-                if (chara != NULL && MenuLoadInfo.unk_1 == 0) {
+                if (chara != NULL && MenuLoadInfo.alternate_model == 0) {
                     chara->InitScript();
                 }
                 MenuCharaSoundEnter(MenuMainScene, chara, 1);
@@ -2580,12 +2580,12 @@ int MenuCharaChangeInit(mgCMemory *memory, int *texBlock, int bootMode) {
     MenuChangeNpcMemory.Align64();
     size = stack_free_size(&MenuChangeNpcMemory);
     MenuCharaLoadStack.stSetBuffer((u_long128 *)stack_free_top(&MenuChangeNpcMemory), size);
-    MenuLoadInfo.unk_1 = 0;
+    MenuLoadInfo.alternate_model = 0;
     MenuCharaLoadStack.stack_used = 0;
     MenuCharaLoadStack.lock = 0;
     switch (bootMode) {
         case 0:
-            MenuLoadInfo.unk_1 = 1;
+            MenuLoadInfo.alternate_model = 1;
             break;
     }
     MenuLoadInfo.mode = 2;
@@ -2630,7 +2630,7 @@ int MenuCharaChangeKey(void) {
                     ChrChangMenuPt->sub_menu = ChrChangMenuPt->sub_menu_next;
                     MenuCharaLoadStack.stack_used = 0;
                     MenuCharaLoadStack.lock = 0;
-                    if (MenuLoadInfo.unk_1 == 1) {
+                    if (MenuLoadInfo.alternate_model == 1) {
                         mode = 0;
                     }
                     MenuMonsterBoxInit(&MenuCharaLoadStack, ChrChangMenuPt->tex_block, mode);
@@ -3388,7 +3388,7 @@ void MenuMonsterBoxInit(mgCMemory *stack, int *tex_block, int mode) {
     stack->Align64();
     rest = stack->stGetRest();
     MenuMosLoadStack.stSetBuffer(stack->stGetTop(), rest);
-    MenuLoadInfo.unk_2 = 1;
+    MenuLoadInfo.load_all = 1;
     MenuLoadInfo.mode = 0;
     MenuLoadInfo.unk_6[1] = 0;
     MenuMemoryAdjust(&MenuMosLoadStack, &MenuMonChangeLoadStack, MenuActionCharaBuffer, 3);
@@ -4111,7 +4111,7 @@ int MenuItemCharaDataLoad(mgCMemory *stack, int chara_no, MENU_BGREAD_INFO2 **in
     for (u32 slot = 0; slot < MENU_CHARA_LOAD_MAX; slot++) {
         name[slot][0] = 0;
     }
-    MenuLoadInfo.unk_3 = chara_no;
+    MenuLoadInfo.chara_no = chara_no;
     strcpy(name[0], menu_chara_chrtbl[chara_no]);
     strcpy(name[1], GetItemFileName(MenuLoadItemNo[4], 1));
     switch (MenuLoadInfo.mode) {
@@ -4139,19 +4139,19 @@ int MenuItemCharaDataLoad(mgCMemory *stack, int chara_no, MENU_BGREAD_INFO2 **in
             }
             break;
         case 2:
-            pathKind.kind[0] = pathtbl_3836[MenuLoadInfo.unk_1];
-            if (MenuLoadInfo.unk_1 == 0) {
+            pathKind.kind[0] = pathtbl_3836[MenuLoadInfo.alternate_model];
+            if (MenuLoadInfo.alternate_model == 0) {
                 pathKind.kind[0] = 4;
                 GetMainCharaModelName(chara_no, name[0], 0);
             }
-            if (MenuLoadInfo.unk_1 == 1) {
+            if (MenuLoadInfo.alternate_model == 1) {
                 pathKind.kind[0] = 5;
                 GetMainCharaModelName(chara_no, name[0], 1);
             }
-            if (MenuLoadInfo.unk_4 < 0) {
+            if (MenuLoadInfo.request_phase < 0) {
                 name[1][0] = 0;
             }
-            if (0 < MenuLoadInfo.unk_4) {
+            if (0 < MenuLoadInfo.request_phase) {
                 name[0][0] = 0;
                 for (i = 0; i < 4; i++) {
                     if (MenuLoadItemNo[i] > 0) {
@@ -4159,7 +4159,7 @@ int MenuItemCharaDataLoad(mgCMemory *stack, int chara_no, MENU_BGREAD_INFO2 **in
                     }
                 }
                 strcpy(name[6], menu_chara_cfg_chrtbl[chara_no]);
-                if (MenuLoadInfo.unk_1 == 1) {
+                if (MenuLoadInfo.alternate_model == 1) {
                     name[2][0] = 0;
                     if (chara_no == 0) {
                         name[3][0] = 0;
@@ -4175,7 +4175,7 @@ int MenuItemCharaDataLoad(mgCMemory *stack, int chara_no, MENU_BGREAD_INFO2 **in
         if (info[i] == NULL || name[i][0] == 0) {
             continue;
         }
-        if (MenuLoadInfo.unk_2 == 1 || (MenuLoadInfo.unk_2 == 0 && i == MenuLoadInfo.unk_5)) {
+        if (MenuLoadInfo.load_all == 1 || (MenuLoadInfo.load_all == 0 && i == MenuLoadInfo.load_phase)) {
             strcpy(info[i]->path, menu_load_chrpathtbl_3811[pathKind.kind[i]]);
             info[i]->chara = NULL;
             strcpy(info[i]->name, name[i]);
@@ -4275,7 +4275,7 @@ int MenuItemCharaDataLoadEndCheck(MENU_BGREAD_INFO2 **info, mgCMemory *stack, CA
         if (MenuLoadInfo.mode == 0 || MenuLoadInfo.mode == 1) {
             sceneChara.entry[0] = NULL;
         }
-        if (MenuLoadInfo.unk_1 == 1) {
+        if (MenuLoadInfo.alternate_model == 1) {
             sceneChara.entry[1] = NULL;
             if (chara_no == 0) {
                 sceneChara.entry[2] = NULL;
@@ -4292,13 +4292,13 @@ int MenuItemCharaDataLoadEndCheck(MENU_BGREAD_INFO2 **info, mgCMemory *stack, CA
     sceneTarget.entry[6] = sceneChara.entry[5];
     switch (MenuLoadInfo.mode) {
         case 2:
-            if (MenuLoadInfo.unk_4 <= 0) {
+            if (MenuLoadInfo.request_phase <= 0) {
                 texManager->DeleteBlock(scene_tex_block);
             }
             break;
         default:
-            if ((MenuLoadInfo.unk_2 == 0 && MenuLoadInfo.unk_4 < 0 && MenuLoadInfo.unk_5 == 0) ||
-                MenuLoadInfo.unk_2 == 1 || MenuLoadInfo.mode == 1) {
+            if ((MenuLoadInfo.load_all == 0 && MenuLoadInfo.request_phase < 0 && MenuLoadInfo.load_phase == 0) ||
+                MenuLoadInfo.load_all == 1 || MenuLoadInfo.mode == 1) {
                 if (0 < tex_block) {
                     texManager->DeleteBlock(tex_block);
                     for (int slot = 0; slot < 6; slot++) {
@@ -4352,18 +4352,18 @@ int MenuItemCharaDataLoadEndCheck(MENU_BGREAD_INFO2 **info, mgCMemory *stack, CA
         }
         info[i]->reading = 0;
     }
-    if (MenuLoadInfo.unk_2 == 0) {
-        if (MenuLoadInfo.unk_4 < 0) {
-            MenuLoadInfo.unk_5++;
+    if (MenuLoadInfo.load_all == 0) {
+        if (MenuLoadInfo.request_phase < 0) {
+            MenuLoadInfo.load_phase++;
         } else {
-            MenuLoadInfo.unk_5 = 7;
+            MenuLoadInfo.load_phase = 7;
         }
     }
     if (MenuLoadInfo.mode == 2) {
-        if (MenuLoadInfo.unk_4 <= 0) {
-            MenuLoadInfo.unk_4 = 1;
+        if (MenuLoadInfo.request_phase <= 0) {
+            MenuLoadInfo.request_phase = 1;
         } else {
-            MenuLoadInfo.unk_4 = 2;
+            MenuLoadInfo.request_phase = 2;
         }
     }
     if (info[6] != NULL) {
@@ -4379,12 +4379,12 @@ int MenuItemCharaDataLoadEndCheck(MENU_BGREAD_INFO2 **info, mgCMemory *stack, CA
                     sceneChara.entry[0]->LoadActionFile((char *)script->buffer, script->size, &MorattaStack[6]);
                 }
             }
-            MenuLoadInfo.unk_5++;
+            MenuLoadInfo.load_phase++;
         }
     }
-    switch (MenuLoadInfo.unk_2) {
+    switch (MenuLoadInfo.load_all) {
         case 0:
-            if (MenuLoadInfo.unk_4 == -1 && MenuLoadInfo.unk_5 < 7) {
+            if (MenuLoadInfo.request_phase == -1 && MenuLoadInfo.load_phase < 7) {
                 stack->stReset();
                 stack->Align64();
                 MenuItemCharaDataLoad(stack, chara_no, info, 1);
@@ -4393,12 +4393,12 @@ int MenuItemCharaDataLoadEndCheck(MENU_BGREAD_INFO2 **info, mgCMemory *stack, CA
         case 1:
             switch (MenuLoadInfo.mode) {
                 case 2:
-                    if (MenuLoadInfo.unk_4 == 1) {
+                    if (MenuLoadInfo.request_phase == 1) {
                         stack->stReset();
                         stack->Align64();
                         MenuItemCharaDataLoad(stack, chara_no, info, 1);
                     }
-                    if (MenuLoadInfo.unk_4 == 2) {
+                    if (MenuLoadInfo.request_phase == 2) {
                         MenuItemCharaDataLoadEndCheckAfter(info, chara_no);
                     }
                     break;
@@ -4408,9 +4408,9 @@ int MenuItemCharaDataLoadEndCheck(MENU_BGREAD_INFO2 **info, mgCMemory *stack, CA
     switch (MenuLoadInfo.mode) {
         case 0:
         case 3:
-            if (MenuLoadInfo.unk_2 == 1 || (MenuLoadInfo.unk_2 == 0 && MenuLoadInfo.unk_5 >= 6)) {
+            if (MenuLoadInfo.load_all == 1 || (MenuLoadInfo.load_all == 0 && MenuLoadInfo.load_phase >= 6)) {
                 MenuItemCharaDataLoadEndCheckAfter(info, chara_no);
-                MenuLoadInfo.unk_4 = -2;
+                MenuLoadInfo.request_phase = -2;
                 return 1;
             }
             break;
@@ -4542,7 +4542,7 @@ int MenuItemRoboDataLoad(mgCMemory *stack, MENU_BGREAD_INFO2 **info, int restart
         load = 0;
         if (MenuLoadInfo.mode == 2) {
             load = 1;
-        } else if (MenuLoadInfo.unk_5 == convItoPhase_4229[i] || MenuLoadInfo.unk_2 == 1) {
+        } else if (MenuLoadInfo.load_phase == convItoPhase_4229[i] || MenuLoadInfo.load_all == 1) {
             load = 1;
         }
         if (!load) {
@@ -4576,7 +4576,7 @@ int MenuItemRoboDataLoad(mgCMemory *stack, MENU_BGREAD_INFO2 **info, int restart
             total += size;
         }
     }
-    if (MenuLoadInfo.mode == 2 || (MenuLoadInfo.unk_2 == 0 && MenuLoadInfo.unk_5 == 6)) {
+    if (MenuLoadInfo.mode == 2 || (MenuLoadInfo.load_all == 0 && MenuLoadInfo.load_phase == 6)) {
         MENU_BGREAD_INFO2 *hat = info[6];
         hat->reading = 1;
         hat->chara = NULL;
@@ -4616,7 +4616,7 @@ int MenuItemRoboDataLoadEndCheck(MENU_BGREAD_INFO2 **info, mgCMemory *stack, CAc
     }
     if (MenuLoadInfo.mode == 2) {
         texManager->DeleteBlock(scene_tex_block);
-    } else if ((MenuLoadInfo.unk_4 < 0 && MenuLoadInfo.unk_5 == 0) || MenuLoadInfo.unk_2 == 1) {
+    } else if ((MenuLoadInfo.request_phase < 0 && MenuLoadInfo.load_phase == 0) || MenuLoadInfo.load_all == 1) {
         if (0 < tex_block) {
             texManager->DeleteBlock(tex_block);
             if (MenuLoadInfo.unk_6[1] != 0) {
@@ -4624,7 +4624,7 @@ int MenuItemRoboDataLoadEndCheck(MENU_BGREAD_INFO2 **info, mgCMemory *stack, CAc
             }
         }
     }
-    if (MenuLoadInfo.unk_2 == 0 && MenuLoadInfo.unk_4 == 0) {
+    if (MenuLoadInfo.load_all == 0 && MenuLoadInfo.request_phase == 0) {
         if (MenuLoadInfo.unk_6[1] != 0) {
             DeleteOutLineMenu(sceneChara.entry[0], 0);
         }
@@ -4768,17 +4768,17 @@ int MenuItemRoboDataLoadEndCheck(MENU_BGREAD_INFO2 **info, mgCMemory *stack, CAc
         }
         info[part]->reading = 0;
     }
-    if (MenuLoadInfo.unk_2 == 0) {
-        if (MenuLoadInfo.unk_4 < 0) {
-            if (MenuLoadInfo.unk_5 == 2) {
-                MenuLoadInfo.unk_5 += 2;
-            } else if (MenuLoadInfo.unk_5 == 4) {
-                MenuLoadInfo.unk_5 += 2;
+    if (MenuLoadInfo.load_all == 0) {
+        if (MenuLoadInfo.request_phase < 0) {
+            if (MenuLoadInfo.load_phase == 2) {
+                MenuLoadInfo.load_phase += 2;
+            } else if (MenuLoadInfo.load_phase == 4) {
+                MenuLoadInfo.load_phase += 2;
             } else {
-                MenuLoadInfo.unk_5++;
+                MenuLoadInfo.load_phase++;
             }
         } else {
-            MenuLoadInfo.unk_5 = 7;
+            MenuLoadInfo.load_phase = 7;
         }
     }
     BG_READ_INFO *script = GetReadBGInfo(info[6]->path);
@@ -4799,16 +4799,16 @@ int MenuItemRoboDataLoadEndCheck(MENU_BGREAD_INFO2 **info, mgCMemory *stack, CAc
                 info[6]->reading = 0;
                 break;
         }
-        MenuLoadInfo.unk_5++;
+        MenuLoadInfo.load_phase++;
     }
-    if (MenuLoadInfo.unk_2 == 0 && MenuLoadInfo.unk_4 == -1 && MenuLoadInfo.unk_5 < 7) {
+    if (MenuLoadInfo.load_all == 0 && MenuLoadInfo.request_phase == -1 && MenuLoadInfo.load_phase < 7) {
         stack->stReset();
         stack->Align64();
         MenuItemRoboDataLoad(stack, info, 1);
     }
-    if (MenuLoadInfo.unk_2 == 1 || (MenuLoadInfo.unk_2 == 0 && MenuLoadInfo.unk_5 > 6)) {
+    if (MenuLoadInfo.load_all == 1 || (MenuLoadInfo.load_all == 0 && MenuLoadInfo.load_phase > 6)) {
         MenuItemCharaDataLoadEndCheckAfter(info, 2);
-        MenuLoadInfo.unk_4 = -2;
+        MenuLoadInfo.request_phase = -2;
     }
     return 0;
 }
@@ -4935,10 +4935,10 @@ int MenuMonsterLoadBGCheck(MENU_BGREAD_INFO2 **info, CActionChara **chara, int t
             target->LoadActionFile((char *)script->buffer, script->size, stack);
         }
         info[5]->reading = 0;
-        MenuLoadInfo.unk_5++;
+        MenuLoadInfo.load_phase++;
     }
     MenuItemCharaDataLoadEndCheckAfter(info, 3);
-    MenuLoadInfo.unk_4 = -2;
+    MenuLoadInfo.request_phase = -2;
     return 1;
 }
 #ifdef NONMATCHING
@@ -5010,11 +5010,11 @@ void InitMainCharaBG(int chara_no, mgCMemory *stack, int mode) {
     MenuMainScene = GetMainScene();
     MorattaStack = MenuArg.base_chara_stack;
     MenuLoadInfo.mode = 2;
-    MenuLoadInfo.unk_2 = 1;
-    MenuLoadInfo.unk_1 = mode;
-    MenuLoadInfo.unk_3 = NowReadMainCharaNo;
-    MenuLoadInfo.unk_4 = -1;
-    MenuLoadInfo.unk_5 = 0;
+    MenuLoadInfo.load_all = 1;
+    MenuLoadInfo.alternate_model = mode;
+    MenuLoadInfo.chara_no = NowReadMainCharaNo;
+    MenuLoadInfo.request_phase = -1;
+    MenuLoadInfo.load_phase = 0;
     MenuLoadInfo.unk_6[0] = 0;
     MenuLoadInfo.unk_6[1] = 1;
     NowReadMainChara = (CActionChara *)MenuMainScene->GetCharacter(0);
@@ -5038,10 +5038,10 @@ void InitMainCharaBG(int chara_no, mgCMemory *stack, int mode) {
     switch (NowReadMainCharaNo) {
         case 0:
         case 1:
-            if (MenuLoadInfo.unk_1 == 1) {
+            if (MenuLoadInfo.alternate_model == 1) {
                 EditCharaPrepare();
             }
-            MenuLoadInfo.unk_4 = -1;
+            MenuLoadInfo.request_phase = -1;
             MenuItemCharaDataLoad(&MenuCharaLoadStack, NowReadMainCharaNo, MenuCharaBuild2, 1);
             break;
         case 2:
@@ -5145,7 +5145,7 @@ int ReadMainCharaBG() {
                 LoadFileBG(model, (u_long128 *)CharaSndBuffer, &size);
                 MenuCharaLoadStack.Alloc(blocks_for(size + 0x2800));
             }
-            if (MenuLoadInfo.unk_1 == 0 && NowReadMainCharaNo < 3) {
+            if (MenuLoadInfo.alternate_model == 0 && NowReadMainCharaNo < 3) {
                 MenuCharaLoadStack.Align64();
                 LoadFileBG(at_4868, MenuCharaLoadStack.stGetTop(), &scriptSize);
             }
@@ -5156,7 +5156,7 @@ int ReadMainCharaBG() {
                 case 0:
                 case 1:
                 case 2:
-                    if (MenuLoadInfo.unk_1 != 1) {
+                    if (MenuLoadInfo.alternate_model != 1) {
                         mgTexManager.EnterIMGFile((u_char *)GetReadBGFile(1)->buffer, MenuCommonInfo->tex_block[1],
                                                   NULL, NULL);
                         CopyActiveItemAndWeapon(NowReadMainCharaNo, -1);
@@ -5166,7 +5166,7 @@ int ReadMainCharaBG() {
                 case 3:
                     break;
             }
-            if (MenuLoadInfo.unk_1 == 0) {
+            if (MenuLoadInfo.alternate_model == 0) {
                 NowReadMainChara->effect_man = FxScriptMan;
                 NowReadMainChara->InitScript();
             }
@@ -5186,7 +5186,7 @@ int KeyMainCharaBG(void) {
     int readState;
 
     readState = ReadMainCharaBG();
-    if (MenuLoadInfo.unk_1 == 1) {
+    if (MenuLoadInfo.alternate_model == 1) {
         NowMainCharaChngTexMoveX = NowMainCharaChngTexMoveX + 0x12;
     } else {
         NowMainCharaChngTexMoveX += 0xC;
@@ -5368,11 +5368,11 @@ void CMenuCostumeSel::LoadMenuData(mgCMemory *stack, int *texBlock) {
     *(int *)&MenuDrawEnv->speed = 0x40000000;
     MenuBGReadInfo2Malloc(stack, tbl_5016);
     MenuLoadInfo.mode = 3;
-    MenuLoadInfo.unk_1 = 1;
-    MenuLoadInfo.unk_2 = 1;
-    MenuLoadInfo.unk_5 = 0;
-    MenuLoadInfo.unk_4 = -1;
-    MenuLoadInfo.unk_3 = 0;
+    MenuLoadInfo.alternate_model = 1;
+    MenuLoadInfo.load_all = 1;
+    MenuLoadInfo.load_phase = 0;
+    MenuLoadInfo.request_phase = -1;
+    MenuLoadInfo.chara_no = 0;
     MenuLoadInfo.unk_6[1] = 0;
     MenuLoadInfo.unk_6[0] = 1;
     freeSize = memory_free_size(stack);
@@ -5500,7 +5500,7 @@ int CMenuCostumeSel::KeyStep() {
                             }
                             GetUserDataMan()->SetChrEquipDirect(chara, list[select][costume_select[select]]);
                             MenuCosutumeLoadPhase = 1;
-                            MenuLoadInfo.unk_5 = phasetbl_5119[select];
+                            MenuLoadInfo.load_phase = phasetbl_5119[select];
                         } else {
                             moveX = 0;
                         }
@@ -5565,7 +5565,7 @@ int CMenuCostumeSel::KeyStep() {
                         }
                         if (monica_enabled == 1 && chara == 0) {
                             chara = 1;
-                            MenuLoadInfo.unk_3 = 1;
+                            MenuLoadInfo.chara_no = 1;
                             chara_data = GetUserDataMan()->GetCharaDataPtr(1);
                             chara_data->unk_2b = 1;
                             UpdateCostumeList(1, CostumeAttr);
@@ -5573,9 +5573,9 @@ int CMenuCostumeSel::KeyStep() {
                             costume_select[1] = CosutmeSelDefaultSet(0x10A, costume_list[0]);
                             costume_select[2] = CosutmeSelDefaultSet(0x85, costume_list[2]);
                             MenuLoadInfo.mode = 0;
-                            MenuLoadInfo.unk_2 = 1;
-                            MenuLoadInfo.unk_5 = 0;
-                            MenuLoadInfo.unk_4 = -1;
+                            MenuLoadInfo.load_all = 1;
+                            MenuLoadInfo.load_phase = 0;
+                            MenuLoadInfo.request_phase = -1;
                             loading = 1;
                             wait_load = 0;
                             MenuCosutumeLoadPhase = 1;
@@ -5618,7 +5618,7 @@ int CMenuCostumeSel::KeyStep() {
                 MenuItemCharaDataLoadEndCheck(MenuCharaBuild2, &MenuCharaLoadStack, MenuActionChara, chara,
                                               tex_block[3], -1);
                 MenuItemCharaDataLoadEndCheckAfter(MenuCharaBuild2, chara);
-                MenuLoadInfo.unk_2 = 0;
+                MenuLoadInfo.load_all = 0;
                 model->SetPosition(chara_pos);
                 model->SetRotation(costume_rotation);
                 model->Step();
@@ -6399,11 +6399,11 @@ void MonsterBookInit(mgCMemory *memory, int *texBlock, int bootMode) {
     MonsterBookBootMode = bootMode;
     MenuBGReadInfo2Malloc(&MosBookStack, tbl_5848);
     MenuLoadInfo.mode = 4;
-    MenuLoadInfo.unk_2 = 1;
+    MenuLoadInfo.load_all = 1;
     MenuLoadInfo.unk_6[1] = 0;
-    MenuLoadInfo.unk_1 = 0;
-    MenuLoadInfo.unk_4 = -1;
-    MenuLoadInfo.unk_5 = 0;
+    MenuLoadInfo.alternate_model = 0;
+    MenuLoadInfo.request_phase = -1;
+    MenuLoadInfo.load_phase = 0;
     MosBookStack.Align64();
     ((CMosBookMenu *)MenuMosBookPtr)->InitEnd();
 }

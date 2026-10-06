@@ -29,7 +29,7 @@ void CScene::BGM_INFO::Init() {
     snd_id = -1;
     load_no = -1;
     fade_speed = 0.0f;
-    unk_c = 1.0f;
+    master_vol = 1.0f;
     time_vol = 0;
     fade_volf = 1.0f;
 }
@@ -198,7 +198,7 @@ int CScene::GetBGMState(void) {
 void CScene::SetVolfBGM(float rate) {
     BGM_INFO *info = GetActiveBgmInfo();
     info->volf = rate;
-    int vol = fptosi(info->fade_volf * (info->unk_c * ((float)info->vol * rate)));
+    int vol = fptosi(info->fade_volf * (info->master_vol * ((float)info->vol * rate)));
     if (vol > 0x7F)
         vol = 0x7F;
     sndSetSeVol(info->snd_id, info->play_no, vol, 0);
@@ -226,7 +226,7 @@ void CScene::GetActiveBgmStatus(BGM_STATUS *status) {
     BGM_INFO *info = scene->GetActiveBgmInfo();
     out->state = scene->GetBGMState();
     out->load_no = info->load_no;
-    out->unk_c = info->unk_c;
+    out->master_vol = info->master_vol;
     out->vol = info->vol;
     out->time_vol = info->time_vol;
     out->volf = info->volf;
@@ -236,7 +236,7 @@ void CScene::SetActiveBgmStatus(BGM_STATUS *status) {
     BGM_INFO *info = GetActiveBgmInfo();
     BGM_STATUS *saved = status;
     info->play_no = saved->play_no;
-    info->unk_c = saved->unk_c;
+    info->master_vol = saved->master_vol;
     info->vol = saved->vol;
     info->time_vol = saved->time_vol;
     info->volf = saved->volf;
