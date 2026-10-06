@@ -756,7 +756,7 @@ void CLockOnModel::Draw() {
         monster_id = DngUserData->monster_id;
     }
     if (target->monster_id == monster_id) {
-        int message = target->unk_134c;
+        int message = target->message_no;
         if (message >= 0) {
             message += 5000;
         }

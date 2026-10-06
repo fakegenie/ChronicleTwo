@@ -218,7 +218,7 @@ void CActiveMonster::Initialize(void) {
     unk_1322 = 0;
     whp = 0;
     defense = 0;
-    unk_134c = -1;
+    message_no = -1;
     locate_param = 0;
     gate_key = -1;
     no_damage_cnt = 0;
@@ -654,7 +654,7 @@ CActiveMonster *CMonsterMan::SetActiveMonster(int refer_no, float *pos, float *r
     monster->gift_mark.Initialize();
     monster->drop_badge = 0;
     monster->sound_info.loop_se = &scene->loop_se;
-    monster->unk_134c = param;
+    monster->message_no = param;
     monster->locate_param = -1;
     monster->attrib = 0;
     monster->state = ACTIVE_MONSTER_LIVE;

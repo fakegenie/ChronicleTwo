@@ -223,7 +223,7 @@ public:
     s16              piyori_time;
     MONSTER_STATUS   status;
     u32              attrib;
-    s32              unk_134c;
+    s32              message_no;
     s32              locate_param;
     s16              gate_key;
     s16              no_damage_cnt;
