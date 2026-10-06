@@ -1501,10 +1501,10 @@ void CAutoMapGen::RandomMapMainProc() {
                 RoomLink(rooms, link_to);
                 rooms++;
                 round = 0;
-            } else {
-                failures++;
+                break;
             }
-        } while (placed == 0 && failures < 128);
+            failures++;
+        } while (failures < 128);
         if (round > 128) {
             break;
         }
