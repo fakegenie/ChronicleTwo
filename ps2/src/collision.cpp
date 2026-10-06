@@ -139,27 +139,79 @@ int CCollisionMDT::GetMaxY(float *position) {
     return found;
 }
 
-#ifdef NONMATCHING
 int CCollisionMDT::PickUpNearPoly(CCPoly *out, const mgVu0FBOX &box, int max) {
-    if (poly == NULL || !mgClipBox((float *)box.max, (float *)box.min, bbox.max, bbox.min)) {
+    sceVu0FVECTOR box_max;
+    sceVu0FVECTOR box_min;
+    sceVu0FVECTOR poly_max;
+    sceVu0FVECTOR poly_min;
+    int i;
+    float *min_ptr;
+    float *max_ptr;
+    int count;
+    CCPoly *polygon;
+
+    if (poly == NULL) {
         return 0;
     }
-
-    int count = 0;
-    for (int i = 0; i < poly_count; i++) {
-        sceVu0FVECTOR poly_max;
-        sceVu0FVECTOR poly_min;
-        mgVectorMaxMin(poly_max, poly_min, poly[i].vertex[0], poly[i].vertex[1], poly[i].vertex[2]);
-        if (mgClipBox((float *)box.max, (float *)box.min, poly_max, poly_min)) {
-            out[count++] = poly[i];
-            if (count >= max) break;
+    if (!(box.min[0] <= bbox.max[0])) {
+        return 0;
+    }
+    if (!(box.min[1] <= bbox.max[1])) {
+        return 0;
+    }
+    if (!(box.min[2] <= bbox.max[2])) {
+        return 0;
+    }
+    if (box.max[0] < bbox.min[0]) {
+        return 0;
+    }
+    if (box.max[1] < bbox.min[1]) {
+        return 0;
+    }
+    if (box.max[2] < bbox.min[2]) {
+        return 0;
+    }
+    i = 0;
+    count = 0;
+    box_max[0] = ((float *)&box)[0];
+    box_max[1] = ((float *)&box)[1];
+    box_max[2] = ((float *)&box)[2];
+    box_max[3] = 1.0f;
+    box_min[0] = box.min[0];
+    box_min[1] = box.min[1];
+    box_min[2] = box.min[2];
+    box_min[3] = 1.0f;
+    max_ptr = box_max;
+    min_ptr = box_min;
+    asm {
+        lqc2 vf10, 0(max_ptr)
+        lqc2 vf11, 0(min_ptr)
+    }
+    polygon = poly;
+    for (; i < poly_count; i++, polygon++) {
+        mgVectorMaxMin(poly_max, poly_min, polygon->vertex[0], polygon->vertex[1], polygon->vertex[2]);
+        if (mgClipBox(box_max, box_min, poly_max, poly_min)) {
+            *(u_long128 *)out->vertex[0] = *(u_long128 *)polygon->vertex[0];
+            *(u_long128 *)out->vertex[1] = *(u_long128 *)polygon->vertex[1];
+            *(u_long128 *)out->vertex[2] = *(u_long128 *)polygon->vertex[2];
+            out->ground_kind = polygon->ground_kind;
+            out->foot_sound = polygon->foot_sound;
+            out->area_kind = polygon->area_kind;
+            out->ignore_mask = polygon->ignore_mask;
+            out->parts_no = polygon->parts_no;
+            out->attr = polygon->attr;
+            out->attr_value = polygon->attr_value;
+            *(u_long128 *)out->normal = *(u_long128 *)polygon->normal;
+            max--;
+            count++;
+            out++;
+            if (max <= 0) {
+                break;
+            }
         }
     }
     return count;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/collision", PickUpNearPoly__13CCollisionMDTFP6CCPolyRC9mgVu0FBOXi);
-#endif
 
 int CCollision::Intersection(float *from, float *to, float *hit) {
     return 0;
