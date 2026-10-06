@@ -4723,15 +4723,14 @@ void MenuInventPictureBoardDraw(float *pos, int &tex_block, int alpha) {
             prim->Color(0x80, 0x80, 0x80, alpha);
             mgRect<int> new_mark;
             new_mark.Set(74, 342, 34, 14);
-            PrimQuad(prim, 35.0f + x, 44.8f + y, new_mark);
+            float mark_y = 44.8f + y;
+            PrimQuad(prim, 35.0f + x, mark_y, new_mark);
             prim->End();
         }
     }
     ResetMenuScissor();
     if (InventInNetaEffectFlag != 0) {
-        NetaEffectTarget target = at_4638;
-        target.x = 24.0f + pos[0];
-        target.y = 26.0f + pos[1];
+        float target[2] = {24.0f + pos[0], 26.0f + pos[1]};
         for (int i = 0; i < InventInNetaEffectNum4; i++) {
             if (InventInNetaEffect[i].active != 0) {
                 InventInNetaEffect[i].Step();
@@ -4742,8 +4741,8 @@ void MenuInventPictureBoardDraw(float *pos, int &tex_block, int alpha) {
             short *effect_alpha = &CMenuInventPt->neta_effect_alpha[i];
             if (*effect_alpha > 0) {
                 float *effect_pos = CMenuInventPt->neta_effect_pos[i];
-                float dy = target.y - effect_pos[1];
-                effect_pos[0] += (target.x - effect_pos[0]) / 26.0f;
+                float dy = target[1] - effect_pos[1];
+                effect_pos[0] += (target[0] - effect_pos[0]) / 26.0f;
                 effect_pos[1] += dy / 12.0f;
                 if (dy < 0.0f) {
                     dy = -dy;
