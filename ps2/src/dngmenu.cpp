@@ -885,9 +885,9 @@ static void DrawDngRoomInfo(DNGMAP_ROOM_INFO *room) {
             PrimQuad(prim, seal_x, seal_y, *seal_uv);
             prim->Color(0x80, 0x80, 0x80, alpha);
         }
-        int mark_x = fptosi(20.0f + board_x);
-        int line_y = fptosi(2.0f + (68.0f + (float)top));
-        int row_y = line_y;
+        int mark_x = (int)(20.0f + board_x);
+        int row_y;
+        int line_y = row_y = fptosi(2.0f + (68.0f + (float)top));
         int text_x = mark_x + 0x1C;
         PrimQuad(prim, (float)mark_x, mark_y, mark_uv);
         if (DngInfoFloorInfo != NULL && (DngInfoFloorInfo->flag & DNG_FLOOR_FLAG_FAST_DESTROY_CLEAR)) {

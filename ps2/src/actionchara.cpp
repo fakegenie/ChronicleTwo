@@ -2032,7 +2032,7 @@ int CActionChara::RoboBikeMoveIF(int mode) {
     RockOn();
     return 1;
 }
-#ifdef NONMATCHING
+#ifdef STATEMATCHING
 int CActionChara::RoboAirMoveIF(int unk, int mode) {
     sceVu0FVECTOR position;
     sceVu0FVECTOR move_velocity;
@@ -2141,7 +2141,8 @@ int CActionChara::RoboAirMoveIF(int unk, int mode) {
             }
             arm = SearchChara("arm");
             if (arm != NULL) {
-                arm->SetRotation(0.0f, unitRotation(arm->CObjectFrame::frame, target_angle, 3.0f), 0.0f);
+                target_angle = unitRotation(arm->CObjectFrame::frame, target_angle, 3.0f);
+                arm->SetRotation(0.0f, target_angle, 0.0f);
             }
         }
     } else {
@@ -2151,7 +2152,8 @@ int CActionChara::RoboAirMoveIF(int unk, int mode) {
         }
         if (move_x != 0.0f || move_z != 0.0f) {
             sceVu0FVECTOR movement;
-            SetRotation(0.0f, unitRotation(CObjectFrame::frame, atan2f(move_x, move_z), turn_speed), 0.0f);
+            float angle = atan2f(move_x, move_z);
+            SetRotation(0.0f, unitRotation(CObjectFrame::frame, angle, turn_speed), 0.0f);
             movement[0] = move_x;
             movement[1] = 0.0f;
             movement[2] = move_z;
