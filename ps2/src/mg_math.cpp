@@ -50,7 +50,25 @@ asm void mgZeroVectorW(float *vector) {
     jr ra
     sqc2 vf0, 0x0(a0)
 }
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgClipBoxVertex__FPfPfPf);
+asm int mgClipBoxVertex(float *point, float *max, float *min) {
+    .set noreorder
+    lqc2 vf1, 0x0(a0)
+    lqc2 vf10, 0x0(a1)
+    lqc2 vf11, 0x0(a2)
+    ctc2.ni zero, vi16
+    vsub.xyz vf25, vf10, vf1
+    vsub.xyz vf25, vf1, vf11
+    vnop
+    vnop
+    vnop
+    vnop
+    vnop
+    cfc2.ni v0, vi16
+    andi v0, v0, 0x80
+    xor v0, v0, zero
+    jr ra
+    sltiu v0, v0, 0x1
+}
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgClipBox__FPfPfPfPf);
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgClipBoxW__FPfPfPfPf);
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgClipInBox__FPfPfPfPf);
