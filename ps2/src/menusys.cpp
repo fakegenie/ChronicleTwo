@@ -9836,8 +9836,10 @@ void CItemSelect::Draw(void) {
     } else {
         scroll += 0.25f * (bar_y - scroll);
     }
-    float scroll_y = scroll;
-    float bar_x = 250.0f + list->left;
+    float scroll_y;
+    float bar_x;
+    bar_x = 250.0f + list->left;
+    scroll_y = scroll;
     prim->Bilinear(1);
     prim->Begin(6);
     PrimQuad(prim, mgRect<int>((int)bar_x, (int)scroll_y, 6, 4), mgRect<int>(0x13E, 0, 6, 4));
