@@ -1673,7 +1673,7 @@ void AutoSetMonster(void) {
     int gate_key;
 
     if (ActiveMonster != NULL) {
-        *(int *)((u8 *)DngMainScene + 0x2FEC) = 0;
+        DngMainScene->battle_area.battle_clear = 0;
         floor_no = DngSaveDataDungeon->stage_id;
         spawn_count = ((CMonsterMan *)ActiveMonster)->locate.num;
         floor_id = DngSaveDataDungeon->floor_id[DngSaveDataDungeon->stage_id];
@@ -1720,7 +1720,7 @@ void AutoSetMonster(int base_index, float *position, float *direction, int optio
     CActiveMonster *monster;
 
     if (ActiveMonster != NULL) {
-        *(int *)((u8 *)DngMainScene + 0x2FEC) = 0;
+        DngMainScene->battle_area.battle_clear = 0;
         index = (ActiveMonster)->SearchBaseIndex(base_index);
         if (index != -1) {
             monster = (CActiveMonster *)((ActiveMonster)->SetActiveMonster(index, position, direction, -1));
@@ -1755,11 +1755,11 @@ void LoadDungeonMapFile(char *map_name, char *cfg_name, int gen_flag) {
     int room_size;
 
     DNG_BATTLE_AREA *area = &DngMainScene->battle_area;
-    DngMainScene->battle_area.unk_5c = 1;
-    area->unk_5c = 1;
+    DngMainScene->battle_area.battle_clear = 1;
+    area->battle_clear = 1;
     area->battle_bgm_state = 0;
     area->battle_bgm_vol = 0.0f;
-    area->unk_54 = 0;
+    area->camera_mode = 0;
     area->pause_flag = 0;
     area->timer = 0;
     area->minimap_reveal = 0;

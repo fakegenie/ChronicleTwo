@@ -1661,7 +1661,7 @@ int MenuInternSelectKey(void) {
             if (next_mode >= 0 && CMenuInterPt->bg_read_step >= MENU_INTER_BG_READ_DONE) {
                 if ((next_mode != MENU_MODE_DNG_TREE_MAP && next_mode != MENU_MODE_WORLD_MOVE) ||
                     ((next_mode == MENU_MODE_DNG_TREE_MAP || next_mode == MENU_MODE_WORLD_MOVE) &&
-                     ((CFadeInOut *)((u8 *)MenuMainScene + 0x2C70))->FadeCheck() != 0)) {
+                     MenuMainScene->fade.FadeCheck() != 0)) {
                     MenuMainStack_Next.Align64();
                     if (NextMenuInit(CMenuInterPt->next_mode, &MenuMainStack_Next, &MenuCommonInfo->tex_block[3]) != 0) {
                         if (CMenuInterPt->next_mode != MENU_MODE_DNG_TREE_MAP && CMenuInterPt->next_mode != MENU_MODE_WORLD_MOVE) {

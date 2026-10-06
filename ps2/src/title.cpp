@@ -264,10 +264,10 @@ void TitleInit(INIT_LOOP_ARG arg) {
     TitleScene->Initialize();
     DNG_BATTLE_AREA *area = &TitleScene->battle_area;
     if (area != NULL) {
-        area->unk_5c = 1;
+        area->battle_clear = 1;
         area->battle_bgm_state = 0;
         area->battle_bgm_vol = 0.0f;
-        area->unk_54 = 0;
+        area->camera_mode = 0;
         area->pause_flag = 0;
         area->timer = 0;
         area->minimap_reveal = 0;

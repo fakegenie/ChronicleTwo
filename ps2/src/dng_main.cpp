@@ -315,10 +315,10 @@ void InitDungeonMain(INIT_LOOP_ARG arg) {
     DNG_BATTLE_AREA *area = BattleAreaScene;
 
     DngMainMap = NULL;
-    area->unk_5c = 1;
+    area->battle_clear = 1;
     area->battle_bgm_state = 0;
     area->battle_bgm_vol = 0.0f;
-    area->unk_54 = 0;
+    area->camera_mode = 0;
     area->pause_flag = 0;
     area->timer = 0;
     area->minimap_reveal = 0;
@@ -2152,7 +2152,7 @@ int DngMainKey() {
                 }
             }
         }
-        if (BattleAreaScene->unk_54 == 0) {
+        if (BattleAreaScene->camera_mode == 0) {
             if (DebugInfo.debug_camera == 0) {
                 sceVu0FVECTOR rot;
 
@@ -2220,7 +2220,7 @@ int DngMainKey() {
                 camera->RotBack(angle);
             }
         }
-        if (BattleAreaScene->unk_54 == 1) {
+        if (BattleAreaScene->camera_mode == 1) {
             MainCamera.FollowOff();
             CCharacter2  *boss = DngMainScene->GetCharacter(24);
             sceVu0FVECTOR chara_pos;
@@ -2254,7 +2254,7 @@ int DngMainKey() {
             MainCamera.SetPos(eye);
             MainCamera.SetRef(boss_pos);
         }
-        if (BattleAreaScene->unk_54 == 2) {
+        if (BattleAreaScene->camera_mode == 2) {
             MainCamera.FollowOff();
             sceVu0FVECTOR pos;
 
@@ -2288,7 +2288,7 @@ int DngMainKey() {
             MainCamera.SetNextPos(rate, eye_y, -322.4 + radius * cos(angle));
             MainCamera.SetNextRef(268.8f, ref_y, -322.4f);
         }
-        if (BattleAreaScene->unk_54 == 4) {
+        if (BattleAreaScene->camera_mode == 4) {
             sceVu0FVECTOR rot;
 
             camera->ControlOn();
@@ -2435,9 +2435,9 @@ void IsEventRun() {
     }
     int num = ActiveMonster->GetMonsterNum(-1.0f);
     num += TreasureBoxMan->MimicCount();
-    if (num == 0 && BattleAreaScene->unk_5c == 0) {
+    if (num == 0 && BattleAreaScene->battle_clear == 0) {
         *event_no = 1500;
-        BattleAreaScene->unk_5c = 1;
+        BattleAreaScene->battle_clear = 1;
         ColPrimMan.Initialize(DngMainScene);
         BTsubo.Clear();
         BTsuboCol = NULL;

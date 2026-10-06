@@ -2128,7 +2128,7 @@ int CMenuTreeMap::Step() {
             DngInfoRoomInfo = &NextFloorGlid_2836->room;
             GetSaveData()->GetBitCtrl();
             DNG_BATTLE_AREA *area = (DNG_BATTLE_AREA *)menu_GetBattleAreaScene();
-            int busy = area->unk_5c;
+            int busy = area->battle_clear;
             jump_pay = 0;
             if (busy == 0 && MenuCommonInfo->open_type == 1) {
                 jump_pay = 1;

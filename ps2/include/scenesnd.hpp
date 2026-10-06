@@ -61,9 +61,9 @@ struct DNG_BATTLE_AREA {
     u8                  unk_4a[0x2];
     float               statusbar_rate;
     float               statusbar_speed;
-    s32                 unk_54;
+    s32                 camera_mode;
     s32                 boss_map;
-    s32                 unk_5c;
+    s32                 battle_clear;
     u8                  unk_60[0x4];
     u32                 minimap_reveal;
     u8                  unk_68[0x4];

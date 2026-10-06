@@ -1712,7 +1712,7 @@ int CheckFishCondition(void) {
     }
     result = enabled;
     if (GetMenuLoopType() == 1) {
-        if (battle_scene->unk_5c == 0) {
+        if (battle_scene->battle_clear == 0) {
             enabled = 0;
         }
         result = enabled;
