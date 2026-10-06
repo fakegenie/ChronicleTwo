@@ -168,7 +168,7 @@ void WaitVSync(int start, int frames) {
 int mgGetVSyncCount(void) {
     return vcount;
 }
-int GetScreenSize(int mode, int *width, int *height, int *left, int *top, int *right, int *bottom) {
+static int GetScreenSize(int mode, int *width, int *height, int *left, int *top, int *right, int *bottom) {
     switch (mode) {
         case 3:
             *width = 0x280;
@@ -964,7 +964,6 @@ void mgSetPkFrameBuffer(mgCTexture *texture) {
 }
 #ifdef NONMATCHING
 void mgSetPkFrameBuffer(int fbp, int width, int height, int psm) {
-    sceGsDBuff *buffers = (sceGsDBuff *)mgDBuff;
     sceGsFrame     frame;
     sceGsFrame    *default_frame;
     sceGsXyOffset  offset;
@@ -978,10 +977,10 @@ void mgSetPkFrameBuffer(int fbp, int width, int height, int psm) {
     int            width_shift;
     int            height_shift;
     int            size;
-    short          bpp;
+    int            bpp;
     int            bit;
 
-    default_frame = mgDBuffID != 0 ? &buffers->draw0.frame1 : &buffers->draw1.frame1;
+    default_frame = mgDBuffID != 0 ? (sceGsFrame *)(mgDBuff + 0x60) : (sceGsFrame *)(mgDBuff + 0x150);
     if (fbp < 0) {
         fbp = default_frame->FBP;
     }
@@ -1005,7 +1004,7 @@ void mgSetPkFrameBuffer(int fbp, int width, int height, int psm) {
     if (aligned_width % 64 != 0) {
         aligned_width += 64 - aligned_width % 64;
     }
-    frame = *default_frame;
+    *(u_long *)&frame = *(u_long *)default_frame;
     frame.FBP = fbp;
     frame.FBW = aligned_width / 64;
     frame.PSM = psm;
@@ -1033,7 +1032,7 @@ void mgSetPkFrameBuffer(int fbp, int width, int height, int psm) {
     registers = (u_long *)&packet[8];
     registers[0] = 0;
     registers[1] = SCE_GS_TEXFLUSH;
-    registers[2] = frame.value;
+    registers[2] = *(u_long *)&frame;
     registers[3] = SCE_GS_FRAME_1;
     registers[4] = *(u_long *)&offset;
     registers[5] = SCE_GS_XYOFFSET_1;
@@ -1043,7 +1042,7 @@ void mgSetPkFrameBuffer(int fbp, int width, int height, int psm) {
     registers[9] = SCE_GS_SCANMSK;
     registers[10] = 0;
     registers[11] = SCE_GS_TEXFLUSH;
-    sceVif1PkReserve(vif, 32);
+    sceVif1PkReserve(vif, ((int)(registers + 12) - (int)packet) / 4);
     bpp = 0;
     switch (psm) {
         case SCE_GS_PSMCT32:
@@ -1053,6 +1052,8 @@ void mgSetPkFrameBuffer(int fbp, int width, int height, int psm) {
             bpp = 24;
             break;
         case SCE_GS_PSMCT16:
+            bpp = 16;
+            break;
         case SCE_GS_PSMCT16S:
             bpp = 16;
             break;
@@ -1063,13 +1064,14 @@ void mgSetPkFrameBuffer(int fbp, int width, int height, int psm) {
     frame_tex.bpp = bpp;
     frame_tex.vram_size = bpp * (width * height) / 8 / 256;
     frame_tex.clut_size = 0;
-    frame_tex.image_blocks = frame_tex.vram_size;
     ((mgFrameTex0 *)&frame_tex.tex0)->value = 0;
+    frame_tex.image_blocks = frame_tex.vram_size;
     ((mgFrameTex0 *)&frame_tex.tex0)->bits.tbp0 = fbp << 5;
     ((mgFrameTex0 *)&frame_tex.tex0)->bits.tbw = width / 64;
     ((mgFrameTex0 *)&frame_tex.tex0)->bits.psm = psm;
     width_shift = 0;
-    for (size = width; size >= 2; size >>= 1) {
+    height_shift = 0;
+    for (size = width; size > 1; size >>= 1) {
         width_shift++;
     }
     size = 1;
@@ -1079,8 +1081,7 @@ void mgSetPkFrameBuffer(int fbp, int width, int height, int psm) {
     if (width != size) {
         width_shift++;
     }
-    height_shift = 0;
-    for (size = height; size >= 2; size >>= 1) {
+    for (size = height; size > 1; size >>= 1) {
         height_shift++;
     }
     size = 1;
@@ -1094,7 +1095,7 @@ void mgSetPkFrameBuffer(int fbp, int width, int height, int psm) {
     ((mgFrameTex0 *)&frame_tex.tex0)->bits.th = height_shift;
     ((mgFrameTex0 *)&frame_tex.tex0)->bits.tcc = 1;
     ((mgFrameTex0 *)&frame_tex.tex0)->bits.tfx = 0;
-    frame_tex.tex1 = 0x261;
+    *(u_long *)&frame_tex.tex1 = 0x261;
 }
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mglib", mgSetPkFrameBuffer__Fiiii);
