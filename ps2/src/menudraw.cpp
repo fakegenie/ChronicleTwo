@@ -1991,17 +1991,14 @@ void MenuMainFrameImgDraw(int &loaded_tex_no) {
     dest.bottom += 1;
     DrawMenuMainFrmImg(loaded_tex_no, dest, source, 0x80, 0x80, 0x80, alpha, 0);
 }
-#ifdef NONMATCHING
 void DrawMenuWakuStep(void) {
     float move[6] = {-0.2f, 0.0f, 18.0f, 0.2f, 18.0f, 0.0f};
     int i;
     for (i = 0; i < 2; i++) {
-        float *axis = &MenuWakuPutXY[i];
-        float *entry = &move[i * 3];
-        float rate = entry[0];
-        *axis += rate;
-        if (CalcMenuAdd(axis, rate, entry[1]) != 0) {
-            *axis = entry[2];
+        int n = i * 3;
+        MenuWakuPutXY[i] += move[n];
+        if (CalcMenuAdd(&MenuWakuPutXY[i], move[n], move[n + 1]) != 0) {
+            MenuWakuPutXY[i] = move[n + 2];
         }
     }
     MenuWakuRotCnt -= 3.1415927f / 220.0f;
@@ -2009,9 +2006,6 @@ void DrawMenuWakuStep(void) {
         MenuWakuRotCnt += 6.2831855f;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", DrawMenuWakuStep__Fv);
-#endif
 void DrawMenuWakuRect(mgCTexture *tex, mgRect<float> rect, mgRect<int> tex_rect, int a, int r, int g, int b) {
     mgCDrawPrim *prim;
     float sign;
