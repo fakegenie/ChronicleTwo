@@ -1343,7 +1343,6 @@ int CInventDataManage::LoadAnalyzeInventFile(char *script, int size) {
     interpreter.Run();
     return 1;
 }
-#ifdef NONMATCHING
 int CheckInventItem(int item_id) {
     CInventDataManage manage;
     int file_size;
@@ -1361,10 +1360,10 @@ int CheckInventItem(int item_id) {
     manage.LoadAnalyzeInventFile(buffer, file_size);
     InventUserDataPtr = GetInventUserDataPtr();
     record = manage.GetInventDataInfoByItemID(item_id);
-    neta_id = record->neta_id;
     if (record == NULL) {
         return 0;
     }
+    neta_id = record->neta_id;
     s8 found[3] = {0, 0, 0};
     for (i = 0; i < 30; i++) {
         USER_PICTURE_INFO *photo = InventUserDataPtr->GetPhotoInfo(i);
@@ -1400,9 +1399,6 @@ int CheckInventItem(int item_id) {
     }
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/inventmn", CheckInventItem__Fi);
-#endif
 int CheckItemTable(int item_id, int *values) {
     CInventDataManage manage;
     int file_size;
