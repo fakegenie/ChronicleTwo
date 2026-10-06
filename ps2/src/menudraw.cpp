@@ -3127,12 +3127,12 @@ void CMenuPosDataForm::SetNextMovePos(int *position, int move_type) {
 }
 #ifdef NONMATCHING
 int CMenuPosDataForm::GetNextMovePos(int *pos) {
-    int move_type;
     int i;
+    int move_type;
     int target_pos;
     float rate_now;
-    float diff;
     MENU_FORM_ACTION_MOVE *move;
+    float diff;
     float rate[2];
     int target[2];
 
@@ -3164,11 +3164,11 @@ int CMenuPosDataForm::GetNextMovePos(int *pos) {
     case MENUFORM_MTYPE_L:
         for (i = 0; i < 2; i++) {
             target_pos = target[i];
-            if (target_pos - now[i] < 0) {
+            if (target[i] - now[i] < 0) {
                 rate[i] = -rate[i];
             }
             rate_now = rate[i];
-            now[i] = (int)((float)now[i] + rate_now);
+            now[i] += rate_now;
             if (abs(target_pos - now[i]) <= abs((int)rate_now)) {
                 now[i] = target_pos;
             }
