@@ -3754,10 +3754,9 @@ int CMenuMosSelect::KeyStep() {
                     break;
                 case 2: {
                     s16 *row = &monster_progress_tbl[select_badge->progress * (1 + MONSTER_PROGRESS_LEVEL_NUM)];
-                    int count = select_badge->class_level + 1;
                     int level = -1;
-                    for (i = 0; i < count; i++) {
-                        if (view_monster == row[1 + i]) {
+                    for (int i = 0; i < select_badge->class_level + 1; i++) {
+                        if ((monster_progress_tbl + select_badge->progress * 5)[1 + i] == view_monster) {
                             level = i;
                             break;
                         }
@@ -3853,10 +3852,10 @@ int CMenuMosSelect::KeyStep() {
                     MenuSePlay(1);
                     info->MsgPreset(6);
                     MonsterNameTable names = at_3511;
-                    for (i = 0; i < select_badge->class_level + 1; i++) {
-                        names.name[i] = GetMonsterName((monster_progress_tbl + select_badge->progress * 5 + 1)[i] );
+                    for (int i = 0; i < select_badge->class_level + 1; i++) {
+                        names.name[i] = GetMonsterName((monster_progress_tbl + select_badge->progress * 5)[1 + i] );
                         if (GetUserDataMan()->active_chr_no == USER_CHARA_MONSTER &&
-                            (monster_progress_tbl + select_badge->progress * 5 + 1)[i]  == GetUserDataMan()->monster_id &&
+                            (monster_progress_tbl + select_badge->progress * 5)[1 + i]  == GetUserDataMan()->monster_id &&
                             i >= 0 && i < 20) {
                             info->line_color[i] = 0x80202020;
                         }
