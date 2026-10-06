@@ -899,31 +899,42 @@ int viBufPutTs(ViBuf *buf, TimeStamp *ts) {
 #pragma divbyzerocheck on
 #ifdef NONMATCHING
 int viBufGetTs(ViBuf *buf, TimeStamp *ts) {
-    u32 ipu_ctrl = *(u32 *)0x10002020;
+    int index;
+    int base;
+    int fifo_bits;
+    int consumed;
+    TimeStamp *entry;
+    int dma_addr;
+    int inside;
+    int found = 0;
+    u32 ipu_ctrl;
+    int count;
+    u32 size;
     u32 read_pos;
-    int dma_addr = *(int *)0x1000B410 - ((((ipu_ctrl >> 16) & 3) + ((ipu_ctrl >> 8) & 0xF)) * 0x10);
-    u32 size = buf->n << 11;
-    int fifo_bits = buf->env.ipubp & 0x7F;
+    int i;
+
+    ipu_ctrl = *(u32 *)0x10002020;
+    fifo_bits = buf->env.ipubp & 0x7F;
+    dma_addr = *(int *)0x1000B410 - ((((ipu_ctrl >> 16) & 3) + ((ipu_ctrl >> 8) & 0xF)) * 0x10);
+    size = buf->n << 11;
 
     WaitSema(buf->sema);
     ts->pts = -1;
     ts->dts = -1;
     read_pos = (size + (dma_addr + (fifo_bits >> 3)) - (u32)buf->data) % size;
-    int found = 0;
-    int count = buf->count_ts;
-    for (int i = 0; i < count && found == 0; i++) {
-        int index = (i + (buf->n_ts + (buf->wt_ts - count))) % buf->n_ts;
-        TimeStamp *entry = &buf->ts[index];
-        if ((int)(read_pos + size - entry->pos) % (int)size < entry->len) {
+    count = buf->count_ts;
+    base = buf->wt_ts - count;
+    for (i = 0; i < count && found == 0; i++) {
+        index = (i + (buf->n_ts + base)) % buf->n_ts;
+        entry = &buf->ts[index];
+        inside = entry->len > (int)(read_pos + size - entry->pos) % (int)size;
+        if (inside) {
             ts->pts = entry->pts;
             ts->dts = buf->ts[index].dts;
             buf->ts[index].pts = -1;
             buf->ts[index].dts = -1;
             found = 1;
-            int consumed = buf->count_ts;
-            if (consumed > 0) {
-                consumed = 1;
-            }
+            consumed = (buf->count_ts <= 0) ? buf->count_ts : 1;
             buf->count_ts -= consumed;
         }
     }
