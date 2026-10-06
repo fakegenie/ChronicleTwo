@@ -646,30 +646,75 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_frame", GetLWMatrix__8mgCFrameFPA4_f);
 #endif
 
 #pragma global_optimizer off
-#ifdef NONMATCHING
 void mgCFrame::GetLWMatrixTopBottom(float (*matrix)[4]) {
+    sceVu0FMATRIX parent_matrix;
+    sceVu0FMATRIX local;
+
     if (reference) {
         GetLWMatrix(matrix);
         return;
     }
-    if (!changed && (parent == NULL || !parent->changed)) {
-        sceVu0CopyMatrix(matrix, lw_matrix);
-        return;
+    if (!changed) {
+        if (parent == NULL) {
+            sceVu0CopyMatrix(matrix, lw_matrix);
+            return;
+        }
+        if (!parent->changed) {
+            sceVu0CopyMatrix(matrix, lw_matrix);
+            return;
+        }
     }
     ClearChildFlag();
-    sceVu0FMATRIX local;
     GetLocalMatrix(local);
     if (parent == NULL) {
         sceVu0CopyMatrix(lw_matrix, local);
+        sceVu0CopyMatrix(matrix, lw_matrix);
+        changed = 0;
     } else {
-        sceVu0MulMatrix(lw_matrix, parent->lw_matrix, local);
+        sceVu0CopyMatrix(parent_matrix, parent->lw_matrix);
+        float (*right)[4];
+        float (*left)[4];
+        float (*out)[4];
+        out = lw_matrix;
+        left = parent_matrix;
+        right = local;
+        asm {
+            lqc2 vf5, 0x0(right)
+            lqc2 vf1, 0x0(left)
+            lqc2 vf2, 0x10(left)
+            lqc2 vf3, 0x20(left)
+            lqc2 vf4, 0x30(left)
+            vmulax.xyzw ACC, vf1, vf5x
+            vmadday.xyzw ACC, vf2, vf5y
+            vmaddaz.xyzw ACC, vf3, vf5z
+            vmaddw.xyzw vf20, vf4, vf5w
+            lqc2 vf6, 0x10(right)
+            lqc2 vf7, 0x20(right)
+            lqc2 vf8, 0x30(right)
+            vmulax.xyzw ACC, vf1, vf6x
+            vmadday.xyzw ACC, vf2, vf6y
+            vmaddaz.xyzw ACC, vf3, vf6z
+            vmaddw.xyzw vf21, vf4, vf6w
+            vmulax.xyzw ACC, vf1, vf7x
+            vmadday.xyzw ACC, vf2, vf7y
+            vmaddaz.xyzw ACC, vf3, vf7z
+            vmaddw.xyzw vf22, vf4, vf7w
+            vmulax.xyzw ACC, vf1, vf8x
+            vmadday.xyzw ACC, vf2, vf8y
+            vmaddaz.xyzw ACC, vf3, vf8z
+            vmaddw.xyzw vf23, vf4, vf8w
+            sqc2 vf20, 0x0(out)
+            sqc2 vf21, 0x10(out)
+            sqc2 vf22, 0x20(out)
+            sqc2 vf23, 0x30(out)
+            sqc2 vf20, 0x0(matrix)
+            sqc2 vf21, 0x10(matrix)
+            sqc2 vf22, 0x20(matrix)
+            sqc2 vf23, 0x30(matrix)
+        }
+        changed = 0;
     }
-    sceVu0CopyMatrix(matrix, lw_matrix);
-    changed = 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_frame", GetLWMatrixTopBottom__8mgCFrameFPA4_f);
-#endif
 #pragma global_optimizer reset
 
 void mgCFrame::GetInverseMatrix(float (*matrix)[4]) {
