@@ -8018,7 +8018,6 @@ int CheckBuildUp(CGameDataUsed *weapon, int *result0, int *result1, int *result2
     }
     return 0;
 }
-#ifdef STATEMATCHING
 int BuildUpWeaponTrans(CGameDataUsed *item, int item_no) {
     CDataWeapon *data = GameItemDataManage.GetWeaponData(item_no);
     if (item == NULL) {
@@ -8050,9 +8049,6 @@ int BuildUpWeaponTrans(CGameDataUsed *item, int item_no) {
     GetSaveData()->SetBitFlag(0x31, 1);
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menusys", BuildUpWeaponTrans__FP13CGameDataUsedi);
-#endif
 void BuildUpWeaponNameBoardDraw(mgCDrawPrim *prim, float x, float y, int width) {
     mgRect<int> left_rect(0xAC, 0x76, 8, 0x20);
     mgRect<int> middle_rect(0xB4, 0x76, 4, 0x20);
