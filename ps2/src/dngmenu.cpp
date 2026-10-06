@@ -159,7 +159,6 @@ extern char at_1020__3[];
 extern char at_1021__3[];
 int SearchMapNo(char *mapName);
 
-// Code (.text)
 void CDngFreeMap::Initialize() {
     float left = 120.0f;
     float top = 138.0f;
@@ -2822,7 +2821,6 @@ void mgRect<float>::Set(float new_left, float new_top, float new_right, float ne
     bottom = new_bottom;
 }
 
-// Static initialiser (.init)
 extern "C" void __sinit_dngmenu_cpp() {
     dng_light_circle.Set(0x184, 0x130, 0x7C, 0x50);
     dngfreemap_num.Set(0, 0, 0xC, 0x12);
@@ -2831,7 +2829,6 @@ extern "C" void __sinit_dngmenu_cpp() {
     MenuTreeMapStack.Init();
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngmenu", markOffsetTable_1092__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngmenu", root_type_texturecrd_1216__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngmenu", get_moji_tbl_1524__DATA);
@@ -2865,7 +2862,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngmenu", name_tbl_2728__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngmenu", bitTable_2900__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngmenu", at_3141__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngmenu", dng_light_circle__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngmenu", dngfreemap_num__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngmenu", at_1018__5__DATA);
@@ -2926,13 +2922,10 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngmenu", at_3451__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngmenu", at_3539__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngmenu", at_3540__DATA);
 
-// Static initialiser table (.ctor)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngmenu", D_0037B018__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngmenu", __vt__12CMenuTreeMap__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngmenu", zerumaito_offset_1110__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngmenu", stepCntTbl_1501__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngmenu", DngInfoStageNo__DATA);
@@ -2943,7 +2936,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngmenu", maxidtable_2752__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngmenu", at_3043__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dngmenu", at_3164__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(MenuDngDebugFlagSelect, 0x4);
 INCLUDE_BSS(MenuDngMap, 0x4);
 INCLUDE_BSS(dngfloor_infoview, 0x4);
@@ -2985,7 +2977,6 @@ INCLUDE_BSS(at_3145, 0x8);
 INCLUDE_BSS(at_3199, 0x8);
 INCLUDE_BSS(at_3478, 0x8);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(MenuDngMes, 0x20);
 INCLUDE_BSS(treemap_root_put, 0x10);
 INCLUDE_BSS(Floor_Info, 0x10);

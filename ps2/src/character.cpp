@@ -71,14 +71,9 @@ extern char at_1522[];
 extern char at_1570[];
 extern char at_1571[];
 extern CHRINFO_SE *now_se_header;
-/**
- *
- * Pair of visual types stored in one quadword.
- *
- */
 union VisualTypeData {
-    mgCreateVisualType type[2]; /**< Visual types. */
-    u_long128 qw;               /**< The same data as one quadword. */
+    mgCreateVisualType type[2];
+    u_long128 qw;
 };
 
 extern VisualTypeData at_1575;
@@ -139,7 +134,6 @@ int _LOD_MODEL_END(SPI_STACK *stack, int argc);
 
 
 
-// Code (.text)
 void CCharacter2::SetPosition(float *pos) {
     mgCObject::SetPosition(pos);
 }
@@ -274,11 +268,6 @@ float CCharacter2::GetCameraDist() {
 }
 int CCharacter2::DrawDirect() {
     float world_pos[4];
-    /**
-     *
-     * Outline state copied while drawing a character directly.
-     *
-     */
     struct OutlineCopy {
         COutLineDraw *next;
         u_long128 box[2];
@@ -1489,9 +1478,6 @@ int _OUTLINE(SPI_STACK *stack, int argc) {
     return 1;
 }
 
-/**
- * Loads the model with the visual classes needed by its animated vertices.
- */
 static int _MODEL(SPI_STACK *stack, int count) {
     char                weight_name[64];
     char               *model_name;
@@ -2854,12 +2840,10 @@ void CCharacter2::Copy(CCharacter2 &dest, mgCMemory *memory) {
 
 
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/character", tag__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/character", skin_tag__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/character", at_1575__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/character", at_281__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/character", at_282__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/character", at_283__DATA);
@@ -2904,10 +2888,8 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/character", at_1522__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/character", at_1570__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/character", at_1571__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/character", __vt__11CCharacter2__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(root_skin_frame, 0x4);
 INCLUDE_BSS(skin_frame, 0x4);
 INCLUDE_BSS(skin_name_ptr, 0x4);
@@ -2938,7 +2920,6 @@ INCLUDE_BSS(eff_pack_size, 0x4);
 INCLUDE_BSS(load_img_ptr, 0x4);
 INCLUDE_BSS(load_img_size, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(alloc_vertex, 0x190);
 INCLUDE_BSS(img_ptr, 0x20);
 INCLUDE_BSS(skin_mds_name, 0x40);

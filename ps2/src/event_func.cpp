@@ -69,57 +69,27 @@
 #include <cmath>
 #include <cstdlib>
 
-/**
- *
- * File name extensions used by event script commands.
- *
- */
 struct ExtensionTable {
-    char *name[4]; /**< Extension names. */
+    char *name[4];
 };
-/**
- *
- * Event script function and its numeric identifier.
- *
- */
 struct EventScriptFunc {
-    int (*func)(RS_STACKDATA *, int); /**< Function called by the script. */
-    int id; /**< Script function identifier. */
+    int (*func)(RS_STACKDATA *, int);
+    int id;
 };
-/**
- *
- * Group, kind and identifiers of one VPK resource.
- *
- */
 struct VpkEntry {
-    int group; /**< Resource group. */
-    int kind;  /**< Resource kind. */
-    int id;    /**< Resource identifier. */
-    int sub;   /**< Subresource identifier. */
+    int group;
+    int kind;
+    int id;
+    int sub;
 };
-/**
- *
- * VPK resource entries used by event scripts.
- *
- */
 struct VpkTable {
-    VpkEntry entry[164]; /**< Resource entries. */
+    VpkEntry entry[164];
 };
-/**
- *
- * Integer training values indexed by non-player character.
- *
- */
 struct NpcTrainTable {
-    int value[25][3]; /**< Training values. */
+    int value[25][3];
 };
-/**
- *
- * Floating point training values indexed by non-player character.
- *
- */
 struct TrainNpcTable {
-    float row[12][4]; /**< Training value rows. */
+    float row[12][4];
 };
 extern TrainNpcTable at_3242;
 extern NpcTrainTable at_4517;
@@ -315,7 +285,6 @@ extern char at_6834[];
 extern char at_5726[];
 extern char at_5736[];
 
-// Code (.text)
 CEoh::CEoh(void) {
     type = EOH_TYPE_NONE;
     scene_no = -1;
@@ -14136,10 +14105,8 @@ void SetEventFunc(CRunScript *script) {
     script->ext_func(ext_func__2, event_func_slots);
 }
 
-// Static initialiser (.init)
 
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/event_func", at_1084__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/event_func", esa_ext_func_info__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/event_func", at_3242__DATA);
@@ -14149,7 +14116,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/event_func", at_4517__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/event_func", at_6800__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/event_func", ext_func_info__2__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/event_func", at_1080__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/event_func", at_1081__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/event_func", at_1082__DATA);
@@ -14259,14 +14225,11 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/event_func", at_9745__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/event_func", at_10100__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/event_func", at_10101__DATA);
 
-// Static initialiser table (.ctor)
-
-
-// Small uninitialised data (.sbss)
 
 
 
-// Uninitialised data (.bss)
+
+
 INCLUDE_BSS(EdEventInfo, 0x12A0);
 inline CEventScriptArg::CEventScriptArg() {
     next_id = 0;

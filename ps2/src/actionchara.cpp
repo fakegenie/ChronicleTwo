@@ -52,23 +52,13 @@ extern char at_1427[];
 extern char at_1428[];
 extern CScene *nowScene__2;
 void GuardEffectSet(CScene *scene, float *point);
-/**
- *
- * Four action values viewed as floats, integers or one quadword.
- *
- */
 union ActionVector {
-    float f[4];    /**< Floating point values. */
-    int i[4];      /**< Integer values. */
-    u_long128 qw;  /**< Quadword value. */
+    float f[4];
+    int i[4];
+    u_long128 qw;
 };
-/**
- *
- * Item numbers that a character can throw.
- *
- */
 struct ThrowItemTable {
-    int item_no[19]; /**< Item numbers. */
+    int item_no[19];
 };
 extern ThrowItemTable at_1398;
 extern CMonsterMan *ActiveMonster;
@@ -90,7 +80,6 @@ void HitEffectSet(CScene *scene, float *point);
 int CheckAmuletAvoid(int item_no);
 int CheckEquipSetItem(int item_no);
 
-// Code (.text)
 void CActionChara::ResetAccele(void) {
     accele.accele[2] = 0;
     accele.accele[1] = 0;
@@ -3262,7 +3251,6 @@ void GuardEffectSet(CScene *scene, float *point) {
 
 
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/actionchara", at_1398__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/actionchara", at_2048__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/actionchara", at_2543__DATA);
@@ -3273,7 +3261,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/actionchara", at_2846__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/actionchara", at_3289__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/actionchara", at_3291__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/actionchara", at_1325__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/actionchara", at_1357__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/actionchara", at_1358__DATA);
@@ -3318,13 +3305,10 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/actionchara", at_3262__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/actionchara", at_3263__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/actionchara", at_3389__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/actionchara", __vt__12CActionChara__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(old_angle, 0x4);
 INCLUDE_BSS(ang_3371, 0x4);
 INCLUDE_BSS(init_3372, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(at_3107, 0x10);

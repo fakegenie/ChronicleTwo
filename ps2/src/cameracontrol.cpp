@@ -13,21 +13,15 @@
 
 #include <cmath>
 
-/**
- *
- * Camera control vector viewed as floats or a quadword.
- *
- */
 union camera_control_vector {
-    float values[4];  /**< Floating point components. */
-    u_long128 quadword; /**< The same components as a quadword. */
+    float values[4];
+    u_long128 quadword;
 };
 
 extern "C" camera_control_vector at_373__3;
 extern "C" u_char at_396__3[];
 extern "C" CameraCtrlParam &__as__15CameraCtrlParamFRC15CameraCtrlParam(CameraCtrlParam *dest, const CameraCtrlParam *src);
 
-// Code (.text)
 void CameraCtrlParam::SetFixHeight(float height) {
     max_height = height;
     min_height = height;
@@ -572,11 +566,8 @@ int CCameraControl::Iam(void) {
     return 1000;
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/cameracontrol", at_396__3__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/cameracontrol", __vt__14CCameraControl__DATA);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(at_373__3, 0x10);

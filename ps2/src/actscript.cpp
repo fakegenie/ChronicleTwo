@@ -41,22 +41,12 @@ extern int (*ext_func__3[256])(RS_STACKDATA *, int);
 extern float at_1181__3[4];
 extern float at_1417__3[4];
 extern int at_1597__2[4];
-/**
- *
- * Names of cannon objects selected by the action script.
- *
- */
 struct CanonObjectNames {
-    char *name[4][2]; /**< Names grouped by cannon variant. */
+    char *name[4][2];
 };
 extern CanonObjectNames at_1645__2;
-/**
- *
- * RGB colours used by the action script's rings.
- *
- */
 struct RingColors {
-    int rgb[4][3]; /**< Red, green and blue components of each ring colour. */
+    int rgb[4][3];
 };
 extern RingColors at_1774;
 extern RS_EXTFUNC_INFO ext_func_info__3[];
@@ -93,38 +83,27 @@ extern char at_1729__2[];
 extern char at_1730__2[];
 extern char at_2004__4[];
 extern char at_2005__3[];
-/**
- *
- * Accumulation effect state accessed by action script commands.
- *
- */
 struct AccumeSlot {
-    mgCFrame *effect; /**< Effect frame. */
+    mgCFrame *effect;
     char unk_4[0x28C];
     int clear[32];
-    int mode; /**< Effect mode. */
+    int mode;
     int unk_314;
     int unk_318;
-    float scale; /**< Effect scale. */
+    float scale;
     int unk_320;
     int unk_324;
 };
 void ParabolicInitialVector(float *result, float *from, float *to, float gravity, float flight_time);
 
-/**
- *
- * Action script vector viewed as floats or one quadword.
- *
- */
 union ScriptVector {
-    float value[4]; /**< Floating point components. */
-    u_long128 quadword; /**< The same components as one quadword. */
+    float value[4];
+    u_long128 quadword;
 };
 
 extern "C" void RemoveThrowItem__12CActionCharaFv(void *chara);
 extern "C" int GetModelNo__13CGameDataUsedFv(void *data);
 
-// Code (.text)
 
 static int GetStackInt(RS_STACKDATA *slot) {
     if (slot->type == 1) {
@@ -1680,7 +1659,6 @@ void ParabolicInitialVector(float *result, float *from, float *to, float gravity
 
 
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/actscript", at_1181__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/actscript", at_1417__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/actscript", at_1597__2__DATA);
@@ -1688,7 +1666,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/actscript", at_1645__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/actscript", at_1774__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/actscript", ext_func_info__3__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/actscript", at_1118__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/actscript", at_1202__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/actscript", at_1211__DATA);
@@ -1723,7 +1700,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/actscript", at_1730__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/actscript", at_2004__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/actscript", at_2005__3__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(nowScene__2, 0x4);
 INCLUDE_BSS(LastCInfo2__2, 0x4);
 INCLUDE_BSS(sw_1617, 0x4);
@@ -1733,6 +1709,5 @@ INCLUDE_BSS(init_1621, 0x4);
 INCLUDE_BSS(cnt_1661, 0x4);
 INCLUDE_BSS(init_1662, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(action_info, 0x10);
 INCLUDE_BSS(ext_func__3, 0x400);

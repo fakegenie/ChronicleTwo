@@ -35,12 +35,6 @@ static inline u_int align16_blocks(u_int size) {
     return size >> 4;
 }
 
-// Code (.text)
-/**
- *
- * Pulls two bound points toward their target separation.
- *
- */
 void BindPosition(float *a, float *b, float length, float rate) {
     float delta[4];
     float pull_a[4];
@@ -963,10 +957,8 @@ int CDAColPipe::CheckHit(float *point) {
     return 1;
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dynamicanime", dynmc_tag__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dynamicanime", at_816__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dynamicanime", at_817__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dynamicanime", at_818__DATA);
@@ -1002,11 +994,9 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dynamicanime", at_979__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dynamicanime", at_1025__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dynamicanime", at_1074__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dynamicanime", __vt__10CDAColPipe__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dynamicanime", __vt__12CDACollision__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(dynNowDA, 0x4);
 INCLUDE_BSS(dynStack, 0x4);
 INCLUDE_BSS(dynTopFrame, 0x4);

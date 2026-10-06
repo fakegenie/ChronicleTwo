@@ -32,7 +32,6 @@ extern "C" NpcLiveName at_983__3;
 extern int LanguageCode;
 extern u_long128 at_796__4;
 
-// Code (.text)
 static void PlaneNormalXZ(float *normal, float *p0, float *p1, float *p2) {
     asm {
         lqc2 vf15, 0(p0)
@@ -796,11 +795,9 @@ int CEditMap::GetSeSrcVolPan(int *ids, float *vols, float *pans, int max) {
     return count;
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmap2", at_796__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmap2", at_983__3__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmap2", at_1042__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmap2", at_1043__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmap2", at_1127__3__DATA);
@@ -808,9 +805,7 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmap2", at_1128__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmap2", at_1129__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmap2", at_1130__2__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(cnt_482, 0x4);
 INCLUDE_BSS(init_483, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(at_1050__2, 0x10);

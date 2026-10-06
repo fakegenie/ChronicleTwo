@@ -44,7 +44,6 @@ extern "C" void *__construct_new_array(void *buffer, void *(*constructor)(void *
 extern char at_1051[];
 extern char at_1214__2[];
 
-// Code (.text)
 float trans_effect_rate(int rate) {
     float f = (float)rate / 255.0f;
     if (1.0f < f) {
@@ -3220,7 +3219,6 @@ float fRand(float limit) {
     return (limit * (float) rand()) / 2.1474836e9f;
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_effect", chill_tex_rect_910__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_effect", gb_tbl_1052__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_effect", thn_tbl__DATA);
@@ -3229,11 +3227,9 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_effect", at_1215__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_effect", at_1216__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_effect", at_3214__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_effect", at_1107__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_effect", at_1981__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_effect", at_2882__DATA);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(at_1051, 0x10);
 INCLUDE_BSS(at_1214__2, 0x10);

@@ -51,17 +51,11 @@ int _ROOM_RATE(SPI_STACK *stack, int argCount);
 int _RD(SPI_STACK *stack, int argCount);
 int _ROOM_END(SPI_STACK *stack, int argCount);
 
-/**
- *
- * Grid position of a linked dungeon room.
- *
- */
 struct ROOM_LINK_POINT {
-    int x; /**< Horizontal grid position. */
-    int y; /**< Vertical grid position. */
+    int x;
+    int y;
 };
 
-// Code (.text)
 void CMiniMapSymbol::SetMapInfo(CMap *newMap, CAutoMapParts *newAutoMapParts, int width, int height,
                                 float cellWidth, float cellDepth) {
     if (newMap == 0) {
@@ -1871,7 +1865,6 @@ void CAutoMapGen::UpdateNaviMap(float *pos, int depth) {
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/automap", UpdateNaviMap__11CAutoMapGenFPfi);
 #endif
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/automap", PartsInfoData__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/automap", MiniMapInfoData__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/automap", symbol_table__DATA);
@@ -1883,7 +1876,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/automap", at_2212__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/automap", at_2298__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/automap", at_2299__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/automap", at_778__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/automap", at_779__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/automap", at_780__DATA);
@@ -2182,7 +2174,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/automap", at_2377__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/automap", at_2561__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/automap", at_2609__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(auto_map, 0x4);
 INCLUDE_BSS(nowPrisetStack, 0x4);
 INCLUDE_BSS(nowPriset, 0x4);

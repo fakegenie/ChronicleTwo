@@ -13,7 +13,6 @@ struct CollisionRow {
 #include <libvu0.h>
 
 
-// Code (.text)
 int ClipBoxXZ(float *max_a, float *min_a, float *max_b, float *min_b) {
     int flags;
     asm {
@@ -391,7 +390,6 @@ void CEditCollision::ApplyMatrix(float (*matrix)[4]) {
     for (i = 0; i < poly_count; i++, p++) {
         mgApplyMatrixN(p->vertex, matrix, p->vertex, 3);
 
-        // Heights are rounded to the nearest whole unit.
         for (j = 0; j < 3; j++) {
             if (p->vertex[j][1] > 0.0f) {
                 p->vertex[j][1] = (int)(p->vertex[j][1] + 0.5f);
