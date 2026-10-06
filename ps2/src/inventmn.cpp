@@ -256,7 +256,6 @@ struct ScreenPoint { int xy[2];  };
 extern ScreenPoint at_3363;
 extern NetaClipRange at_3379;
 extern CursorPos at_3509;
-extern ScreenPoint at_4493;
 
 struct MenuColor { u8 rgba[4];  };
 extern MenuColor at_4494;
@@ -4532,7 +4531,6 @@ void MakeMsgNetaName(CDC2Mes *message, CMenuPosDataForm *form, USER_PICTURE_INFO
     }
 }
 
-#ifdef NONMATCHING
 void MenuInventCreateCardDraw(int &tex_block, float *pos) {
     int i;
     mgCTexture *texture = Tex_Hatsumei;
@@ -4542,10 +4540,8 @@ void MenuInventCreateCardDraw(int &tex_block, float *pos) {
         mgRect<int> put_rect;
         put_rect.Set(0, 0, 0, 0);
         mgCDrawPrim *prim = GetMenuPrim();
-        ScreenPoint origin = at_4493;
-        origin.xy[0] = (int)pos[0];
-        origin.xy[1] = (int)pos[1];
-        put_rect.Set(origin.xy[0], origin.xy[1], card_rect.right, card_rect.bottom);
+        int origin[2] = {(int)pos[0], (int)pos[1]};
+        put_rect.Set(origin[0], origin[1], card_rect.right, card_rect.bottom);
         MenuColor rgba = at_4494;
         SetSpriteEnv(prim, 0);
         prim->Bilinear(1);
@@ -4565,8 +4561,8 @@ void MenuInventCreateCardDraw(int &tex_block, float *pos) {
         mgCTexture *icon_tex = MenuPosData->item_icon_tex[0][0];
         if (icon_tex != NULL) {
             MenuReloadTexture(tex_block, icon_tex->block);
-            put_rect.left = origin.xy[0] + 35;
-            put_rect.top = origin.xy[1] + 6;
+            put_rect.left = origin[0] + 35;
+            put_rect.top = origin[1] + 6;
             for (i = 0; i < 256; i++) {
                 if (put_rect.top + put_rect.bottom >= 20) {
                     mgRect<float> icon_rect(put_rect.left, put_rect.top, 32.0f, 33.0f);
@@ -4581,18 +4577,20 @@ void MenuInventCreateCardDraw(int &tex_block, float *pos) {
         MenuReloadTexture(tex_block, -1);
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/inventmn", MenuInventCreateCardDraw__FRiPf);
-#endif
-#ifdef NONMATCHING
 void PictureDraw(mgCTexture *tex, USER_PICTURE_INFO *photo, float x, float y, float scale, int alpha, int red,
                  int blue, int green) {
+    float w;
+    float h;
+    float right;
+    float bottom;
+    mgRect<int> tex_rect;
+    mgCDrawPrim *prim;
+    mgRect<int> put_rect;
     if (tex == NULL) {
         return;
     }
-    float w = 80.0f;
-    float h = 64.0f;
-    mgRect<int> tex_rect;
+    w = 80.0f;
+    h = 64.0f;
     tex_rect.Set(0, 0, 64, 64);
     w *= scale;
     x += (80.0f - w) / 2.0f;
@@ -4601,18 +4599,19 @@ void PictureDraw(mgCTexture *tex, USER_PICTURE_INFO *photo, float x, float y, fl
     if (mgScreenWidth < x) {
         return;
     }
-    float bottom = y + h;
+    bottom = y + h;
     if (bottom < 0.0f) {
         return;
     }
-    mgCDrawPrim *prim = GetMenuPrim();
+    prim = GetMenuPrim();
     SetSpriteEnv(prim, 1);
     prim->Shading(0);
     prim->AntiAliasing(1);
     prim->Begin(6);
     prim->Color(0x20, 0x20, 0x20, alpha * 2 / 3);
     prim->Vertex(3.0f + (x - 2.0f), 3.0f + (y - 2.0f), 0.0f);
-    float right = 2.0f + (x + w);
+    right = x + w;
+    right = 2.0f + right;
     bottom = 2.0f + bottom;
     prim->Vertex(3.0f + right, 3.0f + bottom, 0.0f);
     prim->Color(10, 10, 10, alpha);
@@ -4639,14 +4638,10 @@ void PictureDraw(mgCTexture *tex, USER_PICTURE_INFO *photo, float x, float y, fl
     prim->Texture(tex);
     prim->Color(red, green, blue, alpha);
     prim->Direct(0x3B, 0x80 | (0x80UL << 32));
-    mgRect<int> put_rect;
     put_rect.Set(x, y, w, h);
     PrimQuad(prim, put_rect, tex_rect);
     prim->End();
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/inventmn", PictureDraw__FP10mgCTextureP17USER_PICTURE_INFOfffiiii);
-#endif
 void PictureMemoOne(float x, float y, int alpha) {
     mgCDrawPrim *prim;
 
