@@ -376,7 +376,6 @@ void CSound::DEL_PORT(int port) {
     }
 }
 
-#ifdef STATEMATCHING
 void CSound::SQ_Play(int port, int seq_no, int volume) {
     void *sequence;
 
@@ -397,9 +396,6 @@ void CSound::SQ_Play(int port, int seq_no, int volume) {
     ezMidi(port + 0x30, 0);
     ezMidi(port, 0);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/sound", SQ_Play__6CSoundFiii);
-#endif
 
 void CSound::SQ_RePlay(int port) {
     if (midi_state.port[port].sequence_count > 0) {
@@ -517,7 +513,6 @@ void CSound::SE_Stop(int port, int bank, int program, int key, int id) {
     }
 }
 
-#ifdef STATEMATCHING
 void CSound::Step() {
     int port;
 
@@ -552,9 +547,6 @@ void CSound::Step() {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/sound", Step__6CSoundFv);
-#endif
 
 void CSound::Stop(int port) {
     ezMidi(port + 0x20, 0);
@@ -585,9 +577,10 @@ void CSound::LoadHdBd(int port, int hd, int hd_size, int bd, int bd_size) {
 void CSound::LoadHdBd2(int port, int hd, int hd_size, int bd, int bd_size) {
     int        dependent;
     int        dependent_port;
+    MIDI_PORT *child;
     int        stream_port;
     MSIN_BUFFER *buffer;
-    MIDI_PORT *child;
+    int slot;
 
     stream_port = port - MIDI_PORT_MSIN_FIRST;
     if (stream_port >= 0) {
@@ -615,7 +608,7 @@ void CSound::LoadHdBd2(int port, int hd, int hd_size, int bd, int bd_size) {
         ezMidi(midi_state.port[port].linked_port + 0x20, 0);
         ezMidi(midi_state.port[port].linked_port + 0x9050, (int)&gBank);
     }
-    for (int slot = 0; slot < midi_state.port[port].bank_count; slot++) {
+    for (slot = 0; slot < midi_state.port[port].bank_count; slot++) {
         sceSifInitIopHeap();
         sceSifFreeSysMemory(midi_state.port[port].bank[slot]);
         midi_state.port[port].bank[slot] = NULL;
@@ -635,7 +628,7 @@ void CSound::LoadHdBd2(int port, int hd, int hd_size, int bd, int bd_size) {
             buffer = &msinBf[stream_port];
             buffer->length = 0;
         }
-        for (int slot = 0; slot < midi_state.port[midi_state.port[port].linked_port].bank_count; slot++) {
+        for (slot = 0; slot < midi_state.port[midi_state.port[port].linked_port].bank_count; slot++) {
             midi_state.port[midi_state.port[port].linked_port].bank[slot] = NULL;
         }
         midi_state.port[midi_state.port[port].linked_port].bank_count = 0;

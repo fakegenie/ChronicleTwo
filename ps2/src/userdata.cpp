@@ -65,7 +65,6 @@ extern char at_1637[];
 extern char at_2061[];
 extern char at_2018[];
 extern char at_2019[];
-extern char at_5773[];
 struct DEBUG_ITEM {
     short item_no;
     short num;
@@ -77,7 +76,7 @@ extern DEBUG_ITEM e3_town_5747[];
 extern DEBUG_ITEM e3_dng_5748[];
 extern DEBUG_ITEM e3_boss_5749[];
 extern s8 init_partytbl_5752[];
-extern DEBUG_ITEM dbg_set1_5774[];
+extern DEBUG_ITEM dbg_set1_5774[1];
 extern DEBUG_ITEM dbg_set2_5775[];
 extern DEBUG_ITEM dbg_set3_5776[];
 extern DEBUG_ITEM subgame1_5788[];
@@ -1728,11 +1727,16 @@ int CFishAquarium::CheckHaigouTankSex(CGameDataUsed *fish) {
 }
 #ifdef NONMATCHING
 void CFishAquarium::RefreshParam() {
+    int i;
+    bool crowded;
+    float hour;
+    int in_tank;
+    int tired;
     int now = GetSaveData()->play_time;
     s64 elapsed = now - last_time;
     last_time = now;
     int day = GetMainScene()->day;
-    float hour = GetMainScene()->time;
+    hour = GetMainScene()->time;
     float hours = hour - last_hour;
     int days = day - last_day;
     if (hours < 0.0f && 0 < days) {
@@ -1743,21 +1747,22 @@ void CFishAquarium::RefreshParam() {
         }
     }
     int fatigue_step = 0;
-    if (6.0f <= (float)fptosi(hours + 24.0f * (float)days)) {
+    hours += 24.0f * (float)days;
+    if (6.0f <= (float)fptosi(hours)) {
         fatigue_step = 1;
     }
-    for (int i = 0; i < 6; i++) {
+    for (i = 0; i < 6; i++) {
         fish_tank[i].TimeCheck(elapsed);
     }
-    bool crowded = false;
-    if (GetAquariumFishNum(1) >= 2) {
+    crowded = false;
+    if (GetAquariumFishNum(1) > 1) {
         crowded = true;
     }
-    for (int i = 0; i < 4; i++) {
+    for (i = 0; i < 4; i++) {
         if (sub_tank[i].item_no > 0) {
             sub_tank[i].TimeCheck(elapsed);
-            float tank_hours = hour - sub_tank[i].data.fish.tank_hour;
             int tank_days = day - sub_tank[i].data.fish.tank_day;
+            float tank_hours = hour - sub_tank[i].data.fish.tank_hour;
             if (tank_hours < 0.0f && 0 < tank_days) {
                 tank_days--;
                 tank_hours += 24.0f;
@@ -1765,10 +1770,10 @@ void CFishAquarium::RefreshParam() {
                     tank_days = 0;
                 }
             }
-            int in_tank = fptosi(tank_hours + 24.0f * (float)tank_days);
+            in_tank = fptosi(tank_hours + 24.0f * (float)tank_days);
             int tired = 0;
             while (crowded && in_tank - 6 >= 0) {
-                if ((u32)sub_tank[i].data.fish.hp >= 16) {
+                if ((u32)sub_tank[i].data.fish.hp > 15) {
                     sub_tank[i].data.fish.param[4]++;
                     sub_tank[i].AddFishHp(-5);
                     sub_tank[i].CheckParamLimmit();
@@ -1786,7 +1791,7 @@ void CFishAquarium::RefreshParam() {
             }
         }
     }
-    for (int i = 0; i < 2; i++) {
+    for (i = 0; i < 2; i++) {
         breed_tank[i].TimeCheck(elapsed);
     }
     if (fatigue_step) {
@@ -2737,13 +2742,15 @@ void CUserDataManager::AllWeaponRepair() {
     robo_data.parts[0].Repair(999);
     robo_data.AddPoint(999.0f);
 }
-#ifdef NONMATCHING
 void CUserDataManager::RefreshNPCStatus(int mode) {
     CGameDataUsed *repair_item[144];
+    int i;
+    int uses;
     int day = GetSaveData()->day;
+    float now = GetSaveData()->now_time;
     int refresh = 0;
-    float elapsed = GetSaveData()->now_time - npc_refresh_hour;
     int days = day - npc_refresh_day;
+    float elapsed = now - npc_refresh_hour;
 
     if (elapsed < 0.0f) {
         days--;
@@ -2757,28 +2764,24 @@ void CUserDataManager::RefreshNPCStatus(int mode) {
         refresh = 1;
     }
     if (refresh != 0) {
-        int time = fptosi(elapsed);
+        int time = (int)elapsed;
         if (NowPartyCharaID() == 0xB) {
-            int repair_num = 0;
-            if (time > 0) {
-                for (int i = 0; i < 144; i++) {
+            if (0 < time) {
+                int repair_num = 0;
+                for (i = 0; i < 144; i++) {
                     CGameDataUsed *item = GetUsedDataPtr(i);
                     if (item->used_type == USED_ITEM_TYPE_WEAPON && item->IsRepair() != 0) {
                         repair_item[repair_num++] = item;
                     }
                 }
-                if (repair_num > 0) {
-                    int uses = 0;
-                    if (time > 0) {
-                        while (uses < time) {
-                            if (UseNpcAbility(0xB, 3, 1) == 0) {
-                                time = uses;
-                                break;
-                            }
-                            uses++;
+                if (0 < repair_num) {
+                    for (uses = 0; uses < time; uses++) {
+                        if (UseNpcAbility(0xB, 3, 1) == 0) {
+                            time = uses;
+                            break;
                         }
                     }
-                    for (int i = 0; i < repair_num; i++) {
+                    for (i = 0; i < repair_num; i++) {
                         repair_item[i]->Repair(time * 2);
                     }
                 }
@@ -2794,10 +2797,10 @@ void CUserDataManager::RefreshNPCStatus(int mode) {
                     gain = 1.0f;
                 }
                 float total = (float)info->point + gain;
-                if (total > 1000.0f) {
+                if (1000.0f < total) {
                     info->point = max_point;
                 } else {
-                    info->point = fptosi(total);
+                    info->point = (int)total;
                 }
                 if (npc->max_npc_point < info->point) {
                     info->point = npc->max_npc_point;
@@ -2810,9 +2813,6 @@ void CUserDataManager::RefreshNPCStatus(int mode) {
         npc_refresh_hour = GetSaveData()->now_time;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/userdata", RefreshNPCStatus__16CUserDataManagerFi);
-#endif
 int CUserDataManager::GetFishingRodNo() {
     return chara_data[0].equip[0].item_no;
 }
@@ -3420,19 +3420,22 @@ int CUserDataManager::GetOverItem(int item_no, int count) {
 int CUserDataManager::CheckItemLimmitOver() {
     u16 item_count[0x200];
     u16 item_count2[0x200];
+    int i;
+    CGameDataUsed *inventory;
+    int bag_size;
 
     memset(item_count, 0, sizeof(item_count));
     memset(item_count2, 0, sizeof(item_count2));
-    CGameDataUsed *inventory = GetUsedDataPtr(0);
-    int bag_size = GetNowBagMax(1);
-    for (int i = 0; i < bag_size; i++) {
-        CGameDataUsed *used = &inventory[i];
-        int owned_no = used->item_no;
+    inventory = GetUsedDataPtr(0);
+    bag_size = GetNowBagMax(1);
+    for (i = 0; i < bag_size; i++) {
+        int owned_no;
+        owned_no = inventory[i].item_no;
         if (0 < owned_no) {
-            item_count[owned_no] += used->GetNum();
-            if (0 < used->GetGiftBoxItemNum()) {
+            item_count[owned_no] += inventory[i].GetNum();
+            if (0 < inventory[i].GetGiftBoxItemNum()) {
                 for (int k = 0; k < 3; k++) {
-                    int gift = used->GetGiftBoxItemNo(k);
+                    int gift = inventory[i].GetGiftBoxItemNo(k);
                     if (gift > 0) {
                         item_count[gift]++;
                     }
@@ -3442,10 +3445,11 @@ int CUserDataManager::CheckItemLimmitOver() {
     }
     CHARA_DATA *charas = GetCharaDataPtr(0);
     for (int chara = 0; chara < 2; chara++) {
+        charas += chara;
         for (int slot = 0; slot < 3; slot++) {
-            CGameDataUsed *active = &charas[chara].active_item[slot];
+            CGameDataUsed *active = &charas->active_item[slot];
             int active_no = active->item_no;
-            if (0 < active_no) {
+            if (active_no > 0) {
                 item_count[active_no] += active->GetNum();
                 if (0 < active->GetGiftBoxItemNum()) {
                     for (int k = 0; k < 3; k++) {
@@ -3458,10 +3462,10 @@ int CUserDataManager::CheckItemLimmitOver() {
             }
         }
     }
-    for (unsigned int item_no = 1; item_no < 0x200; item_no++) {
-        CDataCommon *common = GetCommonItemData(item_no);
-        if (common != NULL && common->max_num < item_count[item_no]) {
-            return item_no;
+    for (i = 1; i < 0x200; i++) {
+        CDataCommon *common = GetCommonItemData(i);
+        if (common != NULL && common->max_num < item_count[i]) {
+            return i;
         }
     }
     return 0;
@@ -3795,7 +3799,8 @@ int CBattleCharaInfo::GetPalletNo(int slot) {
 }
 #ifdef NONMATCHING
 void CBattleCharaInfo::RefreshParamater() {
-    if (chara_data == NULL && chara_data == NULL) {
+    if (chara_data != NULL) {
+    } else if (chara_data == NULL) {
         return;
     }
     memset(weapon_param, 0, 0x40);
@@ -3814,7 +3819,7 @@ void CBattleCharaInfo::RefreshParamater() {
             weapon_rate[0] = 1.5f;
             weapon_rate[1] = 1.5f;
         }
-        defence = *(u16 *)&((CHARA_DATA *)chara_data)->defence;
+        defence = (u16 &)((CHARA_DATA *)chara_data)->defence;
         int i = 0;
         while (i < 2) {
             WEAPON_USED *weapon0 = &equipment[i].data.weapon;
@@ -4867,12 +4872,10 @@ void AquaFishFatigueClear(void) {
         tank++;
     } while (tank < 3);
 }
-#ifdef NONMATCHING
 void DebugGetItem(CUserDataManager *user_data, int mode) {
     CUserDataManager *manager = user_data;
     DEBUG_ITEM *items;
     DEBUG_ITEM *extra_items;
-    short equip_no[4];
     CGameDataUsed *attach;
 
     if (user_data == NULL) {
@@ -4926,7 +4929,7 @@ void DebugGetItem(CUserDataManager *user_data, int mode) {
         manager->EnableCharaChange(2);
         items = e3_boss_5749;
     }
-    memcpy(equip_no, at_5773, sizeof(equip_no));
+    short equip_no[4] = {0, 0, 0, 0};
     if (mode == 7) {
         items = dbg_set1_5774;
         extra_items = &start_tbl_5746[1];
@@ -4986,21 +4989,25 @@ void DebugGetItem(CUserDataManager *user_data, int mode) {
             manager->GetCharaDataPtr(0)->hp.max = 48.0f;
             manager->GetCharaDataPtr(0)->defence = 8;
         }
-        if (equip_no[0] >= 2) {
-            manager->GetItem(equip_no[0], 1);
-            manager->SetChrEquip(0, equip_no[0]);
+        int e0 = equip_no[0];
+        if (e0 > 1) {
+            manager->GetItem(e0, 1);
+            manager->SetChrEquip(0, e0);
         }
-        if (equip_no[1] >= 2) {
-            manager->GetItem(equip_no[1], 1);
-            manager->SetChrEquip(0, equip_no[1]);
+        int e1 = equip_no[1];
+        if (e1 > 1) {
+            manager->GetItem(e1, 1);
+            manager->SetChrEquip(0, e1);
         }
-        if (equip_no[2] >= 2) {
-            manager->GetItem(equip_no[2], 1);
-            manager->SetChrEquip(1, equip_no[2]);
+        int e2 = equip_no[2];
+        if (e2 > 1) {
+            manager->GetItem(e2, 1);
+            manager->SetChrEquip(1, e2);
         }
-        if (equip_no[3] >= 2) {
-            manager->GetItem(equip_no[3], 1);
-            manager->SetChrEquip(1, equip_no[3]);
+        int e3 = equip_no[3];
+        if (e3 > 1) {
+            manager->GetItem(e3, 1);
+            manager->SetChrEquip(1, e3);
         }
         if (extra_items != NULL) {
             for (int i = 0; extra_items[i].item_no > 0; i++) {
@@ -5009,9 +5016,6 @@ void DebugGetItem(CUserDataManager *user_data, int mode) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/userdata", DebugGetItem__FP16CUserDataManageri);
-#endif
 
 extern "C" void __sinit_userdata_cpp() {
     BattleParamater.Initialize();

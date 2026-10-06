@@ -395,17 +395,17 @@ void MenuManualInit(mgCMemory *memory, int *texBlock, int mode) {
 int MenuManualKey() {
     return CManualPtr->KeyStep();
 }
-#ifdef NONMATCHING
 void MenuManualDraw() {
     CManualMenu *menu;
-    mgCTexture *picture;
     CUserDataManager *userData;
-    CActionChara *chara;
+    u_long128 *effectBuffer;
     u_long128 *buffer;
+    mgCTexture *picture;
     int closed;
-    u_char isTown;
+    int isTown;
     int attribute;
     int chrNo;
+    CActionChara *chara;
 
     menu = CManualPtr;
     closed = 0;
@@ -455,13 +455,11 @@ void MenuManualDraw() {
                 sceGsSyncV(0);
                 sceGsSyncV(0);
                 userData = GetUserDataMan();
-                StaticMenuLocalStack2.stack_used = 0;
-                StaticMenuLocalStack2.lock = 0;
-                buffer = StaticMenuLocalStack2.stack + StaticMenuLocalStack2.stack_used;
-                isTown = !GetMenuLoopType();
+                StaticMenuLocalStack2.stReset();
+                buffer = StaticMenuLocalStack2.stGetTop();
+                isTown = (u_char)!GetMenuLoopType();
                 textures->DeleteBlock(MenuArg.chara_tex_block);
-                MenuArg.chara_stack->stack_used = 0;
-                MenuArg.chara_stack->lock = 0;
+                MenuArg.chara_stack->stReset();
                 SetupMainUnit(buffer, MenuArg.chara_stack, MenuArg.base_chara_stack,
                               MenuArg.chara_tex_block, GetMainScene(), userData,
                               userData->active_chr_no, isTown);
@@ -469,13 +467,12 @@ void MenuManualDraw() {
                 chara = (CActionChara *)GetMainScene()->GetCharacter(0);
                 MenuCharaSoundEnter(GetMainScene(), chara, 1);
                 if (userData->active_chr_no == USER_CHARA_MONSTER) {
-                    StaticMenuLocalStack2.stack_used = 0;
-                    StaticMenuLocalStack2.lock = 0;
+                    StaticMenuLocalStack2.stReset();
                     MonsterEffectRead(&StaticMenuLocalStack2, userData->monster_id, 0);
                     StaticMenuLocalStack2.Align64();
                     StaticMenuLocalStack2.Alloc(0x280);
-                    buffer = StaticMenuLocalStack2.stack + StaticMenuLocalStack2.stack_used;
-                    MonsterEffectEnter(GetMainScene(), buffer);
+                    effectBuffer = StaticMenuLocalStack2.stGetTop();
+                    MonsterEffectEnter(GetMainScene(), effectBuffer, 0xAA);
                 }
                 if (isTown == 0) {
                     chara->effect_man = FxScriptMan;
@@ -487,9 +484,8 @@ void MenuManualDraw() {
                 }
                 chara->Step();
                 SetMenuEtcFlag(1);
-                MenuMainTextureReadBuf.stack_used = 0;
-                MenuMainTextureReadBuf.lock = 0;
-                LoadFileMenu(at_1237__4, MenuMainTextureReadBuf.stack + MenuMainTextureReadBuf.stack_used, 1);
+                MenuMainTextureReadBuf.stReset();
+                LoadFileMenu(at_1237__4, MenuMainTextureReadBuf.stGetTop(), 1);
                 MenuBaseTextureReEnter();
                 closed = 1;
             }
@@ -501,21 +497,20 @@ void MenuManualDraw() {
         break;
     }
     if (menu_debug_flag != 0) {
-        CMenuFont menuFont;
         DrawMenuFillBox(300.0f, 10.0f, 310.0f, 24.0f, 0x40, 0, 0, 0);
+        CMenuFont menuFont;
         menuFont.DrawDirect(at_1238__2, 0x12C, 0xA);
     }
     if (closed != 0) {
         SetMenuFrameRate(1);
-        StaticMenuLocalStack2.stack_used = 0;
-        StaticMenuLocalStack2.lock = 0;
+        StaticMenuLocalStack2.stReset();
         MenuMainScene->StopBGM(0);
         sceGsSyncV(0);
         sceGsSyncV(0);
         sceGsSyncV(0);
         CSnd.SndInReverb(1);
         MenuMainScene->LoadBGM(CManualPtr->bgm_status.load_no,
-                               StaticMenuLocalStack2.stack + StaticMenuLocalStack2.stack_used);
+                               StaticMenuLocalStack2.stGetTop());
         MenuMainScene->SetActiveBgmStatus(&CManualPtr->bgm_status);
         if (Movie_DungeonFlag != 0) {
             if (MovieBgmBattleCheckStopFlag != 0) {
@@ -529,9 +524,6 @@ void MenuManualDraw() {
         CManualPtr->key_arg_no = 0;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuop", MenuManualDraw__Fv);
-#endif
 int CManualMenu::KeyStep(void) {
     int finished;
     int moveType;
@@ -818,10 +810,12 @@ int CManualMenu::KeyStep(void) {
                     sndSetSeVolf(sndId, 0, 0.0f, 0);
                     MovieBattleBGMPhase++;
                     break;
-                case 2:
-                    CalcMenuAdd(&MoviePreBattleBGMVol, -0.025f, 0.0f);
+                case 2: {
+                    float step = -0.025f;
+                    CalcMenuAdd(&MoviePreBattleBGMVol, step, 0.0f);
                     sndSetSeVolf(sndId, 0, MoviePreBattleBGMVol, 0);
                     break;
+                }
                 case 3:
                     CalcMenuAdd(&MoviePreBattleBGMVol, 0.033333335f, MoviePreBattleBGMVol_Save);
                     sndSetSeVolf(sndId, 0, MoviePreBattleBGMVol, 0);
@@ -2883,14 +2877,13 @@ int SubGameSaveKey(void) {
             }
             break;
         case SUB_SAVE_WRITE_DONE:
-            unsigned int was_pushed = pushed != 0;
-            if (was_pushed) {
+            if (pushed != 0) {
                 MenuSePlay(SYSTEM_SE_DECIDE);
                 SubGameSaveLoadStatus = 1;
             }
             break;
-        case SUB_SAVE_WRITE_FAILED_FULL:
         case SUB_SAVE_WRITE_FAILED:
+        case SUB_SAVE_WRITE_FAILED_FULL:
             if (pushed != 0) {
                 next = SUB_SAVE_SLOT_SELECT;
                 MenuSePlay(SYSTEM_SE_DECIDE);
@@ -2906,8 +2899,10 @@ int SubGameSaveKey(void) {
                     MenuSePlay(SYSTEM_SE_DECIDE);
                     if (card->formatted == 0) {
                         next = SUB_SAVE_FORMAT_ASK;
+                        break;
                     } else if (card->free_size < SubCheckTotalSaveFileSize) {
                         next = SUB_SAVE_CARD_ERROR;
+                        break;
                     } else {
                         next = SUB_SAVE_DIR_MAKING;
                     }
@@ -2948,8 +2943,7 @@ int SubGameSaveKey(void) {
             break;
         case SUB_SAVE_FORMATTING:
             card = GetSubGameCard(MemoryCardPtr);
-            int format_done = stepResult != 0;
-            if (format_done) {
+            if (stepResult != 0) {
                 if (McCheckMCPs2(card) != 0) {
                     next = SUB_SAVE_DIR_MAKING;
                     if (card != NULL && card->formatted == 0) {

@@ -1044,8 +1044,8 @@ extern char at_1825__3[];
 extern char at_1826__4[];
 void CShopMenu::CalcTex() {
     int num_pos[2];
-    int up_pos[2];
     int down_pos[2];
+    int up_pos[2];
     int name_pos[2];
     float bar_pos[2];
     if (shop_name_brd != NULL && MenuMesForm[1] != NULL) {
@@ -1094,12 +1094,22 @@ void CShopMenu::CalcTex() {
         message_form->draw_flag = 0;
         message->MakeMsg(0);
         if (NowSellMode == SHOP_SELL_MODE_MONEY && (key_arg_no == SHOP_MENU_MODE_BAG || key_arg_no == SHOP_MENU_MODE_SELL_NUM)) {
-            s16 *mes_width = &price_mes_width;
-            CGameDataUsed *item = SearchNowPosItemExist();
-            message->point_y = 0;
-            int gift_box = 0;
-            int mes_no = -1;
+            CGameDataUsed *item;
+            int win_y;
+            int px;
+            int koma[2];
+            int py;
+            int gift_box;
+            int mes_no;
+            int line;
+            int win_x;
+            s16 *mes_width;
             int sell;
+            mes_width = &price_mes_width;
+            item = SearchNowPosItemExist();
+            message->point_y = 0;
+            gift_box = 0;
+            mes_no = -1;
             if (item->item_no > 0) {
                 message_form->draw_flag = 1;
                 sell = 0;
@@ -1125,10 +1135,7 @@ void CShopMenu::CalcTex() {
                 message->MakeMsg(mes_no);
             }
             message->StepMsg();
-            int line = bag_pos / 6 - bag_top;
-            int koma[2];
-            int win_x;
-            int win_y;
+            line = bag_pos / 6 - bag_top;
             MenuPosData->GetPosMenuItemBrdKoma(koma, bag_pos, 1);
             if (gift_box == 1) {
                 koma[0] += 0x2C;
@@ -1136,10 +1143,12 @@ void CShopMenu::CalcTex() {
                 if (mgScreenWidth - *mes_width - 0x1E < win_x) {
                     win_x -= *mes_width + 0x6D;
                 }
-                koma[1] += 0xC;
+                koma[1] = koma[1] + 0xC;
                 win_y = koma[1] - 0x1A;
-                message->point_x = koma[0] - win_x;
-                message->point_y = koma[1] - win_y;
+                px = koma[0] - win_x;
+                py = koma[1] - win_y;
+                message->point_x = px;
+                message->point_y = py;
             } else {
                 koma[0] += 0x14;
                 win_x = koma[0] - *mes_width / 2;
@@ -1155,8 +1164,10 @@ void CShopMenu::CalcTex() {
                         win_y = koma[1] - 0x32;
                     }
                 }
-                message->point_x = koma[0] - win_x;
-                message->point_y = koma[1] - win_y;
+                px = koma[0] - win_x;
+                py = koma[1] - win_y;
+                message->point_x = px;
+                message->point_y = py;
             }
             message_form->x = win_x;
             message_form->y = win_y;
@@ -1266,7 +1277,6 @@ CGameDataUsed *CShopMenu::SearchNowPosItemExist() {
     }
     return NULL;
 }
-#ifdef NONMATCHING
 extern u8 rgba_1897[4];
 void ShopSellListDraw(int &tex_block, float *pos) {
     mgCTexture *icon_tex = MenuPosData->item_icon_tex[0][0];
@@ -1303,21 +1313,25 @@ void ShopSellListDraw(int &tex_block, float *pos) {
     mgRect<int> line_rect(0, 0x8E, 0xB0, 6);
     mgCDrawPrim *prim = GetMenuPrim();
     SetSpriteEnv(prim, 0);
-    float x = pos[0] + 18.0f;
+    float price_x;
+    int price;
     float mark_x;
-    float y = pos[1] + 44.0f;
+    float x;
+    int count;
+    float y;
+    x = pos[0] + 18.0f;
+    y = pos[1] + 44.0f;
     CGameDataUsed item;
-    float price_x = x + 92.0f;
+    price_x = x + 92.0f;
     if (LanguageCode > 0 && NowSellMode == SHOP_SELL_MODE_MEDAL) {
-        mark_x = price_x;
         price_x -= 12.0f;
-    } else {
-        mark_x = price_x;
     }
+    mark_x = price_x;
     if (LanguageCode > 0 && NowSellMode == SHOP_SELL_MODE_ROBO_ABS) {
-        mark_x = price_x + 6.0f;
+        mark_x += 6.0f;
     }
-    for (line = 0; (unsigned int)line < CShopPtr->item_num; line++, y += 44.0f) {
+    count = CShopPtr->item_num;
+    for (line = 0; line < count; line++, y += 44.0f) {
         if (y + 44.0f < 0.0f) {
             continue;
         }
@@ -1331,13 +1345,15 @@ void ShopSellListDraw(int &tex_block, float *pos) {
         prim->Color(0x80, 0x80, 0x80, 0x80);
         PrimQuad(prim, x - 4.0f, y + 40.0f, line_rect);
         PrimQuad(prim, x + 128.0f, y + 1.0f, have_board);
-        int price = CShopPtr->GetHaveNum(line);
-        PrimDrawNumber(prim, price, 1, fptosi(x + 134.0f + 23.0f), fptosi(y + 12.0f), have_digits, 0, 0);
+        int have = CShopPtr->GetHaveNum(line);
+        price = have;
+        PrimDrawNumber(prim, have, 1, fptosi(x + 134.0f + 23.0f), fptosi(y + 12.0f), have_digits, 0, 0);
         item.item_no = item_no;
         CShopPtr->GetPrice(&item, &price, NULL);
         PrimDrawNumber(prim, price, 0, fptosi(price_x), fptosi(y + 16.0f), price_digits, 0, 0);
-        mgRect<int> mark_rect(fptosi(mark_x), fptosi(y + 22.0f), price_mark->right, price_mark->bottom);
-        PrimQuad(prim, mark_rect, *price_mark);
+        int mark_y = fptosi(y + 22.0f);
+        int mark_left = fptosi(mark_x);
+        PrimQuad(prim, mgRect<int>(mark_left, mark_y, price_mark->right, price_mark->bottom), *price_mark);
         prim->End();
         mgRect<float> icon_rect(x, y, 32.0f, 40.0f);
         if (item_no == 0x1A8 || item_no == 0x1AB || item_no == 0x1AC || item_no == 0x1A6) {
@@ -1364,9 +1380,6 @@ void ShopSellListDraw(int &tex_block, float *pos) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menushop", ShopSellListDraw__FRiPf);
-#endif
 extern char at_2114__2[];
 extern char at_2115__2[];
 extern char at_2116__2[];

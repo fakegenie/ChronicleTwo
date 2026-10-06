@@ -1992,7 +1992,6 @@ void CMapEffect_Sprite::Step(mgCCamera *camera) {
         life -= 1;
     }
 }
-#ifdef STATEMATCHING
 void CMapEffect_Sprite::Draw(mgCCamera *camera, CPreSprite *sprite) {
     float world[4];
     int corner0[4];
@@ -2068,9 +2067,6 @@ void CMapEffect_Sprite::Draw(mgCCamera *camera, CPreSprite *sprite) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dng_effect", Draw__17CMapEffect_SpriteFP9mgCCameraP10CPreSprite);
-#endif
 void CMapEffectsManeger::Init_LightBoll(mgCMemory *memory, int count) {
     sprite_num = count;
     u32 blocks;
@@ -2457,7 +2453,6 @@ void CWeaponElement::Draw(void) {
         }
     }
 }
-#ifdef STATEMATCHING
 void CWeaponElement::Init_Cold(float *center) {
     int j;
     int i;
@@ -2488,9 +2483,6 @@ void CWeaponElement::Init_Cold(float *center) {
         frame[j] = fptosi((5.0f * (float)rand()) / 2.1474836e9f) * 0x30;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dng_effect", Init_Cold__14CWeaponElementFPf);
-#endif
 void CWeaponElement::Step_Cold(void) {
     int dead;
     int i;
@@ -2600,7 +2592,6 @@ void CWeaponElement::Draw_Cold(void) {
     }
     prim.End();
 }
-#ifdef STATEMATCHING
 void CWeaponElement::Init_Wind(float *center) {
     int i;
     int j;
@@ -2633,9 +2624,6 @@ void CWeaponElement::Init_Wind(float *center) {
         frame[j] = fptosi((5.0f * (float)rand()) / 2.1474836e9f) * 0x30;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dng_effect", Init_Wind__14CWeaponElementFPf);
-#endif
 void CWeaponElement::Step_Wind(void) {
     int dead;
     int i;
@@ -2757,7 +2745,6 @@ void CWeaponElement::Draw_Wind(void) {
     }
     prim.End();
 }
-#ifdef STATEMATCHING
 void CWeaponElement::Init_Fire(float *center) {
     int i;
     int j;
@@ -2789,9 +2776,6 @@ void CWeaponElement::Init_Fire(float *center) {
         frame[j] = fptosi((5.0f * (float)rand()) / 2.1474836e9f) * 0x30;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dng_effect", Init_Fire__14CWeaponElementFPf);
-#endif
 void CWeaponElement::Step_Fire(void) {
     int dead;
     int i;
@@ -2901,7 +2885,6 @@ void CWeaponElement::Draw_Fire(void) {
     }
     prim.End();
 }
-#ifdef STATEMATCHING
 void CWeaponElement::Init_Thunder(float *center) {
     float scaled[4];
     float dir[4];
@@ -2940,9 +2923,6 @@ void CWeaponElement::Init_Thunder(float *center) {
         bolt_frame[j] = fptosi((4.0f * (float)rand()) / 2.1474836e9f);
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dng_effect", Init_Thunder__14CWeaponElementFPf);
-#endif
 void CWeaponElement::Step_Thunder(void) {
     int dead;
     int i;

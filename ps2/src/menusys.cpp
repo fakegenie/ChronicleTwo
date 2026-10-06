@@ -399,7 +399,7 @@ extern s8 cmd_counter_1048;
 #ifdef NONMATCHING
 int CBaseMenuClass::MenuItemCommandSelect(int select_key, int push_button) {
     CGameDataUsed *used_data = MenuUserParam.used_data;
-    CItemUseTarget target;
+    u_long target;
     CUserDataManager *user = GetUserDataMan();
     MenuItemCmdRet.cmd = -1;
     int decided = 0;
@@ -608,8 +608,8 @@ int CBaseMenuClass::MenuItemCommandSelect(int select_key, int push_button) {
                     if (cmd == 16) {
                         target_chara = MenuUserParam.chara[1];
                     }
-                    target.SetPtr(0, target_chara);
-                    MenuUseItemCheckFunc(ask_para.item, &target, 0);
+                    ((CItemUseTarget *)&target)->SetPtr(0, target_chara);
+                    MenuUseItemCheckFunc(ask_para.item, (CItemUseTarget *)&target, 0);
                     if (MenuUsedNotErrorCode == 1) {
                         MenuItemCmdRet.result = 10;
                     }
@@ -633,8 +633,8 @@ int CBaseMenuClass::MenuItemCommandSelect(int select_key, int push_button) {
                 if (ask_para.cmd_color[cursor] == 0x80202020) {
                     MenuItemCmdRet.cmd = 5;
                 } else {
-                    MenuItemCmdRet.result = MenuItemUse.UseItem(
-                        ask_para.item, 1, &MenuUserParam.chara[CMenuItemInfoPt->sub_view]->equip[cmd - 19]);
+                    CGameDataUsed *equips = MenuUserParam.chara[CMenuItemInfoPt->sub_view]->equip;
+                    MenuItemCmdRet.result = MenuItemUse.UseItem(ask_para.item, 1, &equips[cmd - 19]);
                 }
             } else if (cmd == 21 || cmd == 22) {
                 if (ask_para.cmd_color[cursor] == 0x80202020) {
@@ -779,22 +779,17 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/menusys", MenuItemCommandSelect__14CBaseMe
 #endif
 extern s8 wakutbl_1411[2];
 extern s8 tartbl_1412[2];
-#ifdef NONMATCHING
 void CBaseMenuClass::SetItemCmdMsgPos(int *item_pos) {
-    int pos[2] = { 0, 0 };
+    int pos[2] = {item_pos[0] + 4, item_pos[1] + 0x2A};
+    int cmd_num = ask_para.cmd_num;
     int width = 0;
     int lines = 0;
-    int i;
-
-    pos[0] = item_pos[0] + 4;
-    pos[1] = item_pos[1] + 0x2A;
-    int cmd_num = ask_para.cmd_num;
     MenuItemCommandDir = 1;
     CDC2Mes *message = MenuDCMsg[ask_para.mes_no];
     if (message == NULL) {
         return;
     }
-    for (i = 0; i < cmd_num; i++) {
+    for (int i = 0; i < cmd_num; i++, lines++) {
         if (message->item_mes[i] < 0) {
             break;
         }
@@ -802,7 +797,6 @@ void CBaseMenuClass::SetItemCmdMsgPos(int *item_pos) {
         if (width < line_width) {
             width = line_width;
         }
-        lines++;
     }
     int height = message->font_h * lines;
     CMenuPosDataForm *form = ask_para.form;
@@ -831,9 +825,11 @@ void CBaseMenuClass::SetItemCmdMsgPos(int *item_pos) {
         case 1:
         case 2:
             pos[1] = item_pos[1] - height - 0x14;
-            __typeof__(MenuCommonInfo) menuCommonInfo2 = MenuCommonInfo;
-            message->point_x = wakutbl_1411[menuCommonInfo2->cursor];
-            pos[0] += tartbl_1412[menuCommonInfo2->cursor];
+            {
+                int cursor = MenuCommonInfo->cursor;
+                message->point_x = wakutbl_1411[cursor];
+                pos[0] += tartbl_1412[cursor];
+            }
             message->point_y = height * 2;
             break;
         case 3:
@@ -867,7 +863,7 @@ void CBaseMenuClass::SetItemCmdMsgPos(int *item_pos) {
                     message->point_x = width + 0x1E;
                     message->point_y = height - 0xE;
                     while (*pos_y < 0x14) {
-                        *pos_y++;
+                        (*pos_y)++;
                         message->point_y--;
                     }
                     MenuItemCommandDir = 2;
@@ -877,6 +873,12 @@ void CBaseMenuClass::SetItemCmdMsgPos(int *item_pos) {
                     message->point_x = item_pos[0] + 0x1A - pos[0];
                 }
             }
+            break;
+        case 7:
+            message->point_x = 0x14;
+            message->point_y = 0x3C;
+            pos[0] += 0x3C;
+            pos[1] -= 0x78;
             break;
         case 5:
         case 6:
@@ -888,12 +890,6 @@ void CBaseMenuClass::SetItemCmdMsgPos(int *item_pos) {
                 pos[0] -= width + 0x6A;
                 message->point_x += width + 0x6C;
             }
-            break;
-        case 7:
-            message->point_x = 0x14;
-            message->point_y = 0x3C;
-            pos[0] += 0x3C;
-            pos[1] -= 0x78;
             break;
         case 8:
             break;
@@ -908,9 +904,6 @@ void CBaseMenuClass::SetItemCmdMsgPos(int *item_pos) {
         form->y = pos[1];
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menusys", SetItemCmdMsgPos__14CBaseMenuClassFPi);
-#endif
 int MenuHowMuchNumSelect(int key, CGameDataUsed *item, int limit) {
     short step = 0;
     int max_num;
@@ -4739,7 +4732,6 @@ extern char at_4957[];
 #ifdef NONMATCHING
 int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
     mgCMemory *load_stack = &MenuCharaLoadStack;
-    int close = 0;
     mgCMemory work;
     MENU_ASKMODE_PARA *para = &ask_para;
     if (!init_4683) {
@@ -4752,6 +4744,8 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
     float position[4];
     int size;
     switch (para->ask_mode) {
+        case 0:
+            break;
         case 1:
             switch (step) {
                 case 0:
@@ -4795,6 +4789,7 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
             CActionChara *chara = MenuActionChara[0];
             CDC2Mes *name_message = MenuDCMsg[6];
             CDC2Mes *message = MenuDCMsg[7];
+            int close = 0;
             switch (step) {
                 case 0: {
                     int old_select = info->select_no;
@@ -4816,11 +4811,10 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
                         MenuSePlay(SYSTEM_SE_CURSOR);
                     }
                     MenuWeaponStatusInfoFormSet(info->weapon, data);
-                    if (push_button == MENU_PUSH_BUTTON_CANCEL) {
-                        info->mode = 0;
-                        MenuSePlay(5);
-                        close = 1;
-                    } else if (push_button == 8 || push_button == 4 || push_button == 1) {
+                    switch (push_button) {
+                    case 1:
+                    case 4:
+                    case 8:
                         if (info->enable[select] == 1) {
                             if (CheckBuildUpMonsterCondition(data)) {
                                 ExeScript(at_4950);
@@ -4836,25 +4830,22 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
                         } else {
                             MenuSePlay(5);
                         }
+                        break;
+                    case MENU_PUSH_BUTTON_CANCEL:
+                        info->mode = 0;
+                        MenuSePlay(5);
+                        close = 1;
+                        break;
                     }
                     break;
                 }
                 case 1: {
                     int choice = message->YesNoCursor();
-                    if (push_button == MENU_PUSH_BUTTON_CANCEL) {
-                        if (MenuCommonInfo->cursor_form != NULL) {
-                            MenuCommonInfo->cursor_form->draw_flag = 1;
-                        }
-                        MenuSePlay(5);
-                        step = 0;
-                    } else if (push_button == 8 || push_button == 4 || push_button == 1) {
-                        if (choice != 0) {
-                            if (MenuCommonInfo->cursor_form != NULL) {
-                                MenuCommonInfo->cursor_form->draw_flag = 1;
-                            }
-                            MenuSePlay(5);
-                            step = 0;
-                        } else {
+                    switch (push_button) {
+                    case 1:
+                    case 4:
+                    case 8:
+                        if (choice == 0) {
                             MenuSePlay(SYSTEM_SE_DECIDE);
                             BuildEndFlag_4703 = 0;
                             info->mode = 0;
@@ -4869,7 +4860,15 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
                             load_stack->Alloc(QuadwordsFor(size + 0x800));
                             itemmenu_chr_rotflag = 0;
                             step++;
+                            break;
                         }
+                    case MENU_PUSH_BUTTON_CANCEL:
+                        if (MenuCommonInfo->cursor_form != NULL) {
+                            MenuCommonInfo->cursor_form->draw_flag = 1;
+                        }
+                        MenuSePlay(5);
+                        step = 0;
+                        break;
                     }
                     if (push_button != 0) {
                         mes_form->draw_flag = 0;
@@ -4929,7 +4928,7 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
                             int new_item_no = name_message->item_mes[info->select_no + 1];
                             BuildUpWeaponTrans(info->weapon, new_item_no);
                             int weapon_tex_block = tex_block[1];
-                            mgCTextureManager *textures = &mgTexManager;
+                            mgCTextureManager *textures = tex_manager;
                             textures->DeleteBlock(weapon_tex_block);
                             strcpy(textures->name_suffix, at_4956);
                             MenuActionCharaBuffer[0].stReset();
@@ -4979,8 +4978,6 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
             }
             break;
         }
-        case 0:
-            break;
     }
     return 0;
 }
@@ -8077,7 +8074,7 @@ void MenuWeaponBuildUpDraw(int &tex_block) {
     } else if (BuildUpWeaponInfo.unk_0 == 1) {
         top_y = 80;
     }
-    if (mes == NULL) {
+    if (MenuDCMsg[6] == NULL) {
         return;
     }
     MenuReloadTexture(tex_block, Tex_BuildUpBoard->block);
@@ -8096,13 +8093,15 @@ void MenuWeaponBuildUpDraw(int &tex_block) {
     prim->Texture(Tex_BuildUpBoard);
     prim->Color(0x80, 0x80, 0x80, 0x80);
     int row;
+    int col;
     for (row = 0; row < 3; row++) {
         for (int n = 0; n < backboard_y_repeat_drawnum_7629[row]; n++) {
+            int k;
             int x = 20;
-            for (int col = 0; col < 5; col++) {
+            for (col = 0; col < 5; col++) {
                 mgRect<int> tile(backboard_table_x_7625[col], backboard_table_y_7626[row],
                                  backboard_table_w_7627[col], 28);
-                for (int k = 0; k < backboard_x_repeat_drawnum_7628[col]; k++) {
+                for (k = 0; k < backboard_x_repeat_drawnum_7628[col]; k++) {
                     PrimQuad(prim, x, y, tile);
                     x += tile.right;
                 }
@@ -8112,13 +8111,13 @@ void MenuWeaponBuildUpDraw(int &tex_block) {
         }
     }
     prim->End();
+    int center_y = top_y + ((height - 28) >> 1);
     int name_x = 0x3A;
     int name_w = 0xAC;
-    int center_y = top_y + ((height - 28) >> 1);
+    int list_x = 0x124;
+    int list_y[3] = {0};
     int msg_x = 0x46;
     int list_msg_x = 0x130;
-    int list_y[3] = {0};
-    int list_x = 0x124;
     if (LanguageCode > 0) {
         list_x = 0x11A;
         name_x = 0x32;
@@ -8130,7 +8129,8 @@ void MenuWeaponBuildUpDraw(int &tex_block) {
     int list_name_x = list_x - 20;
     int step = (height - 40) / num;
     float center = 0.5f * (num - 1.0f);
-    for (int i = 0; i < num; i++) {
+    int i;
+    for (i = 0; i < num; i++) {
         list_y[i] = center_y - step * (center - i);
     }
     int name_y;
@@ -8161,17 +8161,16 @@ void MenuWeaponBuildUpDraw(int &tex_block) {
         PrimQuad(prim, 48.0f, title_y, title_rect);
     }
     BuildUpWeaponNameBoardDraw(prim, name_x, name_y, name_w);
-    int i;
     for (i = 0; i < BuildUpWeaponInfo.select_num; i++) {
         BuildUpWeaponNameBoardDraw(prim, list_x, list_y[i], name_w);
     }
     prim->End();
     mes->SetMovePosGyou(0, 0x208, 0);
     mes->SetMovePosGyou(1, msg_x, name_y + 5);
-    for (i = 0; i < 3; i++) {
-        BuildUpNameXY[i][0] = list_name_x;
-        BuildUpNameXY[i][1] = list_y[i] + 5;
-        MenuDCMsg[6]->SetMovePosGyou(i + 2, list_msg_x, BuildUpNameXY[i][1]);
+    for (int k = 0; k < 3; k++) {
+        BuildUpNameXY[k][0] = list_name_x;
+        BuildUpNameXY[k][1] = list_y[k] + 5;
+        MenuDCMsg[6]->SetMovePosGyou(k + 2, list_msg_x, BuildUpNameXY[k][1]);
     }
     prim->Begin(6);
     prim->Texture(Tex_BuildUpBoard);
@@ -8179,29 +8178,30 @@ void MenuWeaponBuildUpDraw(int &tex_block) {
     for (i = 0; i < BuildUpWeaponInfo.select_num; i++) {
         int line_y = list_y[i] + 12;
         PrimQuad(prim, 258.0f, line_y, line_left_rect);
-        mgRect<int> line_rect(0x106, line_y, list_x - 0x104, 6);
-        PrimQuad(prim, line_rect, line_middle_rect);
+        PrimQuad(prim, mgRect<int>(0x106, line_y, list_x - 0x104, 6), line_middle_rect);
         PrimQuad(prim, list_x, line_y, line_right_rect);
     }
     if (0 < BuildUpWeaponInfo.select_num) {
         PrimQuad(prim, 256.0f, bar_y, bar_top_rect);
-        mgRect<int> bar_rect(0x100, bar_y + 4, 6, bar_h - 4);
-        PrimQuad(prim, bar_rect, bar_middle_rect);
+        PrimQuad(prim, mgRect<int>(0x100, bar_y + 4, 6, bar_h - 4), bar_middle_rect);
         PrimQuad(prim, 256.0f, bar_y + bar_h, bar_bottom_rect);
     }
     int line_y = name_y + 12;
     int line_x = name_x + name_w;
     PrimQuad(prim, line_x, line_y, line_left_rect);
-    mgRect<int> line_rect(line_x + 4, line_y, 0x100 - line_x, 6);
-    PrimQuad(prim, line_rect, line_middle_rect);
+    PrimQuad(prim, mgRect<int>(line_x + 4, line_y, 0x100 - line_x, 6), line_middle_rect);
     PrimQuad(prim, 256.0f, line_y, line_right_rect);
     prim->End();
     if (BuildUpWeaponInfo.unk_0 == 0) {
-        int mos_name_x = 0x11E;
-        int mark_x = 0x10A;
-        CDataWeapon *data = BuildUpWeaponInfo.weapon_data[BuildUpWeaponInfo.select_no];
+        CDataWeapon *data;
+        int mos_y;
+        int mos_name_x;
+        int mark_x;
+        data = BuildUpWeaponInfo.weapon_data[BuildUpWeaponInfo.select_no];
         char *mos_names[3] = {NULL};
-        int mos_y = mgScreenHeight - 180;
+        mos_name_x = 0x11E;
+        mark_x = 0x10A;
+        mos_y = mgScreenHeight - 180;
         int board_y = mos_y - 30;
         if (LanguageCode > 0) {
             mos_name_x = 0x114;
@@ -8219,11 +8219,12 @@ void MenuWeaponBuildUpDraw(int &tex_block) {
             prim->Color(0x80, 0x80, 0x80, 0x80);
             for (row = 0; row < 3; row++) {
                 for (int n = 0; n < mos_rows[row]; n++) {
+                    int k;
                     int x = 232;
-                    for (int col = 0; col < 5; col++) {
+                    for (col = 0; col < 5; col++) {
                         mgRect<int> tile(backboard_table_x_7625[col], backboard_table_y_7626[row],
                                          backboard_table_w_7627[col], 28);
-                        for (int k = 0; k < mos_repeat_table_x_7694[col]; k++) {
+                        for (k = 0; k < mos_repeat_table_x_7694[col]; k++) {
                             PrimQuad(prim, x, board_y, tile);
                             x += tile.right;
                         }
@@ -8233,7 +8234,7 @@ void MenuWeaponBuildUpDraw(int &tex_block) {
                 }
             }
             int mark_y = mos_y;
-            for (i = 0; i < 3; i++) {
+            for (int i = 0; i < 3; i++) {
                 mos_names[i] = GetMonsterName(data->buildup_monster[i]);
                 if (mos_names[i] != NULL) {
                     BuildUpWeaponNameBoardDraw(prim, mos_name_x, mark_y, name_w);
@@ -8241,8 +8242,7 @@ void MenuWeaponBuildUpDraw(int &tex_block) {
                     if (0 < KillMonsterCount(data->buildup_monster[i], 0)) {
                         mark_u = 0x16A;
                     }
-                    mgRect<int> mark_rect(mark_u, 0xD0, 16, 16);
-                    PrimQuad(prim, mark_x, mark_y + 7, mark_rect);
+                    PrimQuad(prim, mark_x, mark_y + 7, mgRect<int>(mark_u, 0xD0, 16, 16));
                 }
                 mark_y += 32;
             }
@@ -8253,7 +8253,7 @@ void MenuWeaponBuildUpDraw(int &tex_block) {
         if (mos_names[0] != NULL) {
             int text_y = mos_y + 4;
             CMenuFont font;
-            for (i = 0; i < 3; i++) {
+            for (int i = 0; i < 3; i++) {
                 if (mos_names[i] != NULL) {
                     font.SetStr(mos_names[i]);
                     font.SetPos(text_x, text_y);
@@ -8261,14 +8261,14 @@ void MenuWeaponBuildUpDraw(int &tex_block) {
                 }
                 text_y += 32;
             }
-            int note_y = mos_y + 100;
             int note_x = 0x100;
+            int note_y = mos_y + 100;
             if (LanguageCode == 1) {
                 note_x += 0x12;
             } else if (CheckNowEurope()) {
                 font.SetStr(strtbl_7727[LanguageCode]);
-                int w;
                 int h;
+                int w;
                 font.CalcDrawWH(font.str, &w, &h);
                 note_x = 0x167 - w / 2;
             }
@@ -8333,16 +8333,18 @@ void MenuWeaponStatusInfoFormSet(CGameDataUsed *item, CDataWeapon *data) {
 extern s8 argtblno_7927[][6];
 extern s8 sel_7928[][6];
 extern s8 conv_7932[];
-#ifdef NONMATCHING
 #pragma divbyzerocheck on
 int MenuItemSelectDiffer(int select) {
     if (CMenuItemInfoPt->viewing_weapon) {
         return 0;
     }
-    CMenuKeyFunc *key = MenuCommonInfo;
-    MENU_INPUTKEY_ARG *arg = &item_menu_argtbl[select];
-    key->key_arg = arg;
-    int prev_arg_no = CMenuItemInfoPt->key_arg_no;
+    MENU_INPUTKEY_ARG *arg;
+    int prev_arg_no;
+    CMenuKeyFunc *key;
+    key = MenuCommonInfo;
+    key->key_arg = &item_menu_argtbl[select];
+    arg = &item_menu_argtbl[select];
+    prev_arg_no = CMenuItemInfoPt->key_arg_no;
     switch (prev_arg_no) {
         case 2: {
             s16 line = key->cursor / item_menu_argtbl[2].disp_columns - key->top_line;
@@ -8410,9 +8412,6 @@ int MenuItemSelectDiffer(int select) {
     return 1;
 }
 #pragma divbyzerocheck reset
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menusys", MenuItemSelectDiffer__Fi);
-#endif
 void CMenuItemInfo::CheckLoadItemNo() {
     if (view_mode == 0) {
         SetMenuLoadItemNo(0);
@@ -9730,9 +9729,7 @@ void CItemSelect::Draw(void) {
     mgRect<int> frame_rect;
     frame_rect.Set(1, 0, 0x110, 0xFE);
     mgRect<float> *list = &list_rect;
-    mgRect<int> scissor;
-    scissor.Set(0, (int)(37.0f + list_rect.top), mgScreenWidth - 1, (int)(147.0f + list_rect.top));
-    SetMenuScissor(scissor);
+    SetMenuScissor(mgRect<int>(0, (int)(37.0f + list_rect.top), mgScreenWidth - 1, (int)(147.0f + list_rect.top)));
     SetSpriteEnv(prim, 0);
     prim->Begin(6);
     float scroll_top = 37.0f + list->top - 55.0f * top_line;
@@ -9745,12 +9742,13 @@ void CItemSelect::Draw(void) {
     mgRect<int> cell_rect;
     cell_rect.Set(0x111, 0, 0x2C, 0x37);
     int line;
+    int column;
     int drawn = 0;
     for (line = 0; line < 50; line++) {
         float y = item_rect.top + 55.0f * line;
         if (!(y <= 90.0f)) {
             float x = item_rect.left;
-            for (int column = 0; column < 5; column++) {
+            for (column = 0; column < 5; column++) {
                 PrimQuad(prim, x, y, cell_rect);
                 x += 44.0f;
             }
@@ -9770,19 +9768,20 @@ void CItemSelect::Draw(void) {
     mgRect<int> number_rect;
     number_rect.Set(0, 0xF4, 0xA, 0xD);
     int index = 0;
-    for (int line = 0; line < item_num && item_list[line * 5] != NULL; line++) {
+    for (line = 0; line < item_num && item_list[line] != NULL; line++) {
         icon_rect.left = 4.0f + item_rect.left;
-        for (int column = 0; column < 5; column++, index++) {
+        for (column = 0; column < 5; column++, index++) {
             if (icon_rect.top <= 0.0f) {
                 continue;
             }
             if (index >= item_num) {
                 break;
             }
-            CGameDataUsed *item = item_list[index];
-            DrawOneItem(prim, icon_rect, item->item_no, 0, NULL, color.rgba, 0);
-            int num = item->GetNum();
-            s16 item_no = item->item_no;
+            DrawOneItem(prim, icon_rect, item_list[index]->item_no, 0, NULL, color.rgba, 0);
+            int num;
+            s16 item_no;
+            num = item_list[index]->GetNum();
+            item_no = item_list[index]->item_no;
             if (item_no == 0x137) {
                 num = GetUserDataMan()->yarikomi_medal;
             }
@@ -9829,27 +9828,16 @@ void CItemSelect::Draw(void) {
     } else {
         scroll += 0.25f * (bar_y - scroll);
     }
-    float scroll_y = scroll;
-    float bar_x = 250.0f + list->left;
+    float scroll_y;
+    float bar_x;
+    bar_x = 250.0f + list->left;
+    scroll_y = scroll;
     prim->Bilinear(1);
     prim->Begin(6);
-    mgRect<int> tex_rect;
-    mgRect<int> put_rect;
-    tex_rect.Set(0x13E, 0, 6, 4);
-    int x = (int)bar_x;
-    put_rect.Set(x, (int)scroll_y, 6, 4);
-    PrimQuad(prim, put_rect, tex_rect);
-    mgRect<int> body_tex;
-    mgRect<int> body_put;
-    body_tex.Set(0x13E, 4, 6, 0x12);
-    float body_y = 4.0f + scroll_y;
-    body_put.Set(x, (int)body_y, 6, (int)(bar_h - 8.0f));
-    PrimQuad(prim, body_put, body_tex);
-    mgRect<int> end_tex;
-    mgRect<int> end_put;
-    end_tex.Set(0x13E, 0x18, 6, 4);
-    end_put.Set(x, (int)(body_y + bar_h - 8.0f), 6, 4);
-    PrimQuad(prim, end_put, end_tex);
+    PrimQuad(prim, mgRect<int>((int)bar_x, (int)scroll_y, 6, 4), mgRect<int>(0x13E, 0, 6, 4));
+    float body_y;
+    PrimQuad(prim, mgRect<int>((int)bar_x, (int)(body_y = 4.0f + scroll_y), 6, (int)(bar_h - 8.0f)), mgRect<int>(0x13E, 4, 6, 0x12));
+    PrimQuad(prim, mgRect<int>((int)bar_x, (int)(body_y + bar_h - 8.0f), 6, 4), mgRect<int>(0x13E, 0x18, 6, 4));
     prim->End();
     mgRect<float> cursor_rect;
     cursor_rect.Set(item_rect.left, 40.0f + list->top, item_rect.right, item_rect.bottom);
@@ -9862,14 +9850,10 @@ void CItemSelect::Draw(void) {
         cursor_x += (cursor_rect.left - cursor_x) / 4.0f;
         cursor_y += (cursor_rect.top - cursor_y) / 4.0f;
     }
-    mgRect<int> waku_tex;
-    waku_tex.Set(0x10, 0x20, 0x12, 0xC);
-    mgRect<float> waku_rect(cursor_x - 2.0f, cursor_y - 4.0f, cursor_rect.right, 40.0f);
-    DrawMenuWakuRect(MenuPosData->icon_effect_tex, waku_rect, waku_tex, alpha, 0x80, 0x80, 0x80);
+    DrawMenuWakuRect(MenuPosData->icon_effect_tex, mgRect<float>(cursor_x - 2.0f, cursor_y - 4.0f, cursor_rect.right, 40.0f),
+                     mgRect<int>(0x10, 0x20, 0x12, 0xC), alpha, 0x80, 0x80, 0x80);
     if (mode == MENU_ASK_MODE_NONE) {
-        int mes_pos[2];
-        mes_pos[0] = (int)(16.0f + list->left);
-        mes_pos[1] = (int)(164.0f + list->top);
+        int mes_pos[2] = {(int)(16.0f + list->left), (int)(164.0f + list->top)};
         tex_manager->ReloadTexture(MenuArg.mes_tex_block, (sceVif1Packet *)NULL);
         MenuDCMsg[0]->SetPutPos(mes_pos);
         MenuDCMsg[0]->StepMsg();
@@ -10037,7 +10021,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_935__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_936__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_937__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_938__3__DATA);
-INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_1462__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_1493__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_2545__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_2546__2__DATA);
@@ -10268,7 +10251,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_7729__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_7730__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_7731__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_7732__DATA);
-INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_7968__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_8083__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_8084__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_8199__DATA);

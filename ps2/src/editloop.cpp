@@ -89,8 +89,15 @@ extern int LockChara;
 extern int EditModeChgCnt;
 extern int EditModeChgEvent;
 extern int EditModeChgFlag;
+extern u_long128 * main_pkt1;
+extern u_long128 * main_pkt2;
+extern int FixCharaBuffSize;
+extern int DataPktMode;
+extern mgCMemory buf0;
+extern mgCMemory buf1;
+extern mgCMemory data_buf__2[2];
+extern mgCMemory init_dbuf[2];
 
-#ifdef NONMATCHING
 #include <libvu0.h>
 #include "charasetup.hpp"
 #include "editeff.hpp"
@@ -121,20 +128,12 @@ extern int EventSquareJump;
 extern int EditDrawFlag;
 extern int PauseFlag;
 extern int PreEditMenuCnt;
-extern u_long128 * main_pkt1;
-extern u_long128 * main_pkt2;
 extern u_long128 * MenuDataBuf;
 extern int MenuDataSize;
-extern int FixCharaBuffSize;
 extern u_long128 * CrossFadeBuff;
 extern MENU_INIT_ARG * MenuInfo;
-extern int DataPktMode;
 extern CWaveTable WaveTable;
 extern sceVu0FVECTOR CharaOldPos;
-extern mgCMemory buf0;
-extern mgCMemory buf1;
-extern mgCMemory data_buf__2[2];
-extern mgCMemory init_dbuf[2];
 extern mgCMemory WorkBuffer;
 extern mgCMemory MenuBuffer__2;
 extern mgCMemory ChrEffBuffer;
@@ -148,7 +147,7 @@ extern mgCMemory FishingBuff;
 extern mgCMemory SkyBuff;
 extern mgCVisualMDT TestVisual;
 extern mgCFrame TestFrame;
-namespace editloop { extern CCameraControl *EventCamera; }
+extern CCameraControl *EventCamera;
 void InitSubMapLoadStep();
 void LoadMap();
 void InitEditEvent();
@@ -156,7 +155,6 @@ void ResetEditEvent();
 void RestartEditEvent();
 void UpdateTrBoxFlag(int map_no);
 void editLoadSound(int map_no);
-#endif
 
 static CUserDataManager *GetUserData() {
     CSaveData *save;
@@ -216,7 +214,6 @@ void EditModeChgStep(CScene *scene) {
         }
     }
 }
-#ifdef NONMATCHING
 void SetDataPacket(int mode) {
     u_long128 *buffer;
     int        size;
@@ -224,7 +221,8 @@ void SetDataPacket(int mode) {
     if (mode == 0) {
         buffer = read_buffer - 5000;
         init_dbuf[0].stSetBuffer(buffer, 5000);
-        init_dbuf[1].stSetBuffer(buffer - 5000, 5000);
+        buffer -= 5000;
+        init_dbuf[1].stSetBuffer(buffer, 5000);
         mgInitVif1Packet(main_pkt1, main_pkt2, 160000);
         mgSetPacketBuffer(&buf0, &buf1);
         mgSetDataBuffer(&init_dbuf[0], &init_dbuf[1], 1);
@@ -257,9 +255,6 @@ void SetDataPacket(int mode) {
     printf("Data ADR %x,%x\n", data_buf__2[0].stack + data_buf__2[0].stack_used, data_buf__2[1].stack + data_buf__2[1].stack_used);
     DataPktMode = mode;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editloop", SetDataPacket__Fi);
-#endif
 void PreExitLoop(CScene *scene) {
     BurnEditParts();
     EditDataSave();
@@ -272,33 +267,65 @@ void PreExitLoop(CScene *scene) {
     ResetNpcTalkMes();
     EdEventTermination();
 }
-#ifdef NONMATCHING
+struct EditSubInfo {
+    CScene *scene;
+    int texb;
+    int texb_num;
+    int unk_c;
+    mgCMemory *menu_buff;
+    int dungeon;
+    int no_map_event;
+    int record_check;
+    int rod_no;
+    int esa_no;
+    int keep_bgm;
+    mgCMemory *load_buff;
+    EditSubInfo() {
+        record_check = 0;
+        no_map_event = 0;
+        load_buff = menu_buff = 0;
+        dungeon = 0;
+        keep_bgm = 0;
+        scene = 0;
+    }
+};
+struct EditEffectSpriteState {
+    u_char padding[0x30];
+    u_char sprite[0x1C];
+    void *sprite_vtable;
+};
+extern void *__vt__9mgCObject[];
+extern void *__vt__7CObject[];
+extern void *__vt__12CObjectFrame[];
+extern void *__vt__11CCharacter2[];
+extern void *__vt__15CMapTreasureBox[];
+extern void *__vt__9mgCVisual[];
+extern void *__vt__11mgC3DSprite[];
+extern "C" void *__ct__14CCameraControlFv(void *);
+extern "C" CameraCtrlParam &__as__15CameraCtrlParamFRC15CameraCtrlParam(CameraCtrlParam *destination, const CameraCtrlParam *source);
+static inline void SetDefaultCameraParam(CCameraControl *camera) {
+    __as__15CameraCtrlParamFRC15CameraCtrlParam(&camera->default_param, camera->GetActiveParam());
+}
 void EditInit(INIT_LOOP_ARG arg) {
-    mgCMemory         *main_stack;
-    u_long128         *script_data;
-    u_long128         *image_data;
     CEffectScriptMan  *effects;
-    CActionChara      *characters;
-    CCameraControl   *debug_camera;
+    mgCMemory         *main_stack;
     CCharacter2      *player;
+    mgCTextureManager *tex_manager;
+    CCameraControl   *debug_camera;
+    CActionChara      *characters;
+    u_long128         *script_data;
     CMap             *map;
     mgCTexture       *cross_texture;
-    mgCMDTBuilder     builder;
-    mgLoadData        load;
-    sceVu0FVECTOR     material = {0.5f, 0.0f, 0.0f, 0.2f};
-    sceVu0FVECTOR     position;
-    char              system_image[64] = "img/esystem.img";
     char             *menu_file;
-    int               data_size;
+    int               rest;
+    int               event_no;
     int               image_size;
     int               fire_size;
     int               water_size;
     u_int             water_qwords;
-    int               event_no;
     int               active_chara_no;
-    int               fishing_item;
+    u_long128         *image_data;
     int               i;
-    static sceVu0FVECTOR initial_position;
 
     DataPktMode = -1;
     MainScene__2 = GetMainScene();
@@ -324,8 +351,7 @@ void EditInit(INIT_LOOP_ARG arg) {
     main_stack->stack_used = 0;
     main_stack->lock = 0;
     main_pkt1 = main_stack->stAlloc64(10000);
-    main_pkt2 = main_stack->stAlloc64(10000);
-    mgInitVif1Packet(main_pkt1, main_pkt2, 160000);
+    mgInitVif1Packet(main_pkt1, main_pkt2 = main_stack->stAlloc64(10000), 160000);
     buf0.stSetBuffer(main_stack->stAlloc64(35000), 35000);
     buf1.stSetBuffer(main_stack->stAlloc64(35000), 35000);
     mgSetPacketBuffer(&buf0, &buf1);
@@ -335,27 +361,27 @@ void EditInit(INIT_LOOP_ARG arg) {
     }
     ScriptBuffer__2.stSetBuffer(script_data, 20000);
     main_stack->Align64();
-    data_size = main_stack->stack_size - main_stack->stack_used - 210128;
-    TotalDataBuff.stSetBuffer(&main_stack->stack[main_stack->stack_used], data_size);
-    printf("data memory size = %d kbyte", data_size * 16 / 1024);
+    rest = main_stack->stack_size - main_stack->stack_used;
+    TotalDataBuff.stSetBuffer(&main_stack->stack[main_stack->stack_used], rest - 210128);
+    printf("data memory size = %d kbyte", (rest - 210128) * 16 / 1024);
     if (strlen("Total Data Buffer") < 16) {
         strcpy(TotalDataBuff.name, "Total Data Buffer");
     }
     TotalDataBuff.stack_used = 0;
     TotalDataBuff.lock = 0;
-    main_stack->Alloc(data_size);
-    read_buffer = main_stack->stAlloc64(200000);
-    MenuBuffer__2.stSetBuffer(read_buffer, 200000);
+    main_stack->Alloc(rest - 210128);
+    MenuBuffer__2.stSetBuffer(read_buffer = main_stack->stAlloc64(200000), 200000);
     read_buffer_end = read_buffer + 200000;
     WorkBuffer.stSetBuffer(main_stack->stAlloc64(10000), 10000);
-    mgTexManager.SetTableBuffer(350, 221, &TotalDataBuff);
-    mgTexManager.Initialize(GetVramTopAddress(), -1);
+    tex_manager = &mgTexManager;
+    tex_manager->SetTableBuffer(350, 221, &TotalDataBuff);
+    tex_manager->Initialize(GetVramTopAddress(), -1);
     SetDataPacket(0);
 
     NowLoadingInfo loading;
     loading.tex_block = 206;
-    loading.step_count = 15;
     loading.unk_4 = 1;
+    loading.step_count = 15;
     loading.memory.stSetBuffer(read_buffer + 195000, 5000);
     CreateNowLoading(&loading);
     SetEnvUserDataMan(0);
@@ -368,6 +394,7 @@ void EditInit(INIT_LOOP_ARG arg) {
     }
     NowLoadingBarStep();
 
+    mgCMDTBuilder builder;
     builder.Begin(&TotalDataBuff);
     builder.BeginData(MG_MDT_DATA_VERTEX);
     builder.SetData(0.0f, 0.0f, 0.0f, 1.0f);
@@ -380,6 +407,7 @@ void EditInit(INIT_LOOP_ARG arg) {
     builder.SetData(1.0f, 1.0f, 1.0f, 1.0f);
     builder.EndData();
     builder.BeginData(MG_MDT_DATA_MATERIAL);
+    sceVu0FVECTOR material = {0.5f, 0.0f, 0.0f, 0.2f};
     builder.SetMaterial(material, "");
     builder.EndData();
     builder.BeginFaces();
@@ -405,6 +433,7 @@ void EditInit(INIT_LOOP_ARG arg) {
     builder.EndPrim();
     builder.EndFaces();
     TestFrame.mgCFrame::Initialize();
+    mgLoadData load;
     memset(&load, 0, sizeof(load));
     load.memory = &TotalDataBuff;
     load.work_memory = &WorkBuffer;
@@ -419,18 +448,34 @@ void EditInit(INIT_LOOP_ARG arg) {
         mgCFrameAttr attr;
         attr.billboard = MG_FRAME_BILLBOARD_Y;
         attr.no_light = 1;
+        attr.color[0] = 255.0f;
+        attr.color[1] = 255.0f;
         attr.color[3] = 128.0f;
         attr.color[2] = 255.0f;
-        attr.color[1] = 255.0f;
-        attr.color[0] = 255.0f;
         RedBicMark->SetAttrParam(attr, 1, 0);
     }
     LoadEditCursor(&TotalDataBuff, 163);
     EditSetEffectBuffer(&TotalDataBuff);
     TreasureBox = NULL;
     if (LoadFile2("map/itembox.chr", read_buffer, NULL, 0) != 0) {
-        TreasureBox = new (TotalDataBuff.Alloc(sizeof(CMapTreasureBox) / 16 + 2)) CMapTreasureBox;
-        mgTexManager.DeleteBlock(173);
+        CMapTreasureBox *box;
+        if ((box = (CMapTreasureBox *)operator new(sizeof(CMapTreasureBox), TotalDataBuff.Alloc(sizeof(CMapTreasureBox) / 16 + 2))) != NULL) {
+            *(void ***)box = __vt__9mgCObject;
+            ((mgCObject *)box)->Initialize();
+            *(void ***)box = __vt__7CObject;
+            ((mgCObject *)box)->Initialize();
+            *(void ***)box = __vt__12CObjectFrame;
+            ((mgCObject *)box)->Initialize();
+            *(void ***)box = __vt__11CCharacter2;
+            box->shadow_link.num = 0;
+            box->shadow_link.dst_frame = 0;
+            box->shadow_link.src_frame = 0;
+            ((mgCObject *)box)->Initialize();
+            *(void ***)box = __vt__15CMapTreasureBox;
+            ((mgCObject *)box)->Initialize();
+        }
+        TreasureBox = box;
+        tex_manager->DeleteBlock(173);
         TreasureBox->LoadPackNoLine((u_int *)read_buffer, "info.cfg", &TotalDataBuff, &TotalDataBuff, &TotalDataBuff, 173, NULL);
     }
     ChrEffBuffer.SetHeapMem(TotalDataBuff.stAlloc64(6400), 6400);
@@ -440,11 +485,12 @@ void EditInit(INIT_LOOP_ARG arg) {
 
     TotalDataBuff.Align64();
     image_data = TotalDataBuff.stAllocTest(1);
+    char system_image[64] = "img/esystem.img";
     if (LanguageCode > 0) {
         sprintf(system_image, "img/esystem%d.img", LanguageCode);
     }
     if (LoadFile2(system_image, image_data, &image_size, 0) != 0) {
-        mgTexManager.EnterIMGFile((u_char *)image_data, 162, &TotalDataBuff, NULL);
+        tex_manager->EnterIMGFile((u_char *)image_data, 162, &TotalDataBuff, NULL);
         TotalDataBuff.Alloc(image_size / 16 + 1);
         LoadTakePhoto(162, &TotalDataBuff, read_buffer);
     }
@@ -452,27 +498,33 @@ void EditInit(INIT_LOOP_ARG arg) {
     image_data = TotalDataBuff.stAllocTest(1);
     if (LoadFile2("effect/fire.img", image_data, &fire_size, 0) != 0) {
         TotalDataBuff.Alloc(fire_size / 16 + 1);
-        mgTexManager.EnterIMGFile((u_char *)image_data, 66, &TotalDataBuff, NULL);
+        tex_manager->EnterIMGFile((u_char *)image_data, 66, &TotalDataBuff, NULL);
     }
 
     EventMes1.Init();
     EventMes1.Preset(0);
     EventMes1.texture_block = 154;
     ReLoadFontTexture(154);
-    mgTexManager.EnterIMGFile(GetGaijiImgPtr(), 154, NULL, NULL);
-    mgTexManager.EnterIMGFile(GetFontTex2ImgPtr(), 154, NULL, NULL);
+    tex_manager->EnterIMGFile(GetGaijiImgPtr(), 154, NULL, NULL);
+    tex_manager->EnterIMGFile(GetFontTex2ImgPtr(), 154, NULL, NULL);
     NowLoadingBarStep();
     MainScene__2->Initialize();
     MainScene__2->chara_texb = 70;
-    MainScene__2->villager_texb = 78;
-    MainScene__2->villager_texb_num = 56;
-    MainScene__2->event_texb = 160;
-    MainScene__2->event_texb_num = 2;
-    MainScene__2->GetActiveBgmInfo()->master_vol = 1.0f;
-    MainScene__2->SetVolfBGM(MainScene__2->GetActiveBgmInfo()->volf);
+    MainScene__2->SetVillagerTexb(78, 56);
+    MainScene__2->SetEventTexb(160, 2);
+    CScene *scene = MainScene__2;
+    scene->GetActiveBgmInfo()->master_vol = 1.0f;
+    scene->SetVolfBGM(scene->GetActiveBgmInfo()->volf);
     MainScene__2->tex_block_base = 185;
     MainScene__2->tex_block_count = 21;
-    effects = new (TotalDataBuff.Alloc(sizeof(CEffectScriptMan) / 16 + 2)) CEffectScriptMan;
+    if ((effects = (CEffectScriptMan *)operator new(sizeof(CEffectScriptMan), TotalDataBuff.Alloc(sizeof(CEffectScriptMan) / 16 + 2))) != NULL) {
+        EditEffectSpriteState *sprite = (EditEffectSpriteState *)effects;
+        sprite->sprite_vtable = __vt__9mgCVisual;
+        ((mgC3DSprite *)sprite->sprite)->Initialize();
+        sprite->sprite_vtable = __vt__11mgC3DSprite;
+        ((mgC3DSprite *)sprite->sprite)->Initialize();
+        effects->Initialize(NULL, -1, -1);
+    }
     effects->Initialize(&TotalDataBuff, 174, 11);
     effects->load_buffer = read_buffer;
     effects->SetWorkBuffer(&ChrEffBuffer);
@@ -484,11 +536,12 @@ void EditInit(INIT_LOOP_ARG arg) {
     MainScene__2->AssignEffect(0, effects, NULL);
     MainScene__2->read_buff = read_buffer;
     if (LoadFile2("img/water_ref.img", TotalDataBuff.stAllocTest(1), &water_size, 0) != 0) {
-        water_qwords = (u_int)water_size / 16;
-        if (water_size & 0xF) {
-            water_qwords++;
+        if ((u_int)water_size & 0xF) {
+            water_qwords = ((u_int)water_size >> 4) + 1;
+        } else {
+            water_qwords = (u_int)water_size >> 4;
         }
-        mgTexManager.EnterIMGFile((u_char *)TotalDataBuff.Alloc(water_qwords), 158, NULL, NULL);
+        tex_manager->EnterIMGFile((u_char *)TotalDataBuff.Alloc(water_qwords), 158, NULL, NULL);
     }
     NowLoadingBarStep();
 
@@ -504,12 +557,14 @@ void EditInit(INIT_LOOP_ARG arg) {
     GetSystemMessage(2)->texture_block = 154;
     MainScene__2->AssignMessage(3, GetSystemMessage(2), NULL);
     Camera = new (TotalDataBuff.Alloc(sizeof(CCameraControl) / 16 + 2)) CCameraControl;
-    editloop::EventCamera = new (TotalDataBuff.Alloc(sizeof(CCameraControl) / 16 + 2)) CCameraControl;
+    EventCamera = new (TotalDataBuff.Alloc(sizeof(CCameraControl) / 16 + 2)) CCameraControl;
     FixCamera = new (TotalDataBuff.Alloc(sizeof(CCameraControl) / 16 + 2)) CCameraControl;
     EditCamera = new (TotalDataBuff.Alloc(sizeof(CCameraControl) / 16 + 2)) CCameraControl;
-    debug_camera = new (TotalDataBuff.Alloc(sizeof(CCameraControl) / 16 + 2)) CCameraControl;
+    if ((debug_camera = (CCameraControl *)operator new(sizeof(CCameraControl), TotalDataBuff.Alloc(sizeof(CCameraControl) / 16 + 2))) != NULL) {
+        debug_camera = (CCameraControl *)__ct__14CCameraControlFv(debug_camera);
+    }
     MainScene__2->AssignCamera(0, Camera, NULL);
-    MainScene__2->AssignCamera(1, editloop::EventCamera, NULL);
+    MainScene__2->AssignCamera(1, EventCamera, NULL);
     MainScene__2->AssignCamera(2, FixCamera, NULL);
     MainScene__2->AssignCamera(3, EditCamera, NULL);
     MainScene__2->AssignCamera(7, debug_camera, NULL);
@@ -518,17 +573,17 @@ void EditInit(INIT_LOOP_ARG arg) {
     Camera->GetActiveParam()->near_height = 10.0f;
     Camera->GetActiveParam()->far_height = 10.0f;
     Camera->GetActiveParam()->ground_space = 30.0f;
-    Camera->default_param = *Camera->GetActiveParam();
+    SetDefaultCameraParam(Camera);
     MainScene__2->player_chara = 0;
 
-    mgTexManager.EnterTexture(156, "work", NULL, mgScreenWidth, mgScreenHeight, 32, NULL, 0, 0);
-    mgTexManager.EnterTexture(159, "shadow_work", NULL, mgScreenWidth, mgScreenHeight, 32, NULL, 0, 0);
-    mgTexManager.EnterTexture(158, "water_work", NULL, mgScreenWidth, mgScreenHeight, 32, NULL, 0, 0);
-    mgTexManager.EnterTexture(66, "fire_work", NULL, mgScreenWidth, mgScreenHeight, 32, NULL, 0, 0);
-    mgTexManager.EnterTexture(213, "test4", NULL, 64, 64, 16, NULL, 0, 0);
-    mgTexManager.EnterTexture(157, "f_work", NULL, mgScreenWidth, mgScreenHeight, 32, NULL, 0, 0);
-    mgTexManager.EnterTexture(157, "f_work2", NULL, mgScreenWidth / 3, mgScreenHeight / 3, 32, NULL, 0, 0);
-    cross_texture = mgTexManager.EnterTexture(213, "cross_f", NULL, mgScreenWidth, mgScreenHeight, 32, NULL, 0, 0);
+    tex_manager->EnterTexture(156, "work", NULL, mgScreenWidth, mgScreenHeight, 32, NULL, 0, 0);
+    tex_manager->EnterTexture(159, "shadow_work", NULL, mgScreenWidth, mgScreenHeight, 32, NULL, 0, 0);
+    tex_manager->EnterTexture(158, "water_work", NULL, mgScreenWidth, mgScreenHeight, 32, NULL, 0, 0);
+    tex_manager->EnterTexture(66, "fire_work", NULL, mgScreenWidth, mgScreenHeight, 32, NULL, 0, 0);
+    tex_manager->EnterTexture(213, "test4", NULL, 64, 64, 16, NULL, 0, 0);
+    tex_manager->EnterTexture(157, "f_work", NULL, mgScreenWidth, mgScreenHeight, 32, NULL, 0, 0);
+    tex_manager->EnterTexture(157, "f_work2", NULL, mgScreenWidth / 3, mgScreenHeight / 3, 32, NULL, 0, 0);
+    cross_texture = tex_manager->EnterTexture(213, "cross_f", NULL, mgScreenWidth, mgScreenHeight, 32, NULL, 0, 0);
     InitPause(207);
     CrossFadeBuff = read_buffer + 131072;
     MainScene__2->fade.SetCrossTexture(cross_texture, CrossFadeBuff);
@@ -536,7 +591,8 @@ void EditInit(INIT_LOOP_ARG arg) {
 
     TotalDataBuff.Align64();
     TotalDataBuff.lock = 1;
-    ControlCharaBuff.stSetBuffer(&TotalDataBuff.stack[TotalDataBuff.stack_used], TotalDataBuff.stack_size - TotalDataBuff.stack_used);
+    rest = TotalDataBuff.stack_size - TotalDataBuff.stack_used;
+    ControlCharaBuff.stSetBuffer(&TotalDataBuff.stack[TotalDataBuff.stack_used], rest);
     ControlCharaBuff.stack_used = 0;
     ControlCharaBuff.lock = 0;
     MainScene__2->SetStack(0, &ControlCharaBuff);
@@ -551,8 +607,8 @@ void EditInit(INIT_LOOP_ARG arg) {
     MainScene__2->work_stack = &WorkBuffer;
     ControlCharaBuff.stAlloc64(GetCharaMemAllocSize());
     ControlCharaBuff.Align64();
-    FixCharaBuffSize = ControlCharaBuff.stack_used;
     ControlCharaBuff.lock = 1;
+    FixCharaBuffSize = ControlCharaBuff.stack_used;
     active_chara_no = GetUserData()->active_chr_no;
     SetupMainUnit(read_buffer, &ControlCharaBuff, CharaBufs, 70, MainScene__2, GetUserData(), active_chara_no, 1);
     ActiveCharaNo = GetUserData()->active_chr_no;
@@ -592,18 +648,19 @@ void EditInit(INIT_LOOP_ARG arg) {
     }
     MainCharaBuff.Align64();
     MainCharaBuff.lock = 1;
-    SubDataBuff.stSetBuffer(&MainCharaBuff.stack[MainCharaBuff.stack_used], MainCharaBuff.stack_size - MainCharaBuff.stack_used);
+    rest = MainCharaBuff.stack_size - MainCharaBuff.stack_used;
+    SubDataBuff.stSetBuffer(&MainCharaBuff.stack[MainCharaBuff.stack_used], rest);
     SubDataBuff.stack_used = 0;
     SubDataBuff.lock = 0;
     SetCurrentDir(NULL);
-    *(u_long128 *)position = *(u_long128 *)initial_position;
+    sceVu0FVECTOR position = {0.0f, 0.0f, 0.0f, 0.0f};
     player = MainScene__2->GetCharacter(MainScene__2->player_chara);
     map = MainScene__2->GetMap(0);
     if (player != NULL && map != NULL) {
         player->SetPosition(map->chara_pos);
         player->GetPosition(position);
     }
-    Camera->SetPos(0.0f, 0.0f, 100.0f);
+    Camera->SetPos(0.0f, 0.0f, float(100));
     Camera->Step(10);
     Camera->SetFollowOffset(0.0f, 30.0f, 0.0f);
     Camera->SetFollow(position[0], position[1], position[2]);
@@ -645,34 +702,33 @@ void EditInit(INIT_LOOP_ARG arg) {
     InitLightingEdit();
     EditEvent.Reset();
     InitSubGame(MainScene__2);
-    EdDebugInfo.rod_no = fishing_item;
-    EdDebugInfo.menu_buff = NULL;
-    EdDebugInfo.esa_no = fishing_item;
-    EdDebugInfo.texb = 185;
-    EdDebugInfo.texb_num = 21;
-    EdDebugInfo.load_buff = NULL;
+    EditSubInfo info;
+    info.texb = 185;
+    info.scene = MainScene__2;
+    EdDebugInfo.scene = info.scene;
+    info.texb_num = 21;
+    EdDebugInfo.menu_buff = info.menu_buff;
+    EdDebugInfo.texb = info.texb;
+    EdDebugInfo.texb_num = info.texb_num;
+    info.unk_c = 154;
+    EdDebugInfo.unk_c = info.unk_c;
+    EdDebugInfo.dungeon = info.dungeon;
+    EdDebugInfo.no_map_event = info.no_map_event;
+    EdDebugInfo.record_check = info.record_check;
+    EdDebugInfo.rod_no = info.rod_no;
+    EdDebugInfo.esa_no = info.esa_no;
+    EdDebugInfo.load_buff = info.load_buff;
+    EdDebugInfo.keep_bgm = info.keep_bgm;
     EdDebugInfo.jump_map_no = -1;
-    EdDebugInfo.unk_c = 154;
-    EdDebugInfo.dungeon = 0;
-    EdDebugInfo.no_map_event = 0;
-    EdDebugInfo.record_check = 0;
-    EdDebugInfo.keep_bgm = 0;
-    EdDebugInfo.scene = MainScene__2;
     InitPauseMenu(154);
     NowLoadingBarSteEnd();
     DeleteNowLoading();
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editloop", EditInit__F13INIT_LOOP_ARG);
-#endif
 extern "C" CameraCtrlParam &__as__15CameraCtrlParamFRC15CameraCtrlParam(
     CameraCtrlParam *destination, const CameraCtrlParam *source) {
     *destination = *source;
     return *destination;
 }
-#ifndef NONMATCHING
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editloop", __ct__12CActionCharaFv);
-#endif
 void EditExit(void) {
     sndSeAllStop(1);
     MainScene__2->InitSeSrc();
@@ -717,22 +773,11 @@ int EditLoop() {
     CameraCtrlParam    *camera_param;
     CameraCtrlParam    *default_param;
     SubGameInfo        *current_subgame;
-    PAUSE_INFO          menu_pause;
-    PAUSE_INFO          pause;
     sceVu0FVECTOR       position;
     sceVu0FVECTOR       ground_position;
     sceVu0FVECTOR       closest;
     sceVu0FVECTOR       line_start;
     sceVu0FVECTOR       line_end;
-    sceVu0FVECTOR       load_position = {1400.0f, -6.0f, -218.0f, 1.0f};
-    sceVu0FVECTOR       talk_position;
-    sceVu0FVECTOR       talk_height;
-    sceVu0FVECTOR       villager_position;
-    sceVu0FVECTOR       edit_position;
-    sceVu0FVECTOR       return_position;
-    sceVu0FVECTOR       camera_position;
-    sceVu0FVECTOR       camera_reference;
-    int                 stay[32];
     char               *map_name;
     float               time_rate;
     float               projection;
@@ -742,6 +787,7 @@ int EditLoop() {
     int                 light_band;
     int                 next_sub_map;
     int                 finish;
+    int                 light_check;
     int                 wait_for_map;
     int                 menu_mode;
     int                 open_menu;
@@ -789,6 +835,7 @@ int EditLoop() {
     if (PauseFlag == 0 && IsLightingEditMode() == 0) {
         map = MainScene__2->GetMap(MainScene__2->active_map);
         if (map != NULL) {
+            light_check = 1;
             map->now_time = MainScene__2->time;
             light_band = map->GetNowTimeLightBand();
             if (GamePad__2.On2(PAD_RIGHT) != 0) {
@@ -802,7 +849,7 @@ int EditLoop() {
             }
             if (GamePad__2.Down2(PAD_DOWN) != 0) {
                 show_time_step = 30;
-                time_step = time_step == 0;
+                time_step = !time_step;
             }
             if (LoopMode == EDIT_LOOP_WAIT_READ) {
                 if (ReadBGSync() == 0) {
@@ -811,13 +858,14 @@ int EditLoop() {
             } else if (GetSaveData()->time_stop == 0 && time_step != 0 &&
                        ControlMode == EDIT_CONTROL_PLAYER && LoopMode == EDIT_LOOP_WALK) {
                 time_rate = 1.0f;
-                if (GetSaveData() != NULL && GetSaveData()->config.fast_time != 0) {
+                light_check = 1;
+                if (GetSaveData() != NULL && GetSaveData()->GetConfig()->fast_time != 0) {
                     time_rate = 1.5f;
                 }
                 MainScene__2->TimeStep(time_rate);
             }
             map->now_time = MainScene__2->time;
-            if (light_band != map->GetNowTimeLightBand() && map->time_cfade != 0) {
+            if (light_check != 0 && light_band != map->GetNowTimeLightBand() && map->time_cfade != 0) {
                 MainScene__2->fade.CaptureScreen();
                 MainScene__2->fade.CrossFade(10, 0.8f);
             }
@@ -829,7 +877,7 @@ int EditLoop() {
         wait_for_map = 1;
     }
     map_name = MainScene__2->GetMapName(MainScene__2->active_map);
-    if (LoopCounter >= 3 && LoopMode == EDIT_LOOP_WALK && map_name != NULL && strcmp(map_name, "m01") == 0) {
+    while (LoopCounter >= 3 && LoopMode == EDIT_LOOP_WALK && map_name != NULL && strcmp(map_name, "m01") == 0) {
         chara = MainScene__2->GetCharacter(MainScene__2->player_chara);
         if (chara != NULL) {
             chara->GetPosition(position);
@@ -837,6 +885,7 @@ int EditLoop() {
             ground_position[1] = 0.0f;
             line_start[3] = 1.0f;
             line_end[3] = 1.0f;
+            sceVu0FVECTOR load_position = {1400.0f, -6.0f, -218.0f, 1.0f};
             next_sub_map = -1;
             if (MainScene__2->LoadMapBGStep(NULL) == 0) {
                 line_start[0] = 1900.0f;
@@ -964,7 +1013,18 @@ int EditLoop() {
                 SubMapLoadBG = 1;
             }
         }
+        break;
     }
+    PAUSE_INFO          menu_pause;
+    PAUSE_INFO          pause;
+    sceVu0FVECTOR       camera_reference;
+    sceVu0FVECTOR       talk_position;
+    sceVu0FVECTOR       camera_position;
+    sceVu0FVECTOR       talk_height;
+    sceVu0FVECTOR       villager_position;
+    int                 stay[32];
+    sceVu0FVECTOR       edit_position;
+    sceVu0FVECTOR       return_position;
     if (SubMapLoadStep() != 0) {
         while (wait_for_map != 0 && SubMapLoadStep() != 0) {
         }
@@ -1677,36 +1737,36 @@ int EditDraw() {
     static int                 flag;
     static char                init;
     CMap                      *maps[8];
-    mgCTextureManager        *tex_manager;
-    CInventUserData           *invent;
-    int                       map_index;
     USER_PICTURE_INFO         *picture;
-    int                       chara_no;
+    int                       map_index;
+    CInventUserData           *invent;
+    CCharacter2               *chara;
     mgCTexture                *overlay;
     mgCTexture                *water;
     int                       ghost_visible;
-    int                       dof_off;
+    int                       texture_group;
     int                       block;
     CPartsGroup               *ghost_group;
     CList<PartsGroupData>     *group_entry;
     int                       water_block;
     int                       map_count;
     mgCCamera                 *camera;
+    mgCTextureManager        *tex_manager;
     CMapParts                 *parts;
-    int                       show_system;
+    bool                      show_system;
     int                       main_map_no;
     CList<CMapPiece>          *piece;
     CFuncPoint                *subject;
-    CCharacter2               *chara;
+    int                       map_draw;
+    int                       chara_no;
     CMap                      *map;
     mgCTexture                *screen;
-    int                       texture_group;
+    CEditMap                  *edit_map;
     int                       block_count;
     int                       block_index;
     int                       idea_no;
     int                       exit_flag;
-    CEditMap                  *edit_map;
-    int                       map_draw;
+    int                       dof_off;
     sceVu0FMATRIX             view_matrix;
 
     if (EditDrawCancelFlag != 0) {
@@ -1742,7 +1802,7 @@ int EditDraw() {
     }
 
     ghost_visible = GhostPhotoTiming();
-    if (CheckTime(MainScene__2->time, 0.0f, 4.0f) == 0) {
+    if (CheckTime(MainScene__2->time, float(0), float(4)) == 0) {
         ghost_visible = 0;
     }
     for (map_index = 0; map_index < map_count; map_index++) {
@@ -1772,7 +1832,7 @@ int EditDraw() {
     WorkBuffer.stack_used = 0;
     WorkBuffer.lock = 0;
     int texture_order[65];
-    for (block_index = 0; block_index < 64; block_index++) {
+    for (int block_index = 0; block_index < 64; block_index++) {
         texture_order[block_index] = block_index;
     }
     texture_order[64] = -1;
@@ -1807,9 +1867,10 @@ int EditDraw() {
         int texture_blocks[128];
         for (texture_group = 0; texture_group < 6; texture_group++) {
             block_count = MainScene__2->mds_list_set.GetTextureBlockNo(texture_group, texture_blocks, 128);
-            for (block_index = 0; block_index < block_count; block_index++) {
-                block = texture_blocks[block_count - block_index - 1];
-                if (mgEndDrawReloadTexture(block, NULL) != 0 && water_block == block) {
+            for (int block_index = 0; block_index < block_count; block_index++) {
+                int *entry = &texture_blocks[block_count - block_index - 1];
+                block = *entry;
+                if (mgEndDrawReloadTexture(block, NULL) != 0 && water_block == *entry) {
                     WaveTable.CreateTexture(water);
                 }
                 mgEndDraw(block, NULL);
@@ -1818,12 +1879,12 @@ int EditDraw() {
         mgSetPkTextureRepeat(0);
         sgDrawSubGameMap();
         map = MainScene__2->GetMap(MainScene__2->active_map);
-        dof_off = 0;
         if (map != NULL) {
             map->GetNowTimeBand();
         }
+        dof_off = 0;
         if (GetSaveData() != NULL) {
-            dof_off = GetSaveData()->config.dof_off;
+            dof_off = GetSaveData()->GetConfig()->dof_off;
         }
         if (dof_off != 0 && IsEditMode() == 0) {
             float blur_range[2] = {1000.0f, 2000.0f};
@@ -1868,10 +1929,10 @@ int EditDraw() {
     mgSetPkTextureRepeat(1);
     if (map_draw != 0) {
         int later_texture_blocks[128];
-        for (texture_group = 6; texture_group < 16; texture_group++) {
+        for (int texture_group = 6; texture_group < 16; texture_group++) {
             block_count = MainScene__2->mds_list_set.GetTextureBlockNo(texture_group, later_texture_blocks, 128);
-            for (block_index = 0; block_index < block_count; block_index++) {
-                block = later_texture_blocks[block_index];
+            for (int block_index = 0; block_index < block_count; block_index++) {
+                int block = later_texture_blocks[block_index];
                 mgEndDrawReloadTexture(block, NULL);
                 mgEndDraw(block, NULL);
             }
@@ -1954,6 +2015,7 @@ int EditDraw() {
         screen_chara.dist = 0.0f;
         screen_chara.in_center = 0;
         chara_no = MainScene__2->InScreenChara(&screen_chara, screen_range);
+        int screen_no = screen_chara.chara_no;
         chara = MainScene__2->GetCharacter(chara_no);
         if (chara_no >= 0 && chara != NULL && chara->GetKeyListPtr("\x83\x4A\x83\x81\x83\x89", NULL) != NULL) {
             MainScene__2->ExModeVillager(chara_no);
@@ -1977,8 +2039,8 @@ int EditDraw() {
                 idea_no = 2006;
             }
             if (screen_chara.dist < 5.0f + photo_dist) {
-                picture->npc_no = screen_chara.chara_no;
-                if (screen_chara.in_center != 0 && screen_chara.chara_no == 14) {
+                picture->npc_no = screen_no;
+                if (screen_chara.in_center != 0 && screen_no == 14) {
                     idea_no = 36;
                     picture->npc_no = -1;
                 }
@@ -1995,7 +2057,7 @@ int EditDraw() {
         }
     }
 
-    show_system = DebugInfo.param_off == 0;
+    show_system = !DebugInfo.param_off;
     if ((GetSaveData()->GetBitCtrl() & 0x2) != 0) {
         show_system = 0;
     }
@@ -2015,7 +2077,7 @@ int EditDraw() {
     if (SubGameRunning() != 0) {
         show_system = 0;
     }
-    if (show_system != 0) {
+    if (show_system) {
         sceVu0FVECTOR system_pos;
         chara = MainScene__2->GetCharacter(MainScene__2->player_chara);
         if (chara != NULL) {

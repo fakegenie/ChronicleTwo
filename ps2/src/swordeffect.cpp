@@ -15,37 +15,37 @@ extern char at_356[];
 #endif
 
 #ifdef NONMATCHING
-int CreatSmoothPassSW(float (*dst)[4], float (*src)[4], int num, int division, int start, int ring_size) {
+int CreatSmoothPassSW(float (*out)[4], float (*ring)[4], int point_num, int division, int start, int ring_size) {
     sceVu0FMATRIX coefficients;
     sceVu0FMATRIX points;
     sceVu0FMATRIX basis;
     float powers[4];
     float result[4];
     int control[4];
-    if (num < 3) {
+    if (point_num < 3) {
         return 0;
     }
     float quarter = 0.25f;
     float half = 0.5f;
-    basis[0][0] = -quarter / half;
-    basis[0][1] = 1.5f;
-    basis[0][2] = (-half - quarter) / half;
-    basis[0][3] = 0.5f;
-    basis[1][0] = 1.0f;
-    basis[1][1] = -1.25f / half;
-    basis[1][2] = 2.0f;
-    basis[1][3] = -half;
-    basis[2][0] = basis[0][0];
-    basis[2][1] = 0.0f;
-    basis[2][2] = 0.5f;
-    basis[2][3] = 0.0f;
     basis[3][0] = 0.0f;
+    basis[2][1] = 0.0f;
+    basis[0][0] = -quarter / half;
+    basis[1][0] = 1.0f;
     basis[3][1] = 1.0f;
+    basis[0][2] = (-half - quarter) / half;
+    basis[0][1] = 1.5f;
     basis[3][2] = 0.0f;
+    basis[2][3] = 0.0f;
+    basis[2][0] = basis[0][0];
+    basis[1][1] = -(quarter + 1.0f) / half;
+    basis[1][2] = 2.0f;
+    basis[0][3] = half;
+    basis[2][2] = basis[0][3];
     basis[3][3] = 0.0f;
+    basis[1][3] = -half;
     int written = 0;
-    for (int segment = 0; segment < num - 1; segment++) {
-        if (segment > 0 && segment < num - 2) {
+    for (int segment = 0; segment < point_num - 1; segment++) {
+        if (segment > 0 && segment < point_num - 2) {
             control[0] = segment - 1;
             control[1] = segment;
             control[2] = segment + 1;
@@ -57,7 +57,7 @@ int CreatSmoothPassSW(float (*dst)[4], float (*src)[4], int num, int division, i
                 control[2] = 1;
                 control[3] = 2;
             }
-            if (segment >= num - 2) {
+            if (segment >= point_num - 2) {
                 control[0] = segment - 1;
                 control[1] = segment;
                 control[2] = segment + 1;
@@ -73,10 +73,10 @@ int CreatSmoothPassSW(float (*dst)[4], float (*src)[4], int num, int division, i
                 control[row] += ring_size;
             }
         }
-        float *p0 = src[control[0]];
-        float *p1 = src[control[1]];
-        float *p2 = src[control[2]];
-        float *p3 = src[control[3]];
+        float *p0 = ring[control[0]];
+        float *p1 = ring[control[1]];
+        float *p2 = ring[control[2]];
+        float *p3 = ring[control[3]];
         points[0][0] = p0[0];
         points[0][1] = p0[1];
         points[0][2] = p0[2];
@@ -98,15 +98,15 @@ int CreatSmoothPassSW(float (*dst)[4], float (*src)[4], int num, int division, i
         float step;
         while (t < 1.0f - (step = 1.0f / (division - 1.0f))) {
             powers[3] = 1.0f;
-            powers[2] = t;
             powers[1] = t * t;
-            powers[0] = t * powers[1];
+            powers[0] = t * (t * t);
+            powers[2] = t;
             sceVu0ApplyMatrix(result, coefficients, powers);
-            float *out = dst[written];
-            out[0] = result[0];
-            out[1] = result[1];
-            out[2] = result[2];
-            out[3] = 1.0f;
+            float *entry = out[written];
+            entry[0] = result[0];
+            entry[1] = result[1];
+            entry[2] = result[2];
+            entry[3] = 1.0f;
             t += step;
             written++;
         }
@@ -119,14 +119,23 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/swordeffect", CreatSmoothPassSW__FPA4_fPA4
 
 #ifdef NONMATCHING
 void CSWordAfterEffect::Draw() {
-    if (!active || point_num <= 0) return;
+    if (!active) return;
+    if (point_num <= 0) return;
+    int projected[4];
+    float alpha_step;
     float opacity = alpha;
     int count = (int)((float)length * opacity);
     if (smooth_num < count) count = smooth_num;
     if (count <= 0) return;
-    float alpha_step = opacity / (float)count;
+    alpha_step = opacity / (float)count;
     mgCDrawPrim prim;
-    if (texture != NULL) mgTexManager.ReloadTexture(tex_block, (sceVif1Packet *)NULL);
+    mgCTextureManager *textures = &mgTexManager;
+    switch ((int)texture) {
+    case 0:
+        break;
+    default:
+        textures->ReloadTexture(tex_block, (sceVif1Packet *)NULL);
+    }
     prim.Initialize(NULL, NULL);
     prim.AlphaBlendEnable(1);
     prim.AlphaBlend(2);
@@ -145,9 +154,8 @@ void CSWordAfterEffect::Draw() {
     prim.DepthTest(1);
     prim.Begin(4);
     if (texture != NULL) prim.Texture(texture);
-    float u_step = (float)tex_w / (float)count;
     float u = (float)tex_u;
-    int projected[4];
+    float u_step = (float)tex_w / (float)count;
     if (texture == NULL) {
         for (int point = 0; point < count; ++point) {
             if (mgTransWorldPrim(projected, smooth0[point])) {
@@ -161,8 +169,9 @@ void CSWordAfterEffect::Draw() {
             opacity -= alpha_step;
         }
     } else {
+        int texel_u;
         for (int point = 0; point < count; ++point) {
-            int texel_u = (int)u;
+            texel_u = (int)u;
             if (mgTransWorldPrim(projected, smooth0[point])) {
                 prim.Color(color0[0], color0[1], color0[2], (int)((float)color0[3] * opacity));
                 prim.TextureCrd(texel_u, tex_v);

@@ -1174,8 +1174,8 @@ void ClsMes::StepNormal() {
         if (distance > 0.0f) {
             float tip_y = tail_length * dy / distance;
             float tip_x = tail_length * dx / distance;
-            tail_tip_x = tail_root_x + (int)tip_x;
-            tail_tip_y = tail_root_y + (int)tip_y;
+            tail_tip_x = (int)tip_x + tail_root_x;
+            tail_tip_y = (int)tip_y + tail_root_y;
         } else {
             tail_tip_x = tail_root_x;
             tail_tip_y = tail_root_y;
@@ -2131,16 +2131,18 @@ int ClsMes::SetMesWinTbl(int code, short x, short y) {
     }
     return 1;
 }
-#ifdef NONMATCHING
+#pragma divbyzerocheck on
 int ClsMes::CalcSpaceW(int width, int char_width, unsigned short *text) {
-    int            spaces;
-    int            used_width;
-    unsigned short code;
+    unsigned short *p;
+    int code;
+    int used_width;
+    int spaces;
 
-    spaces = 0;
     used_width = 0;
+    spaces = 0;
+    p = text;
     while (1) {
-        code = *text++;
+        code = *p++;
         switch (code) {
         case MES_CODE_NEWLINE:
         case MES_CODE_PAGE:
@@ -2175,7 +2177,7 @@ int ClsMes::CalcSpaceW(int width, int char_width, unsigned short *text) {
             continue;
         } else if (code >= MES_CODE_COLOR_A && code <= 0xF2FF) {
             continue;
-        } else if (code == MES_CODE_VOICE_1 || code == MES_CODE_VOICE_0) {
+        } else if ((unsigned)(code - MES_CODE_VOICE_1) <= 1) {
             continue;
         } else if (code == MES_CODE_VOICE_2) {
             continue;
@@ -2190,9 +2192,7 @@ int ClsMes::CalcSpaceW(int width, int char_width, unsigned short *text) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/nd_meswin", CalcSpaceW__6ClsMesFiiPUs);
-#endif
+#pragma divbyzerocheck reset
 int ClsMes::MakeMesWinTbl(int mes_no) {
     unsigned short *text;
     short          *registered_name;
@@ -3008,9 +3008,13 @@ void ClsMes::MakeMesWin(int message) {
             extra_width = 0;
             fukidashi_w = text_w + 60;
             for (current_page = 0; current_page < page_num; current_page++) {
-                character_count = 0;
-                for (index = 0; index < current_page + 1; index++) {
-                    character_count += page_chars[index];
+                if (current_page + 1 <= 0) {
+                    character_count = 0;
+                } else {
+                    character_count = 0;
+                    for (index = 0; index < current_page + 1; index++) {
+                        character_count += page_chars[index];
+                    }
                 }
                 if (text_w <= line_w[character_count - 1]) {
                     extra_width = 1;
@@ -3086,9 +3090,13 @@ void ClsMes::MakeMesWin(char *str, int open, int reset_fade) {
             extra_width = 0;
             fukidashi_w = text_w + 60;
             for (current_page = 0; current_page < page_num; current_page++) {
-                character_count = 0;
-                for (index = 0; index < current_page + 1; index++) {
-                    character_count += page_chars[index];
+                if (current_page + 1 <= 0) {
+                    character_count = 0;
+                } else {
+                    character_count = 0;
+                    for (index = 0; index < current_page + 1; index++) {
+                        character_count += page_chars[index];
+                    }
                 }
                 if (text_w <= line_w[character_count - 1]) {
                     extra_width = 1;
@@ -3609,13 +3617,17 @@ extern RECT at_4185;
 void ClsMes::DrawDigit(mgCDrawPrim *prim, int digit, int x, int y, int alpha, RGBAQ_TYPE *color) {
     RECT at = at_4185;
     mgRect<int> xy;
+    int h;
     mgRect<int> uv;
+    int w;
 
     at.x += digit % 5 * at.width;
     at.y += digit / 5 * at.height;
     color->a = alpha * 128 / 128;
-    uv.Set(at.x, at.y, at.width, at.height);
-    xy.Set(x, (int)(y + 2.0), at.width, at.height);
+    h = at.height;
+    w = at.width;
+    uv.Set(at.x, at.y, w, h);
+    xy.Set(x, (int)(y + 2.0), w, h);
     set2DSpriteEasy(prim, xy, uv, color);
 }
 #else
@@ -3874,8 +3886,8 @@ void ClsMes::DrawMesWin() {
             break;
         case MES_WIN_DQ_FUKIDASHI:
         case MES_WIN_DQ_FUKIDASHI_2:
-            text_x = (int)CalcAutoPosSet(0.0f, 512.0f, text_w, 0.5f);
-            text_y = (int)CalcAutoPosSet(0.0f, 480.0f, text_h, 0.95f);
+            text_x = (int)CalcAutoPosSet(0.0f, float(512.0), text_w, 0.5f);
+            text_y = (int)CalcAutoPosSet(0.0f, 480.0f, text_h, float(0.95));
             outer.x = text_x - (font_w + 8);
             outer.y = text_y - 13;
             outer.width = font_w + (font_w + 16 + text_w);
@@ -3915,8 +3927,8 @@ void ClsMes::DrawMesWin() {
     }
     if (window_mode == MES_WIN_BOTTOM || window_mode == MES_WIN_DQ_FUKIDASHI ||
         window_mode == MES_WIN_DQ_FUKIDASHI_2) {
-        text_x = (int)CalcAutoPosSet(0.0f, 512.0f, text_w, 0.5f);
-        text_y = (int)CalcAutoPosSet(0.0f, 480.0f, text_h, 0.95f);
+        text_x = (int)CalcAutoPosSet(0.0f, float(512.0), text_w, float(0.5));
+        text_y = (int)CalcAutoPosSet(float(0.0), float(480.0), text_h, 0.95f);
     }
     if (window_mode == MES_WIN_CENTRE) {
         text_x = (int)CalcAutoPosSet(0.0f, 512.0f, text_w, 0.5f);

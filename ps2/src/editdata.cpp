@@ -237,32 +237,32 @@ void CEditMap::SaveData(CEditData *data) {
 }
 #ifdef NONMATCHING
 void CEditMap::LoadData(CEditData *data) {
-    int logCount;
-    int unused;
     short *gridPos;
-    int m;
-    int k;
-    CEditPartsInfo *info;
-    int remap[kEditPartsCount];
-    int j;
-    EditDataParts *saved;
-    EditPlaceLog *log;
-    float placePos[4];
-    int no;
-    float placeRot[4];
-    CEditGrid *river;
-    int i;
-    int z;
-    int changed;
-    int unnamed;
-    CEditParts *placed;
-    float color[4];
-    CMapParts *model;
-    int c;
     u8 *in;
+    int remap[kEditPartsCount];
+    EditDataParts *saved;
+    float placePos[4];
     CEditParts *lower;
-    CEditParts *part;
+    float placeRot[4];
+    CMapParts *model;
+    int j;
+    int m;
+    int i;
+    EditPlaceLog *log;
     int x;
+    int k;
+    int no;
+    float color[4];
+    CEditParts *placed;
+    CEditGrid *river;
+    CEditParts *part;
+    int unused;
+    int c;
+    CEditPartsInfo *info;
+    int logCount;
+    int unnamed;
+    int changed;
+    int z;
     logCount = 0;
     saved = data->parts;
     log = data->place_log;
@@ -377,10 +377,10 @@ void CEditMap::LoadData(CEditData *data) {
             gridPos = (short *)in;
             printf(at_917__3, gridPos[0], gridPos[1], gridPos[2]);
             in += sizeof(EditDataGrid) - 2;
-            for (c = 0; c < river->num_x; c++) {
-                for (c = 0; c < river->num_z; c++) {
+            for (int x = 0; x < river->num_x; x++) {
+                for (int z = 0; z < river->num_z; z++) {
                     if (*in & 1) {
-                        river->SetRiver(c, c);
+                        river->SetRiver(x, z);
                     }
                     in++;
                 }
