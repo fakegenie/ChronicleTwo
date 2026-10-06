@@ -99,8 +99,6 @@ extern "C" int ClearEffectFromChrid__16CEffectScriptManFi(void *, int);
 extern signed char MenuNPCLoadFlag;
 extern "C" int stSetBuffer__9mgCMemoryFP1i(mgCMemory *memory, void *buffer, int size);
 extern "C" void *__ct__14CBaseMenuClassFv(void *self);
-extern "C" void MenuMainFrameStep__Fv(void);
-extern "C" void MenuMainFrameModeSet__Fii(int, int);
 extern int mos_effect_read_num;
 extern "C" void BuildBase__16CEffectScriptManFPcP1iP1iP9mgCMemoryi(CEffectScriptMan *manager,
                                                                    char *name, int pathFile,
@@ -111,12 +109,6 @@ extern "C" int DeleteBlock__17mgCTextureManagerFi(void *, int);
 extern "C" int GetPutPosXY__16CMenuPosDataFormFPcRiRi(CMenuPosDataForm *, char *, int *, int *);
 extern "C" void MenuPosStep__12CMenuKeyFuncFPiPi(CMenuKeyFunc *, int *, int *);
 extern "C" void MenuSetPos__12CMenuKeyFuncFii(CMenuKeyFunc *, int, int);
-extern "C" int MenuGlidKeyCheck__FiPiPiPiPiPii(int, int *, int *, int *, int *, int *, int);
-extern "C" void GetCharacterSnd__FP16CUserDataManageriPc(CUserDataManager *, int, char *);
-extern "C" int GetMonsterModelFile__FiiPc(int, int, char *);
-extern "C" void sndInitPort__Fi(int);
-extern "C" int sndLoadSound__FiPUiP9mgCMemory(int, u32 *, mgCMemory *);
-extern "C" void *GetGameDataPt__Fv(void);
 void SetupUnitMan(CScene *scene, CUserDataManager *userData, int unit, ROBO_INFO_DATA *robo);
 void GetBajjiPosition(CMenuPosDataForm *form, int slot, int unused, int *pos);
 void SetSwordBlurEffect(CCharacter2 *chara, mgCMemory *stack, int blur_type);
@@ -235,15 +227,10 @@ extern int overcode_3172[4];
 extern CMenuMosSelect *MenuMosSelectPtr;
 extern "C" char at_3779[];
 extern "C" char at_3780[];
-extern "C" int GetTimeBand__Ff(float hour);
-extern "C" int GetMenuMainFrameEndFlag__Fv();
 extern "C" char at_3790[];
 extern int MenuSoundCharaNo;
 extern float at_4158;
-extern "C" char *GetItemFileName__Fii(int, int);
-extern "C" char *GetItemFilePath__Fii(int, int);
 extern "C" char at_4186__2[];
-extern "C" u8 *GetReadBGInfo__FPc(char *);
 extern char at_4123[];
 extern "C" char at_4296[];
 extern "C" u8 at_4517__2[];
@@ -1991,7 +1978,7 @@ void CMenuChrCngMenu::CalcTex() {
     float *frameTop = GetMenuMainFrameLeftTopPos(0);
     int x = (int)(frameTop[0] - 512.0f);
     int y = (int)frameTop[1];
-    if (GetMenuMainFrameEndFlag__Fv() == 0) {
+    if (GetMenuMainFrameEndFlag() == 0) {
         SetFormPoint(form, x, y);
     } else {
         form->x = x;
@@ -2236,7 +2223,7 @@ int CMenuChrCngMenu::MenuLocalLoop() {
     if (MenuCommonInfo->open_type == 4 || close_on_end == 1 || MenuCommonInfo->open_type == 0xE) {
         fadeDone = FadeCheckMenu();
     }
-    frameEnd = GetMenuMainFrameEndFlag__Fv();
+    frameEnd = GetMenuMainFrameEndFlag();
     result = CheckChrChange();
     switch (mode) {
         case 1:
@@ -2588,7 +2575,7 @@ int MenuCharaChangeInit(mgCMemory *memory, int *texBlock, int bootMode) {
     } while (i < 7);
     MenuBGReadInfo2Malloc(&MenuChangeMemory, tbl_2483);
     MenuCharaChangeCLUT_Tex = 0;
-    MenuMainFrameModeSet__Fii(4, 1);
+    MenuMainFrameModeSet(4, 1);
     ChrChangMenuPt->EnterDataMenu((u8*)memory->stack);
     MenuChangeMemory.Align64();
     size = stack_free_size(&MenuChangeMemory);
@@ -2608,7 +2595,7 @@ int MenuCharaChangeInit(mgCMemory *memory, int *texBlock, int bootMode) {
     MenuLoadInfo.mode = 2;
     if (ChrChangMenuPt->key_arg_no == 2 || bootMode == 0xE) {
         while (GetMenuMainFrameEndFlag() == 0) {
-            MenuMainFrameStep__Fv();
+            MenuMainFrameStep();
         }
         ChrChangMenuPt->FadeOutMenu(0x1E, 0.0f);
         ChrChangMenuPt->ExeScript(at_2596__3);
@@ -3270,7 +3257,7 @@ void CMenuMosSelect::CalcTex() {
 }
 int CMenuMosSelect::KeyNormalMode(int keys, int a, int b) {
     int oldCursor = select;
-    MenuGlidKeyCheck__FiPiPiPiPiPii(keys, &select, &top, &max_3170, &viewnum_3171, overcode_3172,
+    MenuGlidKeyCheck(keys, &select, &top, &max_3170, &viewnum_3171, overcode_3172,
                                     0xC);
     if (oldCursor != select) {
         MenuLoadInfo.unk_6[1] = 0;
@@ -4085,7 +4072,7 @@ void MenuTimeStepEnvFunc(CScene *scene, CActionChara *chara, int step) {
     if (sun == NULL || moon == NULL) {
         return;
     }
-    if (GetTimeBand__Ff(scene->time) != kTimeBandNight) {
+    if (GetTimeBand(scene->time) != kTimeBandNight) {
         sun->SetAttrParamDraw(1, 0);
         moon->SetAttrParamDraw(0, 0);
     } else {
@@ -4130,7 +4117,7 @@ int MenuItemCharaDataLoad(mgCMemory *stack, int chara_no, MENU_BGREAD_INFO2 **in
     }
     MenuLoadInfo.unk_3 = chara_no;
     strcpy(name[0], menu_chara_chrtbl[chara_no]);
-    strcpy(name[1], GetItemFileName__Fii(MenuLoadItemNo[4], 1));
+    strcpy(name[1], GetItemFileName(MenuLoadItemNo[4], 1));
     switch (MenuLoadInfo.mode) {
         case 0:
         case 3:
@@ -4139,7 +4126,7 @@ int MenuItemCharaDataLoad(mgCMemory *stack, int chara_no, MENU_BGREAD_INFO2 **in
             }
             for (i = 0; i < 4; i++) {
                 if (MenuLoadItemNo[i] > 0) {
-                    strcpy(name[i + 2], GetItemFileName__Fii(MenuLoadItemNo[i], 1));
+                    strcpy(name[i + 2], GetItemFileName(MenuLoadItemNo[i], 1));
                 } else if (MenuActionChara[i + 1] != NULL) {
                     MenuActionChara[i + 1]->ResetParent();
                     MenuActionChara[i + 1]->Initialize(NULL);
@@ -4149,10 +4136,10 @@ int MenuItemCharaDataLoad(mgCMemory *stack, int chara_no, MENU_BGREAD_INFO2 **in
         case 1:
             strcpy(name[0], at_3913);
             if (0 < MenuLoadItemNo[2]) {
-                strcpy(name[4], GetItemFileName__Fii(MenuLoadItemNo[2], 1));
+                strcpy(name[4], GetItemFileName(MenuLoadItemNo[2], 1));
             }
             if (0 < MenuLoadItemNo[3]) {
-                strcpy(name[5], GetItemFileName__Fii(MenuLoadItemNo[3], 1));
+                strcpy(name[5], GetItemFileName(MenuLoadItemNo[3], 1));
             }
             break;
         case 2:
@@ -4172,7 +4159,7 @@ int MenuItemCharaDataLoad(mgCMemory *stack, int chara_no, MENU_BGREAD_INFO2 **in
                 name[0][0] = 0;
                 for (i = 0; i < 4; i++) {
                     if (MenuLoadItemNo[i] > 0) {
-                        strcpy(name[i + 2], GetItemFileName__Fii(MenuLoadItemNo[i], 1));
+                        strcpy(name[i + 2], GetItemFileName(MenuLoadItemNo[i], 1));
                     }
                 }
                 strcpy(name[6], menu_chara_cfg_chrtbl[chara_no]);
@@ -4444,9 +4431,9 @@ unsigned int MenuCharaSoundLoad(mgCMemory *stack, int charaNo, int background) {
     stack->Align64();
     CharaSndBuffer = (u32*)(stack->stack + stack->stack_used);
     if (charaNo < 3) {
-        GetCharacterSnd__FP16CUserDataManageriPc(GetUserDataMan(), charaNo, path);
+        GetCharacterSnd(GetUserDataMan(), charaNo, path);
     } else {
-        GetMonsterModelFile__FiiPc(GetUserDataMan()->monster_id, 1, path);
+        GetMonsterModelFile(GetUserDataMan()->monster_id, 1, path);
     }
     if (background != 0) {
         LoadFileBG(path, (u_long128 *)CharaSndBuffer, &size);
@@ -4463,7 +4450,7 @@ void MenuCharaSoundEnter(CScene *scene, CActionChara *chara, int openPort) {
         chara->sound_info.foot_se_bank = scene->se_base_id;
         chara->sound_info.foot_sound_id = -1;
         if (openPort != 0) {
-            sndInitPort__Fi(7);
+            sndInitPort(7);
         }
         unsigned int *buffer = (unsigned int *)CharaSndBuffer;
         if (buffer != NULL) {
@@ -4474,7 +4461,7 @@ void MenuCharaSoundEnter(CScene *scene, CActionChara *chara, int openPort) {
                 index = 0;
             }
             chara->sound_info.se_bank =
-                sndLoadSound__FiPUiP9mgCMemory(7, buffer, MorattaStack + charaIds[index]);
+                sndLoadSound(7, buffer, MorattaStack + charaIds[index]);
         }
         chara->sound_info.se_bank_2 = scene->se_battle_id;
         chara->SetSoundInfoCopy();
@@ -4488,14 +4475,14 @@ unsigned int MenuItemChrLoad(mgCMemory *stack, int itemNo, int variant, MENU_BGR
         BreakReadBG();
         StartReadBG();
     }
-    GetGameDataPt__Fv();
+    GetGameDataPt();
     info->reading = 1;
     info->chara = 0;
-    strcpy((char *)info, GetItemFileName__Fii(itemNo, 0));
+    strcpy((char *)info, GetItemFileName(itemNo, 0));
     if (variant == 1) {
         strcat((char *)info, at_4186__2);
     }
-    strcpy((char *)&info->path, GetItemFilePath__Fii(itemNo, 1));
+    strcpy((char *)&info->path, GetItemFilePath(itemNo, 1));
     size = 0;
     stack->Align64();
     if (LoadFileBG((char *)&info->path, (u_long128 *)(stack->stack + stack->stack_used),
@@ -4511,7 +4498,7 @@ unsigned int MenuItemChrLoad(mgCMemory *stack, int itemNo, int variant, MENU_BGR
 int MenuItemChrLoadEndCheck(MENU_BGREAD_INFO2 *info, CActionChara *chara, mgCMemory *memory,
                             int texBlock) {
     if (info->reading != 0) {
-        BG_READ_INFO *loaded = (BG_READ_INFO *)GetReadBGInfo__FPc((char *)&info->path);
+        BG_READ_INFO *loaded = (BG_READ_INFO *)GetReadBGInfo((char *)&info->path);
         mgCTextureManager *texManager = &mgTexManager;
         int modelBuffer;
         DeleteBlock__17mgCTextureManagerFi(texManager, texBlock);
@@ -4578,7 +4565,7 @@ int MenuItemRoboDataLoad(mgCMemory *stack, MENU_BGREAD_INFO2 **info, int restart
                 strcpy(info[i]->name, slash + 1);
             }
         } else {
-            char *file = GetItemFileName__Fii(MenuLoadItemNo[i], 1);
+            char *file = GetItemFileName(MenuLoadItemNo[i], 1);
             if (file != NULL) {
                 strcpy(info[i]->name, file);
             }

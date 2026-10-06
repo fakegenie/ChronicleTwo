@@ -43,9 +43,7 @@ extern "C" void Run__18CScriptInterpreterFv(void *);
 extern "C" void KeyStep__9CShopMenuFv(void *);
 extern "C" void KeyStep__14CMenuQuestViewFv(void *);
 
-extern "C" CMenuSystemData *GetMenuSysData__Fv();
 extern "C" int CheckGetAlready__15CMenuSystemDataFi(CMenuSystemData *, int);
-extern "C" int GetQuestRequestStatus__Fi(int);
 extern short NowSellMode;
 extern "C" int CheckVoiceUnit__16CUserDataManagerFv(CUserDataManager *);
 extern SHOP_PRICE_INFO *Spi_PriceList;
@@ -67,7 +65,7 @@ extern CMenuQuestView *MenuQuestView;
 
 int GetDonyShopLineUp(int *itemList, int *status) {
     CInventUserData *inventData = GetInventUserDataPtr();
-    CMenuSystemData *systemData = GetMenuSysData__Fv();
+    CMenuSystemData *systemData = GetMenuSysData();
     if (systemData == NULL || inventData == NULL) {
         return 0;
 }
@@ -157,7 +155,7 @@ void CShop::CheckEventItem() {
             *(u8 *)&userData->GetMonsterBajjiDataPtr(4)->enable != 0) {
             local_sort1(cursor, &item_num, item_no);
         }
-        if (GetQuestRequestStatus__Fi(2) == 2 &&
+        if (GetQuestRequestStatus(2) == 2 &&
             (item_no[cursor] == 0xC9 || item_no[cursor] == 0xCA)) {
             local_sort1(cursor, &item_num, item_no);
             cursor -= 1;

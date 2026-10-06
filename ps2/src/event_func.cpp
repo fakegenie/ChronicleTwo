@@ -259,7 +259,6 @@ extern char at_3633[];
 extern char at_3634[];
 extern char at_3635[];
 extern char at_3636[];
-extern "C" int CheckInventItem__Fi(int);
 extern char at_1083[];
 extern char at_9148[];
 extern char at_9622[];
@@ -5575,7 +5574,7 @@ int _GET_LANGUAGE(RS_STACKDATA *stack, int argc) {
 }
 static int _CHECK_INVENT_ITEM(RS_STACKDATA *stack, int argc) {
     int item = GetStackInt(stack++);
-    SetStack(stack, CheckInventItem__Fi(item));
+    SetStack(stack, CheckInventItem(item));
     return 1;
 }
 int _SET_AI(RS_STACKDATA *stack, int argc) {
