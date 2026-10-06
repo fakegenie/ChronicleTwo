@@ -95,7 +95,6 @@ static float NowFishRot;
 static int ActionChanceNextCnt;
 static int ActionChanceCnt;
 static int ActionChanceDir;
-extern float RodPoint[60];
 static FISH_ROD_SEGMENT RodPointDist[5];
 static mgCFrame *SaoFrame[8];
 static float SaoDist[8];

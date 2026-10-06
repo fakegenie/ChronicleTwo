@@ -112,8 +112,6 @@ ClsMes *gyo_mes;
 static int CharaTexb;
 static int WindowTexb;
 static int EffectTexb;
-static float raster_offset;
-static bool raster_initialized;
 GYORACE_RESULT fish_game_data[6];
 grRACE_INFO RaceInfo;
 grRACE_PROGRESS old_prog[6];

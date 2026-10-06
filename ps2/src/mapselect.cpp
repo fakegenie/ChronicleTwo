@@ -45,7 +45,6 @@ extern int SelectMode;
 extern int SelectMapType;
 extern int select_1009;
 extern signed char init_1010;
-extern EVENT_VIEW_INFO * EventInfo;
 extern int EventInfoNum;
 extern int BossEventTop;
 extern int sel_event;
@@ -79,23 +78,10 @@ extern char at_859__3[];
 extern char at_860__2[];
 int mlMAP_NAME_NUM(SPI_STACK *stack, int argc);
 int mlMAP_NAME(SPI_STACK *stack, int argc);
-void LoadMapName(int language, u_long128 *buffer);
 extern "C" void __ct__18CScriptInterpreterFv(void *interpreter);
 static MAP_NAME_INFO *GetMapNameInfo(int map_no);
-void GetMapPath(char *path, char *name);
-int GetMapType(int map_no);
-int GetMapAreaNo(int map_no);
-int GetMapSelType(int map_no);
-int GetMapSndDataID(int map_no);
-char *GetMapName(int map_no, char **title);
-int SearchMapNo(char *name);
-char *GetMapTitle(int map_no);
-char *GetAddMapPath(int map_no);
 int MapTypeSelect(void);
 int MapSelect(void);
-void InitSaveDataEdit(mgCMemory *stack);
-int EventViewLoop(void);
-void AtraMiriaOnOff(int mode, CCharacter2 *chara, int enable);
 static char *GetLine(char **columns, char *position, char *end);
 #ifdef NONMATCHING
 #include "character.hpp"
@@ -138,10 +124,6 @@ int BossBattleSelFlag;
 extern SPI_TAG_PARAM tag__7[3];
 extern char *map_sel_type[MAP_SEL_TYPE_NUM];
 extern char SelectMapName[0x100];
-extern int select__1049[8];
-extern int top__1050[8];
-extern int SedSelData[SED_ITEM_NUM];
-extern char *config_str[1];
 #endif
 
 int mlMAP_NAME_NUM(SPI_STACK *stack, int argc) {

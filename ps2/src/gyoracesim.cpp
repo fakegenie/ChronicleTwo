@@ -28,11 +28,9 @@ void CharacterBonus(grFISH_PARAM *param, RACE_FISH_PARAM *fish, int count);
 void RndFishParam(RACE_FISH_PARAM *fish);
 #include "crandom.hpp"
 
-int GetRaceDivision(float distance);
 float GetCourseR(float position, float lane);
 float GetRandomNumber(float mean, float range);
 void init_rnd(unsigned int seed);
-void RndFishParam(RACE_FISH_PARAM *fish);
 void CharacterBonus(grFISH_PARAM *source, RACE_FISH_PARAM *fish, int count);
 void FishModifyParam(grFISH_PARAM *source, float *output, float average);
 static void GetPaseRatio(int tactics, float *ratio);

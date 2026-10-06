@@ -56,11 +56,7 @@ enum { kGeoramaMaxParts = 384, kRemovalNpcMax = 32 };
 extern short penki_item_no[8];
 extern "C" int GetBuildPartsNum__9CSaveDataFi(CSaveData *, int);
 extern "C" short tbl_957[];
-void DrawDownLoadAnaunceSwitch(int value);
 void MenuGeoramaMessageMake(int mode);
-void MakeMsgPartsItemInfo(CDC2Mes *mes, CEditPartsInfo *info, MENUFORM_MAKEBRD_INFO *makeBrd);
-void InitDownLoadAnaunce(mgCMemory *memory);
-void CheckMenuLine(int *selected, int *top, int count, int visible);
 
 struct GeoramaVector {
     union {
@@ -269,7 +265,6 @@ extern float MenuEditAnalyzeDataSrcListH;
 extern float MenuEditAnalyzeDataSrcListH_Move;
 extern float MenuEditAnalyzeDataSrcListHTable[16];
 extern float menu_georama_title_pos[2];
-extern float MakeBoardDrawInfo[];
 extern short GeoramaReqMakeManner;
 extern signed char GeoramaReqMakeFlag;
 extern int DownLoadMesAlpha;
@@ -370,17 +365,9 @@ extern short DestroyMaxNum_3584;
 extern signed char init_3585;
 extern char *DestroyPartsName_3587;
 int georama_menu_local_key(int keys);
-int MenuRemovalKey();
-void MenuRemovalDraw(void);
-int StepDownLoadAnaunce(int confirm);
-void InitMenuDl3(mgCTexture *texture);
-int StepMenuDl3();
 void MenuPlacedHousePosLinkMes();
 void MenuPlacedHouseMessMake(CEditPartsInfo *info, CEditHouse *house, int update);
 int MenuGeoramaPushKey(int keys, int pushed);
-void MenuMapPartsDraw(int &drawWait);
-int CheckGekkaViewMode(int viewMode);
-int GetPenkiItemNo(int slot);
 int MenuGeoramaBasePush(CMenuGeorama *menu, int buttonsHeld, int buttonsPressed);
 int MenuGeoramaPlacePush(CMenuGeorama *menu, int buttonsHeld, int buttonsPressed);
 

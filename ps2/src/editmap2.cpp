@@ -11,7 +11,6 @@
 #include "editdata.hpp"
 #include "editriver.hpp"
 #include "editmap.hpp"
-#include "editmap2.hpp"
 
 extern "C" int sndGetVolPan__FPfPfPfff(float *, float *, float *, float, float);
 

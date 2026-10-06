@@ -125,8 +125,6 @@ CPullItemManager      PullItemMan;
 mgCFrame             *TornadoModel;
 static int            wep_effect_cnt;
 
-void EntryEventScript(int no);
-void ResetEyeView(CActionChara *chara);
 int  DngMainKey();
 int  RunMainEvent();
 void CheckWeaponEnable();

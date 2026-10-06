@@ -23,7 +23,6 @@
 #include "subgame.hpp"
 #include "sound.hpp"
 #include "eventedit.hpp"
-#include "main.hpp"
 #include "dbg_font.hpp"
 #include "editdebug.hpp"
 #include "editdata.hpp"

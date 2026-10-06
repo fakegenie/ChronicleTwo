@@ -8,13 +8,11 @@
 #include "dng_event.hpp"
 #include "effscript.hpp"
 #include "colprim.hpp"
-#include "mg_math.hpp"
 #include "mg_camera.hpp"
 #include "sceneload.hpp"
 #include "scene.hpp"
 #include "sound.hpp"
 #include "dng_main.hpp"
-#include "dng_status.hpp"
 #include "savedata.hpp"
 #include "actscript.hpp"
 #include "scriptinterpreter.hpp"
@@ -62,12 +60,6 @@ extern SetupNameTable4 at_1110;
 extern SetupNameTable3 at_1113;
 extern SetupNameTable3 at_1161;
 extern SetupNameTable3 at_1162;
-void GetCharacterSnd(CUserDataManager *user_data, int unit, char *path);
-int GetCharaMemAllocSize();
-void SetupUnitMan(CScene *scene, CUserDataManager *user_data, int unit, ROBO_INFO_DATA *robo);
-int SetupMints(CScene *scene, CUserDataManager *user_data);
-int SetupMonica(CScene *scene, CUserDataManager *user_data);
-int SetupMonster(CScene *scene, CUserDataManager *user_data);
 #include "gamedata.hpp"
 #include "maintex.hpp"
 #include "menuchr.hpp"

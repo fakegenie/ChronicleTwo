@@ -1,8 +1,6 @@
 #include "common.h"
-#include "mg_math.hpp"
 #include "mg_drawprim.hpp"
 #include "mg_texture.hpp"
-#include "mg_memory.hpp"
 #include "dbg_font.hpp"
 #include "mglib.hpp"
 #include <cstdio>

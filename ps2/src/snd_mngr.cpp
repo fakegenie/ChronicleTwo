@@ -42,7 +42,6 @@ inline sndCSeSeqData *sndBankInfo::GetSeSeqData(int seseq_no) {
     }
     return &seseq[seseq_no];
 }
-int mgGetVSyncCount();
 static void StopSeSeq(int seq_id);
 static int GetCSndPortNo(int port_no, int *port, int *sq_port, int *vol);
 static void FadeMasterVol();

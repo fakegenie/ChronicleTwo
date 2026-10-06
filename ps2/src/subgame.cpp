@@ -8,7 +8,6 @@
 #include "mglib.hpp"
 #include "actionchara.hpp"
 #include "scene.hpp"
-#include "object.hpp"
 #include "padcontrol.hpp"
 #include "cameracontrol.hpp"
 #include "subgame.hpp"
