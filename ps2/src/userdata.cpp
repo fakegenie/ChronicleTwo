@@ -707,10 +707,10 @@ float CGameDataUsed::GetWHp(int *hp) {
             gauge = &data.weapon.whp;
             break;
         case USED_ITEM_TYPE_ROBO_PART:
-            if (item_type == 0xD) {
+            if (item_type == ITEM_DATA_ROBO_PART_D) {
                 gauge = &data.weapon.abs;
             }
-            if (item_type == 0xF) {
+            if (item_type == ITEM_DATA_ROBO_WEAPON) {
                 gauge = &data.weapon.whp;
             }
             break;
@@ -732,11 +732,11 @@ int CGameDataUsed::IsRepair() {
             }
             break;
         case USED_ITEM_TYPE_ROBO_PART:
-            if (this->item_type == 0xD &&
+            if (this->item_type == ITEM_DATA_ROBO_PART_D &&
                 (float)GetDispVolumeForFloat(this->data.weapon.abs.now) < this->data.weapon.abs.max) {
                 return 1;
             }
-            if (this->item_type == 0xF &&
+            if (this->item_type == ITEM_DATA_ROBO_WEAPON &&
                 (float)GetDispVolumeForFloat(this->data.weapon.whp.now) < this->data.weapon.whp.max) {
                 return 1;
             }
@@ -753,10 +753,10 @@ int CGameDataUsed::Repair(int points) {
             gauge = &this->data.weapon.whp;
             break;
         case USED_ITEM_TYPE_ROBO_PART:
-            if (this->item_type == 0xD) {
+            if (this->item_type == ITEM_DATA_ROBO_PART_D) {
                 gauge = &this->data.weapon.abs;
     }
-            if (this->item_type == 0xF) {
+            if (this->item_type == ITEM_DATA_ROBO_WEAPON) {
                 gauge = &this->data.weapon.whp;
     }
             break;
@@ -767,7 +767,7 @@ int CGameDataUsed::Repair(int points) {
     return 1;
 }
 int CGameDataUsed::GetEnableRepairItemNo() {
-    if (item_type == 1 || item_type == 3 || item_type == 0xD) {
+    if (item_type == 1 || item_type == 3 || item_type == ITEM_DATA_ROBO_PART_D) {
         return 0x126;
     }
     if (item_type == 2) {
@@ -776,7 +776,7 @@ int CGameDataUsed::GetEnableRepairItemNo() {
     if (item_type == 4) {
         return 0x160;
     }
-    if (item_type == 0xF) {
+    if (item_type == ITEM_DATA_ROBO_WEAPON) {
         return 0x17D;
     }
     return 0;
@@ -789,10 +789,10 @@ int CGameDataUsed::GetRoboInfoType() {
     if (info == NULL) {
         return -1;
     }
-    if (item_type == 0xD) {
+    if (item_type == ITEM_DATA_ROBO_PART_D) {
         return info->info_type_d;
     }
-    if (item_type == 0xE) {
+    if (item_type == ITEM_DATA_ROBO_PART_E) {
         return info->info_type_e;
     }
     return -1;
@@ -803,10 +803,10 @@ void CGameDataUsed::GetRoboJointName(char *name) {
     if (record == NULL || name == NULL) {
         return;
     }
-    if (item_type == 0xD) {
+    if (item_type == ITEM_DATA_ROBO_PART_D) {
         sprintf(name, at_1623, record->GetOffsetNo());
     }
-    if (item_type == 0xC) {
+    if (item_type == ITEM_DATA_ROBO_PART_C) {
         sprintf(name, at_1624, record->GetOffsetNo());
     }
 }
@@ -816,7 +816,7 @@ void CGameDataUsed::GetRoboSoundFileName(char *name) {
     if (record == NULL || name == NULL) {
         return;
     }
-    if (item_type == 0xD) {
+    if (item_type == ITEM_DATA_ROBO_PART_D) {
         int sound_no = record->GetOffsetNo() + 0x27;
         if (sound_no < 0x28 || sound_no > 0x32) {
             sound_no = 0x28;
@@ -827,7 +827,7 @@ void CGameDataUsed::GetRoboSoundFileName(char *name) {
 int CGameDataUsed::IsBroken() {
     int hp[2];
 
-    if (item_type == 0xF) {
+    if (item_type == ITEM_DATA_ROBO_WEAPON) {
         GetWHp(hp);
         if (hp[0] <= 0) {
             return 1;
@@ -2580,7 +2580,7 @@ int CUserDataManager::CheckCapacity() {
 
     for (; i < 150; i++) {
         CGameDataUsed *item = &used_data[i];
-        if (item->item_type == 11) {
+        if (item->item_type == ITEM_DATA_ROBO_CORE) {
             CDataItem *info = GetItemInfoData(item->item_no);
             if (info != 0) {
                 return info->value[0];
@@ -2591,7 +2591,7 @@ int CUserDataManager::CheckCapacity() {
 }
 int CUserDataManager::CheckRobotCore() {
     for (int i = 0; i < 150; i++) {
-        if (used_data[i].item_type == 11) {
+        if (used_data[i].item_type == ITEM_DATA_ROBO_CORE) {
             return used_data[i].item_no;
         }
     }

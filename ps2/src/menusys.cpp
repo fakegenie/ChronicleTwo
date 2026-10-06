@@ -1778,7 +1778,7 @@ int IsEnableChangeRoboParts(CGameDataUsed *part) {
             enabled = 1;
             MenuItemCommand_RoboPackBreakFlag = 0;
         }
-        if (part->item_type == 0xF) {
+        if (part->item_type == ITEM_DATA_ROBO_WEAPON) {
             if (part->IsBroken() != 0) {
                 enabled = 0;
                 MenuItemCommand_RoboPackBreakFlag = 2;
@@ -3058,7 +3058,7 @@ int GetItemCommandMsg(CGameDataUsed *item, int *cmds, u32 *colors, short *values
         if (cmds[i] == 0x1389 && (!item->IsTrush() || !trush_ok || trush_ng)) {
             local_sort1(i, &num, cmds);
         }
-        if (cmds[i] == 0x138B && item->item_type == 11 && !robo_member) {
+        if (cmds[i] == 0x138B && item->item_type == ITEM_DATA_ROBO_CORE && !robo_member) {
             local_sort1(i, &num, cmds);
         }
         if (cmds[i] == 0x13AA) {
@@ -4518,7 +4518,7 @@ int CMenuItemInfo::ItemCmdAfter(int cmd_ret, ITEMCMD_RET_PARA *ret) {
             if (ret->cmd == 1) {
                 Nameregi_Target.target = 0;
                 Nameregi_Target.item = ask_para.item;
-                if (ask_para.item->item_type == 11) {
+                if (ask_para.item->item_type == ITEM_DATA_ROBO_CORE) {
                     Nameregi_Target.target = 1;
                     Nameregi_Target.item = NULL;
                 }
