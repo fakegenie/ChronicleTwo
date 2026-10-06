@@ -953,7 +953,7 @@ int LoopDungeonMain() {
             PauseStart(&pause);
         }
     }
-    if (DebugFlag && !(BattleAreaScene->pause_flag & 0x8000) && GamePad__2.On(0x800) && GamePad__2.On(0x100)) {
+    if (DebugFlag && !(BattleAreaScene->pause_flag & 0x8000) && GamePad__2.On(PAD_START) && GamePad__2.On(PAD_SELECT)) {
         DngStatus.mode = DNG_STATUS_EXIT;
     }
     if (DngMainScene->exit_flag) {
@@ -1832,14 +1832,14 @@ int DngMainKey() {
                 return 0;
             }
         }
-        if (GamePad__2.Down(0x400)) {
+        if (GamePad__2.Down(PAD_R3)) {
             dngDebugStart();
             return 0;
         }
-        if (GamePad__2.Down2(8)) {
+        if (GamePad__2.Down2(PAD_R1)) {
             debag_param ^= 1;
         }
-        if (GamePad__2.Down2(0x40)) {
+        if (GamePad__2.Down2(PAD_CROSS)) {
             static float         erate = 1.0f;
             static sceVu0FVECTOR chk_pos;
 
@@ -1850,7 +1850,7 @@ int DngMainKey() {
                 erate = 1.0f;
             }
         }
-        if (GamePad__2.Down2(0x10)) {
+        if (GamePad__2.Down2(PAD_TRIANGLE)) {
             float         size = 20.0f;
             sceVu0FVECTOR pos;
 
@@ -1858,14 +1858,14 @@ int DngMainKey() {
             tornado[0].SetPos(pos, size, fRand(255.0f));
             size = 1.0f;
         }
-        if (GamePad__2.On2(2)) {
+        if (GamePad__2.On2(PAD_R2)) {
             BattleAreaScene->SetStatusBar(1, 0.02f);
         }
-        if (GamePad__2.On2(1)) {
+        if (GamePad__2.On2(PAD_L2)) {
             BattleAreaScene->SetStatusBar(0, 0.02f);
         }
     }
-    if (GamePad__2.Down(0x100)) {
+    if (GamePad__2.Down(PAD_SELECT)) {
         SV_CONFIG_OPTION *config = DngSaveData->GetConfig();
 
         if (config != NULL) {
@@ -1883,7 +1883,7 @@ int DngMainKey() {
     }
     if (SubGameRunning()) {
         sgLoopSubGame();
-        if (GamePad__2.Down(0x10) && sgMenuOpenEnable()) {
+        if (GamePad__2.Down(PAD_TRIANGLE) && sgMenuOpenEnable()) {
             VoiceUnit.StopVoice(10);
             MenuArg.open_type = 1;
             DngStatus.mode = DNG_STATUS_MENU;
@@ -1941,10 +1941,10 @@ int DngMainKey() {
         script->event_no = -1;
         return 0;
     }
-    if (GamePad__2.Down(0x200)) {
+    if (GamePad__2.Down(PAD_L3)) {
         unit = 0;
     }
-    if (GamePad__2.Down(0x400)) {
+    if (GamePad__2.Down(PAD_R3)) {
         unit = 1;
     }
     if (MainChara__2->CheckRunEvent() && unit >= 0 && !dead) {
@@ -1964,7 +1964,7 @@ int DngMainKey() {
             return 0;
         }
     }
-    if (GamePad__2.On(0x10) && MainChara__2->CheckRunEvent() && !dead) {
+    if (GamePad__2.On(PAD_TRIANGLE) && MainChara__2->CheckRunEvent() && !dead) {
         if (NowTakePhoto()) {
             MenuArg.open_type = 10;
         } else {
@@ -1985,15 +1985,15 @@ int DngMainKey() {
     CCameraControl *camera = (CCameraControl *) DngMainScene->GetCamera(DngMainScene->active_camera);
 
     if (DngStatus.eye_view) {
-        if (GamePad__2.Down(2) || PadCtrl.Btn(1)) {
+        if (GamePad__2.Down(PAD_R2) || PadCtrl.Btn(1)) {
             ResetEyeView(MainChara__2);
             return 0;
         }
-    } else if (GamePad__2.Down(2) && !SubGameRunning() && MainChara__2->CheckRunEvent()) {
+    } else if (GamePad__2.Down(PAD_R2) && !SubGameRunning() && MainChara__2->CheckRunEvent()) {
         InitEyeCamera(MainChara__2);
         return 0;
     }
-    if (!DngStatus.eye_view && GamePad__2.Down(0x80) && !(BattleAreaScene->pause_flag & 4) && chara_info->chr_no == 0 &&
+    if (!DngStatus.eye_view && GamePad__2.Down(PAD_SQUARE) && !(BattleAreaScene->pause_flag & 4) && chara_info->chr_no == 0 &&
         MainChara__2->CheckRunEvent()) {
         int            found = 0;
         CGameDataUsed *items = GetBattleCharaInfo()->GetActiveItemInfo(0);
@@ -2057,7 +2057,7 @@ int DngMainKey() {
         static int camera_default_dist = 1;
         float      dist_table[3] = {100.0f, 160.0f, 500.0f};
 
-        if (GamePad__2.Down2(0x100)) {
+        if (GamePad__2.Down2(PAD_SELECT)) {
             if (camera_default_dist >= 2) {
                 camera_default_dist = 0;
             } else {
@@ -2184,12 +2184,12 @@ int DngMainKey() {
             if (DebugInfo.debug_camera == 1) {
                 camera->ControlOff();
                 camera->AddAngle(0.06f * -GamePad__2.GetRXf());
-                if (GamePad__2.On(0x200)) {
+                if (GamePad__2.On(PAD_L3)) {
                     camera->AddDistance(3.0f * GamePad__2.GetRYf());
                 } else {
                     camera->AddHeight(3.0f * -GamePad__2.GetRYf());
                 }
-                if (GamePad__2.On(1)) {
+                if (GamePad__2.On(PAD_L2)) {
                     reference += 3.0f * -GamePad__2.GetRYf();
                 }
             }
@@ -2353,16 +2353,16 @@ int DngMainKey() {
     AutoMapGen.MinimapVisTest(pos);
     static int time_step = 0;
 
-    if (GamePad__2.On2(0x2000)) {
+    if (GamePad__2.On2(PAD_RIGHT)) {
         DngMainScene->AddTime(0.1f);
     }
-    if (GamePad__2.On2(0x8000)) {
+    if (GamePad__2.On2(PAD_LEFT)) {
         DngMainScene->AddTime(-0.1f);
     }
-    if (GamePad__2.Down2(0x1000)) {
+    if (GamePad__2.Down2(PAD_UP)) {
         DngMainScene->SetTime((int) DngMainScene->time / 2 * 2 + 2);
     }
-    if (GamePad__2.Down2(0x4000)) {
+    if (GamePad__2.Down2(PAD_DOWN)) {
         time_step = !time_step;
     }
     if (time_step) {

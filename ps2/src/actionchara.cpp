@@ -1944,7 +1944,7 @@ int CActionChara::RoboBikeMoveIF(int mode) {
         sound_info.foot_effect_wait = 2;
         sound_info.loop_se->SeLoopPlayStop(sound_info.se_bank, 16, 3, 12);
     }
-    if (GamePad__2.On(0x4) != 0) {
+    if (GamePad__2.On(PAD_L1) != 0) {
         steering = leg_rotation[1] + 0.8f * (0.034906585f * -stick_x * accele.speed);
     } else {
         steering = leg_rotation[1] + 0.2f * (0.034906585f * -stick_x * accele.speed);

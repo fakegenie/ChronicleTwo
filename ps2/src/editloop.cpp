@@ -1626,7 +1626,7 @@ int EditStep(void) {
         }
         MainScene__2->event_run = 0;
     }
-    if (GamePad__2.Down2(0x80) != 0) {
+    if (GamePad__2.Down2(PAD_SQUARE) != 0) {
         InitEvent(MainScene__2);
         ReloadMapScript();
         MainScene__2->before_camera = MainScene__2->active_camera;

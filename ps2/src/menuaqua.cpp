@@ -1871,9 +1871,9 @@ int CAquaMes::AddQuestionCursor() {
     int now;
     ClsMes *window;
 
-    if (GamePad__2.Down(0x1000)) {
+    if (GamePad__2.Down(PAD_UP)) {
         step--;
-    } else if (GamePad__2.Down(0x4000)) {
+    } else if (GamePad__2.Down(PAD_DOWN)) {
         step++;
     }
     question_cursor += step;
@@ -3427,9 +3427,9 @@ void CAquarium::SelectFish(int force) {
     int tries;
     int old_fish;
 
-    if (GamePad__2.Down(0x2000)) {
+    if (GamePad__2.Down(PAD_RIGHT)) {
         step++;
-    } else if (GamePad__2.Down(0x8000)) {
+    } else if (GamePad__2.Down(PAD_LEFT)) {
         step--;
     }
     if (force) {
@@ -3634,7 +3634,7 @@ int CAquarium::Step() {
                     MenuSePlay(5);
                     return 1;
                 }
-                if (GamePad__2.Down(0x10)) {
+                if (GamePad__2.Down(PAD_TRIANGLE)) {
                     MenuSePlay(0x13);
                     next = 1;
                 }
@@ -3643,9 +3643,9 @@ int CAquarium::Step() {
                 int aqua_no = m_aquarium_para->unk_0;
                 int step = 0;
 
-                if (GamePad__2.Down(0x1000)) {
+                if (GamePad__2.Down(PAD_UP)) {
                     step--;
-                } else if (GamePad__2.Down(0x4000)) {
+                } else if (GamePad__2.Down(PAD_DOWN)) {
                     step++;
                 }
                 if (menu->AddMenuCursor(step, menu_max_tbl_3720[aqua_no]) != 0) {
@@ -3710,23 +3710,23 @@ int CAquarium::Step() {
                         break;
                     }
                     breed = selected->data == NULL ? NULL : &selected->data->data.fish;
-                    if (GamePad__2.Down(0x1000)) {
+                    if (GamePad__2.Down(PAD_UP)) {
                         menu_debug_select--;
                     }
-                    if (GamePad__2.Down(0x4000)) {
+                    if (GamePad__2.Down(PAD_DOWN)) {
                         menu_debug_select++;
                     }
                     add = 0;
-                    if (GamePad__2.On(0x8000)) {
+                    if (GamePad__2.On(PAD_LEFT)) {
                         add = -1;
                     }
-                    if (GamePad__2.On(0x2000)) {
+                    if (GamePad__2.On(PAD_RIGHT)) {
                         add = 1;
                     }
-                    if (GamePad__2.On(4)) {
+                    if (GamePad__2.On(PAD_L1)) {
                         add = -7;
                     }
-                    if (GamePad__2.On(8)) {
+                    if (GamePad__2.On(PAD_R1)) {
                         add = 7;
                     }
                     if (menu_debug_select < 0) {

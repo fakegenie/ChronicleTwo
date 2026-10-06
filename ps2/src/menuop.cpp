@@ -1554,7 +1554,7 @@ int CSaveMenuClass::KeyStep(void) {
     error = &MemoryCardPtr->error;
     static int FormatCase = 0;
     if (DebugFlag != 0 && menu_debug_flag != 0) {
-        GamePad__2.Down(4);
+        GamePad__2.Down(PAD_L1);
     }
     refresh = 0;
     next = -1;

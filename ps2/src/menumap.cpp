@@ -337,7 +337,7 @@ int CWorldMapMenu::KeyStep() {
             break;
         }
         if (menu_debug_flag != 0) {
-            if (GamePad__2.Down(0x20)) {
+            if (GamePad__2.Down(PAD_CIRCLE)) {
                 for (int i = 0; i < spi_wmappos_tblnum; i++) {
                     spi_wmappos_tbl[i].enable = 1;
                 }

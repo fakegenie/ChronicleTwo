@@ -3749,7 +3749,7 @@ int LoadMovie(char *name, mgCMemory *memory, bool skip) {
             mgBeginFrame(NULL);
         }
         GamePad__2.UpDate();
-        if (movie.EndCheck() != 0 || (DebugFlag != 0 && GamePad__2.Down(0x800) != 0)) {
+        if (movie.EndCheck() != 0 || (DebugFlag != 0 && GamePad__2.Down(PAD_START) != 0)) {
         movie.Term();
         textures->ReloadTexture(movieBlock, (sceVif1Packet *)NULL);
         mgBeginFrame(NULL);

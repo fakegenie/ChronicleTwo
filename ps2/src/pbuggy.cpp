@@ -584,7 +584,7 @@ extern "C" void CharaControl__FP6CSceneP11CPadControl__3(CScene *scene, CPadCont
             speed_x *= 5.0f;
             speed_z *= 3.5f;
             if (DebugInfo.chara_move) {
-                if (GamePad__2.On(1)) {
+                if (GamePad__2.On(PAD_L2)) {
                     speed_x *= 3.0f;
                     speed_z *= 3.0f;
                 }

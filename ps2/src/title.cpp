@@ -479,7 +479,7 @@ void TitleExit() {
     mgCloseFont();
 }
 int TitleLoop() {
-    if (DebugFlag != 0 && GamePad__2.On(0x800) != 0 && GamePad__2.On(0x100) != 0) {
+    if (DebugFlag != 0 && GamePad__2.On(PAD_START) != 0 && GamePad__2.On(PAD_SELECT) != 0) {
         mgCloseFont();
         if (TitleInfo->mode == TITLE_MODE_RUSH_MOVIE) {
             RushMovie->Term();
@@ -1131,10 +1131,10 @@ int TitleModeKey() {
         CalcMenuAdd(&TitleInfo->title_alpha, -8.0f, 0.0f);
         CalcMenuAdd(&TitleInfo->menu_alpha, 12.0f, 128.0f);
         CalcMenuAdd(&TitleInfo->cursor_alpha, 12.0f, 128.0f);
-        if (GamePad__2.Down(0x1000) != 0) {
+        if (GamePad__2.Down(PAD_UP) != 0) {
             TitleInfo->select--;
         }
-        if (GamePad__2.Down(0x4000) != 0) {
+        if (GamePad__2.Down(PAD_DOWN) != 0) {
             TitleInfo->select++;
         }
         if (TitleInfo->select < 0) {
@@ -1237,10 +1237,10 @@ int TitleModeKey() {
         CalcMenuAdd(&TitleInfo->menu_alpha, -8.0f, 0.0f);
         CalcMenuAdd(&TitleInfo->cursor_alpha, 3.0f, 128.0f);
         int old_select = TitleInfo->omake_select;
-        if (GamePad__2.Down(0x1000) != 0) {
+        if (GamePad__2.Down(PAD_UP) != 0) {
             TitleInfo->omake_select--;
         }
-        if (GamePad__2.Down(0x4000) != 0) {
+        if (GamePad__2.Down(PAD_DOWN) != 0) {
             TitleInfo->omake_select++;
         }
         if (TitleInfo->omake_select < 0) {
@@ -1809,7 +1809,7 @@ int TitleCopyRightStep() {
             TitleCopyRightDispPhase = COPYRIGHT_PHASE_MOVIE;
             break;
         case COPYRIGHT_PHASE_MOVIE:
-            if (TitleSkipLogoFlag == 0 && (GamePad__2.Down(0x20) != 0 || GamePad__2.Down(0x800) != 0)) {
+            if (TitleSkipLogoFlag == 0 && (GamePad__2.Down(PAD_CIRCLE) != 0 || GamePad__2.Down(PAD_START) != 0)) {
                 TitleSkipLogoFlag = 1;
                 TitleScene->fade.FadeOut(20, 0.0f, 0.0f, 0.0f);
             }
@@ -1970,10 +1970,10 @@ int TitleHDDInstallKey() {
             CalcMenuAdd(&HDDImageAlpha[i], -12, 0);
         }
         int old_select = HDDModeSelect;
-        if (GamePad__2.Down(0x1000) != 0) {
+        if (GamePad__2.Down(PAD_UP) != 0) {
             HDDModeSelect--;
         }
-        if (GamePad__2.Down(0x4000) != 0) {
+        if (GamePad__2.Down(PAD_DOWN) != 0) {
             HDDModeSelect++;
         }
         if (HDDModeSelect < 0) {
@@ -2064,7 +2064,7 @@ int TitleHDDInstallKey() {
         break;
     }
     case HDD_PHASE_RESULT:
-        if (GamePad__2.Down(0x20) != 0 || GamePad__2.Down(0x40) != 0) {
+        if (GamePad__2.Down(PAD_CIRCLE) != 0 || GamePad__2.Down(PAD_CROSS) != 0) {
             next_phase = HDD_PHASE_SELECT;
             if (0 < HDDINFO.connect && 0 < HDDINFO.app_install && HDDINFO.result == 0) {
                 next_phase = HDD_PHASE_EXIT;
@@ -2105,7 +2105,7 @@ int TitleHDDInstallKey() {
         }
         break;
     case HDD_PHASE_ERROR:
-        if (GamePad__2.Down(0x20) != 0 || GamePad__2.Down(0x40) != 0) {
+        if (GamePad__2.Down(PAD_CIRCLE) != 0 || GamePad__2.Down(PAD_CROSS) != 0) {
             next_phase = HDD_PHASE_SELECT;
             MenuSePlay(1);
         }
@@ -2425,7 +2425,7 @@ int TitleLangSelKey(void) {
             if (title_lang_select > 4) {
                 title_lang_select = 0;
             }
-            if (GamePad__2.Down(0x40) != 0) {
+            if (GamePad__2.Down(PAD_CROSS) != 0) {
                 title_lang_phase += 1;
             }
             break;

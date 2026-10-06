@@ -578,13 +578,13 @@ int MenuGeoramaInit(mgCMemory *stack, int arg) {
     return 1;
 }
 void MenuGeoDebugKey() {
-    if (GamePad__2.Down(0x10) != 0) {
+    if (GamePad__2.Down(PAD_TRIANGLE) != 0) {
         CMenuGeoPt->ExeScript(at_1189__2);
         MenuGeoStoneDonwLoadFlag = 0;
         DownLoadMesAlpha = 0;
         MenuSePlay(0x1F);
     }
-    if (GamePad__2.Down(0x80) != 0) {
+    if (GamePad__2.Down(PAD_SQUARE) != 0) {
         CSaveDataDungeon *dungeon = menu_GetSaveDataDungeon();
         int i;
         for (int stage = 0; stage < 7; stage++) {
@@ -2503,9 +2503,9 @@ int CMenuGeorama::LRCheck() {
     float rotation[4];
     if (view_parts != NULL) {
         view_parts->GetRotation(rotation);
-        if (GamePad__2.On(1) != 0)
+        if (GamePad__2.On(PAD_L2) != 0)
             rotation[1] -= 0.05235988f;
-        if (GamePad__2.On(2) != 0)
+        if (GamePad__2.On(PAD_R2) != 0)
             rotation[1] += 0.05235988f;
         rotation[1] = mgAngleLimit(rotation[1]);
         view_parts->SetRotation(rotation);
@@ -2558,7 +2558,7 @@ int CMenuGeorama::IsMakeObject(int buttons_held, int buttons_pressed) {
                                 if (make_brd.line[i].button == 0)
                                     enough = 0;
                             }
-                            if (DebugFlag != 0 && GamePad__2.On(2) != 0)
+                            if (DebugFlag != 0 && GamePad__2.On(PAD_R2) != 0)
                                 enough = 1;
                             if (enough == 0) {
                                 ExeScript(at_3291__2);
@@ -3804,7 +3804,7 @@ int CRemovalMenu::KeyStep() {
                     if (npc == 6 && CheckBitFlagMenu(0x132) == 0) {
                         live = 0;
                     }
-                    if (DebugFlag != 0 && (GamePad__2.On(2) | GamePad__2.On(8)) != 0) {
+                    if (DebugFlag != 0 && (GamePad__2.On(PAD_R2) | GamePad__2.On(PAD_R1)) != 0) {
                         live = 1;
                     }
                     if (live == 0) {

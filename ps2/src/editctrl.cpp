@@ -563,21 +563,21 @@ void EditCameraControl(CScene *scene, CPadControl *pad, float (*look_at)[4]) {
     camera->FollowOn();
     camera->AddAngle(frame_rate * (0.03f * -GamePad__2.GetRXf()));
     camera->SetSpeed(4, 2);
-    if (GamePad__2.On(0x200)) {
+    if (GamePad__2.On(PAD_L3)) {
         camera->AddDistance(frame_rate * (3.0f * GamePad__2.GetRYf()));
     } else {
         camera->AddHeight(frame_rate * (-2.0f * GamePad__2.GetRYf()));
     }
-    if (GamePad__2.On(0x1000)) {
+    if (GamePad__2.On(PAD_UP)) {
         reference += 3.0f * frame_rate;
     }
-    if (GamePad__2.On(0x4000)) {
+    if (GamePad__2.On(PAD_DOWN)) {
         reference -= 3.0f * frame_rate;
     }
-    if (GamePad__2.On(0x4)) {
+    if (GamePad__2.On(PAD_L1)) {
         camera->AddAngle(0.04f * frame_rate);
     }
-    if (GamePad__2.On(0x8)) {
+    if (GamePad__2.On(PAD_R1)) {
         camera->AddAngle(-0.04f * frame_rate);
     }
     if (!(GamePad__2.GetLXf() <= 0.1f)) {
@@ -588,7 +588,7 @@ void EditCameraControl(CScene *scene, CPadControl *pad, float (*look_at)[4]) {
     }
     static int camera_dist_mode = 0;
     float camera_distances[3] = {30.0f, 130.0f, 250.0f};
-    if (GamePad__2.Down(0x800)) {
+    if (GamePad__2.Down(PAD_START)) {
         camera_dist_mode++;
         if (camera_dist_mode >= 3) {
             camera_dist_mode = 0;
@@ -663,7 +663,7 @@ static void CharaControl(CScene *scene, CPadControl *pad) {
         speed_z *= 0.5f;
     }
     if (DebugInfo.chara_move) {
-        if (GamePad__2.On(0x1)) {
+        if (GamePad__2.On(PAD_L2)) {
             speed_x *= 3.0f;
             speed_z *= 3.0f;
         }

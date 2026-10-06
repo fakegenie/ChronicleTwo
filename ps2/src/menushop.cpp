@@ -524,7 +524,7 @@ int CShopMenu::KeyStep() {
             push = 0;
         }
         if (menu_debug_flag != 0) {
-            if (GamePad__2.On(0x20)) {
+            if (GamePad__2.On(PAD_CIRCLE)) {
                 GetUserDataMan()->AddYarikomiMedal(1);
             }
             return 0;

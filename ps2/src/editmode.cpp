@@ -852,7 +852,7 @@ void EditMode(CScene *scene) {
                 move_x *= 10.0f;
                 move_z *= 10.0f;
                 if (DebugFlag != 0) {
-                    if (GamePad__2.On(0x200) || (GamePad__2.On(0x80) && EditModeNo != EDIT_MODE_PLACE)) {
+                    if (GamePad__2.On(PAD_L3) || (GamePad__2.On(PAD_SQUARE) && EditModeNo != EDIT_MODE_PLACE)) {
                         HighSpeedMoveCnt = 0;
                         move_x *= 3.0f;
                         move_z *= 3.0f;
@@ -1342,7 +1342,7 @@ void EditMode(CScene *scene) {
                                             if (color_no == 99) {
                                                 cost *= 5;
                                             }
-                                            if (DebugFlag != 0 && GamePad__2.On(2)) {
+                                            if (DebugFlag != 0 && GamePad__2.On(PAD_R2)) {
                                                 enough = 1;
                                             }
                                             if (color_no >= 0 && color_no < 2) {
@@ -1648,7 +1648,7 @@ void DrawEditCursor(CScene *scene) {
         cnt_1939 = 0;
         init_1940 = 1;
     }
-    if (GamePad__2.Down(0x200)) {
+    if (GamePad__2.Down(PAD_L3)) {
         if (cnt_1939 == 0) {
             *(u_long128 *)pos_save_1942 = *(u_long128 *)eCurPos;
             cnt_1939++;
