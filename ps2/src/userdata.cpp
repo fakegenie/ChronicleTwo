@@ -4,7 +4,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
-extern "C" double pow(double base, double exponent);
 int get_gajji_id_from_monster_progress_table(int monster_no, int *level);
 int get_monster_tbl_bajjilevel(int *out, int bajji_no, int monster_no, int level);
 int get_default_monster_progresstbl(int bajji_no);
@@ -58,7 +57,6 @@ extern signed char tbl1_5167[3];
 extern signed char tbl2_5168[2];
 extern unsigned int at_table_5400[12];
 extern signed char equip_type_tbl_5456[15];
-extern "C" int fptosi(float);
 extern "C" unsigned int fptoui(float);
 extern char at_1378__2[];
 extern char at_1379__2[];
@@ -1692,8 +1690,8 @@ void CFishAquarium::FishIntoAquarium(int tank, int slot, CGameDataUsed *fish) {
     }
     ((CGameDataUsed *)entry)->CopyGameData(fish);
     if (tank == 1) {
-        *(int *)((u8 *)entry + 0x50) = GetMainScene()->day;
-        *(float *)((u8 *)entry + 0x54) = GetMainScene()->time;
+        entry->data.fish.tank_day = GetMainScene()->day;
+        entry->data.fish.tank_hour = GetMainScene()->time;
     }
 }
 int CFishAquarium::GetAquariumFishNum(int tank) {

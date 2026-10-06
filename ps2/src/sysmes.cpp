@@ -21,23 +21,9 @@
 #include "menumain.hpp"
 #include "common.h"
 #include "sysmes.hpp"
-
-extern "C" int CreateSystemMes__Fii(int, int);
-
-extern ClsMes SystemMessage;
-extern ClsMes SystemMessage2;
-extern ClsMes SystemMessage3;
-extern short SystemMesBuffer[];
-extern short SysMesBuffer[];
-#include "dataread.hpp"
-#include "mainloop.hpp"
 #include "nd_meswin.hpp"
 
-extern short SystemMesBuffer[];
-extern short SysMesBuffer[];
-extern ClsMes SystemMessage;
-extern ClsMes SystemMessage2;
-extern ClsMes SystemMessage3;
+extern "C" int CreateSystemMes__Fii(int, int);
 
 // Code (.text)
 ClsMes *GetSystemMessage() {

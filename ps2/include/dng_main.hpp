@@ -11,6 +11,7 @@
 #include "dng_hud.hpp"
 #include "dng_object.hpp"
 #include "mg_memory.hpp"
+#include "pot.hpp"
 
 /**
  * @file
@@ -22,7 +23,6 @@
 class CActionChara;
 class CWeaponElement;
 class CAutoMapGen;
-class CBPot;
 class CCameraControl;
 class CEffectScriptMan;
 class CGeoStone;
@@ -31,7 +31,6 @@ class CMap;
 class CMapEffectsManeger;
 class CMiniEffPrimMan;
 class CMonsterMan;
-class CPot;
 class CRandomCircle;
 class CRedMarkModel;
 class CSaveData;
@@ -560,20 +559,6 @@ extern CCharacter2 ItemBaseData[19];
  *
  */
 extern CRoboVoiceSystem VoiceUnit;
-
-/**
- *
- * Pot that the player carries.
- *
- */
-extern CPot BTsubo;
-
-/**
- *
- * Breakable pot.
- *
- */
-extern CBPot BTsubo2;
 
 /**
  *

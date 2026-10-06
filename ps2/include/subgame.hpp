@@ -42,6 +42,17 @@ enum SG_PLAY_VOICE_STEP {
 
 /**
  *
+ * Scene slots a sub game clears when it is set up.
+ *
+ */
+enum SUBGAME_CLEAR {
+    SUBGAME_CHARA_BASE = 0x40,
+    SUBGAME_CHARA_NUM = 0x28,
+    SUBGAME_EFFECT_SLOT = 7,
+};
+
+/**
+ *
  * Carries the scene and the mode-specific parameters into a sub game.
  *
  */

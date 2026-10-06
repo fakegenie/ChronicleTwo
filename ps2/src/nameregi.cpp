@@ -93,7 +93,6 @@ extern mgCTexture *NameRegiTex1;
 extern s16 NameRegistMax;
 extern s16 gettbl0_2012[12];
 extern s64 at_2031__3;
-extern CNameRegiMenu *NameRegiMenuPtr;
 
 // Code (.text)
 void SetEventKeyword(char *target, char *topic, int code) {
@@ -1767,7 +1766,7 @@ void CNameRegiMenu::DrawSelectedWord() {
 void CNameRegiMenu::DrawMessage() {
     RGBAQ_TYPE color;
     u8 prim[0x128];
-    MenuReloadTexture(OldReloadTexNumber, *(int *)((u8 *)MenuDCMsg[6] + 0x22A4));
+    MenuReloadTexture(OldReloadTexNumber, MenuDCMsg[6]->texture_block);
     __ct__11mgCDrawPrimFv(prim);
     SetSpriteEnv((mgCDrawPrim *)prim, 0);
     *(s64 *)&color = at_2031__3;

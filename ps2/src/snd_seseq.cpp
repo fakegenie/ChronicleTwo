@@ -1,7 +1,6 @@
 #include "common.h"
 #include "snd_seseq.hpp"
 
-extern "C" int fptosi(float value);
 
 #include <cstdio>
 #include <cstring>

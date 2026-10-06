@@ -33,7 +33,6 @@ int TakeBombCheck(void);
 int TakeBomb(void);
 int ThrowBomb(float *velocity);
 int NowPutBomb(void);
-extern "C" int fptosi(float value);
 /**
  *
  * Sprite state embedded in an effect script object.

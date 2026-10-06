@@ -16,6 +16,12 @@ class ClsMes;
  */
 extern mgCMemory SystemMesStack;
 
+extern ClsMes SystemMessage;
+extern ClsMes SystemMessage2;
+extern ClsMes SystemMessage3;
+extern short SystemMesBuffer[];
+extern short SysMesBuffer[];
+
 /**
  * Returns the first system message window.
  *

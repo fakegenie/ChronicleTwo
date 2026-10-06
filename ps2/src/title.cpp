@@ -170,7 +170,6 @@ extern char at_2374__3[];
 extern char at_2375__3[];
 extern char at_2376__3[];
 extern s8 TitleSkipLogoFlag;
-extern "C" int fptosi(float value);
 extern "C" void *__ct__9CMenuFontFv(void *);
 extern short table_2611[3][12];
 extern ClsMes *TitleMCCheckMes;

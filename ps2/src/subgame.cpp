@@ -35,10 +35,10 @@ void InitSubGame(CScene *scene) {
         for (int i = 0; i < scene->unk_3e6c; i++) {
             tex_manager->DeleteBlock(scene->unk_3e68 + i);
         }
-        for (int j = 0; j < 0x28; j++) {
-            scene->DeleteChara(j + 0x40);
+        for (int j = 0; j < SUBGAME_CHARA_NUM; j++) {
+            scene->DeleteChara(j + SUBGAME_CHARA_BASE);
         }
-        scene->DeleteEffect(7);
+        scene->DeleteEffect(SUBGAME_EFFECT_SLOT);
     }
 }
 int SubGameRunning(void) {
@@ -291,31 +291,31 @@ int sgCPlayVoice::Step(void) {
         return 0;
     }
     switch (step) {
-        case 1:
+        case SG_PLAY_VOICE_OPEN:
             sprintf(name, at_985__3, file_no);
             sndStreamOpenFast(name);
             step++;
             break;
-        case 2:
+        case SG_PLAY_VOICE_OPENING:
             if (sndStreamOpenState() == 0) {
                 sndStreamStandBy();
                 step++;
             }
             break;
-        case 3:
+        case SG_PLAY_VOICE_STANDBY:
             if (sndStreamOpenState() == 0) {
                 step++;
             }
             break;
-        case 4:
+        case SG_PLAY_VOICE_READY:
             if (play != 0) {
                 sndStreamSetVol(vol_l, vol_r);
                 sndStreamPlay();
                 step++;
             }
             break;
-        case 5:
-            if (sndStreamGetState() != 0x1000) {
+        case SG_PLAY_VOICE_PLAYING:
+            if (sndStreamGetState() != SND_STREAM_STATE_PLAYING) {
                 sndStreamClose();
                 step = 0;
                 return 0;

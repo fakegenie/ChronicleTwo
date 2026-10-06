@@ -8,7 +8,6 @@
 #include "sound.hpp"
 #include "dataread.hpp"
 
-extern "C" int fptosi(float value);
 extern char at_1011__3[];
 extern char at_1012__3[];
 extern char at_1013__3[];

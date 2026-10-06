@@ -25,7 +25,6 @@
 #include "mg_drawenv.hpp"
 
 extern "C" void __ct__11mgCDrawPrimFv(void *);
-extern "C" int fptosi(float value);
 extern char at_1503__3[];
 extern char at_1504__3[];
 extern char at_853__3[];
