@@ -2280,7 +2280,7 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
                 } else {
                     s32 recipe_index;
                     s32 recipe_offset;
-                    this->unk_584 = 0;
+                    this->create_partial_match = 0;
                     InventUserDataPtr->GetPhotoInfo(0);
                     recipe_index = 0;
                     recipe_offset = 0;
@@ -2316,10 +2316,10 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
                             }
                             if (matched == 2) {
                                 s32 slot_index;
-                                this->unk_584 = 1;
+                                this->create_partial_match = 1;
                                 for (slot_index = 0; slot_index < 3; slot_index++) {
                                     if (found.v[slot_index] == 0) {
-                                        this->unk_594 = slot_index;
+                                        this->create_missing_slot = slot_index;
                                     }
                                 }
                                 break;
@@ -2329,7 +2329,7 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
                         recipe_index++;
                     }
                 }
-                this->unk_60a = 0x7C;
+                this->create_wait_time = 0x7C;
                 this->ExeScript(at_3113);
                 this->GradationSet(1);
                 this->step = kCreateWaitStart;
@@ -2338,7 +2338,7 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
                 StartReadBG();
                 s32 sound_message_size;
                 LoadFileBG(at_3114, load_stack->stGetTop(), &sound_message_size);
-                this->unk_5fc = kLoadSoundMsg;
+                this->create_load_state = kLoadSoundMsg;
                 break;
             }
         case kCreateKeyCancel:
@@ -2349,28 +2349,28 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
         break;
     }
     case kCreateWaitStart:
-        this->unk_60a--;
-        if (this->unk_60a <= 0 && this->unk_5fc > 1) {
+        this->create_wait_time--;
+        if (this->create_wait_time <= 0 && this->create_load_state > 1) {
             this->step++;
         }
         break;
     case kCreateShowReady:
         action_chara->GetNowMotionName();
         s32 motion = action_chara->seq_state;
-        if (this->unk_5fc >= 5 && motion == 3) {
+        if (this->create_load_state >= 5 && motion == 3) {
             this->step++;
             action_chara->seq_advance = 1;
             action_chara->SetMotion(at_3116, 4, 1);
-            this->unk_604 = 1;
-            this->unk_606 = 1;
-            this->unk_608 = 0;
+            this->jingle_state = 1;
+            this->jingle_pending = 1;
+            this->jingle_time = 0;
             this->poly_chr_form[1]->SetActionCharaPtr(this->create_chara, this->tex_block[2], -1);
             this->GradationSet(3);
             MenuCommonInfo->MenuPosPlay();
-            this->unk_5e4 = 0.0f;
-            this->unk_5f0 = 0.0f;
-            this->unk_5f4 = 0;
-            this->unk_5f8 = 0.0f;
+            this->create_spin_angle = 0.0f;
+            this->create_wobble_phase = 0.0f;
+            this->create_show_phase = 0;
+            this->create_scale_in = 0.0f;
             if (this->create_step != 0) {
                 this->ExeScript(at_3117);
                 if (this->create_chara != NULL) {
@@ -2392,7 +2392,7 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
                     }
                     MenuRoboPartsLightOff(frame);
                 }
-            } else if (this->unk_584 != 0) {
+            } else if (this->create_partial_match != 0) {
                 s32 index;
                 this->ExeScript(at_3118);
                 for (index = 0; index < 3; index++) {
@@ -2436,7 +2436,7 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
             } else {
                 this->ExeScript(at_3120);
             }
-            MenuSePlay(0, this->unk_394, &MenuSoundBuffer);
+            MenuSePlay(0, this->create_sound_buffer, &MenuSoundBuffer);
         }
         break;
     case kCreateShow: {
@@ -2444,20 +2444,20 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
             if (this->create_chara != NULL) {
                 float scale[4];
                 this->create_chara->GetScale(scale);
-                switch (this->unk_5f4) {
+                switch (this->create_show_phase) {
                 case 0:
-                    if (CalcMenuAdd(&this->unk_5f8, 0.4f, this->unk_5f8) != 0) {
-                        this->unk_5f4 = 1;
-                        this->unk_5e4 = 0.0f;
-                        this->unk_5ec = 0.4f * this->create_scale;
+                    if (CalcMenuAdd(&this->create_scale_in, 0.4f, this->create_scale_in) != 0) {
+                        this->create_show_phase = 1;
+                        this->create_spin_angle = 0.0f;
+                        this->create_wobble_amp = 0.4f * this->create_scale;
                     }
-                    scale[0] = this->unk_5f8;
+                    scale[0] = this->create_scale_in;
                     break;
                 case 1:
-                    scale[0] = this->create_scale + this->unk_5ec * sinf(0.10471976f * this->unk_5f0);
-                    CalcMenuAdd(&this->unk_5ec, -0.02f, 0.0f);
-                    CalcMenuAdd(&this->unk_5e4, 0.15707964f, 15.707964f);
-                    CalcMenuAdd(&this->unk_5f0, 1.0f, 600.0f);
+                    scale[0] = this->create_scale + this->create_wobble_amp * sinf(0.10471976f * this->create_wobble_phase);
+                    CalcMenuAdd(&this->create_wobble_amp, -0.02f, 0.0f);
+                    CalcMenuAdd(&this->create_spin_angle, 0.15707964f, 15.707964f);
+                    CalcMenuAdd(&this->create_wobble_phase, 1.0f, 600.0f);
                     if (menu_debug_flag != 0) {
                         float move[4];
                         float scale_step = -GamePad__2.GetRYf() / 8.0f;
@@ -2482,14 +2482,14 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
                 this->create_chara->Step();
             }
         }
-        switch (this->unk_604) {
+        switch (this->jingle_state) {
         case 0:
             break;
         case 1:
-            if (this->unk_606 != 0) {
+            if (this->jingle_pending != 0) {
                 s16 jingle_length = sndtimetbl_2868[this->create_step];
-                if (this->unk_608 > jingle_length / 2) {
-                    this->unk_606 = 0;
+                if (this->jingle_time > jingle_length / 2) {
+                    this->jingle_pending = 0;
                     this->ExeScript(at_3121);
                     if (this->create_step != 0) {
                         char *message = GetItemMessage(this->create_item_id);
@@ -2497,7 +2497,7 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
                             strcpy(message_window->name[0], message);
                         }
                         message_window->MakeMsg(kMsgItemCreated);
-                    } else if (this->unk_584 != 0) {
+                    } else if (this->create_partial_match != 0) {
                         char *name;
                         message_window->MakeMsg(kMsgPhotoNamed);
                         name = (char *)this->create_photo_name;
@@ -2509,41 +2509,41 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
                     }
                 }
             }
-            this->unk_608++;
-            if (this->unk_608 > sndtimetbl_2868[this->create_step]) {
+            this->jingle_time++;
+            if (this->jingle_time > sndtimetbl_2868[this->create_step]) {
                 MenuCommonInfo->FadeInMenuBGMVol(6);
-                this->unk_604 = 0;
+                this->jingle_state = 0;
             }
             break;
         }
-        if (this->unk_584 != 0) {
+        if (this->create_partial_match != 0) {
             u32 color;
-            this->unk_5b8++;
-            if (this->unk_5b8 >= 0x32) {
-                this->unk_5b8 = 0;
+            this->blink_time++;
+            if (this->blink_time >= 0x32) {
+                this->blink_time = 0;
             }
             color = kBlinkDark;
-            if (this->unk_5b8 >= 0x19) {
+            if (this->blink_time >= 0x19) {
                 color = kBlinkLight;
             }
             CDC2Mes *color_window = MenuDCMsg[7];
-            if (this->unk_594 >= 0 && this->unk_594 < 0x14) {
-                color_window->line_color[this->unk_594] = color;
+            if (this->create_missing_slot >= 0 && this->create_missing_slot < 0x14) {
+                color_window->line_color[this->create_missing_slot] = color;
             }
         }
-        if (this->unk_604 == 0 && ((keys & kCreateKeyConfirm) || (keys & kCreateKeyCancel))) {
+        if (this->jingle_state == 0 && ((keys & kCreateKeyConfirm) || (keys & kCreateKeyCancel))) {
             s32 cursor[2];
             this->step = 0;
             this->mode = 0;
-            if (this->unk_5fc == kLoadJingleOpen || this->unk_5fc == kLoadJinglePlay) {
+            if (this->create_load_state == kLoadJingleOpen || this->create_load_state == kLoadJinglePlay) {
                 CSnd.StreamClose(1);
-                this->unk_5fc = -2;
+                this->create_load_state = -2;
             }
             action_chara->DeleteExtMotion();
             MenuCommonInfo->FadeInMenuBGMVol(6);
             this->create_effect = NULL;
             if (this->create_step != 0 ||
-                ((s16)this->create_step == 0 && this->unk_584 == 0)) {
+                ((s16)this->create_step == 0 && this->create_partial_match == 0)) {
                 this->InitNetaCircle(0);
             } else {
                 this->InitNetaCircle(1);
@@ -2551,8 +2551,8 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
             this->ExeScript(at_3122);
             this->create_step = 0;
             CDC2Mes *color_window = MenuDCMsg[7];
-            if (this->unk_594 >= 0 && this->unk_594 < 0x14) {
-                color_window->line_color[this->unk_594] = kLineColorNormal;
+            if (this->create_missing_slot >= 0 && this->create_missing_slot < 0x14) {
+                color_window->line_color[this->create_missing_slot] = kLineColorNormal;
             }
             this->GradationSet(0);
             this->poly_chr_form[1]->SetActionCharaPtr(NULL, this->tex_block[2], -1);
@@ -2575,7 +2575,7 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
     }
 
     s32 read_done = ReadBGSync();
-    switch (this->unk_5fc) {
+    switch (this->create_load_state) {
     case -2:
         break;
     case kLoadSoundMsg:
@@ -2585,7 +2585,7 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
                 MenuSePlay(0, (u32 *)file->buffer, &MenuSoundBuffer);
                 MenuCommonInfo->FadeOutMenuBGMVol(-3, 0x18);
             }
-            this->unk_5fc = kLoadModel;
+            this->create_load_state = kLoadModel;
         }
         break;
     case kLoadModel: {
@@ -2601,7 +2601,7 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
         if (this->create_step != 0) {
             strcat((char *)&path, at_3124);
         } else {
-            if (this->unk_584 != 0) {
+            if (this->create_partial_match != 0) {
                 strcat((char *)&path, at_3125);
             } else {
                 strcat((char *)&path, at_3126);
@@ -2617,11 +2617,11 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
         LoadFileBG((char *)&path, (u_long128 *)this->create_model_file, &motion_size);
         this->create_motion_file = this->create_model_file + motion_size / 16 * 16;
         LoadFileBG(at_3127, (u_long128 *)this->create_motion_file, &motion_size);
-        this->unk_5fc = kLoadModelDone;
+        this->create_load_state = kLoadModelDone;
         break;
     }
     case kLoadModelDone:
-        if (this->unk_60a <= 0 && read_done == 0) {
+        if (this->create_wait_time <= 0 && read_done == 0) {
             float pos[4];
             float rot[4];
             BG_READ_INFO *pack_bg;
@@ -2670,19 +2670,19 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
                 form->counter = 0;
                 form->ambient[0] = -1.0f;
             }
-            this->unk_5fc = kLoadSoundBank;
+            this->create_load_state = kLoadSoundBank;
             load_stack->Align64();
-            this->unk_600 = 100;
+            this->create_timer = 100;
             if (this->create_step != 0) {
                 u8 *item_file;
                 char *item_path;
                 s32 item_size;
-                this->unk_600 = 200;
+                this->create_timer = 200;
                 this->create_chara = NewInventActionChara(load_stack);
                 this->create_chara->Initialize(0);
-                this->unk_d48.stSetBuffer(load_stack->stGetTop(), 0x35C0);
-                this->unk_d48.stack_used = 0;
-                this->unk_d48.lock = 0;
+                this->item_model_memory.stSetBuffer(load_stack->stGetTop(), 0x35C0);
+                this->item_model_memory.stack_used = 0;
+                this->item_model_memory.lock = 0;
                 load_stack->Alloc(0x35C0);
                 load_stack->Align64();
                 item_file = (u8 *)load_stack->stGetTop();
@@ -2693,7 +2693,7 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
                         LoadFileBG((char *)item_path, (u_long128 *)item_file, &item_size);
                     }
                 }
-                this->unk_5fc = kLoadItemModel;
+                this->create_load_state = kLoadItemModel;
             }
         }
         break;
@@ -2704,33 +2704,33 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
                 texture_manager->DeleteBlock(this->tex_block[2]);
                 strcpy(texture_manager->name_suffix, at_3134);
                 this->create_chara->Initialize(0);
-                this->create_chara->LoadPack((unsigned int *)item_bg->buffer, at_2249, &this->unk_d48,
-                                           &this->unk_d48, &this->unk_d48, this->tex_block[2], 0);
+                this->create_chara->LoadPack((unsigned int *)item_bg->buffer, at_2249, &this->item_model_memory,
+                                           &this->item_model_memory, &this->item_model_memory, this->tex_block[2], 0);
                 texture_manager->name_suffix[0] = 0;
             }
-            this->unk_5fc++;
+            this->create_load_state++;
         }
         break;
     case kLoadSoundBank: {
         s32 sound_size;
         load_stack->Align64();
         StartReadBG();
-        this->unk_394 = (u32 *)load_stack->stGetTop();
-        LoadFileBG(sndfileName_2951[this->create_step], (u_long128 *)this->unk_394, &sound_size);
+        this->create_sound_buffer = (u32 *)load_stack->stGetTop();
+        LoadFileBG(sndfileName_2951[this->create_step], (u_long128 *)this->create_sound_buffer, &sound_size);
         load_stack->Alloc((sound_size & 15) != 0 ? ((unsigned int)sound_size >> 4) + 1 :
                                                 (unsigned int)sound_size >> 4);
-        this->unk_5fc++;
+        this->create_load_state++;
         break;
     }
     case kLoadSoundPort:
         if (read_done == 0) {
             sndInitPort(8);
-            this->unk_5fc++;
+            this->create_load_state++;
         }
         break;
     case kLoadJingleOpen:
-        this->unk_600--;
-        if (this->unk_600 == 0x28) {
+        this->create_timer--;
+        if (this->create_timer == 0x28) {
             s32 wave = this->create_step;
             char wave_name[0x88];
             if (wave == 1) {
@@ -2739,7 +2739,7 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
             sprintf(wave_name, at_3135, wavname_2960[wave]);
             CSnd.StreamOpenFast(1, wave_name);
         }
-        if (this->unk_600 <= 0) {
+        if (this->create_timer <= 0) {
             while (CSnd.StreamOpenState() != 0) {
             }
             CSnd.StreamStandBy(1);
@@ -2747,16 +2747,16 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
             }
             CSnd.StreamSetVol(1, 0x7FFF, 0x7FFF);
             CSnd.StreamPlay(1);
-            this->unk_600 = 0x50;
-            this->unk_5fc++;
+            this->create_timer = 0x50;
+            this->create_load_state++;
         }
         break;
     case kLoadJinglePlay:
         s32 play_state = CSnd.StreamGetState(1);
-        this->unk_600--;
-        if ((play_state & 0x8000) && this->unk_600 <= 0) {
+        this->create_timer--;
+        if ((play_state & 0x8000) && this->create_timer <= 0) {
             CSnd.StreamClose(1);
-            this->unk_5fc++;
+            this->create_load_state++;
         }
         break;
     }
@@ -2944,10 +2944,10 @@ int CMenuInvent::IsMakeObject(int keys, int button) {
                     MenuCharaLoadStack.stack_used = 0;
                     MenuCharaLoadStack.lock = 0;
                     MenuCharaLoadStack.Alloc(0xC0);
-                    unk_578 = MenuCharaLoadStack.stack + MenuCharaLoadStack.stack_used;
+                    load_sound_buffer = MenuCharaLoadStack.stack + MenuCharaLoadStack.stack_used;
                     StartReadBG();
                     int size;
-                    LoadFileBG(at_3350__2, (u_long128 *)unk_578, &size);
+                    LoadFileBG(at_3350__2, (u_long128 *)load_sound_buffer, &size);
                     u_int bytes = size + 16;
                     MenuCharaLoadStack.Alloc((bytes & 0xF) ? (bytes >> 4) + 1 : bytes >> 4);
                 }
@@ -2978,7 +2978,7 @@ int CMenuInvent::IsMakeObject(int keys, int button) {
                 MenuCommonInfo->cursor_form->draw_flag = 0;
             }
             ExeScript(at_3351);
-            MenuSePlay(0, (u_int *)unk_578, &MenuSoundBuffer);
+            MenuSePlay(0, (u_int *)load_sound_buffer, &MenuSoundBuffer);
             CreateModeSwapForm(1);
             step = 1;
         }
@@ -3716,7 +3716,7 @@ void CMenuInvent::PhotoNetaEnter(int index, int button) {
         case 1:
         case 4:
             if (answer == 0) {
-                unk_390 = 0;
+                neta_effect_time = 0;
                 InventInNetaEffectFlag = 1;
                 ExeScript(at_3932);
                 MenuSePlay(0x20);
@@ -3737,14 +3737,14 @@ void CMenuInvent::PhotoNetaEnter(int index, int button) {
         break;
     }
     case 1:
-        if (unk_390 == 0) {
+        if (neta_effect_time == 0) {
             if (CheckRunStarDust(InventInNetaEffect, InventInNetaEffectNum4) == 0) {
-                unk_390++;
+                neta_effect_time++;
             }
         } else {
-            unk_390++;
+            neta_effect_time++;
         }
-        if (unk_390 > 50) {
+        if (neta_effect_time > 50) {
             CheckPhotoFlag();
             InventUserDataPtr->PhotoCheckEnd();
             if (photo_only == 1 && unk_112 == 0) {
@@ -3920,7 +3920,7 @@ void CMenuInvent::IsAccessAlbum() {
                     step = 5;
                     MCManagerPtr->SetFuncNo(17);
                     InitMenuDl(GetMenuDlTexture(), MCManagerPtr->GetSaveDataSize(2));
-                    unk_d78 = 0;
+                    download_base = 0;
                     ExeScript(at_4358);
                     if (MenuDCMsg[4] != NULL) {
                         MenuDCMsg[4]->SetMsgVolumeNoOne(ActiveSlot_3949 + 1);
@@ -3932,7 +3932,7 @@ void CMenuInvent::IsAccessAlbum() {
         }
         break;
     case 5:
-        StepMenuDl2(unk_d78 + MCManagerPtr->total_transferred);
+        StepMenuDl2(download_base + MCManagerPtr->total_transferred);
         if (done != 0) {
             InitMenuDl(NULL, 0);
             if (McCheckMCPs2(card) == 0) {
@@ -4065,7 +4065,7 @@ void CMenuInvent::IsAccessAlbum() {
         }
         break;
     case 205:
-        StepMenuDl2(unk_d78 + MCManagerPtr->total_transferred);
+        StepMenuDl2(download_base + MCManagerPtr->total_transferred);
         if (done != 0) {
             if (McCheckMCPs2(card) == 0) {
                 card_removed = 1;
@@ -4255,7 +4255,7 @@ void CMenuInvent::IsAccessAlbum() {
         if (McCheckMCPs2(card) == 0) {
             card_removed = 1;
         } else {
-            unk_d78 = 0;
+            download_base = 0;
             MCManagerPtr->SetFuncNo(19);
             InitMenuDl(GetMenuDlTexture(), MCManagerPtr->GetSaveDataSize(4));
         }
@@ -4265,7 +4265,7 @@ void CMenuInvent::IsAccessAlbum() {
             card_removed = 1;
         } else if (card->formatted == 1) {
             MCManagerPtr->SetFuncNo(16);
-            unk_d78 = MCManagerPtr->total_transferred;
+            download_base = MCManagerPtr->total_transferred;
         } else if (card->formatted == 0) {
             step = 500;
             ExeScript(at_4356);
@@ -4279,7 +4279,7 @@ void CMenuInvent::IsAccessAlbum() {
         if (McCheckMCPs2(card) == 0) {
             card_removed = 1;
         } else {
-            unk_d78 = 0;
+            download_base = 0;
             MCManagerPtr->SetFuncNo(16);
             InitMenuDl(GetMenuDlTexture(), MCManagerPtr->GetSaveDataSize(2));
             ExeScript(at_4368__2);
@@ -4937,7 +4937,7 @@ inline CMenuInvent::CMenuInvent() {
     album_cursor = album_top = 0;
     memo_cursor = 0;
     memo_top = 0;
-    unk_24c = 0;
+    card_scroll_dir = 0;
     unk_112 = 0;
     for (i = 0; i < 3; i++) {
         neta_select_index[i] = -1;
@@ -4949,15 +4949,15 @@ inline CMenuInvent::CMenuInvent() {
     neta_circle_radius = 40.0f;
     create_step = 0;
     create_item_id = 0;
-    unk_584 = -1;
+    create_partial_match = -1;
     for (i = 0; i < 3; i++) {
         create_photo_neta[i] = 0;
     }
-    unk_594 = -1;
-    unk_5b8 = 0;
+    create_missing_slot = -1;
+    blink_time = 0;
     neta_circle_snap = 0;
     neta_flash_angle = 0.0f;
-    unk_390 = 0;
+    neta_effect_time = 0;
     album_scroll_reset = 0;
     album_scroll_x = album_scroll_y = 0.0f;
     for (i = 0; i < 30; i++) {
@@ -4969,11 +4969,11 @@ inline CMenuInvent::CMenuInvent() {
         album_tex[i] = NULL;
     }
     InitPhotoNetaBoardToAlbum(0);
-    unk_394 = NULL;
+    create_sound_buffer = NULL;
     photo_scroll = 0.0f;
     photo_bar = 0.0f;
-    unk_5f8 = 0.0f;
-    unk_5f4 = 0;
+    create_scale_in = 0.0f;
+    create_show_phase = 0;
     blink_count = 0;
     chara_read_info = NULL;
     chara_load_step = 0;
@@ -4984,7 +4984,7 @@ inline CMenuInvent::CMenuInvent() {
     photo_only = 0;
     gradation_mode = 0;
     unk_eb0 = 0;
-    unk_d78 = 0;
+    download_base = 0;
     mgZeroVector(neta_color);
     scoop_color[0] = 128.0f;
     scoop_color[1] = 128.0f;
@@ -5398,9 +5398,9 @@ int MenuInventPushKey(int pad, int pushed) {
                 int new_row = CMenuInventPt->card_top;
                 if (old_row != new_row) {
                     if (old_row < new_row) {
-                        CMenuInventPt->unk_24c = 1;
+                        CMenuInventPt->card_scroll_dir = 1;
                     } else {
-                        CMenuInventPt->unk_24c = 0;
+                        CMenuInventPt->card_scroll_dir = 0;
                     }
                 }
                 if (menu_debug_flag != 0) {
@@ -5880,10 +5880,10 @@ int MenuInventPushKey(int pad, int pushed) {
                     i += 1;
                 } while (i < 3);
                 CMenuInventPt->create_item_id =
-                    InventManagePt->CheckInventEnable(ideas, &CMenuInventPt->unk_584);
+                    InventManagePt->CheckInventEnable(ideas, &CMenuInventPt->create_partial_match);
                 InventManagePt->GetInventDataInfoByItemID(CMenuInventPt->create_item_id);
                 CMenuInventPt->mode = 5;
-                CMenuInventPt->unk_5fc = -2;
+                CMenuInventPt->create_load_state = -2;
                 if (InventUserDataPtr->IsAlreadyCreatedItem(CMenuInventPt->create_item_id) >= 0) {
                     CMenuInventPt->step = 4;
                     CMenuInventPt->ExeScript(at_5553);
@@ -6133,7 +6133,7 @@ int MenuInventKey() {
         int line = 0;
         tops.top[0] = CMenuInventPt->card_top;
         tops.top[1] = CMenuInventPt->card_top - 1;
-        int top = tops.top[CMenuInventPt->unk_24c];
+        int top = tops.top[CMenuInventPt->card_scroll_dir];
         InventUserDataPtr->GetHatsumeiNum();
         CMenuPosDataForm *list_form = CMenuInventPt->card_list_form;
         float list_x = list_form->x;

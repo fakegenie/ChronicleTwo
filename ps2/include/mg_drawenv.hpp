@@ -137,8 +137,8 @@ public:
     int all_scissor;
     int fog_enable;
     int plight_enable;
-    int unk_fac;
-    u_int unk_fb0[4];
+    int lighting_enabled;
+    u_int render_params[4];
     int clip;
     int scissor;
     int plight_hit;

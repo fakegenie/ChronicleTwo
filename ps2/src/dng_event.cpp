@@ -150,7 +150,7 @@ void CStartupEpisodeTitle::Switch(int on) {
         current = mes;
         current->draw_speed = current->GetDrawSpeedDef();
         current->mes_no = -1;
-        current->unk_1e40 = 0;
+        current->text_ptr = 0;
         current->open = 0;
         current->fade = 0.0f;
         current->fukidashi_centre_x = -1;
@@ -204,7 +204,7 @@ void CStartupEpisodeTitle::Step(void) {
                 mes_win = mes;
                 mes_win->draw_speed = mes_win->GetDrawSpeedDef();
                 mes_win->mes_no = -1;
-                mes_win->unk_1e40 = 0;
+                mes_win->text_ptr = 0;
                 mes_win->open = 0;
                 mes_win->fade = 0.0f;
                 mes_win->fukidashi_centre_x = -1;
@@ -256,7 +256,7 @@ void MessageTaskManager::Step(void) {
                 current = this->mes;
                 current->draw_speed = current->GetDrawSpeedDef();
                 current->mes_no = -1;
-                current->unk_1e40 = 0;
+                current->text_ptr = 0;
                 current->open = 0;
                 current->fade = 0.0f;
                 current->fukidashi_centre_x = -1;
@@ -326,7 +326,7 @@ void MessageTaskManager::Clear(void) {
             if (line->time > 0) {
                 current->draw_speed = current->GetDrawSpeedDef();
                 current->mes_no = -1;
-                current->unk_1e40 = 0;
+                current->text_ptr = 0;
                 current->open = 0;
                 current->fade = 0.0f;
                 current->fukidashi_centre_x = -1;
@@ -877,9 +877,9 @@ void BattleAreaBGMCtrl(void) {
         distance = ActiveMonster->IsBattleStyleDist();
     }
     if (distance <= 340.0f) {
-        ((CActionChara *)player)->unk_75e = 1;
+        ((CActionChara *)player)->battle_stance = 1;
     } else {
-        ((CActionChara *)player)->unk_75e = 0;
+        ((CActionChara *)player)->battle_stance = 0;
     }
     if (!(state->pause_flag & 0x4000) && state->boss_map == 0) {
         phase = state->battle_bgm_state;

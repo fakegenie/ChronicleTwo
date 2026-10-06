@@ -275,10 +275,10 @@ int mgCShadowMDT::CreateRenderInfoPacket(u_int *packet, float (*matrix)[4], mgRE
     vu[2] = *(u_long128 *)zero;
     vu[3] = *(u_long128 *)zero;
     vu[4] = *(u_long128 *)zero;
-    write[20] = info->unk_fb0[3];
-    write[21] = info->unk_fb0[0];
-    write[22] = info->unk_fb0[1];
-    write[23] = info->unk_fb0[2];
+    write[20] = info->render_params[3];
+    write[21] = info->render_params[0];
+    write[22] = info->render_params[1];
+    write[23] = info->render_params[2];
     sceVu0CopyMatrix((sceVu0FVECTOR *)&vu[6], world_screen);
     sceVu0CopyMatrix((sceVu0FVECTOR *)&vu[10], matrix);
     vu[14] = *(u_long128 *)zero;

@@ -2334,7 +2334,7 @@ void SuccessLoop(CScene *scene, CPadControl *pad) {
             message->select = -1;
             message->draw_speed = message->GetDrawSpeedDef();
             message->mes_no = -1;
-            message->unk_1e40 = 0;
+            message->text_ptr = 0;
             message->open = 0;
             message->fade = 0.0f;
             message->fukidashi_centre_x = -1;
@@ -2402,7 +2402,7 @@ void SuccessLoop(CScene *scene, CPadControl *pad) {
                 result_message->select = -1;
                 result_message->draw_speed = result_message->GetDrawSpeedDef();
                 result_message->mes_no = -1;
-                result_message->unk_1e40 = 0;
+                result_message->text_ptr = 0;
                 result_message->open = 0;
                 result_message->fade = 0.0f;
                 result_message->fukidashi_centre_x = -1;

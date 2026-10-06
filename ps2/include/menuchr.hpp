@@ -241,7 +241,7 @@ public:
     s16 chara;
     int monica_enabled;
     sceVu0FVECTOR chara_pos;
-    float unk_270[4];
+    float costume_rotation[4];
     s32 unk_280;
     int cursor_show;
     int change_chara;
@@ -255,7 +255,7 @@ public:
     float cursor_x;
     float cursor_y;
     float cursor_wave;
-    float unk_2BC;
+    float cursor_wave_y;
     CHARA_DATA *chara_data;
     mgCTexture *tile_tex;
     mgCTexture *cursor_tex;

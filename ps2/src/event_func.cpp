@@ -2786,7 +2786,7 @@ void EdEventMapInit(void) {
     if (message != NULL) {
         message->draw_speed = message->GetDrawSpeedDef();
         message->mes_no = -1;
-        message->unk_1e40 = 0;
+        message->text_ptr = 0;
         message->open = 0;
         message->fade = 0;
         message->fukidashi_centre_x = -1;
@@ -2796,7 +2796,7 @@ void EdEventMapInit(void) {
     if (message != NULL) {
         message->draw_speed = message->GetDrawSpeedDef();
         message->mes_no = -1;
-        message->unk_1e40 = 0;
+        message->text_ptr = 0;
         message->open = 0;
         message->fade = 0;
         message->fukidashi_centre_x = -1;
@@ -2806,7 +2806,7 @@ void EdEventMapInit(void) {
     if (message != NULL) {
         message->draw_speed = message->GetDrawSpeedDef();
         message->mes_no = -1;
-        message->unk_1e40 = 0;
+        message->text_ptr = 0;
         message->open = 0;
         message->fade = 0;
         message->fukidashi_centre_x = -1;
@@ -6927,8 +6927,8 @@ int _MES_MAKE(RS_STACKDATA *stack, int argc) {
                 if (text == NULL) {
                     return 0;
                 }
-                mes->unk_1e40 = (s32)text;
-                mes->MakeMesWin((char *)mes->unk_1e40, 0, 1);
+                mes->text_ptr = (s32)text;
+                mes->MakeMesWin((char *)mes->text_ptr, 0, 1);
             } else if (id == 0 && EdEventInfo.npc_talk_text != NULL) {
                 if (EdEventInfo.npc_talk_text == NULL) {
                     return 0;
@@ -6940,8 +6940,8 @@ int _MES_MAKE(RS_STACKDATA *stack, int argc) {
                 if (text == NULL) {
                     return 0;
                 }
-                mes->unk_1e40 = (s32)text;
-                mes->MakeMesWin((char *)mes->unk_1e40, 0, 1);
+                mes->text_ptr = (s32)text;
+                mes->MakeMesWin((char *)mes->text_ptr, 0, 1);
             } else {
                 mes->MakeMesWin(no);
             }
@@ -6964,7 +6964,7 @@ int _MES_CLOSE(RS_STACKDATA *stack, int argc) {
     }
     mes->draw_speed = mes->GetDrawSpeedDef();
     mes->mes_no = -1;
-    mes->unk_1e40 = 0;
+    mes->text_ptr = 0;
     mes->open = 0;
     mes->fade = 0;
     mes->fukidashi_centre_x = -1;

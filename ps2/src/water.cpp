@@ -396,8 +396,8 @@ int CWater::CreateRenderInfoPacket(u_int *packet, float (*matrix)[4], mgRENDER_I
     render->clear[0] = *(u_long128 *)clear;
     render->clear[1] = *(u_long128 *)clear;
     render->clear[2] = *(u_long128 *)clear;
-    float *render_values = (float *)info->unk_fb0;
-    render->render_word = info->unk_fb0[3];
+    float *render_values = (float *)info->render_params;
+    render->render_word = info->render_params[3];
     render->render_params[0] = render_values[0];
     render->render_params[1] = render_values[1];
     render->render_params[2] = render_values[2];

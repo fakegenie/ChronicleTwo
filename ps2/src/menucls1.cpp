@@ -173,7 +173,7 @@ void MenuMesInit(ClsMes *mes) {
         mes->page_time = 0;
         mes->page_auto_time = 30;
         mes->mes_no = -1;
-        mes->unk_1e40 = 0;
+        mes->text_ptr = 0;
         mes->alpha = 0x80;
         for (b = 0; b < 16; b++) {
             memset(mes->name[b], 0, 0x32);

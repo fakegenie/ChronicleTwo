@@ -5375,7 +5375,7 @@ void CMenuCostumeSel::LoadMenuData(mgCMemory *stack, int *texBlock) {
     this->cursor_x = 0;
     this->cursor_y = 0;
     this->cursor_wave = 0;
-    this->unk_2BC = 0;
+    this->cursor_wave_y = 0;
     AttachMessageForm();
     systemMes = GetSystemMesBuffer();
     MenuDCMsg[0]->SetMessData(systemMes, GetMenuMainMessageBuffer());
@@ -5627,7 +5627,7 @@ int CMenuCostumeSel::KeyStep() {
         case 0:
             break;
         case 1:
-            model->GetRotation(unk_270);
+            model->GetRotation(costume_rotation);
             MenuCharaLoadStack.stReset();
             SetMenuLoadItemNo(chara);
             MenuItemCharaDataLoad(&MenuCharaLoadStack, chara, MenuCharaBuild2, 1);
@@ -5640,7 +5640,7 @@ int CMenuCostumeSel::KeyStep() {
                 MenuItemCharaDataLoadEndCheckAfter(MenuCharaBuild2, chara);
                 MenuLoadInfo.unk_2 = 0;
                 model->SetPosition(chara_pos);
-                model->SetRotation(unk_270);
+                model->SetRotation(costume_rotation);
                 model->Step();
                 MenuCosutumeLoadPhase++;
                 load_wait = 0;
@@ -5765,15 +5765,15 @@ void CMenuCostumeSel::Draw() {
     if (cursor_tex != NULL && cursor_show) {
         float cursorPos[2];
         cursorPos[0] = cursor_x + 6.0f * cosf(cursor_wave);
-        cursorPos[1] = cursor_y + 4.0f * sinf(unk_2BC);
+        cursorPos[1] = cursor_y + 4.0f * sinf(cursor_wave_y);
         MenuCursorDraw(cursor_tex, cursorPos, 0.0f, 0, 0x80, 1.0f);
         cursor_wave += 0.05235988f;
-        unk_2BC += 0.10471976f;
+        cursor_wave_y += 0.10471976f;
         if (!(cursor_wave < 3.1415927f)) {
             cursor_wave -= 6.2831855f;
         }
-        if (!(unk_2BC < 3.1415927f)) {
-            unk_2BC -= 6.2831855f;
+        if (!(cursor_wave_y < 3.1415927f)) {
+            cursor_wave_y -= 6.2831855f;
         }
     }
     texManager->ReloadTexture(MenuArg.mes_tex_block, (sceVif1Packet *)NULL);
@@ -5849,10 +5849,10 @@ void MenuCostumeInit(mgCMemory *stack, int *tex_block, int mode) {
         menu->chara_pos[1] = -14.0f;
         menu->chara_pos[2] = 4.0f;
         menu->chara_pos[3] = 1.0f;
-        menu->unk_270[0] = 0.0f;
-        menu->unk_270[1] = 0.1f;
-        menu->unk_270[2] = 0.0f;
-        menu->unk_270[3] = 1.0f;
+        menu->costume_rotation[0] = 0.0f;
+        menu->costume_rotation[1] = 0.1f;
+        menu->costume_rotation[2] = 0.0f;
+        menu->costume_rotation[3] = 1.0f;
         for (i = 0; i < COSTUME_LIST_MAX; i++) {
             menu->costume_list[0][i] = 0;
             menu->costume_list[1][i] = 0;
@@ -5901,7 +5901,7 @@ BASE_MONSTER_TBL *GetMonsterBaseInfoForMonsterMemoIndex(int memoIndex) {
 
     monster = GetMonsterBaseInfo(0);
     for (i = 0; i < 0x14A; i++) {
-        if (monster->unk_b2 == memoIndex) {
+        if (monster->memo_index == memoIndex) {
             return monster;
         }
         monster++;
@@ -5939,17 +5939,17 @@ void CMosBookMenu::SetMonsterInfo(BASE_MONSTER_TBL *monster) {
     if (monster != NULL) {
         strcpy(this->name, monster->name);
         area = NULL;
-        if (0 <= monster->unk_b0) {
-            area = GetMapTitle(GetDngMapNo(monster->unk_b0));
+        if (0 <= monster->area_no) {
+            area = GetMapTitle(GetDngMapNo(monster->area_no));
         }
 
         *(MonsterBookBlock64 *)localAreaNames = *(MonsterBookBlock64 *)at_5452;
         if (LanguageCode == 1) {
-            if (monster->unk_b0 == 1) {
+            if (monster->area_no == 1) {
                 area = localAreaNames[0];
             }
         }
-        if (LanguageCode == 2 && monster->unk_b0 == 1) {
+        if (LanguageCode == 2 && monster->area_no == 1) {
             area = localAreaNames[1];
         }
         if (area != NULL) {
@@ -5959,8 +5959,8 @@ void CMosBookMenu::SetMonsterInfo(BASE_MONSTER_TBL *monster) {
         if (typeNames[0] != NULL) {
             strcpy(this->type_name, typeNames[monster->user_mons_id]);
         }
-        this->hp = monster->unk_56;
-        this->abs = monster->unk_58;
+        this->hp = monster->reward_exp;
+        this->abs = monster->reward_money;
         this->kill_num = KillMonsterCount(monster->id, 0);
         itemCount = 0;
         for (i = 0; i < 3; i++) {

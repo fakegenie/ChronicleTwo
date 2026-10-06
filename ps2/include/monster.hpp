@@ -100,8 +100,8 @@ struct BASE_MONSTER_TBL {
     s32   unk_4c;
     s32   life;
     s8    user_mons_id;
-    u16   unk_56;
-    u16   unk_58;
+    u16   reward_exp;
+    u16   reward_money;
     s16   unk_5a;
     float whp;
     s16   gekirin_num;
@@ -114,7 +114,7 @@ struct BASE_MONSTER_TBL {
     s8    sw_effect_num;
     s16   element_resist[8];
     s16   ext_param[12];
-    u32   unk_94;
+    u32   flags;
     u32   unk_98;
     s32   next_id;
     union {
@@ -123,9 +123,9 @@ struct BASE_MONSTER_TBL {
     };
     u32   resist_attr;
     s16   status_chance;
-    s16   unk_ae;
-    s8    unk_b0;
-    s16   unk_b2;
+    s16   ratio_damage_rate;
+    s8    area_no;
+    s16   memo_index;
     s16   unk_b4;
 };
 
@@ -223,7 +223,7 @@ public:
     s16              piyori_time;
     MONSTER_STATUS   status;
     u32              attrib;
-    s32              unk_134c;
+    s32              message_no;
     s32              locate_param;
     s16              gate_key;
     s16              no_damage_cnt;

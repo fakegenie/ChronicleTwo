@@ -340,19 +340,19 @@ int _SET_PALLET_ANIM(RS_STACKDATA *stack, int argc) {
         sixth = GetStackInt(stack);
     }
     CActiveMonster *monster = nowMonster;
-    monster->unk_67c.red = first;
-    monster->unk_67c.green = second;
-    monster->unk_67c.blue = third;
-    monster->unk_67c.pulse_num = fourth;
-    monster->unk_67c.duration = fifth;
-    monster->unk_67c.elapsed = 0;
-    monster->unk_67c.repeats = sixth;
+    monster->script_pallet.red = first;
+    monster->script_pallet.green = second;
+    monster->script_pallet.blue = third;
+    monster->script_pallet.pulse_num = fourth;
+    monster->script_pallet.duration = fifth;
+    monster->script_pallet.elapsed = 0;
+    monster->script_pallet.repeats = sixth;
     return 1;
 }
 int _RESET_PALLET_ANIM(RS_STACKDATA *stack, int argc) {
     CActiveMonster *monster = nowMonster;
-    monster->unk_67c.duration = 0;
-    monster->unk_67c.elapsed = 0;
+    monster->script_pallet.duration = 0;
+    monster->script_pallet.elapsed = 0;
     return 1;
 }
 int _CALC_IP_CIRCLE_LINE(RS_STACKDATA *stack, int argc) {
@@ -2107,7 +2107,7 @@ int _SET_DEAD_START(RS_STACKDATA *args, int argc) {
         return 0;
     }
     nowMonster->state = ACTIVE_MONSTER_DEAD;
-    pallet = &nowMonster->unk_67c;
+    pallet = &nowMonster->script_pallet;
     pallet->duration = 0;
     pallet->elapsed = 0;
     if (nowMonster->reward_money <= 0) {

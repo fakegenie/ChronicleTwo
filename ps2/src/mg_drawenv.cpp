@@ -91,7 +91,7 @@ void mgRENDER_INFO::Initialize() {
     draw_env[1].Initialize(1);
     fog_enable = 0;
     plight_enable = 0;
-    unk_fac = 1;
+    lighting_enabled = 1;
     motion = 0;
     all_scissor = 0;
     light_changed = 1;

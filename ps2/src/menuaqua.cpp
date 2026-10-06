@@ -767,7 +767,7 @@ void CAquaFish::Initialize() {
     radius = 0;
     wall_time = 0;
     eat_item = 0;
-    unk_922 = GetRandI(8);
+    swim_variant = GetRandI(8);
     action.Initialize();
     flash_count = 0;
     aqua_no = -1;
@@ -1176,8 +1176,8 @@ void CAquaFish::NextThink(int think, NEXT_THINK_PARAM *param) {
                 GetRandF(40.0f);
                 think_timer = 0;
                 turn[1] = 24.0f;
-                if (unk_922 >= 8) {
-                    unk_922 = 0;
+                if (swim_variant >= 8) {
+                    swim_variant = 0;
                 }
                 NextRootNormal();
             }

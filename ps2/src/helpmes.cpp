@@ -67,7 +67,7 @@ void CreateHelpMes(int message_id) {
         HelpMes.page_time = 0;
         HelpMes.page_auto_time = 30;
         HelpMes.mes_no = -1;
-        HelpMes.unk_1e40 = 0;
+        HelpMes.text_ptr = 0;
         HelpMes.alpha = 0x80;
         for (int i = 0; i < MES_NAME_MAX; i++) {
             memset(HelpMes.name[i], 0, sizeof(HelpMes.name[i]));

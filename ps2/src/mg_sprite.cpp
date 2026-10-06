@@ -86,10 +86,10 @@ int mgC3DSprite::CreateRenderInfoPacket(u_int *dest, float (*matrix)[4],
     *(u_long128 *)head->unk_20[0] = *(u_long128 *)zero;
     *(u_long128 *)head->unk_20[1] = *(u_long128 *)zero;
     *(u_long128 *)head->unk_20[2] = *(u_long128 *)zero;
-    head->unk_50[0] = render_info->unk_fb0[3];
-    head->unk_50[1] = render_info->unk_fb0[0];
-    head->unk_50[2] = render_info->unk_fb0[1];
-    head->unk_50[3] = render_info->unk_fb0[2];
+    head->unk_50[0] = render_info->render_params[3];
+    head->unk_50[1] = render_info->render_params[0];
+    head->unk_50[2] = render_info->render_params[1];
+    head->unk_50[3] = render_info->render_params[2];
     sceVu0CopyMatrix(head->local_screen, local_screen);
     sceVu0CopyMatrix(head->local_world, matrix);
     render_info->scissor = 0;

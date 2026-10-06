@@ -597,7 +597,7 @@ public:
     int                money;
     s16                yarikomi_medal;
     u8                 unk_44da2[0x1E];
-    s16                unk_44dc0;
+    s16                special_item_bought;
     u8                 unk_44dc2[6];
     u64                unk_44dc8;
     s16                photo_subject[0x200];

@@ -362,7 +362,7 @@ int sgLoopBuggy(SubGameInfo *info) {
             message->select = -1;
             message->draw_speed = message->GetDrawSpeedDef();
             message->mes_no = -1;
-            message->unk_1e40 = 0;
+            message->text_ptr = 0;
             message->open = 0;
             message->fade = 0.0f;
             message->fukidashi_centre_x = -1;

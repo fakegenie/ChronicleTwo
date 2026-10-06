@@ -135,7 +135,7 @@ void CShop::CheckEventItem() {
             local_sort1(cursor, &item_num, item_no);
             cursor -= 1;
         }
-        if (item_no[cursor] == 0x1A7 && (once_item_chosen == 1 || userData->unk_44dc0 >= 0x15)) {
+        if (item_no[cursor] == 0x1A7 && (once_item_chosen == 1 || userData->special_item_bought >= 0x15)) {
             local_sort1(cursor, &item_num, item_no);
         }
         if (item_no[cursor] == 0x163 && userData->GetNumSameItem(0x163) > 0) {
@@ -194,7 +194,7 @@ void CShop::GetPrice(CGameDataUsed *item, int *buy, int *sell) {
         }
     }
     if (buy != NULL && item_id == 0x1A7) {
-        int bought = GetUserDataMan()->unk_44dc0;
+        int bought = GetUserDataMan()->special_item_bought;
         float scaled = (float)*buy;
         while (bought > 0) {
             scaled *= 1.1f;
@@ -874,7 +874,7 @@ int CShopMenu::KeyStep() {
             CShopPtr->AddMoney(-total);
             ExeScript(at_1659);
             if (item_no == 0x1A7) {
-                user->unk_44dc0++;
+                user->special_item_bought++;
             }
             CSaveData *save = GetSaveData();
             save->SetBitFlag(0xC, 1);

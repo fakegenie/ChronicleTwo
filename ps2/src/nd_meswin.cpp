@@ -715,7 +715,7 @@ ClsMes::ClsMes() {
     page_time = 0;
     page_auto_time = 30;
     mes_no = -1;
-    unk_1e40 = 0;
+    text_ptr = 0;
     mes_data = NULL;
     mes_data_size = 0;
     fuchi = FUCHI_SHADOW_BLACK;
@@ -828,7 +828,7 @@ void ClsMes::Preset(int preset) {
     page_time = 0;
     page_auto_time = 30;
     mes_no = -1;
-    unk_1e40 = 0;
+    text_ptr = 0;
     alpha = 0x80;
     for (int i = 0; i < 16; i++) {
         memset(name[i], 0, sizeof(name[i]));
@@ -1198,7 +1198,7 @@ void ClsMes::Step(void) {
             select = -1;
             draw_speed = GetDrawSpeedDef();
             mes_no = -1;
-            unk_1e40 = 0;
+            text_ptr = 0;
             open = 0;
             fade = 0.0f;
             fukidashi_centre_x = -1;
