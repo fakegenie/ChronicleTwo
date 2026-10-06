@@ -59,23 +59,30 @@ STATIC_ASSERT(sizeof(mgVISUAL_SETUP_PACKET) == 0x140);
 u_int *GetScrPad(void) {
     return (u_int *)(buff_id ? 0x70002000 : 0x70000000);
 }
-#ifdef NONMATCHING
 void SendDMA(void *packet, int size) {
+    packet = (void *)((u_int)packet & 0x0FFFFFFF);
     if (start_dma) {
-        sceDmaSync(DmaCH8, 0, 0);
+        asm {
+        loop:
+            nop
+            nop
+            nop
+            nop
+            nop
+            nop
+            bc0f loop
+            nop
+        }
         start_dma = 0;
     }
     *(volatile u_int *)0x1000E010 = 0x100;
     DmaCH8->sadr = (u_int)GetScrPad() & 0x0FFFFFFF;
-    DmaCH8->madr = (u_int)packet & 0x0FFFFFFF;
+    DmaCH8->madr = (u_int)packet;
     DmaCH8->qwc = size;
     DmaCH8->chcr.STR = 1;
     start_dma = 1;
     buff_id = !buff_id;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_visual", SendDMA__FPvi);
-#endif
 #pragma global_optimizer off
 int mgSetPkTEX0(u_int *packet, unsigned long tex0, unsigned long tex1) {
     *(u_long128 *)packet = *(u_long128 *)&set_tex0_dma;
@@ -360,13 +367,11 @@ int mgCVisualMDT::CreateBBox(float *min, float *max, float (*matrix)[4]) {
     mgVectorMinMaxN(min, max, vertex, vertex_num);
     return 1;
 }
-#ifdef NONMATCHING
 FACES_ID *mgCVisualMDT::CreateFace(FACES_ID *faces, mgCMemory *memory, mgCMemory *index_memory, mgCFace **out_face) {
     mgCFace      *face;
     mgCFace      *last_face;
     mgFACE_GROUP *group;
     mgFACE_GROUP *previous;
-    int          *indices;
     int          *write;
     int           i;
 
@@ -386,11 +391,12 @@ FACES_ID *mgCVisualMDT::CreateFace(FACES_ID *faces, mgCMemory *memory, mgCMemory
     }
     face->index_num = face->vertex_num * face->index_stride;
     face->material = faces->material;
-    indices = faces->index;
+    faces = (FACES_ID *)faces->index;
     write = (int *)index_memory->Alloc(face->index_num / 4 + 1);
     face->index = write;
     for (i = 0; i < face->index_num; i++) {
-        *write++ = *indices++;
+        *write++ = *(int *)faces;
+        faces = (FACES_ID *)((int *)faces + 1);
     }
     face->next = NULL;
     previous = face_group;
@@ -430,14 +436,15 @@ FACES_ID *mgCVisualMDT::CreateFace(FACES_ID *faces, mgCMemory *memory, mgCMemory
         }
         last_face->next = face;
     }
-    if (out_face != NULL) {
+    switch ((int)out_face) {
+    case 0:
+        break;
+    default:
         *out_face = face;
+        break;
     }
-    return (FACES_ID *)indices;
+    return faces;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_visual", CreateFace__12mgCVisualMDTFP8FACES_IDP9mgCMemoryP9mgCMemoryPP7mgCFace);
-#endif
 int mgCVisualMDT::DataAssignMDT(MDT_HEADER *header, mgCMemory *memory,
                                 mgCTextureManager *textures) {
     mgCVisualMDT *self = this;
@@ -1290,26 +1297,26 @@ void SetDrawEnv(mgCDrawEnv *env, mgCVisualAttr *attr, mgCDrawEnv *base) {
         env->SetAlpha(attr->alpha_blend);
     }
 }
-#ifdef NONMATCHING
 int mgCVisualPrim::CreateRenderInfoPacket(u_int *packet, float (*matrix)[4], mgRENDER_INFO *info) {
     u_int      *start;
     u_int      *write;
     mgCDrawEnv *environment;
     int         size;
 
-    start = GetScrPad();
+    write = GetScrPad();
+    start = write;
     u_int tag[4] __attribute__((aligned(16)));
     *(u_long128 *)tag = 0;
     tag[0] = 0x10000007;
     tag[3] = 0x50000007;
-    *(u_long *)&start[12] = 0;
-    *(u_long128 *)start = *(u_long128 *)tag;
+    *(u_long128 *)write = *(u_long128 *)tag;
     giftag.word0 = 0x8002;
-    *(u_long128 *)&start[4] = *(u_long128 *)&giftag;
-    *(u_long *)&start[8] = 1;
-    u_int *body = start + 8;
-    *(u_long *)&start[10] = MG_GS_PRMODECONT;
-    *(u_long *)&start[14] = SCE_GS_TEXFLUSH;
+    *(u_long128 *)&write[4] = *(u_long128 *)&giftag;
+    u_int *body = write + 8;
+    *(u_long *)&body[0] = 1;
+    *(u_long *)&body[2] = MG_GS_PRMODECONT;
+    *(u_long *)&body[4] = 0;
+    *(u_long *)&body[6] = SCE_GS_TEXFLUSH;
     environment = (mgCDrawEnv *)(body + 8);
     if (draw_env != NULL) {
         *environment = *draw_env;
@@ -1321,14 +1328,10 @@ int mgCVisualPrim::CreateRenderInfoPacket(u_int *packet, float (*matrix)[4], mgR
     write[1] = 0;
     write[2] = 0;
     write[3] = 0;
-    write += 4;
-    size = ((u_long128 *)write - (u_long128 *)start);
+    size = ((u_long128 *)environment + 5 - (u_long128 *)start);
     SendDMA(packet, size);
     return size;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_visual", CreateRenderInfoPacket__13mgCVisualPrimFPUiPA4_fP13mgRENDER_INFO);
-#endif
 void mgCVisualPrim::Initialize() {
     unk_00 = 0;
     draw_env = NULL;

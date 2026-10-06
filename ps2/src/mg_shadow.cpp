@@ -84,8 +84,8 @@ int mgCShadowMDT::CreateFacePacket(u_int *packet, mgCFace *face) {
         write[0] = 0;
         write[1] = 0;
         write[2] = 0;
-        write[3] = 0;
         u_int *unpack = &write[3];
+        write[3] = 0;
         u_int *data = &write[4];
         tag.NLOOP = num;
         ((u_long128 *)write)[1] = *(u_long128 *)&tag;

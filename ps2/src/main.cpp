@@ -25,17 +25,17 @@ extern const unsigned char at_855__DATA[];
 extern const unsigned char at_856__DATA[];
 extern const unsigned char at_857__DATA[];
 
-#ifdef NONMATCHING
 extern "C" int VSyncCallBack__Fi__2(int) {
     ++vcount__2;
     if (vcount__2 < 0) {
         vcount__2 = 0;
     }
+    asm {
+        sync
+        ei
+    }
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/main", VSyncCallBack__Fi__2);
-#endif
 
 static void ClearScreen(int r, int g, int b) {
     sceGsDBuff db;
