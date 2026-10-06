@@ -425,24 +425,44 @@ loop:
 #pragma global_optimizer reset
 #pragma schedule reset
 #pragma global_optimizer off
-#ifdef NONMATCHING
-void mgApplyMatrixN_MaxMin(float (*out)[4], float (*matrix)[4], float (*in)[4], int count,
-                           float *max, float *min) {
-    mgApplyMatrixN(out, matrix, in, count);
-    for (int axis = 0; axis < 4; ++axis) {
-        max[axis] = out[0][axis];
-        min[axis] = out[0][axis];
-    }
-    for (int i = 1; i < count; ++i) {
-        for (int axis = 0; axis < 4; ++axis) {
-            if (max[axis] < out[i][axis]) max[axis] = out[i][axis];
-            if (min[axis] > out[i][axis]) min[axis] = out[i][axis];
-        }
-    }
+asm void mgApplyMatrixN_MaxMin(float (*out)[4], float (*matrix)[4], float (*in)[4], int count, float *max,
+                               float *min) {
+    .set noreorder
+    addi a3, a3, -1
+    lqc2 vf16, 0(a2)
+    lqc2 vf10, 0(a1)
+    lqc2 vf11, 0x10(a1)
+    lqc2 vf12, 0x20(a1)
+    lqc2 vf13, 0x30(a1)
+    vmulax.xyzw ACC, vf10, vf16x
+    vmadday.xyzw ACC, vf11, vf16y
+    vmaddaz.xyzw ACC, vf12, vf16z
+    vmaddw.xyzw vf17, vf13, vf16w
+    addi a3, a3, -1
+    addi a0, a0, 0x10
+    addi a2, a2, 0x10
+    sqc2 vf17, -0x10(a0)
+    lqc2 vf16, 0(a2)
+    vaddx.xyzw vf20, vf17, vf0x
+    vaddx.xyzw vf21, vf17, vf0x
+loop:
+    vmulax.xyzw ACC, vf10, vf16x
+    vmadday.xyzw ACC, vf11, vf16y
+    vmaddaz.xyzw ACC, vf12, vf16z
+    vmaddw.xyzw vf17, vf13, vf16w
+    addi a3, a3, -1
+    addi a0, a0, 0x10
+    addi a2, a2, 0x10
+    sqc2 vf17, -0x10(a0)
+    lqc2 vf16, 0(a2)
+    vmax.xyzw vf20, vf20, vf17
+    bgez a3, loop
+    vmini.xyzw vf21, vf21, vf17
+    nop
+    sqc2 vf20, 0(t0)
+    jr ra
+    sqc2 vf21, 0(t1)
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgApplyMatrixN_MaxMin__FPA4_fPA4_fPA4_fiPfPf);
-#endif
 #pragma global_optimizer reset
 #pragma global_optimizer off
 asm void mgVectorMinMaxN(float *max, float *min, float (*vectors)[4], int count) {
