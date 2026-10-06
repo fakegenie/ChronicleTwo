@@ -545,8 +545,6 @@ void MenuInit(INIT_LOOP_ARG arg) {
     mgTexManager.EnterIMGFile(GetFontTex2ImgPtr(), 1, NULL, NULL);
     LoadEventViewData(read_buffer, &MenuBuffer);
 }
-#ifdef NONMATCHING
-
 static int MenuLoop() {
     mgCTextureManager *textures = &mgTexManager;
     int map_result;
@@ -625,11 +623,15 @@ static int MenuLoop() {
     if (GamePad__2.Down(PAD_L1)) {
         menu_arguments[select] -= 10;
     }
+    int step = 100;
+    if (select == 1) {
+        step = 100;
+    }
     if (GamePad__2.Down(PAD_R2)) {
-        menu_arguments[select] += 100;
+        menu_arguments[select] += step;
     }
     if (GamePad__2.Down(PAD_L2)) {
-        menu_arguments[select] -= 100;
+        menu_arguments[select] -= step;
     }
     if (menu_arguments[select] < -1) {
         menu_arguments[select] = -1;
@@ -664,7 +666,7 @@ static int MenuLoop() {
     if (CaptureMode > CAPTURE_PLAY_SCREEN) {
         CaptureMode = CAPTURE_OFF;
     }
-    for (; row < DEBUG_ROW_NUM && menu[row][0] != '\0'; row++) {
+    while (menu[row][0] != '\0') {
         if (row == DEBUG_ROW_ITEM_SET) {
             text_end += sprintf(text_end, "%s%s%s\n", cursor[row == select], menu[row], item_set[menu_arguments[row]]);
         } else if (row == DEBUG_ROW_LANGUAGE) {
@@ -673,6 +675,9 @@ static int MenuLoop() {
             text_end += sprintf(text_end, "%s%s\n", cursor[row == select], menu[row]);
         } else {
             text_end += sprintf(text_end, "%s%s%d\n", cursor[row == select], menu[row], menu_arguments[row]);
+        }
+        if (++row >= DEBUG_ROW_NUM) {
+            break;
         }
     }
     Font.DrawDirect(text, 10, 10);
@@ -684,7 +689,8 @@ static int MenuLoop() {
             LanguageChange(menu_arguments[select], read_buffer);
             return 0;
         } else if (select == DEBUG_ROW_ITEM_SET) {
-            DebugGetItem(&GetSaveData()->user_data, item_set_no[menu_arguments[select]]);
+            CUserDataManager *user = &GetSaveData()->user_data;
+            DebugGetItem(user, item_set_no[menu_arguments[select]]);
             return 0;
         } else if (select == DEBUG_ROW_SAVE_DATA) {
             InitSaveDataEdit(&MenuBuffer);
@@ -717,9 +723,6 @@ static int MenuLoop() {
     }
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mainloop", MenuLoop__Fv);
-#endif
 void MenuExit(void) {
     GamePad__2.AutoRepeatOff();
     mgCloseFont();
