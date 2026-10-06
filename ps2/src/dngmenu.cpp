@@ -134,6 +134,7 @@ extern char at_3451[];
 extern float stepCntTbl_1501[2];
 extern s16 get_moji_tbl_1524[4][4];
 extern s16 put_moji_tbl_1525[4][2];
+int CheckGeoramaMateria(TRESURE_BOX_FLOOR_INFO *tresure, int floor, int *materia);
 static void DrawDngRoomInfo(DNGMAP_ROOM_INFO *room);
 static void DrawGeoramaMateria(int y, char *title, int materia_num, int *materia, int tex_block);
 extern s16 TreeMapSaveDispY;
@@ -1847,7 +1848,6 @@ void CMenuTreeMap::MsgInit() {
         help->SetMovePosGyou(1, 600, help_y);
     }
 }
-#ifdef NONMATCHING
 int CMenuTreeMap::Step() {
     int result = DNG_TREE_MAP_CONTINUE;
     CMenuKeyFunc *key = MenuCommonInfo;
@@ -2105,7 +2105,7 @@ int CMenuTreeMap::Step() {
                 int loop_no;
                 int map_no;
                 MakeDngTreeMapJumpNo(dng_no, NextFloorGlid_2836->room.floor_id, &loop_no, &map_no);
-                if (MenuMainScene->now_map_no == map_no) {
+                if (MenuMainScene->GetNowMapNo() == map_no) {
                     MenuSePlay(5);
                     break;
                 }
@@ -2444,9 +2444,6 @@ int CMenuTreeMap::Step() {
     }
     return result;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dngmenu", Step__12CMenuTreeMapFv);
-#endif
 void CMenuTreeMap::Draw() {
     float target[2];
     if ((mode & 2) && unk_11a == 1) {
