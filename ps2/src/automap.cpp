@@ -1795,24 +1795,23 @@ float CAutoMapGen::GetNaviDistance(float *pos) {
 }
 #ifdef NONMATCHING
 void CAutoMapGen::UpdateNaviMap(float *pos, int depth) {
-    int x;
     int z;
+    int x;
     int steps;
-    float sizeX;
-    u32 wall;
     int row;
-    int col;
     CAutoMapParts *cell;
-    float sizeZ;
-    int i;
     int changed;
+    u32 wall;
+    int i;
+    float sizeX;
+    int col;
     if (grid == NULL || navi_enable == 0) {
         return;
     }
     navi_depth = depth;
     sizeX = cell_w;
     x = (int)((pos[0] + 0.5f * sizeX) / sizeX);
-    sizeZ = cell_d;
+    float sizeZ = cell_d;
     z = (int)((pos[2] + 0.5f * sizeZ) / sizeZ);
     if (x < 0) {
         x = 0;
