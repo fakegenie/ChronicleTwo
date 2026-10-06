@@ -8333,16 +8333,18 @@ void MenuWeaponStatusInfoFormSet(CGameDataUsed *item, CDataWeapon *data) {
 extern s8 argtblno_7927[][6];
 extern s8 sel_7928[][6];
 extern s8 conv_7932[];
-#ifdef NONMATCHING
 #pragma divbyzerocheck on
 int MenuItemSelectDiffer(int select) {
     if (CMenuItemInfoPt->viewing_weapon) {
         return 0;
     }
-    CMenuKeyFunc *key = MenuCommonInfo;
-    MENU_INPUTKEY_ARG *arg = &item_menu_argtbl[select];
-    key->key_arg = arg;
-    int prev_arg_no = CMenuItemInfoPt->key_arg_no;
+    MENU_INPUTKEY_ARG *arg;
+    int prev_arg_no;
+    CMenuKeyFunc *key;
+    key = MenuCommonInfo;
+    key->key_arg = &item_menu_argtbl[select];
+    arg = &item_menu_argtbl[select];
+    prev_arg_no = CMenuItemInfoPt->key_arg_no;
     switch (prev_arg_no) {
         case 2: {
             s16 line = key->cursor / item_menu_argtbl[2].disp_columns - key->top_line;
@@ -8410,9 +8412,6 @@ int MenuItemSelectDiffer(int select) {
     return 1;
 }
 #pragma divbyzerocheck reset
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menusys", MenuItemSelectDiffer__Fi);
-#endif
 void CMenuItemInfo::CheckLoadItemNo() {
     if (view_mode == 0) {
         SetMenuLoadItemNo(0);
@@ -10254,7 +10253,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_7729__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_7730__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_7731__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_7732__DATA);
-INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_7968__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_8083__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_8084__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menusys", at_8199__DATA);
