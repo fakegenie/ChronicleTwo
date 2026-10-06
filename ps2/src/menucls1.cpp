@@ -32,7 +32,6 @@ extern char *MenuHatena_1byte_897;
 extern signed char init_898;
 extern char at_905__4[];
 extern char at_906__4[];
-extern char *MenuBigNum[];
 extern signed char *sn_944[];
 extern char at_1328[];
 extern char at_1512__3[];

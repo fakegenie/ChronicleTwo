@@ -110,8 +110,6 @@ extern s8 mes_cord_conv_1193[16][2];
 
 static inline unsigned int align16_blocks(unsigned int n);
 
-int menu_spi_analyze_func_strcut1(MENU_SPI_ANALYZE_STRUCT1 *table, char *name);
-
 int menu_dtype_init(CMenuPosDataForm *form, SPI_STACK *stack, int argc);
 
 extern "C" MENU_FORM_ACTION

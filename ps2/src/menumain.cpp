@@ -67,10 +67,8 @@ void GetPhotoNameStr(int photoNo, char *name);
 void MenuPolygonSetEnv(void);
 void MenuPolygonEnvReset(void);
 int PauseEnable(int enable);
-void SetupUnitMan(CScene *scene, CUserDataManager *userData, int unit, ROBO_INFO_DATA *robo);
 void EdEventMenuExit(void);
 void MenuInventInit(mgCMemory *memory, int *args, int page);
-void MenuAquaInit(mgCMemory *memory, int *args, int page);
 short CheckEventDay(int *day);
 void MenuWorldTrans(void);
 void MenuDebugModeDraw(void);
@@ -204,7 +202,6 @@ extern char at_2344[];
 extern char at_2345[];
 extern char at_2450[];
 extern char *filetbl_2141[];
-int ReadBGSync(void);
 
 void MenuScreenBlackBeltSet(int enable) {
 }

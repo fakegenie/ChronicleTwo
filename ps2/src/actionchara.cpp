@@ -61,7 +61,6 @@ struct ThrowItemTable {
     int item_no[19];
 };
 extern ThrowItemTable at_1398;
-extern CMonsterMan *ActiveMonster;
 extern float at_3289[4];
 extern float at_3291[4];
 extern char at_2423[];

@@ -64,10 +64,6 @@ extern void (*LoopExit[])();
 extern PAD_TABLE_ENTRY pad_table[];
 extern ANALOG_TABLE_ENTRY analog_table[];
 
-void LoadFilePictureName();
-int get_gajji_id_from_monster_progress_table(int monster_no, int *level);
-int GetMonsterProgressTableNo(int level, int monster_no);
-
 extern CFont Font;
 extern mgCMemory MainBuffer;
 extern int menu_mode;

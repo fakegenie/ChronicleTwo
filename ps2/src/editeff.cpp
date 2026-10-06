@@ -34,7 +34,6 @@ extern u32 EffectState;
 extern CPaintEffect *PaintEffect;
 extern CStarEffect _StarEffect[star_effect_count];
 extern mgCMemory CurPartsBuff;
-extern CPlaceAnime PlaceAnime[place_anime_count];
 
 void EditSetEffectBuffer(mgCMemory *memory) {
     mgCTexture *texture = mgTexManager.GetTexture(at_821__5, -1);

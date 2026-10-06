@@ -439,8 +439,6 @@ extern "C" char at_4935[];
 
 void MENU_BASETEXINFO_Init(MENU_BASETEXINFO *info);
 
-mgCTexture *GetMenuItemIconTexInfo(int itemNo, int index);
-
 void ConvMGIRECTtoINTtbl(mgRect<int> rect, int *corners);
 
 void PushPrimRepeat(mgCDrawPrim *prim, float *positions, int *texCoords, int count);
@@ -453,14 +451,6 @@ int DrawMenuNumber(mgCDrawPrim *prim, int number, int align, mgRect<int> rect, m
                    int step_y);
 
 void DrawRandamLine(mgCDrawPrim *prim, int *points, int smoothing, int count, u8 *color);
-
-mgCTexture *GetMenuDlTexture(void);
-
-float *GetMenuMainFrameLeftTopPos(int frame);
-
-void *GetMenuMainIconChar(int iconNo);
-
-CStarDust *CheckNotRunStarDust(CStarDust *dusts, int count);
 
 void InitInitBuildUpInfoEffectPos();
 

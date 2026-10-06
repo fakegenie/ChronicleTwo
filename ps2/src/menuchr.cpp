@@ -108,7 +108,6 @@ extern "C" void BuildBase__16CEffectScriptManFPcP1iP1iP9mgCMemoryi(CEffectScript
 extern "C" int DeleteBlock__17mgCTextureManagerFi(void *, int);
 extern "C" int GetPutPosXY__16CMenuPosDataFormFPcRiRi(CMenuPosDataForm *, char *, int *, int *);
 extern "C" void MenuPosStep__12CMenuKeyFuncFPiPi(CMenuKeyFunc *, int *, int *);
-void SetupUnitMan(CScene *scene, CUserDataManager *userData, int unit, ROBO_INFO_DATA *robo);
 void GetBajjiPosition(CMenuPosDataForm *form, int slot, int unused, int *pos);
 void SetSwordBlurEffect(CCharacter2 *chara, mgCMemory *stack, int blur_type);
 
@@ -531,7 +530,6 @@ static void MenuItemCharaDataLoadPack(int chara_no, CActionChara *chara, CAction
 extern u16 menu_chr_memorytbl[MENU_CHARA_LOAD_MAX];
 extern u16 menu_robo_memorytbl[MENU_CHARA_LOAD_MAX];
 extern char at_1078__2[];
-int ReadBGSync(void);
 
 void InitMenuBGReadInfo2(MENU_BGREAD_INFO2 *info) {
     info->reading = 0;

@@ -127,7 +127,6 @@ extern s8 GeoramaMateriaInfoDrawPage;
 extern s16 GeoramaMateriaNum;
 extern u8 GeoramaMateriaInfoDrawFlag;
 extern s8 DngAskMessageDrawFlag;
-extern s16 TreeMapSaveNum;
 extern float TreeMapSaveHopCount;
 extern char at_3451[];
 extern float stepCntTbl_1501[2];
@@ -156,7 +155,6 @@ extern char at_1018__5[];
 extern char at_1019__4[];
 extern char at_1020__3[];
 extern char at_1021__3[];
-int SearchMapNo(char *mapName);
 
 void CDngFreeMap::Initialize() {
     float left = 120.0f;

@@ -42,7 +42,6 @@
 #include "mapinfo.hpp"
 #include "gameutil.hpp"
 
-extern mgCTextureManager mgTexManager;
 extern short gift_item_tbl[][3];
 extern int LanguageCode;
 extern char *dung_progtxt_notlift_mons[];
@@ -59,21 +58,16 @@ extern char at_2589[];
 extern char at_2809[];
 extern int no_score_uv[][4];
 extern int guard_score_uv[][4];
-extern CDamageScore DamageScoreMons[8];
 extern int dmg_sc_cnt_2104;
 extern s8 init_2105;
 extern SPI_TAG_PARAM mos_data_anlyze_tag[];
-extern CUserDataManager *DngUserData;
-extern CEffectScriptMan *FxScriptMan;
 extern "C" CCameraControl *GetCamera__6CSceneFi(CScene *, int);
 extern "C" void SethitEffect__15CHitEffectImageFPfPfffffii(CHitEffectImage *, float *, float *, float, float, float, float, int, int);
-float SearchArea(CScene *scene, float *from, float *to, float range);
 void HitEffectSet(CScene *scene, float *point, int flags);
 void GuardEffectSet(CScene *scene, float *point, int play_script);
 void HitScoreSet(float *pos, int type, int value);
 int CheckGiftPack(CActiveMonster *monster, CColPrim *prim);
 int _MONSTER_NAME(SPI_STACK *stack, int argument_count);
-void LoadMonsterLanguage(int language);
 
 int CActiveMonster::IsDraw(int view_state) {
     if (chara_kind != ACTION_KIND_SCRIPT)

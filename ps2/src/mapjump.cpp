@@ -49,25 +49,6 @@ extern char at_894__2[];
 extern char at_914__4[];
 extern char at_950__4[];
 extern char at_1091__2[];
-int GetMainMapNo(void);
-int GetSubMapNo(void);
-void ClearSubMapNo(void);
-void SetMainMapInfo(MapJumpMapInfo *info);
-void SetSubMapInfo(MapJumpMapInfo *info);
-void SetScriptBuffer(mgCMemory *buffer);
-void PreLoadSync(void);
-int MapJump(CScene *scene, SCN_LOADMAP_INFO2 *info, int mapIndex);
-int GetLoadMapInfo(SCN_LOADMAP_INFO2 *info, int mapNo);
-int LoadSubMap(CScene *scene, int subMapNo, int flag);
-void LoadMapScript(char *mapName);
-void ReloadMapScript(void);
-void LoadScript(char *path);
-int GetOldInteriorMapNo(void);
-void InitInterior(void);
-int InInterior(void);
-void GotoInterior(CScene *scene, int interiorNo);
-void DeleteInterior(CScene *scene);
-int InteriorMapJump(CScene *scene, int interiorNo);
 
 int GetMainMapNo(void) {
     return NowMainMapNo;

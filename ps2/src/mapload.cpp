@@ -69,7 +69,6 @@ extern char at_1437[];
 extern char at_1438[];
 extern char at_1439[];
 extern char at_1544[];
-MAP_TIME_BAND GetTimeBand(float time);
 int mapDummy(SPI_STACK *stack, int argument_count);
 static int IsAddMode();
 int mapPARTS(SPI_STACK *stack, int argument_count);

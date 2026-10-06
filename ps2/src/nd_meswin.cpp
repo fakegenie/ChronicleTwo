@@ -166,8 +166,6 @@ extern char at_2567[];
 
 extern char at_1124[];
 
-char *GetTopAddress(char *text, int size, int id);
-
 #include "common.h"
 
 void MySetPrim(mgCDrawPrim *prim, int mode, int bilinear) {

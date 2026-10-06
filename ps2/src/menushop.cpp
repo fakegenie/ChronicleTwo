@@ -32,8 +32,6 @@
 
 mgCMemory MenuLocalStack;
 
-CInventUserData *GetInventUserDataPtr();
-
 extern "C" int CheckRobotCore__16CUserDataManagerFv(CUserDataManager *);
 extern "C" int AddYarikomiMedal__16CUserDataManagerFi(CUserDataManager *, int);
 extern "C" void *__ct__18CScriptInterpreterFv(void *);
