@@ -1469,10 +1469,9 @@ int mapFUNC_POINT_END(SPI_STACK *stack, int argc) {
             return 0;
         }
         mngr = &mapNowMapParts->pGetData()->func_point_mngr;
-        goto update;
+    } else {
+        mngr = &mapMap->func_point;
     }
-    mngr = &mapMap->func_point;
-update:
     mngr->UpdateStatus();
     return 1;
 }
