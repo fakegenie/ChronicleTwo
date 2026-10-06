@@ -605,16 +605,16 @@ void DeleteLoadThread(void) {
         ThreadRunning = 0;
     }
 }
-#ifdef NONMATCHING
 void StepDataLoading(void *arg) {
     char path[0x80];
     char bgm_path[0x80];
     int file_size;
     int pack_size;
+    mgCTextureManager *tex_manager = &mgTexManager;
     u_long128 *buffer = ReadBuffer;
     SubGameInfo *info = GetNowSubGameInfo();
-    mgCMemory *memory = info->load_buff;
     CScene *scene = info->scene;
+    mgCMemory *memory = info->load_buff;
 
     if (memory == NULL) {
         memory = scene->GetStack(5);
@@ -628,122 +628,238 @@ void StepDataLoading(void *arg) {
     } else {
         strcpy(path, at_1306__6);
     }
-    if (LoadFileBG(path, buffer, &pack_size) != 0) {
-        while (ReadBGSync() != 0) {
-            switch_thread();
-        }
-        UkiRod = new (memory->Alloc(0x68)) CCharacter2;
-        UkiRod->Initialize();
-        LureRod = new (memory->Alloc(0x68)) CCharacter2;
-        LureRod->Initialize();
-        Uki = new (memory->Alloc(0x68)) CCharacter2;
-        Uki->Initialize();
-        Lure = new (memory->Alloc(0x68)) CCharacter2;
-        Lure->Initialize();
-        Hari = new (memory->Alloc(0x68)) CCharacter2;
-        Hari->Initialize();
-        CursorChara[0] = new (memory->Alloc(0x68)) CCharacter2;
-        CursorChara[0]->Initialize();
-        CursorChara[1] = new (memory->Alloc(0x68)) CCharacter2;
-        CursorChara[1]->Initialize();
-        EsaChara = NULL;
-        FishChara = NULL;
-        BG_READ_INFO *read_info = GetReadBGFile(0);
-        if (read_info != NULL) {
-            u_int *pack = (u_int *)read_info->buffer;
-            int bgm_no = scene->GetDefBgmNo(0x205);
-            if (scene->CheckLoadBGM(bgm_no) != 0) {
-                scene->GetBgmFile(bgm_path, bgm_no);
-                u_int *bgm_pack = GetPackFile(pack, bgm_path, NULL);
-                if (bgm_pack != NULL) {
-                    BgmReadFlag = 1;
-                    scene->LoadBGMPack(bgm_no, bgm_pack);
-                }
-            }
-            switch_thread();
-            scene->PlayBGM(0, -1, 1.0f);
-            if (info->rod_no == 0x12F) {
-                u_int *rod_pack = GetPackFile(pack, at_1307__6, NULL);
-                if (rod_pack != NULL) {
-                    UkiRod->LoadPack(rod_pack, at_932__4, memory, memory, memory, FishingTexb, NULL);
-                }
-            } else {
-                u_int *rod_pack = GetPackFile(pack, at_1308__6, NULL);
-                if (rod_pack != NULL) {
-                    UkiRod->LoadPack(rod_pack, at_932__4, memory, memory, memory, FishingTexb, NULL);
-                }
-            }
-            if (UkiRod->CObjectFrame::frame != NULL) {
-                u_int *cursor_pack = GetPackFile(pack, at_1309__5, NULL);
-                if (cursor_pack != NULL) {
-                    CursorChara[0]->LoadPack(cursor_pack, at_932__4, memory, memory, memory, FishingTexb, NULL);
-                }
-                u_int *system_pack = GetPackFile(pack, at_1310__5, &pack_size);
-                if (system_pack != NULL) {
-                    u_char *copy = (u_char *)memory->Alloc((pack_size + 15) / 16);
-                    if (copy != NULL) {
-                        memcpy(copy, system_pack, pack_size);
-                        mgTexManager.EnterIMGFile(copy, SystemTexb, NULL, NULL);
-                    }
-                }
-                u_int *fish_pack = GetPackFile(pack, at_1311__4, &pack_size);
-                if (fish_pack != NULL) {
-                    u_char *copy = (u_char *)memory->Alloc((pack_size + 15) / 16);
-                    if (copy != NULL) {
-                        memcpy(copy, fish_pack, pack_size);
-                        mgTexManager.EnterIMGFile(copy, SystemTexb, NULL, NULL);
-                    }
-                }
-                u_int *uki_pack = GetPackFile(pack, at_1312__2, NULL);
-                if (uki_pack != NULL) {
-                    Uki->LoadPack(uki_pack, at_932__4, memory, memory, memory, FishingTexb, NULL);
-                }
-                u_int *hari_pack = GetPackFile(pack, at_1313__2, NULL);
-                if (hari_pack != NULL) {
-                    Hari->LoadPack(hari_pack, at_932__4, memory, memory, memory, FishingTexb, NULL);
-                }
-                UkiFrame = Uki->CObjectFrame::frame;
-                HariFrame = Hari->CObjectFrame::frame;
-                if (UkiFrame != NULL && HariFrame != NULL) {
-                    MainChara = scene->GetCharacter(scene->player_chara);
-                    if (MainChara != NULL && MainChara->CObjectFrame::frame != NULL) {
-                        RodHand = MainChara->CObjectFrame::frame->SearchFrame(at_1314__2);
-                        if (RodHand != NULL) {
-                            UkiRod->CObjectFrame::frame->SetReference(RodHand);
-                            InitRodPoint(RodHand, UkiRod->CObjectFrame::frame);
-                            InitUkiObj(0, UkiFrame, HariFrame);
-                            EsaStack.stSetBuffer(memory->Alloc(8000), 8000);
-                            FishSnd = -1;
-                            FanSnd = -1;
-                            SndStack.stSetBuffer(memory->Alloc(100), 100);
-                            if (LoadFile2(at_1315__4, buffer, NULL, 0) != 0) {
-                                sndInitPort(5);
-                                FishSnd = sndLoadSound(5, (u_int *)buffer, memory);
-                            }
-                            if (LoadFile2(at_1058__3, buffer, NULL, 0) != 0) {
-                                sndInitPort(8);
-                                SndStack.stack_used = 0;
-                                SndStack.lock = 0;
-                                FanSnd = sndLoadSound(8, (u_int *)buffer, &SndStack);
-                            }
-                            if (info->dungeon != 0) {
-                                if (LoadFile2(at_917__6, buffer, NULL, 0) != 0) {
-                                    MainChara->LoadPackNoLine((u_int *)buffer, at_932__4, memory, memory, memory, 0, NULL);
-                                }
-                            }
-                            sgRestartFishing(info);
-                            printf(at_1316__2, (memory->stack_size - memory->stack_used) * 16 / 1024);
-                        }
-                    }
-                }
-            }
+    if (LoadFileBG(path, buffer, &pack_size) == 0) {
+        step_end_flag = 1;
+        return;
+    }
+    while (ReadBGSync() != 0) {
+        switch_thread();
+    }
+    CCharacter2 *chara;
+    if ((chara = (CCharacter2 *)operator new(sizeof(CCharacter2), memory->Alloc(0x68))) != NULL) {
+        *(void ***)chara = __vt__9mgCObject;
+        chara->Initialize();
+        *(void ***)chara = __vt__7CObject;
+        chara->Initialize();
+        *(void ***)chara = __vt__12CObjectFrame;
+        chara->Initialize();
+        *(void ***)chara = __vt__11CCharacter2;
+        chara->shadow_link.num = 0;
+        chara->shadow_link.dst_frame = 0;
+        chara->shadow_link.src_frame = 0;
+        chara->Initialize();
+    }
+    UkiRod = chara;
+    if ((chara = (CCharacter2 *)operator new(sizeof(CCharacter2), memory->Alloc(0x68))) != NULL) {
+        *(void ***)chara = __vt__9mgCObject;
+        chara->Initialize();
+        *(void ***)chara = __vt__7CObject;
+        chara->Initialize();
+        *(void ***)chara = __vt__12CObjectFrame;
+        chara->Initialize();
+        *(void ***)chara = __vt__11CCharacter2;
+        chara->shadow_link.num = 0;
+        chara->shadow_link.dst_frame = 0;
+        chara->shadow_link.src_frame = 0;
+        chara->Initialize();
+    }
+    LureRod = chara;
+    if ((chara = (CCharacter2 *)operator new(sizeof(CCharacter2), memory->Alloc(0x68))) != NULL) {
+        *(void ***)chara = __vt__9mgCObject;
+        chara->Initialize();
+        *(void ***)chara = __vt__7CObject;
+        chara->Initialize();
+        *(void ***)chara = __vt__12CObjectFrame;
+        chara->Initialize();
+        *(void ***)chara = __vt__11CCharacter2;
+        chara->shadow_link.num = 0;
+        chara->shadow_link.dst_frame = 0;
+        chara->shadow_link.src_frame = 0;
+        chara->Initialize();
+    }
+    Uki = chara;
+    if ((chara = (CCharacter2 *)operator new(sizeof(CCharacter2), memory->Alloc(0x68))) != NULL) {
+        *(void ***)chara = __vt__9mgCObject;
+        chara->Initialize();
+        *(void ***)chara = __vt__7CObject;
+        chara->Initialize();
+        *(void ***)chara = __vt__12CObjectFrame;
+        chara->Initialize();
+        *(void ***)chara = __vt__11CCharacter2;
+        chara->shadow_link.num = 0;
+        chara->shadow_link.dst_frame = 0;
+        chara->shadow_link.src_frame = 0;
+        chara->Initialize();
+    }
+    Lure = chara;
+    if ((chara = (CCharacter2 *)operator new(sizeof(CCharacter2), memory->Alloc(0x68))) != NULL) {
+        *(void ***)chara = __vt__9mgCObject;
+        chara->Initialize();
+        *(void ***)chara = __vt__7CObject;
+        chara->Initialize();
+        *(void ***)chara = __vt__12CObjectFrame;
+        chara->Initialize();
+        *(void ***)chara = __vt__11CCharacter2;
+        chara->shadow_link.num = 0;
+        chara->shadow_link.dst_frame = 0;
+        chara->shadow_link.src_frame = 0;
+        chara->Initialize();
+    }
+    Hari = chara;
+    if ((chara = (CCharacter2 *)operator new(sizeof(CCharacter2), memory->Alloc(0x68))) != NULL) {
+        *(void ***)chara = __vt__9mgCObject;
+        chara->Initialize();
+        *(void ***)chara = __vt__7CObject;
+        chara->Initialize();
+        *(void ***)chara = __vt__12CObjectFrame;
+        chara->Initialize();
+        *(void ***)chara = __vt__11CCharacter2;
+        chara->shadow_link.num = 0;
+        chara->shadow_link.dst_frame = 0;
+        chara->shadow_link.src_frame = 0;
+        chara->Initialize();
+    }
+    CursorChara[0] = chara;
+    if ((chara = (CCharacter2 *)operator new(sizeof(CCharacter2), memory->Alloc(0x68))) != NULL) {
+        *(void ***)chara = __vt__9mgCObject;
+        chara->Initialize();
+        *(void ***)chara = __vt__7CObject;
+        chara->Initialize();
+        *(void ***)chara = __vt__12CObjectFrame;
+        chara->Initialize();
+        *(void ***)chara = __vt__11CCharacter2;
+        chara->shadow_link.num = 0;
+        chara->shadow_link.dst_frame = 0;
+        chara->shadow_link.src_frame = 0;
+        chara->Initialize();
+    }
+    CursorChara[1] = chara;
+    EsaChara = NULL;
+    FishChara = NULL;
+    UkiRod->Initialize();
+    LureRod->Initialize();
+    Uki->Initialize();
+    Lure->Initialize();
+    Hari->Initialize();
+    CursorChara[0]->Initialize();
+    CursorChara[1]->Initialize();
+    BG_READ_INFO *read_info = GetReadBGFile(0);
+    if (read_info == NULL) {
+        step_end_flag = 1;
+        return;
+    }
+    u_int *pack = (u_int *)read_info->buffer;
+    int bgm_no = scene->GetDefBgmNo(0x205);
+    if (scene->CheckLoadBGM(bgm_no) != 0) {
+        scene->GetBgmFile(bgm_path, bgm_no);
+        u_int *bgm_pack = GetPackFile(pack, bgm_path, NULL);
+        if (bgm_pack != NULL) {
+            BgmReadFlag = 1;
+            scene->LoadBGMPack(bgm_no, bgm_pack);
         }
     }
+    switch_thread();
+    scene->PlayBGM(0, -1, 1.0f);
+    if (info->rod_no == 0x12F) {
+        u_int *rod_pack;
+        if ((rod_pack = GetPackFile(pack, at_1307__6, NULL)) != NULL) {
+            UkiRod->LoadPackNoLine(rod_pack, at_932__4, memory, memory, memory, FishingTexb, NULL);
+        }
+    } else {
+        u_int *rod_pack;
+        if ((rod_pack = GetPackFile(pack, at_1308__6, NULL)) != NULL) {
+            UkiRod->LoadPackNoLine(rod_pack, at_932__4, memory, memory, memory, FishingTexb, NULL);
+        }
+    }
+    if (UkiRod->CObjectFrame::frame == NULL) {
+        step_end_flag = 1;
+        return;
+    }
+    u_int *cursor_pack = GetPackFile(pack, at_1309__5, NULL);
+    if (cursor_pack != NULL) {
+        CursorChara[0]->LoadPackNoLine(cursor_pack, at_932__4, memory, memory, memory, FishingTexb, NULL);
+    }
+    u_int *system_pack;
+    if ((system_pack = GetPackFile(pack, at_1310__5, &pack_size)) != NULL) {
+        int qwords;
+        if ((u_int)pack_size & 0xF) {
+            qwords = ((u_int)pack_size >> 4) + 1;
+        } else {
+            qwords = (u_int)pack_size >> 4;
+        }
+        u_char *copy = (u_char *)memory->Alloc(qwords);
+        if (copy != NULL) {
+            memcpy(copy, system_pack, pack_size);
+            tex_manager->EnterIMGFile(copy, SystemTexb, NULL, NULL);
+        }
+    }
+    u_int *fish_pack;
+    if ((fish_pack = GetPackFile(pack, at_1311__4, &pack_size)) != NULL) {
+        int qwords;
+        if ((u_int)pack_size & 0xF) {
+            qwords = ((u_int)pack_size >> 4) + 1;
+        } else {
+            qwords = (u_int)pack_size >> 4;
+        }
+        u_char *copy = (u_char *)memory->Alloc(qwords);
+        if (copy != NULL) {
+            memcpy(copy, fish_pack, pack_size);
+            tex_manager->EnterIMGFile(copy, SystemTexb, NULL, NULL);
+        }
+    }
+    u_int *uki_pack = GetPackFile(pack, at_1312__2, NULL);
+    if (uki_pack != NULL) {
+        Uki->LoadPackNoLine(uki_pack, at_932__4, memory, memory, memory, FishingTexb, NULL);
+    }
+    u_int *hari_pack;
+    if ((hari_pack = GetPackFile(pack, at_1313__2, NULL)) != NULL) {
+        Hari->LoadPackNoLine(hari_pack, at_932__4, memory, memory, memory, FishingTexb, NULL);
+    }
+    mgCFrame *uki_frame = Uki->CObjectFrame::frame;
+    UkiFrame = uki_frame;
+    mgCFrame *hari_frame = Hari->CObjectFrame::frame;
+    HariFrame = hari_frame;
+    if (uki_frame == NULL || hari_frame == NULL) {
+        step_end_flag = 1;
+        return;
+    }
+    CCharacter2 *main_chara;
+    MainChara = main_chara = scene->GetCharacter(scene->player_chara);
+    if (main_chara == NULL || main_chara->CObjectFrame::frame == NULL) {
+        step_end_flag = 1;
+        return;
+    }
+    RodHand = main_chara->CObjectFrame::frame->SearchFrame(at_1314__2);
+    if (RodHand == NULL) {
+        step_end_flag = 1;
+        return;
+    }
+    UkiRod->CObjectFrame::frame->SetReference(RodHand);
+    InitRodPoint(RodHand, UkiRod->CObjectFrame::frame);
+    InitUkiObj(0, UkiFrame, HariFrame);
+    EsaStack.stSetBuffer(memory->Alloc(8000), 8000);
+    FishSnd = -1;
+    FanSnd = -1;
+    SndStack.stSetBuffer(memory->Alloc(100), 100);
+    if (LoadFile2(at_1315__4, buffer, NULL, 0) != 0) {
+        sndInitPort(5);
+        FishSnd = sndLoadSound(5, (u_int *)buffer, memory);
+    }
+    if (LoadFile2(at_1058__3, buffer, NULL, 0) != 0) {
+        sndInitPort(8);
+        SndStack.stack_used = 0;
+        SndStack.lock = 0;
+        FanSnd = sndLoadSound(8, (u_int *)buffer, &SndStack);
+    }
+    if (info->dungeon != 0) {
+        if (LoadFile2(at_917__6, buffer, NULL, 0) != 0) {
+            MainChara->LoadPack((u_int *)buffer, at_932__4, memory, memory, memory, 0, NULL);
+        }
+    }
+    sgRestartFishing(info);
+    printf(at_1316__2, (memory->stack_size - memory->stack_used) * 16 / 1024);
     step_end_flag = 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/fishing", StepDataLoading__FPv);
-#endif
 int sgBreakFishing(void) {
     DeleteLoadThread();
     sgExitFishing(GetNowSubGameInfo());
