@@ -8111,13 +8111,13 @@ void MenuWeaponBuildUpDraw(int &tex_block) {
         }
     }
     prim->End();
+    int center_y = top_y + ((height - 28) >> 1);
     int name_x = 0x3A;
     int name_w = 0xAC;
-    int center_y = top_y + ((height - 28) >> 1);
+    int list_x = 0x124;
+    int list_y[3] = {0};
     int msg_x = 0x46;
     int list_msg_x = 0x130;
-    int list_y[3] = {0};
-    int list_x = 0x124;
     if (LanguageCode > 0) {
         list_x = 0x11A;
         name_x = 0x32;
@@ -8219,11 +8219,12 @@ void MenuWeaponBuildUpDraw(int &tex_block) {
             prim->Color(0x80, 0x80, 0x80, 0x80);
             for (row = 0; row < 3; row++) {
                 for (int n = 0; n < mos_rows[row]; n++) {
+                    int k;
                     int x = 232;
                     for (int col = 0; col < 5; col++) {
                         mgRect<int> tile(backboard_table_x_7625[col], backboard_table_y_7626[row],
                                          backboard_table_w_7627[col], 28);
-                        for (int k = 0; k < mos_repeat_table_x_7694[col]; k++) {
+                        for (k = 0; k < mos_repeat_table_x_7694[col]; k++) {
                             PrimQuad(prim, x, board_y, tile);
                             x += tile.right;
                         }
@@ -8252,7 +8253,7 @@ void MenuWeaponBuildUpDraw(int &tex_block) {
         if (mos_names[0] != NULL) {
             int text_y = mos_y + 4;
             CMenuFont font;
-            for (i = 0; i < 3; i++) {
+            for (int i = 0; i < 3; i++) {
                 if (mos_names[i] != NULL) {
                     font.SetStr(mos_names[i]);
                     font.SetPos(text_x, text_y);
@@ -8260,8 +8261,8 @@ void MenuWeaponBuildUpDraw(int &tex_block) {
                 }
                 text_y += 32;
             }
-            int note_y = mos_y + 100;
             int note_x = 0x100;
+            int note_y = mos_y + 100;
             if (LanguageCode == 1) {
                 note_x += 0x12;
             } else if (CheckNowEurope()) {
