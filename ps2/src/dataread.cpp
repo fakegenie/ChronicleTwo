@@ -209,12 +209,14 @@ int LoadFileBG(char *name, u_long128 *buffer, int *out_size) {
     }
     i = 0;
     info = bg_read_info;
-search:
-    if (info->busy != 0) {
+    for (;;) {
+        if (info->busy == 0) {
+            break;
+        }
         i++;
         info++;
-        if (i < 32) {
-            goto search;
+        if (i >= 32) {
+            break;
         }
     }
     if (i == 32) {
