@@ -1474,19 +1474,18 @@ int CActionChara::HumanMoveIF() {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/actionchara", HumanMoveIF__12CActionCharaFv);
 #endif
-#ifdef NONMATCHING
 int CActionChara::HumanShrowMoveIF() {
-    sceVu0FVECTOR position;
-    sceVu0FVECTOR move_velocity;
-    sceVu0FVECTOR target_position;
-    CActionChara *target;
     float         camera_angle;
+    sceVu0FVECTOR position;
     float         stick_x;
     float         stick_y;
-    float         move_x;
+    sceVu0FVECTOR move_velocity;
+    CActionChara *target;
     float         move_z;
-    float         abs_x;
-    float         abs_z;
+    sceVu0FVECTOR target_position;
+    float         rotation;
+    float         speed;
+    float         move_x;
 
     GetPosition(position);
     sceVu0CopyVector(move_velocity, velocity);
@@ -1510,44 +1509,30 @@ int CActionChara::HumanShrowMoveIF() {
     }
     SetMotion("\x8E\x9D\x82\xBF\x8F\xE3\x82\xB0\x92\xE2\x8E~", 0, 1);
     if (move_x != 0.0f || move_z != 0.0f) {
-        SetRotation(0.0f, unitRotation(CObjectFrame::frame, atan2f(move_x, move_z), 5.0f), 0.0f);
-        abs_x = move_x;
-        if (abs_x < 0.0f) {
-            abs_x = -abs_x;
-        }
-        abs_z = move_z;
-        if (abs_z < 0.0f) {
-            abs_z = -abs_z;
-        }
-        if (!(abs_x <= abs_z)) {
-            if (move_x < 0.0f) {
-                move_x = -move_x;
-            }
+        rotation = unitRotation(CObjectFrame::frame, atan2f(move_x, move_z), 5.0f);
+        SetRotation(0.0f, rotation, 0.0f);
+        if (mgAbs(move_x) > mgAbs(move_z)) {
+            speed = mgAbs(move_x);
         } else {
-            if (move_z < 0.0f) {
-                move_z = -move_z;
-            }
-            move_x = move_z;
+            speed = mgAbs(move_z);
         }
-        if (!(move_x <= 0.5f)) {
-            move_x = 0.5f;
+        if (speed > 0.5f) {
+            speed = 0.5f;
         }
         SetMotion("\x8E\x9D\x82\xBF\x8F\xE3\x82\xB0\x95\xE0\x82\xAB", 0, 1);
-        SetStep(0.5f * move_x);
+        SetStep(0.5f * speed);
     } else if (lock_on != 0) {
         target = (CActionChara *)nowScene__2->GetCharacter(target_no);
         if (target->chara_kind == ACTION_KIND_SCRIPT) {
             target->GetEntryObjectPos(0, 0, target_position);
-            SetRotation(0.0f, unitRotation(CObjectFrame::frame, atan2f(target_position[0] - position[0], target_position[2] - position[2]), 5.0f), 0.0f);
+            rotation = unitRotation(CObjectFrame::frame, atan2f(target_position[0] - position[0], target_position[2] - position[2]), 5.0f);
+            SetRotation(0.0f, rotation, 0.0f);
         }
     }
     sceVu0CopyVector(velocity, move_velocity);
     RockOn();
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/actionchara", HumanShrowMoveIF__12CActionCharaFv);
-#endif
 int CActionChara::HumanTameMoveIF() {
     float position[4];
     float movement[4];
