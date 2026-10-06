@@ -9,7 +9,13 @@
 int Check_Point_Poly3(float x, float y, float x0, float y0, float x1, float y1, float x2, float y2);
 static void MulMatrix3(float (*matrix)[4], float (*second)[4], float (*third)[4]);
 
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgFotI4__FPiPf);
+asm void mgFotI4(int *out, float *in) {
+    .set noreorder
+    lqc2 vf1, 0x0(a1)
+    vftoi4.xyzw vf1, vf1
+    jr ra
+    sqc2 vf1, 0x0(a0)
+}
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgCreateBox8__FPA4_fPfPf);
 void mgZeroVector(float *vector) {
     *(u_long128 *)vector = 0;
