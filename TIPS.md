@@ -345,3 +345,8 @@ only functions present in both objects can be replaced, the plain build keeps th
 - A retail `if` whose test sits at the bottom, reached by a forward `b` with the body laid out before it, is `while (cond) { ...; break; }`.
 - After a noreturn call such as `exit(0)`, retail's `b` past the loop increment is a `break`.
 - A ternary instead of if/else changes which branch's first instruction fills the delay slot (`MagnetParts`).
+- Initialise two float locals with `float a; float b; b = a = 0.0f;` instead of `float a = 0.0f; float b = 0.0f;`. This swapped which register gets the `mtc1 zero` versus the `mov.s`, and no declaration-order change did the same (`_RESET_CAMERA`).
+- In a branch that reads the same `float[]` locals twice, copying the elements into named locals before an earlier member call (`float fx = charaPos[0];` before `camera->FollowOn()`) reproduces retail loading them into callee-saved float registers before the call.
+- For a compute-then-store statement (`x * 50 / 60`), assigning back into the local and storing afterwards gave a different schedule from storing directly. Try both (`_SET_MOVIE_CC`).
+- Reading two fields into locals before a branch, in source order, matched `_GET_DEF_BGM_NO`.
+- The container mounts only the worktree, so helper templates and scripts must live under `ps2/re/`, not in the scratchpad.
