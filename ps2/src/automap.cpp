@@ -1789,13 +1789,13 @@ float CAutoMapGen::GetNaviDistance(float *pos) {
 }
 #ifdef NONMATCHING
 void CAutoMapGen::UpdateNaviMap(float *pos, int depth) {
-    int z;
-    int x;
     int steps;
+    int x;
+    u32 wall;
+    int changed;
+    int z;
     int row;
     CAutoMapParts *cell;
-    int changed;
-    u32 wall;
     int i;
     float sizeX;
     int col;
