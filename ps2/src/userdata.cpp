@@ -2737,13 +2737,15 @@ void CUserDataManager::AllWeaponRepair() {
     robo_data.parts[0].Repair(999);
     robo_data.AddPoint(999.0f);
 }
-#ifdef NONMATCHING
 void CUserDataManager::RefreshNPCStatus(int mode) {
     CGameDataUsed *repair_item[144];
+    int i;
+    int uses;
     int day = GetSaveData()->day;
+    float now = GetSaveData()->now_time;
     int refresh = 0;
-    float elapsed = GetSaveData()->now_time - npc_refresh_hour;
     int days = day - npc_refresh_day;
+    float elapsed = now - npc_refresh_hour;
 
     if (elapsed < 0.0f) {
         days--;
@@ -2757,28 +2759,24 @@ void CUserDataManager::RefreshNPCStatus(int mode) {
         refresh = 1;
     }
     if (refresh != 0) {
-        int time = fptosi(elapsed);
+        int time = (int)elapsed;
         if (NowPartyCharaID() == 0xB) {
-            int repair_num = 0;
-            if (time > 0) {
-                for (int i = 0; i < 144; i++) {
+            if (0 < time) {
+                int repair_num = 0;
+                for (i = 0; i < 144; i++) {
                     CGameDataUsed *item = GetUsedDataPtr(i);
                     if (item->used_type == USED_ITEM_TYPE_WEAPON && item->IsRepair() != 0) {
                         repair_item[repair_num++] = item;
                     }
                 }
-                if (repair_num > 0) {
-                    int uses = 0;
-                    if (time > 0) {
-                        while (uses < time) {
-                            if (UseNpcAbility(0xB, 3, 1) == 0) {
-                                time = uses;
-                                break;
-                            }
-                            uses++;
+                if (0 < repair_num) {
+                    for (uses = 0; uses < time; uses++) {
+                        if (UseNpcAbility(0xB, 3, 1) == 0) {
+                            time = uses;
+                            break;
                         }
                     }
-                    for (int i = 0; i < repair_num; i++) {
+                    for (i = 0; i < repair_num; i++) {
                         repair_item[i]->Repair(time * 2);
                     }
                 }
@@ -2794,10 +2792,10 @@ void CUserDataManager::RefreshNPCStatus(int mode) {
                     gain = 1.0f;
                 }
                 float total = (float)info->point + gain;
-                if (total > 1000.0f) {
+                if (1000.0f < total) {
                     info->point = max_point;
                 } else {
-                    info->point = fptosi(total);
+                    info->point = (int)total;
                 }
                 if (npc->max_npc_point < info->point) {
                     info->point = npc->max_npc_point;
@@ -2810,9 +2808,6 @@ void CUserDataManager::RefreshNPCStatus(int mode) {
         npc_refresh_hour = GetSaveData()->now_time;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/userdata", RefreshNPCStatus__16CUserDataManagerFi);
-#endif
 int CUserDataManager::GetFishingRodNo() {
     return chara_data[0].equip[0].item_no;
 }

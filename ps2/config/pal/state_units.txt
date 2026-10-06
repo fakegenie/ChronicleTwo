@@ -29,3 +29,4 @@ menushop drafts primer=u64div
 menumap primer=u64div
 menumain drafts primer=u64div
 gyorace primer=u64div
+userdata primer=u64div
