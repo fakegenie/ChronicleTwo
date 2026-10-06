@@ -1115,10 +1115,10 @@ int TitleModeKey() {
         }
         break;
     case TITLE_PHASE_PUSH_START:
-        CalcMenuAdd(&TitleInfo->menu_alpha, -12.0f, 0.0f);
-        CalcMenuAdd(&TitleInfo->cursor_alpha, -12.0f, 0.0f);
+        CalcMenuAdd(&TitleInfo->menu_alpha, float(-12.0), float(0.0));
+        CalcMenuAdd(&TitleInfo->cursor_alpha, float(-12.0), 0.0f);
         CalcMenuAdd(&TitleInfo->title_alpha, 8.0f, 128.0f);
-        CalcMenuAdd(&TitleInfo->omake_alpha, -8.0f, 0.0f);
+        CalcMenuAdd(&TitleInfo->omake_alpha, float(-8.0), 0.0f);
         if (start_pushed != 0) {
             sndSePlay(TitleEventSound, 0, 0);
             TitlePhase = TITLE_PHASE_MENU;
@@ -1129,8 +1129,8 @@ int TitleModeKey() {
         TitlePushStart_AlphaPlus = 0;
         int old_select = TitleInfo->select;
         CalcMenuAdd(&TitleInfo->title_alpha, -8.0f, 0.0f);
-        CalcMenuAdd(&TitleInfo->menu_alpha, 12.0f, 128.0f);
-        CalcMenuAdd(&TitleInfo->cursor_alpha, 12.0f, 128.0f);
+        CalcMenuAdd(&TitleInfo->menu_alpha, float(12.0), float(128.0));
+        CalcMenuAdd(&TitleInfo->cursor_alpha, float(12.0), float(128.0));
         if (GamePad__2.Down(PAD_UP) != 0) {
             TitleInfo->select--;
         }
@@ -1234,8 +1234,8 @@ int TitleModeKey() {
         break;
     case TITLE_PHASE_OMAKE_MENU: {
         TitlePushStart_AlphaPlus = 0;
-        CalcMenuAdd(&TitleInfo->menu_alpha, -8.0f, 0.0f);
-        CalcMenuAdd(&TitleInfo->cursor_alpha, 3.0f, 128.0f);
+        CalcMenuAdd(&TitleInfo->menu_alpha, float(-8.0), float(0.0));
+        CalcMenuAdd(&TitleInfo->cursor_alpha, float(3.0), float(128.0));
         int old_select = TitleInfo->omake_select;
         if (GamePad__2.Down(PAD_UP) != 0) {
             TitleInfo->omake_select--;
