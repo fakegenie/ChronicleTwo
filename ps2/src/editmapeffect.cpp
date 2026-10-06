@@ -1,5 +1,5 @@
 #include "common.h"
-#include "editmapeffect.hpp"
+#include "editmap.hpp"
 #include "effectlist.hpp"
 #include "funcpoint.hpp"
 #include "mg_math.hpp"
