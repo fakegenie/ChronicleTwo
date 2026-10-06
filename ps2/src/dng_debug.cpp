@@ -74,7 +74,6 @@ void dngDebugInit() {
     dbFont.Init();
     dbFont.SetClearance(20, 20);
 }
-#ifdef STATEMATCHING
 void dngDebugStart() {
     dbinfo.active = 1;
     dbinfo.command = -1;
@@ -91,9 +90,6 @@ void dngDebugStart() {
     dbinfo.saved_pause_flag = BattleAreaScene->pause_flag;
     BattleAreaScene->pause_flag = 15;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dng_debug", dngDebugStart__Fv);
-#endif
 void dngDebugDraw(void) {
     union { CPreSprite sprite; };
     char text[0x800];
