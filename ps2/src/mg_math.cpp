@@ -246,7 +246,18 @@ asm void mgBoxMaxMin(mgVu0FBOX *box, mgVu0FBOX *other) {
     jr ra
     sqc2 vf21, 0x10(a0)
 }
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgPlaneNormal__FPfPfPfPf);
+asm void mgPlaneNormal(float *normal, float *v0, float *v1, float *v2) {
+    .set noreorder
+    lqc2 vf15, 0x0(a1)
+    lqc2 vf16, 0x0(a2)
+    lqc2 vf17, 0x0(a3)
+    vsub.xyzw vf10, vf16, vf15
+    vsub.xyzw vf11, vf17, vf15
+    vopmula.xyz ACC, vf10, vf11
+    vopmsub.xyz vf12, vf11, vf10
+    jr ra
+    sqc2 vf12, 0x0(a0)
+}
 float mgDistPlanePoint(float *normal, float *on_plane, float *point) {
     sceVu0FVECTOR offset;
 
