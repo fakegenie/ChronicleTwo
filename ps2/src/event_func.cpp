@@ -3934,7 +3934,6 @@ int _TRG_PAKU_ANIM(RS_STACKDATA *stack, int argc) {
     }
     return 1;
 }
-#ifdef NONMATCHING
 int _RESET_CAMERA(RS_STACKDATA *stack, int argc) {
     int mode;
     float follow[4];
@@ -3953,8 +3952,9 @@ int _RESET_CAMERA(RS_STACKDATA *stack, int argc) {
     float dz;
     float distance;
     mode = GetStackInt(stack++);
-    float height = 0.0f;
-    float angle = 0.0f;
+    float angle;
+float height;
+height = angle = 0.0f;
     if (argc > 1) {
         angle = GetStackFloat(stack++);
     }
@@ -3995,8 +3995,11 @@ int _RESET_CAMERA(RS_STACKDATA *stack, int argc) {
         if (argc < 2) {
             angle = atan2f(dx, dz);
         }
+        float fx = charaPos[0];
+        float fy = charaPos[1];
+        float fz = charaPos[2];
         camera->FollowOn();
-        camera->SetFollow(charaPos[0], charaPos[1], charaPos[2]);
+        camera->SetFollow(fx, fy, fz);
         camera->SetFollowOffset(followOffset[0], followOffset[1], followOffset[2]);
         camera->SetDistance(distance);
         camera->SetHeight(height);
@@ -4041,9 +4044,6 @@ int _RESET_CAMERA(RS_STACKDATA *stack, int argc) {
     }
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/event_func", _RESET_CAMERA__FP12RS_STACKDATAi);
-#endif
 int _GET_ACTIVE_CHR_NO(RS_STACKDATA *stack, int argc) {
     CUserDataManager *userData = NULL;
     CSaveData *save = GetSaveData();
