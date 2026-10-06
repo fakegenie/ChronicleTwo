@@ -3420,7 +3420,6 @@ void ClsMes::DrawFont() {
     prim.End();
 }
 #pragma divbyzerocheck reset
-#ifdef STATEMATCHING
 void ClsMes::SetGoalCursorXY() {
     int dx;
     int dy;
@@ -3461,9 +3460,6 @@ void ClsMes::SetGoalCursorXY() {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/nd_meswin", SetGoalCursorXY__6ClsMesFv);
-#endif
 void ClsMes::StepSelectCursor(int steps) {
     int i;
 
