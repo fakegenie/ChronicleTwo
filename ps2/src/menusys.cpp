@@ -5698,27 +5698,28 @@ extern char at_5882[];
 extern char at_5883[];
 extern s8 waku_infotbl_5836[][2];
 extern s8 wakutypeTbl_5837[];
-#ifdef NONMATCHING
 void CMenuItemInfo::CalcCursorPosition(void) {
     if (mode == MENU_ASK_MODE_CLOSE) {
         MenuCommonInfo->SetWakuType(-1);
         return;
     }
     char name[0x20];
-    char part_name[0x20];
     CMenuPosDataForm *form = NULL;
     int pos[2] = {0, 0};
+    int cursor;
     int arg_no = key_arg_no;
-    int cursor = MenuCommonInfo->cursor;
+    cursor = MenuCommonInfo->cursor;
     int waku_no = arg_no;
     if (arg_no != 12) {
         if (arg_no < 0) {
             key_arg_no = 0;
         }
+        CMenuPosDataForm *forms[12] = {view_form[sub_view], view_form[sub_view], item_board_form, view_form[sub_view], view_form[2], view_form[2],
+                                       view_form[3], view_form[3], view_form[4], view_form[5], view_form[5], view_form[sub_view]};
         form = view_form[sub_view];
-        CMenuPosDataForm *forms[12] = {form, form, item_board_form, form, view_form[2], view_form[2],
-                                       view_form[3], view_form[3], view_form[4], view_form[5], view_form[5], form};
-        if (key_arg_no != 0 && key_arg_no != 1) {
+        if (key_arg_no == 0 || key_arg_no == 1) {
+            form = view_form[sub_view];
+        } else {
             form = forms[key_arg_no];
         }
     }
@@ -5731,6 +5732,7 @@ void CMenuItemInfo::CalcCursorPosition(void) {
         msg_pos[0] = pos[0];
         msg_pos[1] = pos[1];
     } else {
+        char part_name[0x20];
         int offset[2] = {0, 0};
         if (arg_no == 4 || arg_no == 9) {
             strcpy(part_name, at_5879);
@@ -5809,9 +5811,6 @@ void CMenuItemInfo::CalcCursorPosition(void) {
         reset_cursor_pos = 0;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menusys", CalcCursorPosition__13CMenuItemInfoFv);
-#endif
 extern s16 trans_spectol_posold;
 #ifdef NONMATCHING
 void CBaseMenuClass::EffectDrawCheck(CMenuPosDataForm *form) {
