@@ -392,7 +392,7 @@ void CBaseMenuClass::SetTexBlock(int *block) {
     DeleteTexBlock();
 }
 void CBaseMenuClass::DeleteTexBlock() {
-    MenuDeleteTextureBlock((int *)((u8 *)this + 0x18));
+    MenuDeleteTextureBlock(tex_block);
 }
 int CBaseMenuClass::MenuItemCommnadSelectPrepare(CGameDataUsed *item, int slot, int arg) {
 
@@ -1322,9 +1322,9 @@ int CBaseMenuClass::IsSpectolFusion(int key, int command) {
         case 1: {
             if (!sndflag_1665 && ReadBGSync() == 0) {
                 sndflag_1665 = 1;
-                void *file = GetReadBGFile(0);
+                BG_READ_INFO *file = GetReadBGFile(0);
                 if (file != NULL) {
-                    MenuSePlay(0, *(unsigned int **)((u8 *)file + 0x110), &MenuSoundBuffer);
+                    MenuSePlay(0, (unsigned int *)file->buffer, &MenuSoundBuffer);
                 }
             }
             if (*(u8 *)&MenuEffect[0]->run == 0) {
@@ -2371,7 +2371,7 @@ void CMenuKeyFunc::AttachFuncData() {
         have_icon = cursor_form->GetPartInfo(at_2546__2);
         have_shadow = cursor_form->GetPartInfo(at_2547);
         have_num = cursor_form->GetPartInfo(at_2548);
-        *(int *)((u8 *)have_num + 0x38) = 1;
+        have_num->etc_info[2] = 1;
     }
     waku_form = (CMenuPosDataForm *)MenuPosData->GetFormInfo(at_2549);
     how_much_form = (CMenuPosDataForm *)MenuPosData->GetFormInfo(at_2550);
@@ -3372,7 +3372,7 @@ void CMenuKeyFunc::SetHaveItemInfo(int visible, int detail) {
             *(int *)&have_icon->etc_info[2] = ((CGameDataUsed *)(&have_item))->GetSpectolNo();
             Func_MenuItemIconSetEffectOne(have_icon);
         } else if (have_shadow->etc_info[1] == 0x1AA) {
-            *(int *)&have_icon->etc_info[2] = *(short *)((u8 *)this + 0xD0);
+            *(int *)&have_icon->etc_info[2] = have_item.data.item.num;
         }
     }
     have_icon->item_flag = 0;
@@ -3399,7 +3399,7 @@ void CMenuKeyFunc::SetHaveItemInfo(int visible, int detail) {
 int CMenuKeyFunc::menu_inputkey_limmit_check_line(int keys) {
     int result;
     int *cursor = &this->cursor;
-    MENU_INPUTKEY_ARG *limit = *(MENU_INPUTKEY_ARG **)((u8 *)this + 0x134);
+    MENU_INPUTKEY_ARG *limit = key_arg;
     int i;
 
     result = -1;
@@ -3465,7 +3465,7 @@ int CMenuKeyFunc::menu_inputkey_limmit_check_glid(int select_key) {
 int CMenuKeyFunc::CheckMoveSelect(int arg) {
     int result = -1;
     if (key_enable != 0) {
-        switch (*(int *)(*(u8 **)((u8 *)this + 0x134) + 8)) {
+        switch (key_arg->type) {
             case 0:
                 result = menu_inputkey_limmit_check_line(arg);
                 break;
@@ -3762,10 +3762,10 @@ void MenuPosFormValueSetFishingRod(CGameDataUsed *item) {
     char name[0x20];
     CMenuPosDataForm *form;
     int i;
-    u8 *rod;
+    WEAPON_USED *rod;
 
     if (item != NULL && item->IsFishingRod() != 0) {
-        rod = (u8 *)item + 0x10;
+        rod = &item->data.weapon;
         i = 0;
         form = CMenuItemInfoPt->view_form[5];
         values[0] = item->data.weapon.attribute[0];
@@ -3778,7 +3778,7 @@ void MenuPosFormValueSetFishingRod(CGameDataUsed *item) {
             form->SetNumber(name, values[i]);
             i += 1;
         } while (i < 5);
-        form->SetNumber(at_3829, *(short *)(rod + 0x2C));
+        form->SetNumber(at_3829, rod->fusion_point);
     }
 }
 void CMenuItemInfo::Initialize(void) {
@@ -5318,10 +5318,10 @@ void CMenuItemInfo::AttachFormInfo(void) {
 void CMenuItemInfo::MenuModeMalloc(mgCMemory *stack) {
     int i;
     CMenuMoveItem *move_item;
-    u8 *slot;
+    MENU_ITEM_MOVE_INFO *slot;
     CMenuEffect *effect;
     CRepairManager *repair;
-    u8 *buffer;
+    mgCMemory *buffer;
 
     int free_blocks = stack->stack_size - stack->stack_used;
     MenuItemMemory2.stSetBuffer((u_long128 *)(stack->stack + stack->stack_used),
@@ -5332,11 +5332,11 @@ void CMenuItemInfo::MenuModeMalloc(mgCMemory *stack) {
     }
     MenuBGReadInfo2Malloc__FP9mgCMemoryPi(&MenuItemMemory2, tbl_5293);
     if ((move_item = (CMenuMoveItem *)operator new(0x104, (u_long128*)MenuItemMemory2.Alloc(0x13))) != NULL) {
-        slot = (u8 *)move_item + 0xC;
+        slot = move_item->info;
         do {
-            __ct__13CGameDataUsedFv(slot + 8);
-            slot += 0x7C;
-        } while (slot < (u8 *)move_item + 0x104);
+            __ct__13CGameDataUsedFv(&slot->item);
+            slot++;
+        } while (slot < move_item->info + 2);
         move_item->Initialize();
     }
     MenuMoveItemPtr = move_item;
@@ -5351,11 +5351,11 @@ void CMenuItemInfo::MenuModeMalloc(mgCMemory *stack) {
     }
     MenuEffect[1] = effect;
     if ((repair = (CRepairManager *)operator new(0x1EC, (u_long128*)MenuItemMemory2.Alloc(0x21))) != NULL) {
-        buffer = (u8*)&repair->effect_stack[0];
+        buffer = repair->effect_stack;
         do {
-            ((mgCMemory *)buffer)->Init();
-            buffer += 0x30;
-        } while (buffer < (u8 *)repair + 0x1A4);
+            buffer->Init();
+            buffer++;
+        } while (buffer < repair->effect_stack + 8);
         (&repair->model_stack)->Init();
     }
     MenuRepairMan = repair;
@@ -7492,7 +7492,7 @@ int CMenuItemInfo::PushKey(int pad, int trigger) {
                     CGameDataUsed *item = this->view_weapon;
                     short *saved_words = (short *)&SpectolInfoStay.data.weapon.whp;
                     short *words = (short *)&item->data.weapon.whp;
-                    int spare_points = *(short *)((u8 *)item + 0x3C) / kPointsPerStep;
+                    int spare_points = item->data.weapon.fusion_point / kPointsPerStep;
                     int selected = MenuCommonInfo->select_pos[0];
                     short *entry = (short *)((selected << 1) + (int)words);
                     short *stat_slot = &entry[kStatWord];
