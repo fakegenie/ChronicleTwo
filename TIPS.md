@@ -327,3 +327,11 @@ only functions present in both objects can be replaced, the plain build keeps th
 - Compiling a function that does `new T[n]` emits T's weak inline constructor. Remove that constructor's `INCLUDE_ASM` stub, or `check_objects` reports an unexpected piece while the image check still passes.
 - A local declared directly in an unbraced `case` gives a different constant-load order than the same code in a braced case (`FishModifyParam` case 5).
 - Bash in the worktrees refuses a python heredoc followed by `./dev.sh` in one command. Put generator scripts in files and run them separately.
+- An increment written inside a call argument (`PrintDirect(x, y += 0x12, ...)`) stops MWCC constant-propagating the counter. Retail's `addiu s0,s0,N` before each call comes from this (`DrawEventEdit`).
+- A redundant `if` that assigns a variable the value it already holds (`int step = 100; if (select == 1) { step = 100; }`) switches on retail's unfilled delay-slot style. It also leaves a dead `lw`/`li` compare pair and keeps the constant in a saved register (`MenuLoop`). Look for an orphan compare in retail to find where it goes.
+- Reusing named float locals, declared once at function top and reassigned before each use, changed float constant load order where per-block locals, literals or declaration order did not (`DrawMenuTopic`).
+- Declaring a loop temporary outside the loop (`int glyph_x;` before a `do` loop, assigned inside) fixes callee-saved register colouring when strength-reduced induction pointers take the wrong registers (`DrawActiveFont`).
+- A call evaluated once before an if/else that uses it in both branches is a named local before the `if`.
+- Retail's `x - (x / 5) * 5` (a subtract instead of a second divide) comes from a named quotient (`int part = rest / 5; ... rest - part * 5`).
+- For a jump-table function use perm's word count or an aligned diff, not the objdiff percent: `MenuMainInit` was 13 words off while objdiff reported 44.9%.
+- In perm.py templates `[[[[` (an array subscript followed by a choice) mis-parses. Put a space after the bracket.
