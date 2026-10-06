@@ -27,7 +27,7 @@ enum MotionKeyType {
     MOTION_KEY_MATERIAL_ALPHA  = 40,
     MOTION_KEY_MATERIAL_COLOR  = 41,
     MOTION_KEY_VISIBLE         = 50,
-    MOTION_KEY_UNK_33          = 51,
+    MOTION_KEY_VISIBLE_TREE     = 51,
 };
 
 enum CheckWidthSide {

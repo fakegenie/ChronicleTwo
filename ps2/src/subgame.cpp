@@ -86,7 +86,7 @@ int sgInitSubGame(int type, SubGameInfo *info) {
         case SUBGAME_BUGGY:
             result = sgInitBuggy(&GameInfo);
             break;
-        case SUBGAME_UNK_4:
+        case SUBGAME_UNUSED:
             break;
     }
     if (result == 0) {
@@ -111,7 +111,7 @@ int sgLoopSubGame(void) {
         case SUBGAME_BUGGY:
             finished = sgLoopBuggy(&GameInfo);
             break;
-        case SUBGAME_UNK_4:
+        case SUBGAME_UNUSED:
             finished = 1;
             break;
     }
@@ -130,7 +130,7 @@ int sgLoopSubGame2(void) {
             break;
         case SUBGAME_GYORACE:
         case SUBGAME_BUGGY:
-        case SUBGAME_UNK_4:
+        case SUBGAME_UNUSED:
             break;
     }
     return 0;
@@ -146,7 +146,7 @@ int sgExitSubGame(void) {
             break;
         case SUBGAME_GYORACE:
         case SUBGAME_BUGGY:
-        case SUBGAME_UNK_4:
+        case SUBGAME_UNUSED:
             break;
     }
     SubGame = SUBGAME_NONE;
@@ -163,7 +163,7 @@ int sgRestartSubGame(SubGameInfo *info) {
             break;
         case SUBGAME_GYORACE:
         case SUBGAME_BUGGY:
-        case SUBGAME_UNK_4:
+        case SUBGAME_UNUSED:
             break;
     }
     return result;
@@ -179,7 +179,7 @@ int sgBreakSubGame(void) {
             break;
         case SUBGAME_GYORACE:
         case SUBGAME_BUGGY:
-        case SUBGAME_UNK_4:
+        case SUBGAME_UNUSED:
             break;
     }
     SubGame = SUBGAME_NONE;
@@ -204,7 +204,7 @@ int sgDrawSubGameCharaShadow(void) {
             break;
         case SUBGAME_BUGGY:
             return sgDrawShadowBuggy(&GameInfo);
-        case SUBGAME_UNK_4:
+        case SUBGAME_UNUSED:
             break;
     }
     return 0;
@@ -221,7 +221,7 @@ int sgDrawSubGameChara(void) {
         case SUBGAME_BUGGY:
             return sgDrawBuggy(&GameInfo);
         default:
-        case SUBGAME_UNK_4:
+        case SUBGAME_UNUSED:
             return 0;
     }
 }
@@ -250,7 +250,7 @@ int sgDrawSubGameSystem(void) {
         case SUBGAME_BUGGY:
             return sgSystemDrawBuggy(&GameInfo);
         default:
-        case SUBGAME_UNK_4:
+        case SUBGAME_UNUSED:
             return 0;
     }
 }
