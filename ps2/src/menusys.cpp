@@ -8991,7 +8991,6 @@ void MenuCharaStatusDraw(int &tex_block) {
         }
     }
 }
-#ifdef STATEMATCHING
 void MenuItemInfoCursorDraw(int &tex_block) {
     if (MenuItemCursorInfo.enable == 0) {
         return;
@@ -9090,9 +9089,6 @@ void MenuItemInfoCursorDraw(int &tex_block) {
     }
     prim->End();
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menusys", MenuItemInfoCursorDraw__FRi);
-#endif
 void CMenuItemInfo::KeyStepLocal(int select_key, int push_button, int flag) {
     int select = -1;
     if (GamePad__2.Down(PAD_R3) && menu_debug_flag == 1) {
