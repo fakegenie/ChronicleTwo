@@ -9982,17 +9982,12 @@ int _BGM_PLAY_ENABLE(RS_STACKDATA *stack, int argc) {
     (&EventScene->skip_load_sound)[1] = 0;
     return 1;
 }
-#ifdef NONMATCHING
 int _GET_DEF_BGM_NO(RS_STACKDATA *stack, int argc) {
     int sndId;
     int bgmNo;
     if (argc == 1) {
-        CScene *scene = EventScene;
-        if (0 < scene->now_sub_map_no) {
-            sndId = GetMapSndDataID(scene->now_sub_map_no);
-        } else {
-            sndId = GetMapSndDataID(scene->now_map_no);
-        }
+        CScene *scene = EventScene; int map = scene->now_map_no; int sub = scene->now_sub_map_no;
+if (0 < sub) { sndId = GetMapSndDataID(sub); } else { sndId = GetMapSndDataID(map); }
         bgmNo = EventScene->GetDefBgmNo(sndId);
         SetStack(stack, bgmNo);
         return 1;
@@ -10005,9 +10000,6 @@ int _GET_DEF_BGM_NO(RS_STACKDATA *stack, int argc) {
     }
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/event_func", _GET_DEF_BGM_NO__FP12RS_STACKDATAi);
-#endif
 #ifdef NONMATCHING
 int _SET_MOVIE_CC(RS_STACKDATA *stack, int argc) {
     int i;
@@ -13811,7 +13803,7 @@ int _GET_FLOOR_STATUS(RS_STACKDATA *stack, int argc) {
     if (info == NULL) {
         return 0;
     }
-    SetStack(stack, (int)(u_int) info->floor_status);
+    SetStack(stack, (int)(u_long) info->floor_status);
     return 1;
 }
 #else
