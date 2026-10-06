@@ -797,7 +797,7 @@ int Lamb2WolfManager(void) {
     if (info->chr_no != 1) {
         return -1;
     }
-    form = *(s16 *)((u8 *)info->equip + 2);
+    form = info->equip->item_no;
     if (form != 0x38 && form != 0x58) {
         return -1;
     }
