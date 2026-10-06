@@ -285,3 +285,6 @@ only functions present in both objects can be replaced, the plain build keeps th
 - objdiff scores a function with jump tables near zero because it splits at the case labels. Compare against the concatenated retail pieces instead.
 - `#pragma optimization_level 2` is needed for `mgCTextureManager::ReloadTexture(int, u_int *)`.
 - Declaring a parameter as `sceVu0FVECTOR ground` instead of `float *` fixed a stack slot in `GetFootPoly` with the same mangled name.
+- Retail's brace-initialised local arrays (an `at_NNNN` template followed by element stores) are written as brace initialisers with non-constant elements, such as `int next[2] = {waku_pos[0], waku_pos[1]};`. Template copy plus assignments makes MWCC hold the array addresses in registers where retail does not.
+- A function containing an if/else whose two branches store the same value the variable already holds, so the compiler deletes both stores, switches on retail's "no fall-through delay-slot fill" style in menusys switches.
+- Writing a call argument as a named local before the call, and reordering locals with a permutation search, are the usual last steps once the structure is right.
