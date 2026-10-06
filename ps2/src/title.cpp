@@ -674,9 +674,9 @@ int TitleLoop() {
         if (CheckStartChapter8(save) != 0) {
             map_no = SearchMapNo(at_1479__2);
         }
-        if ((s8)save->unk_643C9 != 0) {
+        if ((s8)save->skip_load_bgm != 0) {
             TitleScene->skip_load_bgm = 1;
-            save->unk_643C9 = 0;
+            save->skip_load_bgm = 0;
         }
         SetSoundMode();
         PlayTimeCount(1);

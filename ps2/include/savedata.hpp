@@ -103,7 +103,7 @@ public:
     CMonsterBook     monster_book;
     CMenuSystemData  menu_system_data;
     u8               bit_ctrl;
-    u8               unk_643C9;
+    u8               skip_load_bgm;
     u8               unk_643CA[6];
     SAVE_TOUR_INFO   tour;
     u8               unk_643EC[0x1544];

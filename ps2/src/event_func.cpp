@@ -5886,7 +5886,7 @@ int _SET_SAVEDATA_ETC(RS_STACKDATA *stack, int argc) {
             if (save == NULL) {
                 return 0;
             }
-            save->unk_643C9 = GetStackInt(stack);
+            save->skip_load_bgm = GetStackInt(stack);
             break;
         case 4:
             DeleteErekiFish();

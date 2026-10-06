@@ -314,7 +314,7 @@ void CMonsterMan::StepEffectScript() {
 }
 float CMonsterMan::IsBattleStyleDist() {
     int i;
-    int mons_base = GetBattleCharaInfo()->unk_2;
+    int mons_base = GetBattleCharaInfo()->user_mons_id;
     CActiveMonster *found;
     float nearest;
 
@@ -363,7 +363,7 @@ int CMonsterMan::CheckMonsterTolk(float *pos) {
     if (DngUserData->active_chr_no != USER_CHARA_MONSTER) {
         return -1;
     }
-    int mons_base = GetBattleCharaInfo()->unk_2;
+    int mons_base = GetBattleCharaInfo()->user_mons_id;
     if (mons_base == -1) {
         return -1;
     }
@@ -1782,7 +1782,7 @@ void CMonsterMan::ThinkHost() {
     }
     int user_monster = -1;
     if (DngUserData->active_chr_no == USER_CHARA_MONSTER) {
-        user_monster = GetBattleCharaInfo()->unk_2;
+        user_monster = GetBattleCharaInfo()->user_mons_id;
     }
     for (int i = 0; i < MONSTER_ACTIVE_MAX; i++) {
         CActiveMonster *monster = active[i];

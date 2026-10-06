@@ -3665,7 +3665,7 @@ void CBattleCharaInfo::SetChrNo(int new_chara_no) {
         ClearMagicSwordPow();
     }
     chr_no = new_chara_no;
-    unk_2 = 0;
+    user_mons_id = 0;
     if (0 <= chr_no && chr_no < 2) {
         chara_type = 0;
         chara_data = manager->GetCharaDataPtr(chr_no);
@@ -3695,7 +3695,7 @@ void CBattleCharaInfo::SetChrNo(int new_chara_no) {
         if (info != 0) {
             base = info->user_mons_id;
         }
-        unk_2 = base;
+        user_mons_id = base;
         active_item = 0;
         equip = 0;
         hp = &manager->GetCharaDataPtr(1)->hp;
