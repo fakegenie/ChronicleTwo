@@ -521,7 +521,23 @@ asm float mgDistVector2(float *vector) {
     jr ra
     nop
 }
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgDistVector__FPfPf);
+asm float mgDistVector(float *a, float *b) {
+    .set noreorder
+    lqc2 vf2, 0x0(a0)
+    lqc2 vf3, 0x0(a1)
+    vsub.xyz vf4, vf3, vf2
+    vmul.xyz vf4, vf4, vf4
+    vmr32.xy vf5, vf4
+    vmr32.x vf6, vf5
+    vadd.x vf7, vf4, vf5
+    vadd.x vf5, vf6, vf7
+    vsqrt Q, vf5x
+    vwaitq
+    cfc2.ni v0, vi22
+    mtc1 v0, f0
+    jr ra
+    nop
+}
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgDistVectorXZ__FPfPf);
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgDistVector2__FPfPf);
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgDistVectorXZ2__FPfPf);
