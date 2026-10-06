@@ -517,11 +517,9 @@ int CEditMap::GetOnOffParts(char *name, CMapParts **out_parts, CMapPiece **out_p
     }
     return count;
 }
-#ifdef NONMATCHING
 void CEditMap::PartsOnOff(int map_no, CEditData *data) {
     CMapParts *parts[0x10];
     CMapPiece *pieces[0x10];
-    int off_index;
 
     if (data == NULL) {
         return;
@@ -532,27 +530,25 @@ void CEditMap::PartsOnOff(int map_no, CEditData *data) {
             continue;
         }
         int flag = data->GetAnalyzeFlag(map_no, data_no);
-        int on_count = GetOnOffParts(request->on_parts, parts, pieces, 0x10);
-        for (int i = 0; i < on_count; i++) {
+        int count = GetOnOffParts(request->on_parts, parts, pieces, 0x10);
+        int i;
+        for (i = 0; i < count; i++) {
             if (pieces[i] != NULL) {
                 pieces[i]->Show(flag);
             } else if (parts[i] != NULL) {
                 parts[i]->Show(flag);
             }
         }
-        int off_count = GetOnOffParts(request->off_parts, parts, pieces, 0x10);
-        for (off_index = 0; off_index < off_count; off_index++) {
-            if (pieces[off_index] != NULL) {
-                pieces[off_index]->Show((u8)((flag != 0) ^ 1));
-            } else if (parts[off_index] != NULL) {
-                parts[off_index]->Show((u8)((flag != 0) ^ 1));
+        count = GetOnOffParts(request->off_parts, parts, pieces, 0x10);
+        for (i = 0; i < count; i++) {
+            if (pieces[i] != NULL) {
+                pieces[i]->Show((u8)((flag != 0) ^ 1));
+            } else if (parts[i] != NULL) {
+                parts[i]->Show((u8)((flag != 0) ^ 1));
             }
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editdata", PartsOnOff__8CEditMapFiP9CEditData);
-#endif
 int CEditData::GetPartsNumID(int parts_id) {
     int number = 0;
     EditDataParts *entry = parts;
