@@ -1716,7 +1716,6 @@ int MenuInternSelectKey(void) {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/menumain", MenuInternSelectKey__Fv);
 #endif
-#ifdef NONMATCHING
 void MenuInternSelectDraw(void) {
     MenuPosData->FormDraw();
     if (MenuInterMesDrawFlag != 0 && MenuInterMes != NULL) {
@@ -1725,8 +1724,11 @@ void MenuInternSelectDraw(void) {
     }
     DrawMenuTopic();
     if (menu_debug_flag != 0) {
+        float box_x = 360.0f;
+        float box_h = 80.0f;
+        float box_y = 60.0f;
         float box_w = (float)(mgScreenWidth - 360);
-        DrawMenuFillBox(360.0f, 60.0f, box_w, 80.0f, 0x40, 0, 0, 0);
+        DrawMenuFillBox(box_x, box_y, box_w, box_h, 0x40, 0, 0, 0);
         CMenuFont font;
         char text[0x100];
         text[0] = 0;
@@ -1750,14 +1752,11 @@ void MenuInternSelectDraw(void) {
             strcpy(text, at_2334__2);
         }
         font.DrawDirect(text, 360, 60);
-        float help_x = 300.0f, help_w = 190.0f;
-        DrawMenuFillBox(help_x, 350.0f, help_w, 60.0f, 0x40, 0, 0, 0);
+        float help_y = 350.0f;
+        DrawMenuFillBox(300.0f, help_y, 190.0f, 60.0f, 0x40, 0, 0, 0);
         font.DrawDirect(at_2335, 300, 350);
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menumain", MenuInternSelectDraw__Fv);
-#endif
 void CopyActiveItemAndWeapon(int slot, int weaponSlot) {
     mgCTexture *textures[2];
 
