@@ -32,7 +32,6 @@
 #include "vtables.hpp"
 
 extern "C" void *__ct__14CBaseMenuClassFv(void *);
-extern "C" void *__ct__9CMenuFontFv(void *font);
 extern "C" void LocalFunc_AdjustScrlBar__FPP18MENUFORMPARTS_TYPEPiPiiffi(MENUFORMPARTS_TYPE **,
                                                                          int *, int *, int, float,
                                                                          float, int);

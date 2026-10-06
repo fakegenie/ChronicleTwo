@@ -119,7 +119,6 @@ extern "C" void *__vt__11CCharacter2[];
 extern "C" void *__vt__9mgCVisual[];
 extern "C" void *__vt__11mgC3DSprite[];
 extern "C" int fptosi(float value);
-extern "C" unsigned int fptoui(float value);
 extern "C" int GetItemDataType__Fi(int);
 extern "C" int GetNowHorl__11CSphidaDataFv(CSphidaData *);
 

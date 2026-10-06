@@ -41,7 +41,6 @@ extern char at_474__2[];
 
 extern "C" void Initialize__4CMapFv(void *self);
 extern "C" int GetPlaceParts__4CMapFPc(void *map, char *name);
-extern "C" void Free__9mgCMemoryFP1(void *memory, void *block);
 extern "C" void Step__4CMapFv(...);
 extern "C" void PreDraw__4CMapFPf(void *self, float *pos);
 struct EditFuncCheck {

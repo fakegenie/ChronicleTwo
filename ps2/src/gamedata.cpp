@@ -12,7 +12,6 @@
 #include <cstdlib>
 
 extern "C" void __ct__18CScriptInterpreterFv(void *);
-extern "C" u8 *GetCommonData__9CGameDataFi(CGameData *, int);
 extern "C" int GetDataType__9CGameDataFi(CGameData *, int);
 
 extern CDataCommon *comdatapt;

@@ -96,14 +96,11 @@ enum ItemMenuCommand {
     kCmdBuildUpInfo = 0x78
 };
 
-extern "C" void Func_MenuItemIconSetEffectOne__FP18MENUFORMPARTS_TYPE(MENUFORMPARTS_TYPE *);
-extern "C" void GetWorldPosition__8mgCFrameFPfPf(mgCFrame *frame, float *position, float *offset);
 extern "C" void sceVu0AddVector(float *result, float *a, float *b);
 extern "C" void __ct__13CGameDataUsedFv(void *);
 extern "C" void ToSpectolTrans__13CGameDataUsedFP13CGameDataUsedi(CGameDataUsed *item,
                                                                   CGameDataUsed *out, int count);
 extern "C" MENU_ASKMODE_PARA *__ct__17MENU_ASKMODE_PARAFv(MENU_ASKMODE_PARA *param);
-extern "C" int GetItemDataType__Fi(int itemNo);
 void MenuAquaInit(mgCMemory *memory, int *data, int arg);
 void NameRegistInit(mgCMemory *memory, int *data, int arg);
 void MenuNPCQuestViewInit(mgCMemory *memory, int *data, int arg);
@@ -178,7 +175,6 @@ extern s8 TrushMesWindowFlag;
 extern CMenuPosDataForm *MenuSpectolSatusCheckForm;
 extern CMenuPosDataForm *MenuSpectolSatusCheckBGFadeForm;
 extern CItemSelect *ItemSelectPtr;
-extern "C" int GetSpectolNo__13CGameDataUsedFv(CGameDataUsed *self);
 extern "C" u8 __vt__14CBaseMenuClass[];
 extern "C" float sinf(float);
 extern float MenuWeaponBasePos[4];
@@ -234,14 +230,12 @@ extern "C" char at_2548[];
 extern "C" char at_2549[];
 extern "C" char at_2550[];
 extern "C" char *n_2667[4];
-extern "C" int CheckBuildUp__FP13CGameDataUsedPiPiPi(CGameDataUsed *, int *, int *, int *);
 extern "C" int MenuCheckKey[4];
 extern "C" char *focusnametbl[21];
 extern "C" float at_3771[4];
 extern "C" float at_3772[4];
 extern "C" char at_3774__2[];
 extern "C" char at_3775__2[];
-extern "C" mgCFrame *SearchObject__12CActionCharaFPc(CActionChara *chara, char *name);
 extern "C" char at_3924[];
 extern "C" char at_3829[];
 extern CGamePad GamePad__2;

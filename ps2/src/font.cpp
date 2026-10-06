@@ -9,7 +9,6 @@
 #include <cstdio>
 #include <cstring>
 
-extern "C" void __ct__11mgCDrawPrimFv(void *);
 
 struct GaijiCodeTable {
     u16 code[24];

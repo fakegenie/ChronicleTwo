@@ -394,8 +394,6 @@ extern float Gyoracemenu_CursorXY[2];
 extern s8 MenuLoadFishIsLoad;
 extern CGameDataUsed *MenuLoadFishSelectData;
 extern int vol_5253[6];
-extern "C" char at_5229[];
-extern "C" char at_5230[];
 extern "C" char at_5487[];
 extern "C" char at_5488[];
 extern "C" char at_5489[];

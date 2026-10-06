@@ -248,7 +248,6 @@ extern "C" u8 *GetReadBGInfo__FPc(char *);
 extern char at_4123[];
 extern "C" char at_4296[];
 extern "C" u8 at_4517__2[];
-extern "C" int SearchFrame__8mgCFrameFPc(...);
 extern mgCTexture *NowMainCharaChngTex;
 extern mgCTexture *NowMainCharaFrameImage;
 extern short NowMainCharaChngStatusBit;

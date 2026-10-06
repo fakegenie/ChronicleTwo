@@ -1479,7 +1479,6 @@ void CMap::CreateMap(CMdsListSet *mds_list_set, mgCMemory *stack) {
     LoadMapFile(script, size, stack, 0);
 }
 
-extern "C" void *__ct__9CObjAnimeFv(void *);
 void CMap::AssignFuncPoint(mgCMemory *stack) {
     CMapParts  *parts;
 

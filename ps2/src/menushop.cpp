@@ -40,9 +40,7 @@ extern "C" void *__ct__18CScriptInterpreterFv(void *);
 extern "C" void SetTag__18CScriptInterpreterFP13SPI_TAG_PARAM(void *, SPI_TAG_PARAM *);
 extern "C" void SetScript__18CScriptInterpreterFPci(void *, char *, int);
 extern "C" void Run__18CScriptInterpreterFv(void *);
-extern "C" void GetPutPosXY__16CMenuPosDataFormFPcRfRf(CMenuPosDataForm *, char *, float &, float &);
 extern "C" void KeyStep__9CShopMenuFv(void *);
-extern "C" void FormDraw__14CPosDataManageFv(void *);
 extern "C" void KeyStep__14CMenuQuestViewFv(void *);
 
 extern "C" CMenuSystemData *GetMenuSysData__Fv();
