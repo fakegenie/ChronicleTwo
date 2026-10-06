@@ -5633,7 +5633,6 @@ int CMenuCostumeSel::KeyStep() {
     }
     return 0;
 }
-#ifdef NONMATCHING
 void CMenuCostumeSel::Draw() {
     sceVu0FMATRIX view;
     sceVu0FVECTOR eye;
@@ -5667,19 +5666,18 @@ void CMenuCostumeSel::Draw() {
     prim->Begin(6);
     prim->Texture(tile_tex);
     for (i = 0; i < COSTUME_LIST_NUM; i++) {
-        int lineY = y + 0x1E;
-        prim->Color(0, 0, 0, 0x30);
-        PrimQuad(prim, 50.0f, (float)(y + 4), labelRect);
-        PrimQuad(prim, 74.0f, (float)(lineY + 4), lineRect);
+        int lineY;
         float wave;
         float leftX;
         float rightX;
         float arrowY;
         float shadowY;
+        lineY = y + 0x1E;
+        prim->Color(0, 0, 0, 0x30);
+        PrimQuad(prim, 50.0f, (float)(y + 4), labelRect);
+        PrimQuad(prim, 74.0f, (float)(lineY + 4), lineRect);
         wave = 6.0f * sinf(line_wave[i]);
-        if (wave < 0.0f) {
-            wave = -wave;
-        }
+        wave = (wave < 0.0f) ? -wave : wave;
         rightX = wave + (float)(lineRect.right + 0x49);
         leftX = 55.0f - wave;
         arrowY = (float)(lineY + 3);
@@ -5776,9 +5774,6 @@ void CMenuCostumeSel::Draw() {
         help.DrawDirect(infomsg_5256[LanguageCode], 0x28, mgScreenHeight - 0x28);
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuchr", Draw__15CMenuCostumeSelFv);
-#endif
 extern u_long CostumeOptionEnv;
 extern "C" void *__ct__15mgCCameraFollowFffff(void *camera, float distance, float height, float angle,
                                                float speed);
