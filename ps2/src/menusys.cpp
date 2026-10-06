@@ -2200,24 +2200,34 @@ int MenuItemBrdKey(int keys, int *cursor, int *scroll, int board) {
 extern s8 ret_tbl1_2511[2];
 #ifdef NONMATCHING
 int MenuDataSwap(CGameDataUsed *destination, CGameDataUsed *source, int quantity) {
+    CDataCommon *src_common;
+    int src_used;
+    int src_type;
+    CDataCommon *dst_common;
+    int dst_no;
+    int src_no;
+    int dst_type;
+    int result;
+    int dst_used;
     if (destination == NULL || source == NULL) {
         return 0;
     }
-    int result = 1;
-    int dst_no = destination->item_no;
-    unsigned int src_no = source->item_no;
-    int dst_type = GetItemDataType(dst_no);
-    int src_type = GetItemDataType(src_no);
-    int dst_used = destination->used_type;
-    int src_used = source->used_type;
-    CDataCommon *dst_common = GetCommonItemData(dst_no);
-    CDataCommon *src_common = GetCommonItemData(src_no);
-    int dst_is_gift_box = dst_used == USED_ITEM_TYPE_GIFT_BOX;
-    if (dst_is_gift_box && destination->GetGiftBoxItemNum() < 3 && src_common != NULL && (src_common->attribute & ITEM_ATTRIBUTE_TRUSH) && ((src_used == USED_ITEM_TYPE_ITEM && src_type != 0x1D && src_type != 0x1E && src_type != 0x15 && src_type != 0x1A && src_type != 0x1B) || (src_used == USED_ITEM_TYPE_ATTACH && src_type != 0x11 && src_type != 0x22))) {
+    result = 1;
+    dst_no = destination->item_no;
+    src_no = source->item_no;
+    dst_type = GetItemDataType(dst_no);
+    src_type = GetItemDataType(src_no);
+    dst_used = destination->used_type;
+    src_used = source->used_type;
+    dst_common = GetCommonItemData(dst_no);
+    src_common = GetCommonItemData(src_no);
+    if (dst_used == USED_ITEM_TYPE_GIFT_BOX && destination->GetGiftBoxItemNum() < 3 && src_common != NULL && (src_common->attribute & ITEM_ATTRIBUTE_TRUSH) && ((src_used == USED_ITEM_TYPE_ITEM && src_type != 0x1D && src_type != 0x1E && src_type != 0x15 && src_type != 0x1A && src_type != 0x1B) || (src_used == USED_ITEM_TYPE_ATTACH && src_type != 0x11 && src_type != 0x22))) {
         int slot = destination->SetGiftBoxItem(src_no, -1);
         result = 4;
         if (slot >= 0) {
             source->DeleteNum(1);
+            result = 4;
+        } else {
             result = 4;
         }
     } else if (dst_type == 0x1D && src_used == USED_ITEM_TYPE_FISH) {
@@ -2249,17 +2259,16 @@ int MenuDataSwap(CGameDataUsed *destination, CGameDataUsed *source, int quantity
         }
         result = 5;
     } else {
+        int had_src = 0;
         int had_dst = 0;
         GameDataSwap(destination, source, 1);
-        int had_src = 0;
-        if (src_no > 0) {
-            had_src = 1;
-        }
         if (dst_no > 0) {
             had_dst = 1;
         }
-        s8 results[2] = { 0, 2 };
-        results[0] = ret_tbl1_2511[had_src];
+        if (src_no > 0) {
+            had_src = 1;
+        }
+        s8 results[2] = {ret_tbl1_2511[had_src], 2};
         result = results[had_dst];
     }
     CheckEnableHaveItemNum();
