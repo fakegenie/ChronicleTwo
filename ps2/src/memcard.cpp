@@ -152,20 +152,20 @@ void CMemoryCardManager::Initialize(mgCMemory *memory) {
     fd = -1;
     save_buffer = NULL;
     if (memory != NULL) {
-        u8 *buffer;
-        if ((buffer = (u8 *)operator new(sizeof(SAVEDATA_FORMAT),
+        SAVEDATA_FORMAT *buffer;
+        if ((buffer = (SAVEDATA_FORMAT *)operator new(sizeof(SAVEDATA_FORMAT),
                                          (u_long128 *)memory->Alloc(0x659E))) !=
             NULL) {
-            u8 *edit = buffer + 0x1CA4;
+            CEditData *edit = buffer->save_data.edit_data;
             do {
                 __ct__9CEditDataFv(edit);
-                edit += 0x5510;
-            } while (edit < buffer + 0x1C5F4);
-            __ct__16CUserDataManagerFv(buffer + 0x1D320);
-            ((CQuestData *)(buffer + 0x62AC0))->Initialize();
-            __ct__15CMenuSystemDataFv(buffer + 0x64140);
+                edit++;
+            } while (edit < &buffer->save_data.edit_data[SAVE_EDIT_DATA_MAX]);
+            __ct__16CUserDataManagerFv(&buffer->save_data.user_data);
+            buffer->save_data.quest_data.Initialize();
+            __ct__15CMenuSystemDataFv(&buffer->save_data.menu_system_data);
         }
-        save_buffer = (SAVEDATA_FORMAT *)buffer;
+        save_buffer = buffer;
         memset(save_buffer, 0, sizeof(SAVEDATA_FORMAT));
     }
     InitError();
