@@ -168,7 +168,7 @@ public:
     s32              chara_type;
     CActionChara    *parent;
     CActionChara    *next;
-    CPalletAnime     unk_67c;
+    CPalletAnime     script_pallet;
     s16              chara_kind;
     sceVu0FVECTOR    front_vec;
     s32              mask_flag;
@@ -192,8 +192,8 @@ public:
     s16              catch_state;
     s16              no_hit_time;
     CPalletAnime     pallet[3];
-    s16              unk_75e;
-    float            unk_760;
+    s16              battle_stance;
+    float            battle_stance_rate;
     s16              shot_wait;
     s32              muteki_time;
     s8               menu_flag;
@@ -227,7 +227,7 @@ public:
     s32              unk_be0;
     s32              unk_be4;
     s32              damage_time;
-    s32              unk_bec;
+    s32              melee_hit;
     s32              guard_flag;
     s8               stagger;
     s8               stagger_time;

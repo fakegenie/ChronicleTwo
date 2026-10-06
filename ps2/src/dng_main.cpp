@@ -2413,7 +2413,7 @@ void IsEventRun() {
             info->SetAttr(0x6F, 1);
             FxScriptMan->CreateEffSpt("\x92\xca\x8f\xed\x89\xf1\x95\x9c", 0, 0);
             FxScriptMan->SetScriptTargetId(0, -1, -1);
-            CPalletAnime *pallet = &MainChara__2->unk_67c;
+            CPalletAnime *pallet = &MainChara__2->script_pallet;
             pallet->red = 0x60;
             pallet->green = 0xB4;
             pallet->blue = 0xFF;

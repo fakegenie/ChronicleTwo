@@ -1369,7 +1369,7 @@ int CActionChara::HumanMoveIF() {
         stand_flag = 1;
     }
     if (lock_on != 0 && boss == 0) {
-        if (unk_75e != 0) {
+        if (battle_stance != 0) {
             SetMotion("\x83o\x83g\x83\x8B\x97\xA7\x82\xBF", 0, 1);
         } else {
             SetMotion("\x97\xA7\x82\xBF", 0, 1);
@@ -1429,7 +1429,7 @@ int CActionChara::HumanMoveIF() {
             SetStep(motion_speed);
         }
     } else {
-        if (unk_75e != 0 || boss != 0) {
+        if (battle_stance != 0 || boss != 0) {
             SetMotion("\x83o\x83g\x83\x8B\x97\xA7\x82\xBF", 0, 1);
         } else {
             SetMotion("\x97\xA7\x82\xBF", 0, 1);
@@ -2753,9 +2753,9 @@ void CActionChara::RunScript(CScene *scene, RUN_SCRIPT_ENV *env) {
     } else {
         action_info.chara->acumu_pad = 0;
     }
-    if (unk_bec != 0) {
+    if (melee_hit != 0) {
         prog_no = 700;
-        unk_bec = 0;
+        melee_hit = 0;
     }
     if (damage_req == ACTION_DAMAGE_REQ_DEAD) {
         AllDeleteDamage();
@@ -2989,15 +2989,15 @@ void CActionChara::StepParam() {
         sceVu0CopyVector(velocity, blow_vec);
         blow_vec[1] -= 0.6f;
     }
-    if (unk_75e != 0) {
-        unk_760 += 0.016666668f;
-        if (!(unk_760 < 1.0f)) {
-            unk_760 = 1.0f;
+    if (battle_stance != 0) {
+        battle_stance_rate += 0.016666668f;
+        if (!(battle_stance_rate < 1.0f)) {
+            battle_stance_rate = 1.0f;
         }
     } else {
-        unk_760 = unk_760 - 0.016666668f;
-        if (unk_760 <= 0.0f) {
-            unk_760 = 0.0f;
+        battle_stance_rate = battle_stance_rate - 0.016666668f;
+        if (battle_stance_rate <= 0.0f) {
+            battle_stance_rate = 0.0f;
         }
     }
     if (stagger_time > 0) {
@@ -3131,9 +3131,9 @@ void CActionChara::Initialize(mgCMemory *memory) {
     *(int *)&accele.accele[3] = 0;
     acumu_pad = 0;
     now_status = 0;
-    unk_bec = 0;
-    unk_75e = 0;
-    unk_760 = 0.0f;
+    melee_hit = 0;
+    battle_stance = 0;
+    battle_stance_rate = 0.0f;
     muteki_time = 0;
     guard_flag = 0;
     menu_flag = 0;

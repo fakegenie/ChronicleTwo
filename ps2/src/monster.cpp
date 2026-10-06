@@ -1449,7 +1449,7 @@ void CMonsterMan::CheckDamage() {
                     HitScoreSet(prim->hit_pos, 1, 0);
                 }
                 if (melee) {
-                    player->unk_bec = 1;
+                    player->melee_hit = 1;
                 }
                 continue;
             }
