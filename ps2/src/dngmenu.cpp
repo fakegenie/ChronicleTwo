@@ -1368,6 +1368,7 @@ int CDngFreeMap::LoadDngInfo(mgCMemory *stack, int tex_block, int dng_no, int us
         float glid_y;
         float room_x;
         float room_y;
+        int j;
         glid_x = 0.0f;
         direction = -1;
         glid_y = 0.0f;
@@ -1617,18 +1618,18 @@ int CDngFreeMap::LoadDngInfo(mgCMemory *stack, int tex_block, int dng_no, int us
         s16(*room_points)[2] = RoomHokanTablePtrTable_2245[room_table];
         s8 room_reverse = is_reverse_tbl_room_2248[0][room_table];
         if (room_reverse == 0) {
-            for (int i = 0; i < 10; i++) {
+            for (j = 0; j < 10; j++) {
                 DNGMAP_KOMA_POS *pos = (DNGMAP_KOMA_POS *)work.Alloc(1);
-                pos->x = room_x + (float)room_points[i][0];
-                pos->y = room_y + (float)room_points[i][1];
+                pos->x = room_x + (float)room_points[j][0];
+                pos->y = room_y + (float)room_points[j][1];
                 tail->next = pos;
                 tail = pos;
             }
         } else if (room_reverse == 1) {
-            for (int i = 9; i >= 0; i--) {
+            for (j = 9; j >= 0; j--) {
                 DNGMAP_KOMA_POS *pos = (DNGMAP_KOMA_POS *)work.Alloc(1);
-                pos->x = room_x + (float)room_points[i][0];
-                pos->y = room_y + (float)room_points[i][1];
+                pos->x = room_x + (float)room_points[j][0];
+                pos->y = room_y + (float)room_points[j][1];
                 tail->next = pos;
                 tail = pos;
             }
@@ -1637,9 +1638,11 @@ int CDngFreeMap::LoadDngInfo(mgCMemory *stack, int tex_block, int dng_no, int us
         while (glid != NULL) {
             CalcGlidPutPos(glid, glid_x, glid_y, 0);
             glid->blink = 1;
+            s16(*points)[2];
+            s8 reverse;
             if (glid->type == 0) {
-                s16(*points)[2] = RootHokanTablePtrTable_2240[glid->root.shape];
-                s8 reverse = is_reverse_tbl_2246[glid->root.shape][direction];
+                points = RootHokanTablePtrTable_2240[glid->root.shape];
+                reverse = is_reverse_tbl_2246[glid->root.shape][direction];
                 if (reverse < 0) {
                     break;
                 }
@@ -1662,8 +1665,8 @@ int CDngFreeMap::LoadDngInfo(mgCMemory *stack, int tex_block, int dng_no, int us
                 }
             } else if (glid->type == 1) {
                 int table = old_hokantbl_useno_2247[1][direction];
-                s16(*points)[2] = RoomHokanTablePtrTable_2245[table];
-                s8 reverse = is_reverse_tbl_room_2248[1][table];
+                points = RoomHokanTablePtrTable_2245[table];
+                reverse = is_reverse_tbl_room_2248[1][table];
                 if (reverse == 0) {
                     for (i = 0; i < 10; i++) {
                         DNGMAP_KOMA_POS *pos = (DNGMAP_KOMA_POS *)work.Alloc(1);
