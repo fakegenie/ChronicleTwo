@@ -12,6 +12,7 @@ extern s8 aquarium_fish_maxtbl[];
 #include "userdata.hpp"
 #include "menucls1.hpp"
 #include "menucommon.hpp"
+extern float MenuItemBrdUnderBrdPosXY[];
 #include "menudraw.hpp"
 #include "menumain.hpp"
 #include "menusys.hpp"
@@ -408,18 +409,18 @@ extern "C" char at_5497[];
 extern "C" char at_5498[];
 extern "C" char at_5499[];
 extern mgCTexture *MenuLoadBoardTex;
-extern s8 GyoraceQuestionMsgDrawFlag;
+extern u8 GyoraceQuestionMsgDrawFlag;
 extern CDC2Mes *GyoraceMes;
-extern s8 GyoraceMesDrawFlag;
+extern u8 GyoraceMesDrawFlag;
 extern CDC2Mes *GyoraceFishHave;
 extern CDC2Mes *GyoraceFishTacMes;
-extern s8 GyoraceFishHaveDrawFlag;
+extern u8 GyoraceFishHaveDrawFlag;
 extern float GyoraceHaveFishListTopY;
-extern s8 GyoraceFishTacMesDrawFlag;
-extern s8 GyoraceFishInfoDrawFlag;
+extern u8 GyoraceFishTacMesDrawFlag;
+extern u8 GyoraceFishInfoDrawFlag;
 extern s16 GyoraceHaveFishListMakeLine;
 extern int Gyoracemenu_long_hand_count;
-extern s8 GyoraceHaveFishCursorDrawFlag;
+extern u8 GyoraceHaveFishCursorDrawFlag;
 extern float GyoraceHaveFishCursor;
 extern s16 GyoraceNowMode;
 extern s16 GyoraceNowPhase;
@@ -6038,7 +6039,6 @@ int GyoraceMenuKey() {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuaqua", GyoraceMenuKey__Fv);
 #endif
-#ifdef NONMATCHING
 void GyoraceMenuDraw() {
     mgCTextureManager *textures;
     mgCDrawPrim *prim;
@@ -6049,16 +6049,24 @@ void GyoraceMenuDraw() {
     int frame_block;
 
     switch (GyoraceNowMode) {
-    case 0x3D:
-        MenuSaveDraw();
-        break;
     case 7:
         NameRegistDraw();
         break;
+    case 0x3D:
+        MenuSaveDraw();
+        break;
     default: {
         mgRect<int> bg_tex;
+        int list_rect[4];
+        mgRect<int> board;
+        mgRect<int> cursor_rect;
         mgRect<int> bg_put;
         mgRect<int> bg_edge;
+        mgRect<int> title;
+        mgRect<int> wide_title;
+        mgRect<int> label;
+        mgRect<int> clip;
+        mgRect<int> have_clip;
 
         textures = &mgTexManager;
         bg_tex.Set(0, 0, mgScreenWidth / 2, mgScreenHeight / 2);
@@ -6077,17 +6085,15 @@ void GyoraceMenuDraw() {
         prim = GetMenuPrim();
         textures->ReloadTexture(GyoraceTexBlock[1], (sceVif1Packet *)NULL);
         if (LanguageCode == 0) {
-            mgRect<int> title;
 
             DrawSubGameTitle(GyoraceFishTex, 0, 0x116, 0x1E, 0xA0);
             title.Set(0, 0x9E, 0x6C, 0x18);
             PrimQuad(prim, GyoraceFishTex, 305.0f, 42.0f, title, 0x80, 0x80, 0x80, 0x80);
         } else {
-            mgRect<int> title;
 
             DrawSubGameTitle(GyoraceFishTex, 0, 0x116, 0x1E, 0xA8);
-            title.Set(0, 0x9E, 0x74, 0x18);
-            PrimQuad(prim, GyoraceFishTex, 305.0f, 42.0f, title, 0x80, 0x80, 0x80, 0x80);
+            wide_title.Set(0, 0x9E, 0x74, 0x18);
+            PrimQuad(prim, GyoraceFishTex, 305.0f, 42.0f, wide_title, 0x80, 0x80, 0x80, 0x80);
         }
         DrawSubGameListFix(GyoraceFishTex, 0xFA, 0x52, 0xFA, 0xBE);
         for (i = 0; i < 6; i++) {
@@ -6107,10 +6113,7 @@ void GyoraceMenuDraw() {
                 int title_x = 0x13;
                 float label_x = 34.0f;
                 int title_w = 0xE4;
-                mgRect<int> label;
-                int list_rect[4];
                 int scroll[2];
-                mgRect<int> clip;
                 float cursor_x;
                 float cursor_y;
 
@@ -6132,8 +6135,9 @@ void GyoraceMenuDraw() {
                 scroll[0] = fptosi(GyoraceHaveFishListScrlBarY);
                 y = fptosi(21.0f + (112.0f + GyoraceHaveFishListTopY));
                 DrawSubGameScrlList(GyoraceFishTex, list_rect, scroll);
-                clip.Set(list_rect[0], list_rect[1] + 0x12, list_rect[0] + list_rect[2] + 0x24,
-                         fptosi(2.0f + (260.0f + (list_rect[1] + 0x12)) - 8.0f));
+                int clip_top = list_rect[1] + 0x12;
+                clip.Set(list_rect[0], clip_top, list_rect[0] + list_rect[2] + 0x24,
+                         (int)(2.0f + (260.0f + clip_top) - 8.0f));
                 SetMenuScissor(clip);
                 for (i = 0; i < 0x40; i++) {
                     DrawSubGameUnderLine(GyoraceFishTex, list_rect[0] + 0xE, y, 0xBA);
@@ -6154,10 +6158,9 @@ void GyoraceMenuDraw() {
         textures->ReloadTexture(MenuArg.mes_tex_block, (sceVif1Packet *)NULL);
         GyoraceFishMes->DrawMsg();
         if (GyoraceFishHaveDrawFlag != 0) {
-            mgRect<int> clip;
 
-            clip.Set(0x14, 0x6D, 0xD2, 0x158);
-            SetMenuScissor(clip);
+            have_clip.Set(0x14, 0x6D, 0xD2, 0x158);
+            SetMenuScissor(have_clip);
             GyoraceFishHave->DrawMsg();
             ResetMenuScissor();
         }
@@ -6169,7 +6172,7 @@ void GyoraceMenuDraw() {
                 int tac_y = cursor * 0x18 + 0x30;
 
                 if (LanguageCode > 0) {
-                    tac_x = 0xE0;
+                    tac_x -= 0x38;
                     tac_y -= 0x18;
                 }
                 GyoraceFishTacMes->SetPutPos(tac_x, tac_y, -1, -1);
@@ -6186,8 +6189,6 @@ void GyoraceMenuDraw() {
             case 0x42:
             case 0x43: {
                 int board_block;
-                mgRect<int> board;
-                mgRect<int> cursor_rect;
 
                 Func_MenuItemBrdPosStep(MenuLoadFishTopLine);
                 board_block = -1;
@@ -6201,12 +6202,16 @@ void GyoraceMenuDraw() {
                 break;
             }
         }
-        if (GyoraceNowMode == 0x41 || GyoraceNowMode == 0x40 || GyoraceNowMode == 0x3F || GyoraceNowMode == 0x28) {
-            if (GyoraceFishInfoDrawFlag != 0 && GyoracerActive != NULL && Tex_Aqualium != NULL) {
-                textures->ReloadTexture(Tex_Aqualium->block, (sceVif1Packet *)NULL);
-                DrawFishParam(((mgScreenWidth - 0x14A) >> 1) + 0xA, mgScreenHeight - 0x8E, Tex_Aqualium,
-                              GyoracerActive);
-            }
+        switch (GyoraceNowMode) {
+            case 0x28:
+            case 0x3F:
+            case 0x40:
+            case 0x41:
+                if (GyoraceFishInfoDrawFlag != 0 && GyoracerActive != NULL && Tex_Aqualium != NULL) {
+                    textures->ReloadTexture(Tex_Aqualium->block, (sceVif1Packet *)NULL);
+                    DrawFishParam(((mgScreenWidth - 0x14A) >> 1) + 0xA, mgScreenHeight - 0x8E, Tex_Aqualium,
+                                  GyoracerActive);
+                }
         }
         if (show_cursor != 0) {
             float target_x = (board_x - 0x12 + (MenuLoadFishSelect % 6) * 0x28) +
@@ -6214,8 +6219,8 @@ void GyoraceMenuDraw() {
             float target_y = ((MenuLoadFishSelect / 6 - MenuLoadFishTopLine) * 0x32 + 0x40) +
                              4.0f * sinf(mgAngleLimit(0.10471976f * Gyoracemenu_long_hand_count));
 
-            CalcMenu1(target_x, &Gyoracemenu_CursorXY[0], 4.0f, 2.0f, 0);
-            CalcMenu1(target_y, &Gyoracemenu_CursorXY[1], 4.0f, 2.0f, 0);
+            CalcMenu1(target_x, Gyoracemenu_CursorXY, 4.0f, 2.0f, 0);
+            CalcMenu1(target_y, Gyoracemenu_CursorXY + 1, 4.0f, 2.0f, 0);
             if (board_x <= 0xE0) {
                 PrimQuad(prim, GyoraceCursor, Gyoracemenu_CursorXY[0], Gyoracemenu_CursorXY[1], menu_long_hand,
                          0x80, 0x80, 0x80, 0x80);
@@ -6229,14 +6234,11 @@ void GyoraceMenuDraw() {
     }
     }
     Gyoracemenu_long_hand_count++;
-    if (Gyoracemenu_long_hand_count >= 60000001) {
+    if (Gyoracemenu_long_hand_count > 60000000) {
         Gyoracemenu_long_hand_count = 0;
     }
     GyoraceHaveFishListScrlInit = 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuaqua", GyoraceMenuDraw__Fv);
-#endif
 void DrawSubGameTitle(mgCTexture *texture, int large, int x, int y, int width) {
     mgRect<int> shadow;
     mgRect<int> frame;
