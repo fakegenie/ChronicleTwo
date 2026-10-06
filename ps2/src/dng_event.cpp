@@ -238,7 +238,7 @@ void MessageTaskManager::Step(void) {
 
     current = this->mes;
     if (current != NULL && !(this->flag & 1)) {
-        line = (MESSAGE_TASK *)this->top;
+        line = this->top;
         if (line != NULL) {
             if (line->count <= 0) {
                 current->fukidashi_pos = line->slot;
@@ -270,19 +270,16 @@ void MessageTaskManager::Print(char *text, int count, int fukidashi_pos, int pri
     MESSAGE_TASK *prev;
     MESSAGE_TASK *next;
     int i;
-    int byte_offset;
 
     if (this->mes != NULL) {
         node = NULL;
         i = 0;
-        byte_offset = 0;
         do {
-            if (*(char **)((u8 *)this + byte_offset + 8) == NULL) {
-                node = (MESSAGE_TASK *)((u8 *)this + i * 0x90 + 8);
+            if (task[i].message == NULL) {
+                node = &task[i];
                 break;
             }
             i += 1;
-            byte_offset += 0x90;
         } while (i < 6);
         if (node != NULL) {
             strcpy(node->text, text);
@@ -291,7 +288,7 @@ void MessageTaskManager::Print(char *text, int count, int fukidashi_pos, int pri
             node->slot = fukidashi_pos;
             node->time = count;
             node->count = 0;
-            head = (MESSAGE_TASK *)this->top;
+            head = this->top;
             if (head == NULL) {
                 this->top = node;
                 node->next = NULL;
@@ -320,7 +317,7 @@ void MessageTaskManager::Clear(void) {
 
     current = this->mes;
     if (current != NULL) {
-        line = (MESSAGE_TASK *)this->top;
+        line = this->top;
         if (line != NULL) {
             if (line->time > 0) {
                 current->draw_speed = current->GetDrawSpeedDef();
