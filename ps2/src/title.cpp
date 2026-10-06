@@ -1459,8 +1459,9 @@ void TitleMapDraw() {
         for (int group = 0; group < 6; group++) {
             int i;
             int block;
-            int block_count = TitleScene->mds_list_set.GetTextureBlockNo(group, texture_blocks, 128);
-            for (i = 0; i < block_count; i++) {
+            int block_count;
+            block_count = TitleScene->mds_list_set.GetTextureBlockNo(group, texture_blocks, 128);
+            for (i = 0; block_count > i; i++) {
                 int index = block_count - i - 1;
                 block = texture_blocks[index];
                 if (0 != mgEndDrawReloadTexture(block, NULL) && texture_blocks[index] == water_block) {
@@ -1473,10 +1474,11 @@ void TitleMapDraw() {
     }
     for (texture_group = 6; texture_group < 16; texture_group++) {
         int later_blocks[128];
-        int block_count = TitleScene->mds_list_set.GetTextureBlockNo(texture_group, later_blocks, 128);
         int i;
         int block;
-        for (i = 0; i < block_count; i++) {
+        int block_count;
+        block_count = TitleScene->mds_list_set.GetTextureBlockNo(texture_group, later_blocks, 128);
+        for (i = 0; block_count > i; i++) {
             block = later_blocks[i];
             mgEndDrawReloadTexture(block, NULL);
             mgEndDraw(block, NULL);
