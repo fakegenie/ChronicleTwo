@@ -5784,7 +5784,6 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuchr", Draw__15CMenuCostumeSelFv);
 extern u_long CostumeOptionEnv;
 extern "C" void *__ct__15mgCCameraFollowFffff(void *camera, float distance, float height, float angle,
                                                float speed);
-#ifdef STATEMATCHING
 void MenuCostumeInit(mgCMemory *stack, int *tex_block, int mode) {
     int i;
     CMenuCostumeSel *menu;
@@ -5859,9 +5858,6 @@ void MenuCostumeInit(mgCMemory *stack, int *tex_block, int mode) {
     MenuArg.result[2] = 0;
     MenuCamInit(1.0f);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuchr", MenuCostumeInit__FP9mgCMemoryPii);
-#endif
 int MenuCostumeKey() {
     return MenuCosPtr->KeyStep();
 }
