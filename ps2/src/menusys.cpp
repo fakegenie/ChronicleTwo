@@ -399,7 +399,7 @@ extern s8 cmd_counter_1048;
 #ifdef NONMATCHING
 int CBaseMenuClass::MenuItemCommandSelect(int select_key, int push_button) {
     CGameDataUsed *used_data = MenuUserParam.used_data;
-    CItemUseTarget target;
+    u_long target;
     CUserDataManager *user = GetUserDataMan();
     MenuItemCmdRet.cmd = -1;
     int decided = 0;
@@ -608,8 +608,8 @@ int CBaseMenuClass::MenuItemCommandSelect(int select_key, int push_button) {
                     if (cmd == 16) {
                         target_chara = MenuUserParam.chara[1];
                     }
-                    target.SetPtr(0, target_chara);
-                    MenuUseItemCheckFunc(ask_para.item, &target, 0);
+                    ((CItemUseTarget *)&target)->SetPtr(0, target_chara);
+                    MenuUseItemCheckFunc(ask_para.item, (CItemUseTarget *)&target, 0);
                     if (MenuUsedNotErrorCode == 1) {
                         MenuItemCmdRet.result = 10;
                     }
@@ -633,8 +633,8 @@ int CBaseMenuClass::MenuItemCommandSelect(int select_key, int push_button) {
                 if (ask_para.cmd_color[cursor] == 0x80202020) {
                     MenuItemCmdRet.cmd = 5;
                 } else {
-                    MenuItemCmdRet.result = MenuItemUse.UseItem(
-                        ask_para.item, 1, &MenuUserParam.chara[CMenuItemInfoPt->sub_view]->equip[cmd - 19]);
+                    CGameDataUsed *equips = MenuUserParam.chara[CMenuItemInfoPt->sub_view]->equip;
+                    MenuItemCmdRet.result = MenuItemUse.UseItem(ask_para.item, 1, &equips[cmd - 19]);
                 }
             } else if (cmd == 21 || cmd == 22) {
                 if (ask_para.cmd_color[cursor] == 0x80202020) {
