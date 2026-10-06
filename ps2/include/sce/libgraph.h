@@ -526,8 +526,7 @@ typedef struct {
 } sceGsClear;
 
 typedef struct {
-    sceGsDispEnv disp0;
-    sceGsDispEnv disp1;
+    sceGsDispEnv disp[2];
     sceGifTag giftag0;
     sceGsDrawEnv1 draw0;
     sceGsClear clear0;

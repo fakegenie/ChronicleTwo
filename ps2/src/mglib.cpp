@@ -571,21 +571,21 @@ void mgEndFrame(mgCDrawManager *manager) {
     }
     font_draw_flag = 0;
     if (mgAntialiasing != 0) {
-        ((sceGsDispEnv *)&mgDBuff)[mgDBuffID].pmode = 0x7F23;
+        *(u_long *)&mgDBuff.disp[mgDBuffID].pmode = 0x7F23;
     } else {
         *(volatile u_long *)0x12000000 = 0xFF23;
-        ((sceGsDispEnv *)&mgDBuff)[mgDBuffID].pmode = 0xFF23;
+        *(u_long *)&mgDBuff.disp[mgDBuffID].pmode = 0xFF23;
     }
-    ((sceGsDispEnv *)&mgDBuff)[mgDBuffID].bgcolor = 0;
-    ((sceGsDispEnv *)&mgDBuff)[mgDBuffID].smode2 = 1;
+    *(u_long *)&mgDBuff.disp[mgDBuffID].bgcolor = 0;
+    *(u_long *)&mgDBuff.disp[mgDBuffID].smode2 = 1;
     frame = mgDBuffID != 0 ? &mgDBuff.draw1.frame1 : &mgDBuff.draw0.frame1;
     magnification = 3;
     if (mgScreenWidth == 512) {
         magnification = 4;
     }
     display_position = 0x290 | ((u_long)((524 - mgScreenHeight) / 2 + 72) << 12) | ((u_long)magnification << 23);
-    ((sceGsDispEnv *)&mgDBuff)[mgDBuffID].dispfb = (u_long)frame->FBP | ((u_long)frame->FBW << 9) | ((u_long)frame->PSM << 15);
-    *(u_long *)&((sceGsDispEnv *)&mgDBuff)[mgDBuffID].display = ((u_long)(mgScreenHeight - 1) << 44) | (display_position | ((u_long)(mgScreenWidth * (magnification + 1) - 1) << 32));
+    *(u_long *)&mgDBuff.disp[mgDBuffID].dispfb = (u_long)frame->FBP | ((u_long)frame->FBW << 9) | ((u_long)frame->PSM << 15);
+    *(u_long *)&mgDBuff.disp[mgDBuffID].display = ((u_long)(mgScreenHeight - 1) << 44) | (display_position | ((u_long)(mgScreenWidth * (magnification + 1) - 1) << 32));
     FlushCache(0);
     sceGsSwapDBuff(&mgDBuff, mgDBuffID);
     sceDmaSync(DmaCH2, 0, 0);
