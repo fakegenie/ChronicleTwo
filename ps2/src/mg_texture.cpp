@@ -77,32 +77,31 @@ mgCTexture::mgCTexture() {
 #pragma global_optimizer off
 
 void mgCTexture::Initialize() {
-    u_char *self = (u_char *)this;
     int i;
-    *(signed char *)(self + 8) = 0;
+    name[0] = 0;
     this->block = -1;
     for (i = 0; i < 4; i++) {
-        *(int *)((i << 2) + (int)self + 0x50) = 0;
+        *(int *)((i << 2) + (int)this + 0x50) = 0;
     }
-    *(int *)(self + 0x60) = 0;
-    *(long long *)(self + 0x48) = 0;
-    *(long long *)(self + 0x40) = 0;
-    *(long long *)(self + 0x38) = 0;
+    clut = 0;
+    *(long long *)&clamp = 0;
+    *(long long *)&tex1 = 0;
+    *(long long *)&tex0 = 0;
     struct TexFlags {
         u_char flags_low : 2;
         u_char flags_mid : 2;
         u_char flags_high : 4;
     };
-    ((TexFlags *)(self + 0x48))->flags_low = 1;
-    ((TexFlags *)(self + 0x48))->flags_mid = 1;
-    *(short *)(self + 6) = 0;
+    ((TexFlags *)&clamp)->flags_low = 1;
+    ((TexFlags *)&clamp)->flags_mid = 1;
+    bpp = 0;
     this->height = 0;
     this->width = 0;
-    *(int *)(self + 0x64) = 0;
-    *(int *)(self + 0x28) = 0;
-    *(int *)(self + 0x2C) = 0;
-    *(int *)(self + 0x30) = 0;
-    *(int *)(self + 0x68) = 0;
+    swizzled = 0;
+    vram_size = 0;
+    image_blocks = 0;
+    clut_size = 0;
+    next = 0;
 }
 #pragma global_optimizer reset
 #pragma schedule reset
@@ -307,7 +306,7 @@ void mgCTextureManager::AddHash(mgCTexture *texture) {
         node->next = NULL;
         node->texture = texture;
 
-        int index = hash((char *)texture + 8);
+        int index = hash(texture->name);
         bucket = (mgTEXTURE_HASH **)((index << 2) + (int)this + 0x24);
         cur = *bucket;
         if (cur == NULL) {
@@ -334,7 +333,7 @@ void mgCTextureManager::DelHash(mgCTexture *texture) {
     mgTEXTURE_HASH *found;
     mgTEXTURE_HASH **bucket;
     if (texture != NULL) {
-        int index = hash((char *)texture + 8);
+        int index = hash(texture->name);
         bucket = (mgTEXTURE_HASH **)((index << 2) + (int)this + 0x24);
         cur = *bucket;
         prev = NULL;
@@ -370,7 +369,7 @@ mgCTexture *mgCTextureManager::SearchHash(char *name, int mode) {
 
     for (node = *(mgTEXTURE_HASH **)((bucket << 2) + (int)this + 0x24); node != NULL;
          node = node->next) {
-        if (strcmp(name, (char *)node->texture + 8) == 0) {
+        if (strcmp(name, node->texture->name) == 0) {
             if (mode < 0 || node->texture->block == mode) {
                 return node->texture;
             }
