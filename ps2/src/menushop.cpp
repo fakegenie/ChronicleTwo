@@ -1630,7 +1630,6 @@ extern float QuestListTopY;
 extern float QuestCommentWinX;
 extern s16 QuestReactionCommentGyouNum;
 extern int menu_debug_questselect;
-#ifdef STATEMATCHING
 int CMenuQuestView::KeyStep() {
     MenuCommonInfo->CheckSelectKey();
     int lr_key = MenuCommonInfo->CheckLRKey();
@@ -1804,9 +1803,6 @@ int CMenuQuestView::KeyStep() {
     QuestCursorPos[1] += ((float)((select - top) * 0x22 + 0x52) + 3.0f - QuestCursorPos[1]) / QuestMoveRate;
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menushop", KeyStep__14CMenuQuestViewFv);
-#endif
 void MenuNPCQuestViewInit(mgCMemory *stack, int *tex_block, int view_mode) {
     Menu_Memo_ViewMode = 0;
     if (view_mode == 1) {
