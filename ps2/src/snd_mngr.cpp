@@ -15,7 +15,6 @@
 #include "snd_seseq.hpp"
 #include "sound.hpp"
 
-extern CSound CSnd;
 extern int snd_sema_id;
 extern float MasterVol[2];
 extern int MasterVolFade[2];

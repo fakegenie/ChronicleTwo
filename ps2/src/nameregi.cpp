@@ -93,7 +93,6 @@ extern mgCTexture *NameRegiTex1;
 extern s16 NameRegistMax;
 extern s16 gettbl0_2012[12];
 extern s64 at_2031__3;
-extern CNameRegiMenu *NameRegiMenuPtr;
 
 // Code (.text)
 void SetEventKeyword(char *target, char *topic, int code) {
