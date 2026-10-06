@@ -1022,8 +1022,7 @@ int SearchMapEventParts(int kind, CMapParts **parts, float *rotation, int unused
 #ifdef NONMATCHING
 int SearchMapFlatPosition(float *out_pos, CAutoMapGen *map_gen) {
     CMapParts *place_parts;
-    int tries_left;
-    CMap *map;
+    int attempt;
     float center[4];
     float from[4];
     float to[4];
@@ -1033,15 +1032,13 @@ int SearchMapFlatPosition(float *out_pos, CAutoMapGen *map_gen) {
     float hit_points[32][4];
     float found[4];
     int place_num;
-    int cell_num;
     int poly_num;
     int hit_num;
     int axis;
-    int attempt;
-    int i;
+    int tries_left;
+    CMap *map;
 
-    map = DngMainScene->GetMap(DngMainScene->active_map);
-    if (map == NULL) {
+    if ((map = DngMainScene->GetMap(DngMainScene->active_map)) == NULL) {
         return 0;
     }
     place_parts = map->GetPlacPartsTable(&place_num);
@@ -1053,7 +1050,7 @@ int SearchMapFlatPosition(float *out_pos, CAutoMapGen *map_gen) {
     }
     CMapParts *placed = place_parts;
     place_num = 0;
-    while (placed->name[0] != 0) {
+    while ((placed->name[0] == 0) == 0) {
         placed++;
         place_num++;
     }
@@ -1065,11 +1062,10 @@ int SearchMapFlatPosition(float *out_pos, CAutoMapGen *map_gen) {
     box.max[3] = 1.0f;
     while (1) {
         CMapParts *parts = &place_parts[iRand(place_num)];
-        short attr = 0;
+        int attr = 0;
         if (map_gen != NULL) {
             CAutoMapParts *cell = map_gen->grid;
-            cell_num = map_gen->grid_w * map_gen->grid_h;
-            for (i = 0; i < cell_num; i++) {
+            for (int i = 0; i < map_gen->grid_w * map_gen->grid_h; i++) {
                 if (cell->parts_no >= 0 && cell->parts == parts) {
                     attr = cell->attr;
                     break;
@@ -1099,7 +1095,7 @@ int SearchMapFlatPosition(float *out_pos, CAutoMapGen *map_gen) {
             from[1] += 4200.0f;
             to[1] -= 4200.0f;
             hit_num = CheckHits(polys, poly_num, from, to, 0x20, hit_polys, hit_points, 0, 0);
-            for (i = 0; i < hit_num; i++) {
+            for (int i = 0; i < hit_num; i++) {
                 short area_kind = polys[hit_polys[i]].area_kind;
                 if (area_kind == 0xB) {
                     break;
