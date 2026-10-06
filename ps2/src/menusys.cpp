@@ -1504,7 +1504,7 @@ void CBaseMenuClass::SetAskHowMuchItemNum(MENU_SWAPITEM_INFO *info, CGameDataUse
 }
 void CBaseMenuClass::SetAskParam(MENU_ASKMODE_PARA *param) {
     if (param == NULL) {
-        ((MENU_ASKMODE_PARA *)((u8 *)this + kMenuAskParamOffset))->Initialize();
+        ask_para.Initialize();
         return;
     }
     u8 *dst = (u8 *)this;
