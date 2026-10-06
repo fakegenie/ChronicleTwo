@@ -1185,8 +1185,8 @@ void CShopMenu::CalcTex() {
         if (0 < arrow_flash[0]) {
             trade_brd->SetPartRGBA(at_1825__3, 0xA4, 0xA4, 0xA4, 0x80);
         }
-        int temp = arrow_flash[1] > 0;
-        if (temp) {
+        int right_arrow_lit = arrow_flash[1] > 0;
+        if (right_arrow_lit) {
             trade_brd->SetPartRGBA(at_1826__4, 0xA4, 0xA4, 0xA4, 0x80);
         }
     }

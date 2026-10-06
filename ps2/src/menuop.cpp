@@ -2895,8 +2895,8 @@ int SubGameSaveKey(void) {
             }
             break;
         case SUB_SAVE_WRITE_DONE:
-            unsigned int temp = pushed != 0;
-            if (temp) {
+            unsigned int was_pushed = pushed != 0;
+            if (was_pushed) {
                 MenuSePlay(1);
                 SubGameSaveLoadStatus = 1;
             }

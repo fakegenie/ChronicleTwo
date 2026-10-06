@@ -1886,8 +1886,8 @@ void MenuGeoramaMessageMake(int mode) {
             int no = first_line + i;
             line_pos[i][0] = (int)x;
             line_pos[i][1] = y;
-            int temp = list_no == GEORAMA_VIEW_PAINT;
-            if (temp) {
+            int is_paint_view = list_no == GEORAMA_VIEW_PAINT;
+            if (is_paint_view) {
                 item_mes[i] = i + 0x145A + CMenuGeoPt->list_info[GEORAMA_VIEW_PAINT].top;
                 if (first_line + i == 8 && LanguageCode > 0) {
                     line_pos[i][0] = (int)(x - 40.0f);
@@ -3631,8 +3631,8 @@ int CRemovalMenu::KeyStep() {
                         ExeScript(at_4258);
                     }
                     remake = 1;
-                    int temp = special_house == 1;
-                    if (temp) {
+                    int is_special_house = special_house == 1;
+                    if (is_special_house) {
                         CMenuPosDataForm *form = MenuMesForm[1];
                         form->x = 76.0f;
                         form->y = 160.0f;

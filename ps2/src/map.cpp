@@ -744,14 +744,14 @@ int CMap::SetFuncPLight(float *pos, CFuncPointCheck *check) {
     }
     count = func_point.GetLight(pos, ft_1248, 3, check, 0);
     for (i = 0; i < count; i++) {
-        u8 *point = (u8 *)ft_1248 + i * 0x1C0;
-        sceVu0ScaleVector((float *)color, (float *)(point + 0x20), GetLightAnimeWeight((CFuncPoint *)point, anime_frame));
-        mgSetPlight(3 - i, (float *)(point + 0x180), color, *(float *)(point + 0x30), *(float *)(point + 0x34));
+        CFuncPoint *point = &ft_1248[i];
+        sceVu0ScaleVector((float *)color, point->plight.color, GetLightAnimeWeight(point, anime_frame));
+        mgSetPlight(3 - i, point->position, color, point->plight.power, point->plight.range);
     }
     return count;
 }
 extern "C" void *__ct__10CFuncPointFv(void *point) {
-    __ct__8mgCFrameFv((u8 *)point + 0x70);
+    __ct__8mgCFrameFv(&((CFuncPoint *)point)->frame);
     return point;
 }
 
@@ -1100,7 +1100,7 @@ void CMap::DrawTrBox() {
         if (((CMapTreasureBox *)box)->active == 0) continue;
         CMapParts *link = ((CMapTreasureBox *)box)->parts;
         if (link != 0 && link->GetShow() == 0) continue;
-        if (*(unsigned int *)&func_point & 0x40) {
+        if (func_point.flag & 0x40) {
             ((CMapTreasureBox *)box)->GetPosition(position);
             position[3] = 40.0f;
             light_count = SetFuncPLight(position, &check);
@@ -1130,7 +1130,7 @@ int CMap::GetPoly(int kind, CCPoly *polys, mgVu0FBOX &box, int max) {
             j = 0;
             do {
                 j++;
-                *(s16 *)((u8 *)polys + 0x48) = i;
+                polys->parts_no = i;
                 polys++;
             } while (j < effect_num);
         }
@@ -1316,7 +1316,7 @@ CFuncPoint *CMap::GetEvent(float *pos, int check_type, MapEventInfo *info) {
     current = (MapEventInfo *)&event_storage;
     nearest_point = NULL;
     current->event_no = 0;
-    mgUnitMatrix((float (*)[4])((u8 *)current + 0x10));
+    mgUnitMatrix(current->matrix);
     current->point_no = -1;
     current->parts_no = -1;
     func_point.GetStart(FUNC_POINT_EVENT);
