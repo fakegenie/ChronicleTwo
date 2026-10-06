@@ -367,7 +367,6 @@ int mgCVisualMDT::CreateBBox(float *min, float *max, float (*matrix)[4]) {
     mgVectorMinMaxN(min, max, vertex, vertex_num);
     return 1;
 }
-#ifdef NONMATCHING
 FACES_ID *mgCVisualMDT::CreateFace(FACES_ID *faces, mgCMemory *memory, mgCMemory *index_memory, mgCFace **out_face) {
     mgCFace      *face;
     mgCFace      *last_face;
@@ -437,14 +436,15 @@ FACES_ID *mgCVisualMDT::CreateFace(FACES_ID *faces, mgCMemory *memory, mgCMemory
         }
         last_face->next = face;
     }
-    if (out_face != NULL) {
+    switch ((int)out_face) {
+    case 0:
+        break;
+    default:
         *out_face = face;
+        break;
     }
     return faces;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_visual", CreateFace__12mgCVisualMDTFP8FACES_IDP9mgCMemoryP9mgCMemoryPP7mgCFace);
-#endif
 int mgCVisualMDT::DataAssignMDT(MDT_HEADER *header, mgCMemory *memory,
                                 mgCTextureManager *textures) {
     mgCVisualMDT *self = this;
