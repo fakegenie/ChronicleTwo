@@ -171,7 +171,14 @@ void mgNormalizeVector(float *out, float *in, float length) {
     sceVu0Normalize(unit, in);
     sceVu0ScaleVector(out, unit, length);
 }
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgVectorMin__FPfPfPf);
+asm void mgVectorMin(float *min, float *a, float *b) {
+    .set noreorder
+    lqc2 vf15, 0x0(a1)
+    lqc2 vf16, 0x0(a2)
+    vmini.xyzw vf18, vf15, vf16
+    jr ra
+    sqc2 vf18, 0x0(a0)
+}
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgVectorMin__FPfPfPfPfPf);
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgVectorMaxMin__FPfPfPfPf);
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgVectorMaxMin__FPfPfPfPfPf);
