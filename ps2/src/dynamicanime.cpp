@@ -66,6 +66,10 @@ void CDynamicAnime::ResetPosition(void) {
     }
 }
 #ifdef NONMATCHING
+static inline float WindRand(int *seed) {
+    *seed = *seed * 0x10DCD + 1;
+    return (float)*seed / -2147483648.0f;
+}
 void CDynamicAnime::Step() {
     sceVu0FMATRIX   matrix;
     sceVu0FVECTOR   pull;
@@ -119,46 +123,45 @@ void CDynamicAnime::Step() {
     sceVu0CopyVector(max, now_vertex[0]);
     sceVu0CopyVector(min, now_vertex[0]);
     PreCollision();
-    for (i = 0; i < vertex_num; i++) {
-        sceVu0SubVector(velocity[i], now_vertex[i], old_vertex[i]);
-        *(u_long128 *)old_vertex[i] = *(u_long128 *)now_vertex[i];
-        fixed = &fix_vertex[i];
+    for (j = 0; j < vertex_num; j++) {
+        sceVu0SubVector(velocity[j], now_vertex[j], old_vertex[j]);
+        *(u_long128 *)old_vertex[j] = *(u_long128 *)now_vertex[j];
+        fixed = &fix_vertex[j];
         if (fixed->weight < 1.0f && fixed->weight > 0.0f) {
             fixed_frame = GetFrame(fixed->frame_id);
             if (fixed_frame != NULL) {
                 fixed_frame->GetWorldPosition(pull, fixed->position);
-                mgSubVector(pull, now_vertex[i]);
+                mgSubVector(pull, now_vertex[j]);
                 sceVu0ScaleVector(pull, pull, fixed->weight);
-                mgAddVector(now_vertex[i], pull);
+                mgAddVector(now_vertex[j], pull);
                 sceVu0ScaleVector(pull, pull, fixed->velocity_rate);
-                mgSubVector(velocity[i], pull);
+                mgSubVector(velocity[j], pull);
             }
         }
         friction = 1.0f;
         hit = 0;
         if (fixed->weight < 1.0f) {
-            for (j = 0; j < collision_num; j++) {
-                volume = collision[j];
+            for (i = 0; i < collision_num; i++) {
+                volume = collision[i];
                 if (volume != NULL) {
-                    hit |= volume->CheckHit(now_vertex[i]);
+                    hit |= volume->CheckHit(now_vertex[j]);
                     if (friction > volume->friction) {
                         friction = volume->friction;
                     }
                 }
             }
             if (hit != 0) {
-                sceVu0ScaleVector(velocity[i], velocity[i], friction);
+                sceVu0ScaleVector(velocity[j], velocity[j], friction);
             }
         }
         if (floor_enable != 0) {
-            if (now_vertex[i][1] < floor_y) {
-                now_vertex[i][1] = floor_y;
-                sceVu0ScaleVector(velocity[i], velocity[i], 0.3f);
+            if (now_vertex[j][1] < floor_y) {
+                now_vertex[j][1] = floor_y;
+                sceVu0ScaleVector(velocity[j], velocity[j], 0.3f);
             }
         }
         if (wind_power != 0.0f) {
-            wind_seed = wind_seed * 0x10DCD + 1;
-            wind_gust += 0.5f * ((float)wind_seed / -2147483648.0f - 0.5f);
+            wind_gust += 0.5f * (WindRand(&wind_seed) - 0.5f);
             if (wind_gust > 1.0f) {
                 wind_gust = 1.0f;
             }
@@ -166,9 +169,9 @@ void CDynamicAnime::Step() {
                 wind_gust = 0.0f;
             }
             sceVu0ScaleVector(wind, wind_dir, wind_scale * (wind_power * wind_gust));
-            mgAddVector(velocity[i], wind);
+            mgAddVector(velocity[j], wind);
         }
-        mgVectorMaxMin(max, min, max, min, now_vertex[i]);
+        mgVectorMaxMin(max, min, max, min, now_vertex[j]);
     }
     for (i = 0; i < frame_num; i++) {
         FramePose(frame[i], &frame_pose[i]);
