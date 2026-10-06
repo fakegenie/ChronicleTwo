@@ -65,7 +65,6 @@ extern char at_1637[];
 extern char at_2061[];
 extern char at_2018[];
 extern char at_2019[];
-extern char at_5773[];
 struct DEBUG_ITEM {
     short item_no;
     short num;
@@ -77,7 +76,7 @@ extern DEBUG_ITEM e3_town_5747[];
 extern DEBUG_ITEM e3_dng_5748[];
 extern DEBUG_ITEM e3_boss_5749[];
 extern s8 init_partytbl_5752[];
-extern DEBUG_ITEM dbg_set1_5774[];
+extern DEBUG_ITEM dbg_set1_5774[1];
 extern DEBUG_ITEM dbg_set2_5775[];
 extern DEBUG_ITEM dbg_set3_5776[];
 extern DEBUG_ITEM subgame1_5788[];
@@ -4875,12 +4874,10 @@ void AquaFishFatigueClear(void) {
         tank++;
     } while (tank < 3);
 }
-#ifdef NONMATCHING
 void DebugGetItem(CUserDataManager *user_data, int mode) {
     CUserDataManager *manager = user_data;
     DEBUG_ITEM *items;
     DEBUG_ITEM *extra_items;
-    short equip_no[4];
     CGameDataUsed *attach;
 
     if (user_data == NULL) {
@@ -4934,7 +4931,7 @@ void DebugGetItem(CUserDataManager *user_data, int mode) {
         manager->EnableCharaChange(2);
         items = e3_boss_5749;
     }
-    memcpy(equip_no, at_5773, sizeof(equip_no));
+    short equip_no[4] = {0, 0, 0, 0};
     if (mode == 7) {
         items = dbg_set1_5774;
         extra_items = &start_tbl_5746[1];
@@ -4994,21 +4991,25 @@ void DebugGetItem(CUserDataManager *user_data, int mode) {
             manager->GetCharaDataPtr(0)->hp.max = 48.0f;
             manager->GetCharaDataPtr(0)->defence = 8;
         }
-        if (equip_no[0] >= 2) {
-            manager->GetItem(equip_no[0], 1);
-            manager->SetChrEquip(0, equip_no[0]);
+        int e0 = equip_no[0];
+        if (e0 > 1) {
+            manager->GetItem(e0, 1);
+            manager->SetChrEquip(0, e0);
         }
-        if (equip_no[1] >= 2) {
-            manager->GetItem(equip_no[1], 1);
-            manager->SetChrEquip(0, equip_no[1]);
+        int e1 = equip_no[1];
+        if (e1 > 1) {
+            manager->GetItem(e1, 1);
+            manager->SetChrEquip(0, e1);
         }
-        if (equip_no[2] >= 2) {
-            manager->GetItem(equip_no[2], 1);
-            manager->SetChrEquip(1, equip_no[2]);
+        int e2 = equip_no[2];
+        if (e2 > 1) {
+            manager->GetItem(e2, 1);
+            manager->SetChrEquip(1, e2);
         }
-        if (equip_no[3] >= 2) {
-            manager->GetItem(equip_no[3], 1);
-            manager->SetChrEquip(1, equip_no[3]);
+        int e3 = equip_no[3];
+        if (e3 > 1) {
+            manager->GetItem(e3, 1);
+            manager->SetChrEquip(1, e3);
         }
         if (extra_items != NULL) {
             for (int i = 0; extra_items[i].item_no > 0; i++) {
@@ -5017,9 +5018,6 @@ void DebugGetItem(CUserDataManager *user_data, int mode) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/userdata", DebugGetItem__FP16CUserDataManageri);
-#endif
 
 extern "C" void __sinit_userdata_cpp() {
     BattleParamater.Initialize();
