@@ -40,7 +40,6 @@ extern char D_0037B038[];
 
 extern int cnt_1056;
 
-// Code (.text)
 int LoadNpcTalkMes(mgCMemory *memory) {
     char path[0x4C];
     int size;
@@ -166,7 +165,6 @@ int EventDoorLoop(int frame, int use_scene_se) {
     }
     return 0;
 }
-
 
 int StartEventSyori(void) {
     int started = -1;
@@ -356,7 +354,6 @@ int EventLoop() {
     return request;
 }
 
-
 ClsMes *GetEventMessage(int index) {
     ClsMes *message;
 
@@ -385,14 +382,11 @@ CCharacter2 *GetCharacter(int index) {
     return character;
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/event", vv_984__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/event", at_819__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/event", at_820__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/event", at_1002__4__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(EventScene, 0x4);
 INCLUDE_BSS(cnt_1056, 0x4);

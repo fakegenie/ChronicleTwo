@@ -11,73 +11,49 @@
 extern u_int prog_vif_291[4];
 extern u_int progf_vif_292[4];
 
-/**
- *
- * GIF tag fields used while drawing a sprite.
- *
- */
 struct SpriteGifTag {
     u_char unknown_00;
     u_char unknown_01 : 7;
-    u_char eop : 1; /**< Ends the GIF packet when set. */
+    u_char eop : 1;
     u_char unknown_02[3];
     u_char unknown_05 : 6;
-    u_char pre : 1; /**< Includes the PRIM value in the GIF tag. */
+    u_char pre : 1;
     u_char unknown_05hi : 1;
     u_char unknown_06;
     u_char unknown_07 : 4;
-    u_char nreg : 4; /**< Number of GS registers in each loop. */
-    u_char regs0 : 4; /**< First GS register descriptor. */
-    u_char regs1 : 4; /**< Second GS register descriptor. */
-    u_char regs2 : 4; /**< Third GS register descriptor. */
-    u_char regs3 : 4; /**< Fourth GS register descriptor. */
-    u_char regs4 : 4; /**< Fifth GS register descriptor. */
-    u_char regs5 : 4; /**< Sixth GS register descriptor. */
-    u_char regs6 : 4; /**< Seventh GS register descriptor. */
-    u_char regs7 : 4; /**< Eighth GS register descriptor. */
+    u_char nreg : 4;
+    u_char regs0 : 4;
+    u_char regs1 : 4;
+    u_char regs2 : 4;
+    u_char regs3 : 4;
+    u_char regs4 : 4;
+    u_char regs5 : 4;
+    u_char regs6 : 4;
+    u_char regs7 : 4;
     u_char regs8 : 4;
     u_char regs9 : 4;
 };
 
-/**
- *
- * PRIM field of the sprite's GIF tag.
- *
- */
 struct SpriteGifPrim {
     unsigned long long unknown_low : 47;
-    unsigned long long prim : 11; /**< GS primitive attributes. */
+    unsigned long long prim : 11;
     unsigned long long unknown_high : 6;
 };
 
-/**
- *
- * VIF data viewed as one quadword or four words.
- *
- */
 union VifQuad {
-    u_long128 q; /**< Quadword value. */
-    u_int w[4];  /**< The same data as words. */
+    u_long128 q;
+    u_int w[4];
 };
 extern u_int at_298[4];
 extern u_int at_324__2[4];
-/**
- *
- * Words of the GIF tag written into a sprite packet.
- *
- */
+
 struct SpriteGifTagBuf {
-    u_int word0; /**< First GIF tag word. */
+    u_int word0;
     u_int unknown_04[3];
 };
-/**
- *
- * GIF tag of the GS register writes that draw an mgCSprite, in A+D mode, whose loop count CreatePacket sets.
- *
- */
+
 extern SpriteGifTagBuf sprite_giftag;
 
-// Code (.text)
 #ifdef NONMATCHING
 int mgC3DSprite::CreateRenderInfoPacket(u_int *dest, float (*matrix)[4],
                                         mgRENDER_INFO *render_info) {
@@ -263,7 +239,7 @@ void mgC3DSprite::CPSetDrawEnv(mgCDrawEnv *drawEnv) {
         *(mgCDrawEnv *)packet_cur = *drawEnv;
         packet_cur += 4;
         int macro = drawEnv->GetAlphaMacroID();
-            // Additive and subtractive blends fog towards black so that fogged pixels fade out.
+
         u_int *extra = (u_int *)packet_cur;
         if (macro == 2 || macro == 3) {
             extra[0] = 0x10000002;
@@ -368,7 +344,7 @@ void mgC3DSprite::EndCPSprite(void) {
         header[1] = 0;
         header[2] = 0;
         header[3] = 0;
-        // The first batch starts the VU program; later batches continue it.
+
         if (prog_started == 0) {
             *packet_cur++ = *(u_long128 *)prog_vif_291;
             prog_started = 1;
@@ -446,7 +422,7 @@ u_int mgCSprite::CreatePacket(mgCDrawManager *manager) {
     tag[3] = 0x50000009;
     *(u_long128 *)cursor = *(u_long128 *)tag;
     sprite_giftag.word0 = 0x8008;
-    // Drawn at depth zero unless a view depth is given and lands on the screen.
+
     *(u_long128 *)(cursor + 0x10) = *(u_long128 *)&sprite_giftag;
     data = (long long *)(cursor + 0x20);
     screen_z = 0;
@@ -515,22 +491,18 @@ int mgCSprite::Draw(u_int *tag, float (*matrix)[4], mgCDrawManager *manager) {
     return 0;
 }
 
-// Defined in mg_sprite.hpp.
 void mgCSprite::Draw(float (*matrix)[4], mgCDrawManager *manager) {
     Draw(NULL, matrix, manager);
 }
 
-// Defined in mg_visual.hpp.
 int mgCVisualPrim::Iam() {
     return MG_VISUAL_KIND_PRIM;
 }
 
-// Defined in mg_sprite.hpp.
 void mgC3DSprite::Draw(float (*matrix)[4], mgCDrawManager *manager) {
     Draw(NULL, matrix, manager);
 }
 
-// Defined in mg_sprite.hpp.
 void mgC3DSprite::Initialize(void) {
     this->packet = 0;
     this->unk_00 = 0;
@@ -540,16 +512,13 @@ void mgC3DSprite::Initialize(void) {
     this->vu1_base = 0;
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_sprite", sprite_giftag__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_sprite", prog_vif_291__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_sprite", progf_vif_292__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_sprite", at_298__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_sprite", at_324__2__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_sprite", __vt__9mgCSprite__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_sprite", __vt__11mgC3DSprite__DATA);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(at_199, 0x10);

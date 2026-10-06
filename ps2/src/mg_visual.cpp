@@ -37,30 +37,26 @@ struct mgMaterialVector {
 };
 
 #ifdef NONMATCHING
-/**
- * Initial transform and lighting upload of an MDT visual's setup packet.
- */
+
 struct mgVISUAL_SETUP_PACKET {
-    u_int          dma[4];        /**< DMA count tag for the initial upload. */
-    u_int          vif[4];        /**< Buffer layout and upload commands. */
+    u_int          dma[4];
+    u_int          vif[4];
     u_long128      unk_20;
-    sceVu0FMATRIX  model_screen;  /**< Transform from model space to GS screen space. */
-    sceVu0FMATRIX  model_world;   /**< Transform from model space to world space. */
-    sceVu0FVECTOR  light_dir[3];  /**< Three directional-light vectors sent to VU1. */
-    sceVu0FMATRIX  light_color;   /**< Directional-light colours. */
-    sceVu0FVECTOR  ambient;       /**< Ambient light with the object's alpha factor. */
-    sceVu0FVECTOR  object_color;  /**< Object colour with the object's alpha factor. */
+    sceVu0FMATRIX  model_screen;
+    sceVu0FMATRIX  model_world;
+    sceVu0FVECTOR  light_dir[3];
+    sceVu0FMATRIX  light_color;
+    sceVu0FVECTOR  ambient;
+    sceVu0FVECTOR  object_color;
 };
 STATIC_ASSERT(sizeof(mgVISUAL_SETUP_PACKET) == 0x140);
 
-
 static u_long128 *(*set_data_func[8])(int, int, int **, u_long128 *, u_long128 *, u_long128 *, u_long128 *, u_long128 *) = {
     SetData0, SetData1, SetData2, SetData3, SetData4, SetData5, SetData6, SetData7
-}; /**< Vertex upload writers selected by the face attributes. */
+};
 
 #endif
 
-// Code (.text)
 u_int *GetScrPad(void) {
     return (u_int *)(buff_id ? 0x70002000 : 0x70000000);
 }
@@ -694,9 +690,7 @@ u_long128 *SetData0(int count, int type, int **index, u_long128 *packet, u_long1
     *index = cursor;
     return uv_out;
 }
-/**
- * Writes the indexed vertex, normal, uv, colour streams for one vertex batch.
- */
+
 u_long128 *SetData1(int count, int type, int **index, u_long128 *packet, u_long128 *vertex, u_long128 *normal, u_long128 *uv, u_long128 *colour) {
     u_long128 *vertex_out;
     u_long128 *normal_out;
@@ -725,9 +719,7 @@ u_long128 *SetData1(int count, int type, int **index, u_long128 *packet, u_long1
     *index = cursor;
     return colour_out;
 }
-/**
- * Writes the indexed vertex, normal streams for one vertex batch.
- */
+
 u_long128 *SetData2(int count, int type, int **index, u_long128 *packet, u_long128 *vertex, u_long128 *normal, u_long128 *uv, u_long128 *colour) {
     u_long128 *vertex_out;
     u_long128 *normal_out;
@@ -750,9 +742,7 @@ u_long128 *SetData2(int count, int type, int **index, u_long128 *packet, u_long1
     *index = cursor;
     return normal_out;
 }
-/**
- * Writes the indexed vertex, normal, colour streams for one vertex batch.
- */
+
 u_long128 *SetData3(int count, int type, int **index, u_long128 *packet, u_long128 *vertex, u_long128 *normal, u_long128 *uv, u_long128 *colour) {
     u_long128 *vertex_out;
     u_long128 *normal_out;
@@ -778,9 +768,7 @@ u_long128 *SetData3(int count, int type, int **index, u_long128 *packet, u_long1
     *index = cursor;
     return colour_out;
 }
-/**
- * Writes the indexed vertex, uv streams for one vertex batch.
- */
+
 u_long128 *SetData4(int count, int type, int **index, u_long128 *packet, u_long128 *vertex, u_long128 *normal, u_long128 *uv, u_long128 *colour) {
     u_long128 *vertex_out;
     u_long128 *uv_out;
@@ -803,9 +791,7 @@ u_long128 *SetData4(int count, int type, int **index, u_long128 *packet, u_long1
     *index = cursor;
     return uv_out;
 }
-/**
- * Writes the indexed vertex, uv, colour streams for one vertex batch.
- */
+
 u_long128 *SetData5(int count, int type, int **index, u_long128 *packet, u_long128 *vertex, u_long128 *normal, u_long128 *uv, u_long128 *colour) {
     u_long128 *vertex_out;
     u_long128 *uv_out;
@@ -832,9 +818,7 @@ u_long128 *SetData5(int count, int type, int **index, u_long128 *packet, u_long1
     return colour_out;
 }
 #ifdef NONMATCHING
-/**
- * Writes the indexed vertex streams for one vertex batch.
- */
+
 u_long128 *SetData6(int count, int type, int **index, u_long128 *packet, u_long128 *vertex, u_long128 *normal, u_long128 *uv, u_long128 *colour) {
     int       *cursor;
     u_long128 *vertex_out;
@@ -861,9 +845,7 @@ u_long128 *SetData6(int count, int type, int **index, u_long128 *packet, u_long1
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_visual", SetData6__FiiPPiP1P1P1P1P1);
 #endif
-/**
- * Writes the indexed vertex, colour streams for one vertex batch.
- */
+
 u_long128 *SetData7(int count, int type, int **index, u_long128 *packet, u_long128 *vertex, u_long128 *normal, u_long128 *uv, u_long128 *colour) {
     u_long128 *vertex_out;
     u_long128 *colour_out;
@@ -1371,7 +1353,6 @@ int mgCVisualFixMDT::Iam() {
     return 2;
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_visual", giftag__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_visual", set_tex0_dma__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_visual", set_tex0_giftag__DATA);
@@ -1388,12 +1369,10 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_visual", prog_vif_730__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_visual", progf_vif_731__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_visual", at_769__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_visual", __vt__13mgCVisualPrim__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_visual", __vt__15mgCVisualFixMDT__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_visual", __vt__12mgCVisualMDT__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(start_dma, 0x4);
 INCLUDE_BSS(buff_id, 0x4);
 INCLUDE_BSS(prev_tex, 0x4);

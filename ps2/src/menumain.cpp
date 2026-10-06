@@ -85,56 +85,30 @@ static inline void SetFormPoint(CMenuPosDataForm *form, int x, int y) {
     form->y = (float)y;
 }
 
-/**
- *
- * Stores a destination point for menu movement.
- *
- */
 struct MovePoint {
-    int x; /**< Horizontal coordinate of the destination. */
-    int y; /**< Vertical coordinate of the destination. */
+    int x;
+    int y;
 };
 
-/**
- *
- * Stores menu pages reached by the page keys.
- *
- */
 struct MenuKeyPageTable {
-    int next[2]; /**< Page destinations for the two page keys. */
+    int next[2];
 };
-/**
- *
- * Pairs names used for a menu area.
- *
- */
+
 struct AreaNameItems {
-    char *name[2]; /**< Names for the two area entries. */
+    char *name[2];
 };
-/**
- *
- * Stores the two coordinates of a menu board.
- *
- */
+
 struct BoardPosition {
-    int value[2]; /**< Horizontal and vertical board coordinates. */
+    int value[2];
 };
-/**
- *
- * Stores menu widths for supported languages.
- *
- */
+
 struct LanguageWidths {
-    int value[9]; /**< Width values indexed by language. */
+    int value[9];
 };
-/**
- *
- * Pairs a monster name with its message.
- *
- */
+
 struct MonsterTableEntry {
-    short nameNo; /**< Message number for the monster name. */
-    short messageNo; /**< Message number for the monster description. */
+    short nameNo;
+    short messageNo;
 };
 
 extern CMenuInter *CMenuInterPt;
@@ -232,7 +206,6 @@ extern char at_2450[];
 extern char *filetbl_2141[];
 int ReadBGSync(void);
 
-// Code (.text)
 void MenuScreenBlackBeltSet(int enable) {
 }
 int GetMenuLoopType(void) {
@@ -1748,7 +1721,6 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/menumain", MenuInternSelectKey__Fv);
 #endif
 #ifdef NONMATCHING
 void MenuInternSelectDraw(void) {
-
     MenuPosData->FormDraw();
     if (MenuInterMesDrawFlag != 0 && MenuInterMes != NULL) {
         mgTexManager.ReloadTexture(MenuArg.mes_tex_block, (sceVif1Packet *)0);
@@ -1886,7 +1858,6 @@ int CopyActiveIconTexture(mgCTexture **textures, int chara_no, u_int *unused) {
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/menumain", CopyActiveIconTexture__FPP10mgCTextureiPUi);
 #endif
 void MenuDebugModeDraw() {
-
     float margin = 6.0f, width = 110.0f, height = 24.0f;
     struct {
         u8 prefix[0x94];
@@ -1902,7 +1873,6 @@ void MenuDebugModeDraw() {
     DrawDirect__5CFontFPcii(&menuFont, (char *)&menuFont, menuFont.x, menuFont.y);
 }
 void BookshelfMessageMake(ClsMes *message, int baseWindow, int itemNo, int monsterNo) {
-
     int photos[5];
     char name[0x80];
     int windowNo;
@@ -1950,7 +1920,6 @@ void BookshelfMessageMake(ClsMes *message, int baseWindow, int itemNo, int monst
     }
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumain", light_1062__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumain", lightcolor_1063__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumain", menu_keyfunctbl__DATA);
@@ -1965,7 +1934,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumain", topic_tbl_1777__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumain", filetbl_2141__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumain", monster_table__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumain", at_1028__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumain", at_1440__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumain", at_1598__2__DATA);
@@ -2030,7 +1998,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumain", at_2439__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumain", at_2440__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumain", at_2450__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumain", MenuPrim__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumain", MenuPrevEndCode__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumain", MenuBGTextureBlock__DATA);
@@ -2045,7 +2012,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumain", at_1866__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumain", at_1867__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menumain", loopnumtbl_2360__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(MenuMainScene, 0x4);
 INCLUDE_BSS(MenuActiveSaveData, 0x4);
 INCLUDE_BSS(MenuUserDataManPtr, 0x4);
@@ -2093,7 +2059,6 @@ INCLUDE_BSS(TopicFontX, 0x8);
 INCLUDE_BSS(at_1976, 0x8);
 INCLUDE_BSS(at_2209__3, 0x8);
 
-// Uninitialised data (.bss)
 mgCMemory MenuMainStack;
 mgCMemory MenuMainStack_Next;
 INCLUDE_BSS(CMenuInterStatic, 0x20);

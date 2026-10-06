@@ -10,8 +10,6 @@
 #include "mdslist.hpp"
 #include "collision.hpp"
 
-
-// Code (.text)
 int CEditMap::PlaceRiver(float *pos) {
     for (int i = 0; i < grid_max; i++) {
         CEditGrid *grid = this->grid[i];
@@ -293,7 +291,6 @@ CGridData::CGridData() {
     memset(this, 0, sizeof(CGridData));
 }
 void CEditGrid::Clear() {
-
     memset((void *)data, 0, num_x * num_z * sizeof(CGridData));
 }
 void CEditGrid::Initialize() {
@@ -591,7 +588,6 @@ void CEditGrid::GetGridBox(mgVu0FBOX *box, float *pos) {
     box->max[2] += step_z;
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editriver", at_504__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editriver", at_505__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editriver", at_506__DATA);
@@ -603,6 +599,5 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editriver", at_593__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editriver", at_594__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editriver", at_799__3__DATA);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(at_733__2, 0x10);
 INCLUDE_BSS(at_734, 0x10);

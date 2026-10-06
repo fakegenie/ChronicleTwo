@@ -42,20 +42,12 @@ extern int *SelData[EDIT_DEBUG_PAGE_COUNT][8];
 extern char *SelText[EDIT_DEBUG_PAGE_COUNT][8];
 extern char *SelHelp[EDIT_DEBUG_PAGE_COUNT][8];
 
-/**
- * Writes the marker for the selected debug-menu row and returns its length.
- */
 static int PrintCursor(char *text, int row);
-/**
- * Loads one fish-race contestant from the GYOFISH script tag.
- */
+
 int tagGyoFish(SPI_STACK *stack, int argument_count);
-/**
- * Reloads the host fish-race configuration into the bonus racer table.
- */
+
 static void LoadGyorace();
 
-// Code (.text)
 void EditDebugInit() { EditDebugFlag = 0; Select = 0; EditDebugTexb = -1; }
 int EditDebugMode() { return EditDebugFlag; }
 void EditDebugStart(int texb, mgCMemory *buffer) {
@@ -580,7 +572,6 @@ static void LoadGyorace() {
     }
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editdebug", SelMax__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editdebug", SelData__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editdebug", SelText__DATA);
@@ -598,7 +589,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editdebug", at_1387__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editdebug", at_1388__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editdebug", at_1542__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editdebug", at_989__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editdebug", at_990__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editdebug", at_991__DATA);
@@ -668,14 +658,12 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editdebug", at_1514__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editdebug", at_1541__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editdebug", at_1544__2__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editdebug", EventNo__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editdebug", at_1059__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editdebug", at_1063__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editdebug", at_1224__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editdebug", at_1226__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(EditDebugFlag, 0x4);
 INCLUDE_BSS(EditDebugTexb, 0x4);
 INCLUDE_BSS(Select, 0x4);
@@ -691,5 +679,4 @@ INCLUDE_BSS(LightType, 0x4);
 INCLUDE_BSS(DirLightNo, 0x4);
 INCLUDE_BSS(fish_num, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(at_1237, 0x10);

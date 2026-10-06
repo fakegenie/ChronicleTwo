@@ -47,7 +47,6 @@ extern "C" float mgGetProjection__Fv();
 
 static int CheckPlaceBurnParts(GeoFuncParam *param, RS_STACKDATA *args, int argc);
 
-// Code (.text)
 void CEditEvent::Reset() {
     state = EDIT_EVENT_STATE_IDLE;
     unk_c = 0;
@@ -106,14 +105,10 @@ int CEditEvent::StartEvent(CSceneEventData *event_data) {
 extern "C" char at_1133__5[], at_1134__4[], at_1135__4[], at_1136__3[], at_1137__3[], at_1138__3[], at_1139[], at_916__4[];
 extern "C" u_long128 at_920__4;
 extern "C" MENU_INIT_ARG *MenuInfo__2;
-/**
- *
- * Four edit event names stored in one quadword.
- *
- */
+
 union EditEventNames {
-    char *name[4]; /**< Event names. */
-    u_long128 qw;  /**< The same pointers as one quadword. */
+    char *name[4];
+    u_long128 qw;
 };
 extern "C" int PreLoadSync__Fv();
 
@@ -644,10 +639,8 @@ void GeoUpdateNpcPos(CScene *scene) {
     }
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editevent", at_920__4__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editevent", at_888__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editevent", at_916__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editevent", at_917__4__DATA);
@@ -667,5 +660,4 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editevent", at_1209__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editevent", at_1210__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editevent", at_1211__2__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editevent", MenuInfo__2__DATA);

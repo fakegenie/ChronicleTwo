@@ -32,7 +32,6 @@
 
 #define WindowFillAlpha(alpha, opaque) ((opaque) ? 0x80 : (alpha) * 0x36 / 128)
 
-// Code (.text)
 void CalcSelectCursorPos(RECT rect, int *out) {
     int left = rect.x + 0x17;
     int inner = rect.width - 0x2E;
@@ -379,5 +378,5 @@ void DrawDQFukidashi(mgCDrawPrim *prim, RECT win, int tail_x, int tail_y,
                    0x10, 0xF0, 0x10, 0x10, color);
     DrawWindowTile(prim, right_x, bottom_y, 0x10, 0x10, 0x20, 0xF0, 0x10, 0x10, color);
 }
-// Initialised data (.data)
+
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/drawwin", data__DATA);

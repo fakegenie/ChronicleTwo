@@ -34,13 +34,9 @@ extern char at_871__3[];
 extern char at_872__3[];
 extern char at_1150[];
 extern char at_1000__3[], at_1001__3[], at_1002__3[], at_1003__3[], at_1004__3[], at_1005__3[], at_1006__2[], at_1007__2[], at_1008__3[], at_1009__2[], at_1010__2[], at_1011__2[], at_1012__2[], at_1013__2[], at_1014__2[], at_1015__2[], at_1016__3[], at_1017__3[], at_1018__4[];
-/**
- *
- * Memory stack slots used while setting up character parts.
- *
- */
+
 struct SetupPartStack {
-    int stacks[5]; /**< Stack slots for the parts. */
+    int stacks[5];
 };
 extern SetupPartStack at_919__3;
 extern int mem_table[4][7];
@@ -48,29 +44,17 @@ extern char at_1149[];
 int SetupMints(CScene *scene, CUserDataManager *user_data);
 int SetupMonica(CScene *scene, CUserDataManager *user_data);
 int SetupMonster(CScene *scene, CUserDataManager *user_data);
-/**
- *
- * Four resource names used by character setup.
- *
- */
+
 struct SetupNameTable4 {
-    char *names[4]; /**< Resource names. */
+    char *names[4];
 };
-/**
- *
- * Three resource names used by character setup.
- *
- */
+
 struct SetupNameTable3 {
-    char *names[3]; /**< Resource names. */
+    char *names[3];
 };
-/**
- *
- * Six resource names used by character setup.
- *
- */
+
 struct SetupNameTable6 {
-    char *names[6]; /**< Resource names. */
+    char *names[6];
 };
 extern SetupNameTable6 at_1216__4;
 extern char at_1268[], at_1269[], at_1270[], at_1271[], at_1272[], at_1273[], at_1274[], at_1275[], at_1276[], at_1277[];
@@ -89,16 +73,11 @@ int SetupMonster(CScene *scene, CUserDataManager *user_data);
 #include "menuchr.hpp"
 #include "mg_memory.hpp"
 
-
 extern char r_robo_pname_1282[4][16];
 extern char fname_1290[64];
-/**
- *
- * Order of the four parts used by character setup.
- *
- */
+
 struct SetupPartOrder {
-    int parts[4]; /**< Part order. */
+    int parts[4];
 };
 extern SetupPartOrder at_1281__2;
 extern char *fname_tbl_1291[6];
@@ -107,7 +86,6 @@ extern "C" int GetDataTypeStartListNo__9CGameDataFi(CGameData *, int);
 
 static int SetupRobo(CScene *scene, CUserDataManager *user_data, ROBO_INFO_DATA *robo_info);
 
-// Code (.text)
 void GetCharacterSnd(CUserDataManager *user_data, int unit, char *path) {
     CHARA_DATA *chara = user_data->GetCharaDataPtr(unit);
     CGameDataUsed *equip = chara->equip;
@@ -561,7 +539,6 @@ int SetupMonster(CScene *scene, CUserDataManager *user_data) {
     return 1;
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/charasetup", at_919__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/charasetup", mem_table__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/charasetup", at_1110__DATA);
@@ -574,7 +551,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/charasetup", at_1281__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/charasetup", fname_tbl_1291__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/charasetup", fname_tbl2_1298__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/charasetup", at_868__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/charasetup", at_869__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/charasetup", at_870__2__DATA);
@@ -630,7 +606,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/charasetup", at_1302__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/charasetup", at_1303__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/charasetup", at_1304__3__DATA);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(robo_dat, 0x30);
 INCLUDE_BSS(r_robo_pname_1282, 0x40);
 INCLUDE_BSS(fname_1290, 0x40);

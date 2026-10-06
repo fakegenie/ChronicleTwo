@@ -4,9 +4,8 @@
 #include <sifrpc.h>
 #include <cstdio>
 
-/** Client connection to the EZBGM IOP server. */
 extern sceSifClientData gCd2;
-/** Command send and response buffer shared with the EZBGM server. */
+
 extern int sbuff__3[16];
 extern const char at_32[];
 extern const char at_33__2[];
@@ -14,7 +13,6 @@ extern const char at_52[];
 extern const char at_53[];
 extern const char at_54[];
 
-// Code (.text)
 #ifdef NONMATCHING
 int ezBgmInit() {
     printf(at_32);
@@ -126,13 +124,11 @@ int CSound::StreamOpenState() {
     return sceSifCheckStatRpc(&gCd2);
 }
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/ezbgm", at_32__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/ezbgm", at_33__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/ezbgm", at_52__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/ezbgm", at_53__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/ezbgm", at_54__DATA);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(sbuff__3, 0x40);
 INCLUDE_BSS(gCd2, 0x30);

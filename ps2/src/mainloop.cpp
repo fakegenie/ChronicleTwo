@@ -112,7 +112,6 @@ extern char at_2083[];
 extern char at_2084[];
 extern char at_2085[];
 
-// Code (.text)
 CFont *GetDebugFont(void) {
     return &Font;
 }
@@ -156,9 +155,7 @@ void SetTextureTable(int table_size, int table_count, mgCMemory *memory) {
     mgTexManager.SetTableBuffer(table_count, table_size, memory);
     mgTexManager.Initialize(GetVramTopAddress(), -1);
 }
-/**
- * Registers the logical controller bindings for the selected language.
- */
+
 static void InitPadTable(int language) {
     int confirm[2] = { PAD_CIRCLE, PAD_CROSS };
     int cancel[2]  = { PAD_CROSS, PAD_CIRCLE };
@@ -553,9 +550,7 @@ void MenuInit(INIT_LOOP_ARG arg) {
     LoadEventViewData(read_buffer, &MenuBuffer);
 }
 #ifdef NONMATCHING
-/**
- * Runs the debug mode selection menu and its configuration screens.
- */
+
 static int MenuLoop() {
     mgCTextureManager *textures = &mgTexManager;
     int map_result;
@@ -713,11 +708,9 @@ static int MenuLoop() {
             if (select == DEBUG_ROW_CONVERT_SAVE) {
                 INIT_LOOP_ARG arg;
 
-
                 NextLoop(LOOP_SV_CONV_VIEW, arg);
             } else {
                 INIT_LOOP_ARG arg;
-
 
                 arg.map_no = menu_arguments[select];
                 arg.event_no = DefStartEventNo;
@@ -742,9 +735,7 @@ void InitEventSelect(void) {
     hdd_sel = 0;
 }
 #ifdef NONMATCHING
-/**
- * Runs the debug chapter, event, map and extra-mode selection screen.
- */
+
 static int EventSelect() {
     static int   menu_sel[11];
     static char *menu[12] = {
@@ -1320,9 +1311,7 @@ int gcHP(SPI_STACK *stack, int arg_count) {
     }
     return 1;
 }
-/**
- * Unlocks Geostones and town conditions and grants Georama materials.
- */
+
 static int gcALL_GEO_PARTS(SPI_STACK *stack, int argc) {
     CSaveDataDungeon *dungeon;
     DNG_FLOOR_SAVE   *floor;
@@ -1484,10 +1473,6 @@ CEditData::CEditData() {
     Initialize();
 }
 
-// Static initialiser (.init)
-
-
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop", LoopInit__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop", LoopMain__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop", LoopExit__DATA);
@@ -1503,7 +1488,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop", at_1456__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop", menu_1457__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop", tag__3__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop", at_1212__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop", at_1213__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop", at_1214__DATA);
@@ -1612,17 +1596,12 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop", at_2083__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop", at_2084__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop", at_2085__DATA);
 
-// Static initialiser table (.ctor)
-
-
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop", MainThreadPriority__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop", at_973__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop", at_974__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop", at_1317__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mainloop", at_1474__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(read_buffer, 0x4);
 INCLUDE_BSS(SystemSND_ID, 0x4);
 INCLUDE_BSS(DebugFlag, 0x4);
@@ -1663,7 +1642,6 @@ INCLUDE_BSS(exit_start, 0x4);
 INCLUDE_BSS(PauseSel, 0x4);
 INCLUDE_BSS(PauseMenuMode, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(GamePad__2, 0x480);
 INCLUDE_BSS(PadCtrl, 0x510);
 DEBUG_INFO DebugInfo;

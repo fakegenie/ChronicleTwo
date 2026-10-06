@@ -37,142 +37,82 @@ extern s8 aquarium_fish_maxtbl[];
 #include <cstring>
 #include "vtables.hpp"
 
-/**
- *
- * Describes the fish growth and parameter changes caused by food.
- *
- */
 struct aqua_food_info {
-    short item_no; /**< Item number of the food. */
-    signed char growth; /**< Growth change from the food. */
-    signed char add_param3; /**< Change to fish parameter three. */
-    signed char add_param0; /**< Change to fish parameter zero. */
-    signed char add_param1; /**< Change to fish parameter one. */
-    signed char add_param2; /**< Change to fish parameter two. */
+    short item_no;
+    signed char growth;
+    signed char add_param3;
+    signed char add_param0;
+    signed char add_param1;
+    signed char add_param2;
     signed char unk_7;
-    u16 add_timer; /**< Duration added by the food. */
+    u16 add_timer;
 };
 
-/**
- *
- * References the horizontal and height data of an aquarium grid cell.
- *
- */
 struct aqua_grid_cell {
-    float *xz; /**< Horizontal position data. */
-    float *y; /**< Height data. */
+    float *xz;
+    float *y;
 };
 
-/**
- *
- * Views four floating-point values as a single 128-bit value.
- *
- */
 union aqua_quad {
-    float v[4]; /**< Four floating-point components. */
-    u_long128 quad; /**< Combined 128-bit representation. */
+    float v[4];
+    u_long128 quad;
 };
 
-/**
- *
- * Stores four floating-point components for aquarium geometry.
- *
- */
 struct aqua_vector {
-    float v[4]; /**< Four vector components. */
+    float v[4];
 };
 
-/**
- *
- * Records the parents and offspring of a fish breeding combination.
- *
- */
 struct fish_breed_pair {
-    signed char first_parent; /**< First parent fish type. */
-    signed char second_parent; /**< Second parent fish type. */
-    signed char child; /**< Resulting fish type. */
+    signed char first_parent;
+    signed char second_parent;
+    signed char child;
 };
 
 STATIC_ASSERT(sizeof(fish_breed_pair) == 3);
 
 extern fish_breed_pair aquafish_mixTable[171];
 
-/**
- *
- * Associates a fish item with its image and sex-dependent colours.
- *
- */
 struct aqua_fish_info {
-    short item_no; /**< Fish item number. */
+    short item_no;
     u8 unk_2[2];
-    const char *img_path; /**< Path to the fish image. */
-    signed char color_male; /**< Colour index for a male fish. */
-    signed char color_female; /**< Colour index for a female fish. */
+    const char *img_path;
+    signed char color_male;
+    signed char color_female;
     u8 unk_a[2];
 };
 
-/**
- *
- * Tracks the cursor and first visible row of a race list.
- *
- */
 struct gyorace_list_select {
-    int cursor; /**< Selected list row. */
-    int top; /**< First visible list row. */
+    int cursor;
+    int top;
 };
 
-/**
- *
- * Stores data indices for the six racers.
- *
- */
 struct gyoracer_index_data {
-    short data_index[6]; /**< Data index for each racer. */
+    short data_index[6];
 };
 
-/**
- *
- * Stores tactic numbers for the six racers.
- *
- */
 struct gyoracer_tactics_data {
-    short tactics_no[6]; /**< Tactic number for each racer. */
+    short tactics_no[6];
 };
 
-/**
- *
- * Groups the prize records for a fish contest.
- *
- */
 struct fish_prize_group {
-      int prize_count; /**< Number of prizes in the group. */
+      int prize_count;
       int unk_4[8];
       u8 unk_24[0x1C];
-      fish_prize_record *prizes; /**< Prize records for the group. */
+      fish_prize_record *prizes;
 };
 
-/**
- *
- * Stores prize information for three ranks.
- *
- */
 struct fish_prize_record {
       int unk_0;
-      FISH_PRIZE_INFO rank[3]; /**< Prize information for each rank. */
+      FISH_PRIZE_INFO rank[3];
 };
 
 extern CAquaFishEff *AquaFishEff[];
 
 extern CBubble *AquaFishBubble[6];
 
-/**
- *
- * Stores a spherical collision point in the aquarium.
- *
- */
 struct aqua_col_point {
-    float pos[4]; /**< Centre position of the collision point. */
-    float radius; /**< Collision radius. */
+    float pos[4];
+    float radius;
     u8 unk_14[0xC];
 };
 
@@ -230,23 +170,13 @@ extern "C" int AQUA_TITLE_W;
 extern "C" int AQUA_TITLE_H;
 extern "C" void Initialize__11CCharacter2Fv(void *character);
 
-
-
-
-
-
 extern "C" mgCCameraFollow *Camera__2;
 
-/**
- *
- * Stores the aquarium lighting state for restoration.
- *
- */
 struct aqua_light_env {
-    float light_dir[4][4]; /**< Directions of the active lights. */
-    float light_color[4][4]; /**< Colours of the active lights. */
-    mgPOINT_LIGHT plight; /**< Point-light settings. */
-    int plight_enable; /**< Whether the point light is enabled. */
+    float light_dir[4][4];
+    float light_color[4][4];
+    mgPOINT_LIGHT plight;
+    int plight_enable;
 };
 
 extern CScene *AquaScene;
@@ -263,13 +193,8 @@ extern "C" aqua_vector at_2742__2;
 extern "C" char at_2871[];
 extern "C" char at_2874[];
 
-/**
- *
- * Stores bubble counts for the three aquarium groups.
- *
- */
 struct aqua_bubble_counts {
-    int num[3]; /**< Bubble count for each group. */
+    int num[3];
 };
 
 extern "C" aqua_bubble_counts at_2935;
@@ -306,13 +231,8 @@ extern "C" aqua_vector at_4352;
 extern "C" aqua_vector at_4363__2;
 extern "C" aqua_vector at_4364__2;
 
-/**
- *
- * Stores the four corners of an aquarium wall.
- *
- */
 struct aqua_wall_quad {
-    float v[4][4]; /**< Position of each wall corner. */
+    float v[4][4];
 };
 
 extern "C" aqua_wall_quad at_4369__2;
@@ -332,15 +252,10 @@ extern s8 menu_max_tbl_3720[3];
 extern s8 menu_id_tbl_3721[3][6];
 extern s8 another_aquarium_Notbl_3642[3][2];
 
-/**
- *
- * Stores the position and width of a fish parameter icon.
- *
- */
 struct aqua_param_icon {
-    s16 x; /**< Horizontal icon position. */
-    s16 y; /**< Vertical icon position. */
-    s16 w; /**< Icon width. */
+    s16 x;
+    s16 y;
+    s16 w;
 };
 
 extern u8 xtbl_2468[5];
@@ -355,9 +270,6 @@ extern short u_brdtbl_2493[];
 extern u8 chrtbl_2503[][4][2];
 extern aqua_param_icon get_paraxtbl_2494[][10];
 extern int *Aquarium_NameregistBlock;
-
-
-
 
 enum {
     short_flag_tour_count = 0x15,
@@ -386,11 +298,9 @@ extern "C" aqua_fish_info aquafish_info[];
 
 extern aqua_food_info esa_info[10];
 
-
 static int GetFishPath(int item_no, char *out);
 
 static aqua_food_info *GetEsaInfo(int item_no);
-
 
 extern int Aqua_SpSndID;
 extern CDC2Mes *GyoraceFishMes;
@@ -460,7 +370,6 @@ extern char *filename_4899[2];
 extern char *GyoraceExeCfgBuffer;
 
 extern int GyoraceExeCfgBufferSize;
-
 
 extern mgCTexture *Tex_Aqualium;
 
@@ -535,7 +444,6 @@ extern s16 GyoraceFishSelectNo;
 
 extern "C" char at_2873[];
 
-
 extern gyorace_list_select GyoraceFishHaveListSelect;
 
 extern fish_prize_record *save_fish_prize_list;
@@ -581,7 +489,6 @@ static inline unsigned int align16_blocks(unsigned int bytes) {
 
 #include "common.h"
 
-// Code (.text)
 static aqua_grid_cell *Get_aquarium_paul_table(int index) {
     if ((index < 0) || (index >= 0x3C)) {
         index = 0;
@@ -662,7 +569,6 @@ void CBubble::Generate(int index) {
     particle->alpha = 32.0f;
 }
 int CBubble::Generate(float *start_pos) {
-
     if (active != 0 && bubble_num <= (unsigned int)generated) {
         return 0;
     }
@@ -867,7 +773,6 @@ void CAquaFish::Initialize() {
     aqua_no = -1;
 }
 void CAquaFish::SetLiveParam(CGameDataUsed *item) {
-
     u16 value;
     int base;
 
@@ -958,31 +863,31 @@ void CAquaFish::NormalGetNextRot() {
     target_rot[1] = mgAngleLimit(atan2f(dir[0], dir[2]));
 }
 float CAquaFish::CalcMoveSpeed(float speed) {
-    u8 *stats;
+    BREEDFISH_USED *stats;
     float ceiling;
-    int offset;
+    int param_no;
 
     if (data == NULL) {
         stats = NULL;
     } else {
-        stats = (u8 *)data + 0x10;
+        stats = &data->data.fish;
     }
     ceiling = 3.0f;
     switch (think_mode) {
         case 1:
-            offset = GetRandI(3) * 2;
-            speed *= 0.55f + 0.02f * (float) * (u16 *)(offset + (int)stats + 0x26);
+            param_no = GetRandI(3);
+            speed *= 0.55f + 0.02f * (float)stats->param[param_no];
             break;
         case 5:
-            speed *= 0.65f + 0.024f * (float) * (u16 *)(stats + 0x26);
+            speed *= 0.65f + 0.024f * (float)stats->param[0];
             ceiling = 4.4f;
             break;
         case 6:
-            speed *= 0.65f + 0.024f * (float) * (u16 *)(stats + 0x26);
+            speed *= 0.65f + 0.024f * (float)stats->param[0];
             break;
         case 7:
         case 8:
-            speed *= 0.4f + 0.02f * (float) * (u16 *)(stats + 0x2C);
+            speed *= 0.4f + 0.02f * (float)stats->param[3];
             break;
     }
     if (ceiling < speed) {
@@ -2209,9 +2114,7 @@ int FishIMGReplace(u_long128 *data, CCharacter2 *character, int item_no, BREEDFI
     char saved_dir[0x6C];
     u8 *texture_buffer;
 
-    u8 *character_bytes = (u8 *)character;
-
-    if (data == NULL || character_bytes == NULL || fish == NULL) {
+    if (data == NULL || character == NULL || fish == NULL) {
         return 0;
     }
     if (fish->flags & 2) {
@@ -2221,10 +2124,10 @@ int FishIMGReplace(u_long128 *data, CCharacter2 *character, int item_no, BREEDFI
         GetCurrentDir(saved_dir);
         SetCurrentDir(NULL);
         if (LoadFile2(path, data, &size, 0) != 0) {
-            texture_buffer = *(u8 **)(character_bytes + 0x2C4);
-            mgTexManager.DeleteBlock(*(int *)(character_bytes + 0x2E4));
+            texture_buffer = (u8 *)character->images[0];
+            mgTexManager.DeleteBlock(character->texture_block);
             memcpy(texture_buffer, data, size);
-            mgTexManager.EnterIMGFile(texture_buffer, *(int *)(character_bytes + 0x2E4), NULL, NULL);
+            mgTexManager.EnterIMGFile(texture_buffer, character->texture_block, NULL, NULL);
         }
         SetCurrentDir(saved_dir);
     }
@@ -5097,7 +5000,6 @@ void SetGyoRaceRanking(int rank) {
     }
     fish = GetGyoRaceFish();
     if (rank <= 2) {
-
         *(u8 *)&fish->data.fish.unk_3d |= 1;
     }
     if (rank == 0 && fish != NULL) {
@@ -5150,7 +5052,7 @@ static int _GYORACE_LISTNUM(SPI_STACK *stack, int arg_count) {
 }
 static int _GYORACE_DATA(SPI_STACK *stack, int arg_count) {
     CGameDataUsed *entry;
-    u8 *fields;
+    BREEDFISH_USED *fish;
 
     if (spi_nowanalyze_gyorace_limmit <= spi_gyorace_counter) {
         return 0;
@@ -5158,15 +5060,15 @@ static int _GYORACE_DATA(SPI_STACK *stack, int arg_count) {
     entry = &spi_nowanalyze_gyorace_data[spi_gyorace_counter];
     entry->CopyDataFish(spiGetStackInt(stack++));
 
-    fields = (u8 *)entry + 0x10;
+    fish = &entry->data.fish;
     entry->SetName(spiGetStackString(stack++));
-    *(u8 *)(fields + 0x16) = spiGetStackInt(stack++);
-    *(short *)(fields + 0x2E) = spiGetStackInt(stack++);
-    *(short *)(fields + 0x26) = spiGetStackInt(stack++);
-    *(short *)(fields + 0x28) = spiGetStackInt(stack++);
-    *(short *)(fields + 0x2A) = spiGetStackInt(stack++);
-    *(short *)(fields + 0x2C) = spiGetStackInt(stack++);
-    *(short *)(fields + 0x18) = spiGetStackInt(stack);
+    fish->unk_16 = spiGetStackInt(stack++);
+    fish->param[4] = spiGetStackInt(stack++);
+    fish->param[0] = spiGetStackInt(stack++);
+    fish->param[1] = spiGetStackInt(stack++);
+    fish->param[2] = spiGetStackInt(stack++);
+    fish->param[3] = spiGetStackInt(stack++);
+    fish->size = spiGetStackInt(stack);
     spi_gyorace_counter += 1;
     return 1;
 }
@@ -5235,7 +5137,6 @@ static int _PRIZE_GROUP(SPI_STACK *stack, int arg_count) {
     offset = 0;
     spiFishTournamentGoods->prize_count = prize_count;
     do {
-
         ((int *)((u8 *)spiFishTournamentGoods + offset))[1] = spiGetStackInt(arg++);
         i += 1;
         offset += 4;
@@ -6440,7 +6341,6 @@ void DrawSubGameUnderLine(mgCTexture *texture, int x, int y, int width) {
     prim->End();
 }
 
-// Static initialiser (.init)
 extern "C" void __sinit_menuaqua_cpp() {
     Aquarium_NameregistStack.Init();
     __ct__9CAquariumFv(&Aquarium);
@@ -6448,7 +6348,6 @@ extern "C" void __sinit_menuaqua_cpp() {
     GyoraceStack.Init();
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuaqua", aquafish_mixTable__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuaqua", ambient__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuaqua", light_dir__DATA);
@@ -6511,7 +6410,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuaqua", tbl_5669__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuaqua", bart_5670__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuaqua", pl_s_5699__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuaqua", at_1323__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuaqua", at_1387__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuaqua", at_1388__2__DATA);
@@ -6609,14 +6507,11 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuaqua", at_5498__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuaqua", at_5499__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuaqua", at_5500__DATA);
 
-// Static initialiser table (.ctor)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuaqua", D_0037B024__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuaqua", __vt__9CFishFood__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuaqua", __vt__9CAquaFish__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuaqua", ColChkPointNum__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuaqua", AQUA_TITLE_X__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuaqua", AQUA_TITLE_Y__DATA);
@@ -6637,7 +6532,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuaqua", menu_max_tbl_3720__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuaqua", filename_4899__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menuaqua", at_5309__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(AquaScene, 0x4);
 INCLUDE_BSS(AquaMode, 0x4);
 INCLUDE_BSS(Aquarium_NameregistBlock, 0x4);
@@ -6726,7 +6620,6 @@ INCLUDE_BSS(init_5178, 0x4);
 INCLUDE_BSS(save_now_space_racer_no_5180, 0x4);
 INCLUDE_BSS(init_5181, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(Aquarium_NameregistStack, 0x30);
 INCLUDE_BSS(AquaBubble, 0x10);
 INCLUDE_BSS(AquaFishBubble, 0x20);

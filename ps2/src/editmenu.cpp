@@ -34,13 +34,8 @@
 #include "editanalyze.hpp"
 #include "common.h"
 
-
 enum { kBitFlagGekkaView = 0x2BE, kBitFlagCulture = 0x208 };
-/**
- *
- * Identifies actions returned while removing a georama part.
- *
- */
+
 enum RemovalAction {
     REMOVAL_ACTION_NONE = -1,
     REMOVAL_ACTION_BACK = 0x32,
@@ -68,31 +63,21 @@ void MakeMsgPartsItemInfo(CDC2Mes *mes, CEditPartsInfo *info, MENUFORM_MAKEBRD_I
 void InitDownLoadAnaunce(mgCMemory *memory);
 void CheckMenuLine(int *selected, int *top, int count, int visible);
 
-/**
- *
- * Stores four georama coordinates as floats or one quadword.
- *
- */
 struct GeoramaVector {
     union {
-        float f[4]; /**< Four floating-point vector components. */
-        u_long128 qw; /**< Combined 128-bit vector representation. */
+        float f[4];
+        u_long128 qw;
     };
 };
 
-/**
- *
- * Links a downloadable georama item to its name and category.
- *
- */
 struct DownLoadEntry {
-      signed char kind; /**< Download entry category. */
+      signed char kind;
       u8 unk_1[3];
-      char *name; /**< Display name of the download entry. */
+      char *name;
       u8 unk_8;
-      signed char has_extra; /**< Whether the entry carries extra data. */
+      signed char has_extra;
       u8 unk_a[2];
-      DownLoadEntry *next; /**< Next entry in the download list. */
+      DownLoadEntry *next;
 
       DownLoadEntry() {
           kind = 0;
@@ -102,27 +87,19 @@ struct DownLoadEntry {
           has_extra = 0;
       }
 };
-/**
- *
- * Stores the screen rectangle for a download item.
- *
- */
+
 struct DownLoadRect {
-    short x; /**< Horizontal rectangle position. */
-    short y; /**< Vertical rectangle position. */
-    short w; /**< Rectangle width. */
-    short h; /**< Rectangle height. */
+    short x;
+    short y;
+    short w;
+    short h;
 };
-/**
- *
- * Tracks a staged Geostone count animation.
- *
- */
+
 struct GeoStoneDmyCnt {
-      int step; /**< Current animation step. */
-      int remaining_steps; /**< Steps left in the animation. */
-      int frames; /**< Frames elapsed in the current step. */
-      GeoStoneDmyCnt *next; /**< Next count animation entry. */
+      int step;
+      int remaining_steps;
+      int frames;
+      GeoStoneDmyCnt *next;
 
       GeoStoneDmyCnt() {
           frames = 0;
@@ -131,11 +108,7 @@ struct GeoStoneDmyCnt {
           next = NULL;
       }
 };
-/**
- *
- * Views a window colour as channels or an RGBAQ value.
- *
- */
+
 union WinColor {
     struct {
         u_long r : 8;
@@ -144,36 +117,24 @@ union WinColor {
         u_long a : 8;
         u_long q : 32;
     } bits;
-    RGBAQ_TYPE rgbaq; /**< Combined colour and Q value. */
+    RGBAQ_TYPE rgbaq;
 };
-/**
- *
- * Tracks whether each georama request condition has been met.
- *
- */
+
 struct GeoRequestCheck {
-    int con_no[16][8]; /**< Condition numbers for each request. */
-    int con_flag[16][8]; /**< Flags for each request condition. */
-    int met[16]; /**< Completion state of each request. */
+    int con_no[16][8];
+    int con_flag[16][8];
+    int met[16];
 };
 STATIC_ASSERT(sizeof(GeoRequestCheck) == 0x440);
-/**
- *
- * Tracks the selected and first visible row of a georama list.
- *
- */
+
 struct GeoramaListState16 {
-    short selected; /**< Selected list row. */
-    short top; /**< First visible list row. */
+    short selected;
+    short top;
 };
-/**
- *
- * Stores list positions for the georama menu.
- *
- */
+
 struct MenuGeoramaSystemInfo {
       u8 unk_0[0x50];
-      GeoramaListState16 list_state[7]; /**< Position and selection of each list. */
+      GeoramaListState16 list_state[7];
 };
 
 extern "C" char at_990__3[14];
@@ -424,7 +385,6 @@ int GetPenkiItemNo(int slot);
 int MenuGeoramaBasePush(CMenuGeorama *menu, int buttonsHeld, int buttonsPressed);
 int MenuGeoramaPlacePush(CMenuGeorama *menu, int buttonsHeld, int buttonsPressed);
 
-// Code (.text)
 void GetPenkiColor(int no, float *out_rgb) {
     if (no >= 0 && no < 8) {
         float *color = GeoramaColorList[no];
@@ -1926,8 +1886,8 @@ void MenuGeoramaMessageMake(int mode) {
             int no = first_line + i;
             line_pos[i][0] = (int)x;
             line_pos[i][1] = y;
-            int temp = list_no == GEORAMA_VIEW_PAINT;
-            if (temp) {
+            int is_paint_view = list_no == GEORAMA_VIEW_PAINT;
+            if (is_paint_view) {
                 item_mes[i] = i + 0x145A + CMenuGeoPt->list_info[GEORAMA_VIEW_PAINT].top;
                 if (first_line + i == 8 && LanguageCode > 0) {
                     line_pos[i][0] = (int)(x - 40.0f);
@@ -3671,8 +3631,8 @@ int CRemovalMenu::KeyStep() {
                         ExeScript(at_4258);
                     }
                     remake = 1;
-                    int temp = special_house == 1;
-                    if (temp) {
+                    int is_special_house = special_house == 1;
+                    if (is_special_house) {
                         CMenuPosDataForm *form = MenuMesForm[1];
                         form->x = 76.0f;
                         form->y = 160.0f;
@@ -4117,14 +4077,12 @@ void MenuRemovalDraw(void) {
 }
 void CBaseMenuClass::InitEnd() {}
 
-// Static initialiser (.init)
 extern "C" void __sinit_editmenu_cpp() {
     MenuGeoramaStack.Init();
     potti0.Set(0x174, 0xBE, 0x10, 0x10);
     potti1.Set(0x164, 0xBE, 0x10, 0x10);
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmenu", old_menuparts_pos__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmenu", old_menuparts_rot__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmenu", now_menu_pos_mapparts__DATA);
@@ -4151,7 +4109,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmenu", at_3757__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmenu", MenuGeoramaPushFunc__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmenu", at_4101__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmenu", at_990__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmenu", at_1014__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmenu", at_1132__3__DATA);
@@ -4266,14 +4223,11 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmenu", at_4293__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmenu", at_4367__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmenu", at_4368__DATA);
 
-// Static initialiser table (.ctor)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmenu", D_0037B01C__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmenu", __vt__12CRemovalMenu__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmenu", __vt__12CMenuGeorama__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmenu", DownLoadMesScrlGyouNum__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmenu", analyze_percent__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmenu", GeoramaReqMakeFlag__DATA);
@@ -4288,7 +4242,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmenu", at_4151__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmenu", at_4152__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmenu", fname_4292__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(HouseDrawInfo, 0x4);
 INCLUDE_BSS(HouseInfoFormGrobal, 0x4);
 INCLUDE_BSS(HousePartsID, 0x4);
@@ -4370,7 +4323,6 @@ INCLUDE_BSS(at_4137, 0x8);
 INCLUDE_BSS(at_4150, 0x8);
 INCLUDE_BSS(RemovalMenuPtr, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(HouseChildPartInfo, 0x60);
 INCLUDE_BSS(PartsMakeOkTable, 0x400);
 INCLUDE_BSS(DownLoadMes, 0x20);

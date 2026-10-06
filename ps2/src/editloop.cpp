@@ -159,7 +159,6 @@ void UpdateTrBoxFlag(int map_no);
 void editLoadSound(int map_no);
 #endif
 
-// Code (.text)
 static CUserDataManager *GetUserData() {
     CSaveData *save;
 
@@ -198,9 +197,7 @@ int NowEditModeChg(void) {
     }
     return 0;
 }
-/**
- * Locks character control for thirty frames before starting the transition event.
- */
+
 void EditModeChg(int event) {
     EditModeChgEvent = event;
     EditModeChgFlag = 1;
@@ -2052,7 +2049,6 @@ void UpdateTrBoxFlag(int map_no) {
     for (i = 0; i < box_count; i++) {
         CMapTreasureBox *box = map->GetTrBox(i);
         if (box != NULL) {
-
             DNG_FLOOR_SAVE *floor = (DNG_FLOOR_SAVE *)dungeon_save->GetFloorInfoPtr(
                 box->floor_id / 100 - 1, box->floor_id % 100);
             if (floor != NULL && (u16)floor->visit_count <= 0) {
@@ -2465,16 +2461,12 @@ void LoadMap(void) {
     LoadComVillaager();
 }
 
-// Static initialiser (.init)
-
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editloop", at_1045__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editloop", at_1053__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editloop", at_1528__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editloop", at_2271__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editloop", at_3040__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editloop", at_1032__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editloop", at_1033__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editloop", at_1395__2__DATA);
@@ -2537,15 +2529,11 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editloop", at_2956__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editloop", at_2957__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editloop", at_2958__DATA);
 
-// Static initialiser table (.ctor)
-
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editloop", MenuInfo__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editloop", DataPktMode__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editloop", at_2346__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editloop", at_2352__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(WaterFrame, 0x4);
 INCLUDE_BSS(RedBicMark, 0x4);
 INCLUDE_BSS(BlueBicMark, 0x4);
@@ -2599,7 +2587,6 @@ INCLUDE_BSS(flag_2408, 0x4);
 INCLUDE_BSS(init_2409, 0x4);
 INCLUDE_BSS(DelMainNPCflag, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(at_949, 0x10);
 CWaveTable WaveTable;
 sceVu0FVECTOR CharaOldPos;

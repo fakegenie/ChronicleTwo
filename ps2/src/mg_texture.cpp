@@ -11,30 +11,19 @@
 #include "mg_texture.hpp"
 #include "mglib.hpp"
 
-/**
- * Gives the quadwords a buffer of the given bytes takes, rounded up.
- */
 #define QWORDS(bytes) ((bytes) % 16 == 0 ? (bytes) / 16 : (bytes) / 16 + 1)
 
-/**
- * Words of the DMA tags, VIF codes and GIF tags the upload chains are
- * built from.
- */
 enum {
-    DMA_ID_CNT = 0x10000000,   /**< DMA tag transferring the quadwords that follow it. */
-    DMA_ID_REF = 0x30000000,   /**< DMA tag transferring quadwords from the address it holds. */
-    VIF_DIRECT = 0x50000000,   /**< VIF code passing the quadwords that follow it to the GIF. */
-    GIF_EOP = 0x8000,          /**< GIF tag lower word: last tag of the packet. */
-    GIF_NREG_1 = 0x10000000,   /**< GIF tag upper word: one register descriptor. */
-    GIF_FLG_IMAGE = 0x08000000 /**< GIF tag upper word: image data. */
+    DMA_ID_CNT = 0x10000000,
+    DMA_ID_REF = 0x30000000,
+    VIF_DIRECT = 0x50000000,
+    GIF_EOP = 0x8000,
+    GIF_NREG_1 = 0x10000000,
+    GIF_FLG_IMAGE = 0x08000000
 };
 
 static int Conv32To8(int width, int height, u_char *image);
 
-/**
- * DMA chain flushing the GS texture cache, copied in front of and behind
- * every texture upload.
- */
 extern u_char texflush_dma[0x30];
 
 extern char at_497[];
@@ -57,11 +46,6 @@ static inline u_int align16_blocks(u_int n) {
 
 #pragma schedule off
 
-// Code (.text)
-/**
- * Gives the VRAM block address of the Z buffer and stores the GS blocks
- * it spans, which 8-bit textures can borrow while it holds nothing.
- */
 static int GetZBufVram(int *size) {
     mgCTexture frame;
 
@@ -73,10 +57,6 @@ static int GetZBufVram(int *size) {
 #pragma schedule reset
 #pragma schedule off
 
-/**
- * Tells whether a texture can be placed in the Z buffer's VRAM, which
- * holds unswizzled 8-bit textures only, and stores the blocks it needs.
- */
 static int CheckCopyToZBufVram(mgCTexture *texture, int *size) {
     *size = 0;
 
@@ -97,32 +77,31 @@ mgCTexture::mgCTexture() {
 #pragma global_optimizer off
 
 void mgCTexture::Initialize() {
-    u_char *self = (u_char *)this;
     int i;
-    *(signed char *)(self + 8) = 0;
+    name[0] = 0;
     this->block = -1;
     for (i = 0; i < 4; i++) {
-        *(int *)((i << 2) + (int)self + 0x50) = 0;
+        *(int *)((i << 2) + (int)this + 0x50) = 0;
     }
-    *(int *)(self + 0x60) = 0;
-    *(long long *)(self + 0x48) = 0;
-    *(long long *)(self + 0x40) = 0;
-    *(long long *)(self + 0x38) = 0;
+    clut = 0;
+    *(long long *)&clamp = 0;
+    *(long long *)&tex1 = 0;
+    *(long long *)&tex0 = 0;
     struct TexFlags {
         u_char flags_low : 2;
         u_char flags_mid : 2;
         u_char flags_high : 4;
     };
-    ((TexFlags *)(self + 0x48))->flags_low = 1;
-    ((TexFlags *)(self + 0x48))->flags_mid = 1;
-    *(short *)(self + 6) = 0;
+    ((TexFlags *)&clamp)->flags_low = 1;
+    ((TexFlags *)&clamp)->flags_mid = 1;
+    bpp = 0;
     this->height = 0;
     this->width = 0;
-    *(int *)(self + 0x64) = 0;
-    *(int *)(self + 0x28) = 0;
-    *(int *)(self + 0x2C) = 0;
-    *(int *)(self + 0x30) = 0;
-    *(int *)(self + 0x68) = 0;
+    swizzled = 0;
+    vram_size = 0;
+    image_blocks = 0;
+    clut_size = 0;
+    next = 0;
 }
 #pragma global_optimizer reset
 #pragma schedule reset
@@ -327,7 +306,7 @@ void mgCTextureManager::AddHash(mgCTexture *texture) {
         node->next = NULL;
         node->texture = texture;
 
-        int index = hash((char *)texture + 8);
+        int index = hash(texture->name);
         bucket = (mgTEXTURE_HASH **)((index << 2) + (int)this + 0x24);
         cur = *bucket;
         if (cur == NULL) {
@@ -354,7 +333,7 @@ void mgCTextureManager::DelHash(mgCTexture *texture) {
     mgTEXTURE_HASH *found;
     mgTEXTURE_HASH **bucket;
     if (texture != NULL) {
-        int index = hash((char *)texture + 8);
+        int index = hash(texture->name);
         bucket = (mgTEXTURE_HASH **)((index << 2) + (int)this + 0x24);
         cur = *bucket;
         prev = NULL;
@@ -390,7 +369,7 @@ mgCTexture *mgCTextureManager::SearchHash(char *name, int mode) {
 
     for (node = *(mgTEXTURE_HASH **)((bucket << 2) + (int)this + 0x24); node != NULL;
          node = node->next) {
-        if (strcmp(name, (char *)node->texture + 8) == 0) {
+        if (strcmp(name, node->texture->name) == 0) {
             if (mode < 0 || node->texture->block == mode) {
                 return node->texture;
             }
@@ -586,7 +565,6 @@ mgCTexture *mgCTextureManager::EnterTexture(int block, char *name, u_long128 **i
         tbw = 1;
     }
 
-    // 24-bit pixels occupy 32 bits each in VRAM.
     level_blocks = (bpp == 24 ? 32 : bpp) * width * height / 256 / 8;
     texture->image_blocks = 0;
     last_level = -1;
@@ -662,7 +640,6 @@ mgCTexture *mgCTextureManager::EnterTexture(int block, char *name, u_long128 **i
     texture_block->Add(texture);
     AddHash(texture);
 
-    // Fixed textures are allocated downwards from the top of VRAM, each palette above its pixels.
     if (block == MG_TEXTURE_BLOCK_FIX) {
         vram = vram_fix;
 
@@ -730,7 +707,7 @@ mgCTexture *mgCTextureManager::EnterTexture(int id, char *name, TM2_head *head, 
     for (int j = 0; j < 4; j++) {
         images[j] = NULL;
     }
-        // The pixels follow the picture header; the palette follows every mip level.
+
     if (no_image == 0) {
         images[0] = (u_long128 *)((u_char *)pic + pic->header_size);
         if (pixel_bits <= 8) {
@@ -916,10 +893,6 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_texture", EnterIMGFile__17mgCTextureMan
 
 #pragma schedule off
 
-/**
- * Identifies the archive format of an IMG texture archive from its
- * signature, or gives MG_IMG_VERSION_NONE when the data is not one.
- */
 static int GetIMGVersion(char *img) {
     if (img == NULL) {
         return MG_IMG_VERSION_NONE;
@@ -1087,7 +1060,7 @@ int mgLoadImage(u_int *packet, int base, int format, int width, u_long128 *image
     unsigned long long trx_reg;
     int chunk;
     int length;
-    // The transfer setup: TEXFLUSH, BITBLTBUF, TRXPOS, TRXREG and TRXDIR as A+D pairs.
+
     packet[0] = 0x10000006;
     packet[1] = 0;
     packet[2] = 0;
@@ -1119,7 +1092,7 @@ int mgLoadImage(u_int *packet, int base, int format, int width, u_long128 *image
     packet[25] = 0;
     packet[26] = 0x53;
     packet[27] = 0;
-    // The pixels follow by reference, in transfers of at most 0x4000 quadwords.
+
     packet += 28;
     while (quadwords > 0) {
         chunk = 0x4000;
@@ -1149,10 +1122,7 @@ int mgLoadImage(u_int *packet, int base, int format, int width, u_long128 *image
 #pragma schedule reset
 #pragma schedule off
 #pragma global_optimizer off
-/**
- * Writes the DMA chain flushing the GS texture cache, when given a
- * buffer; gives the quadwords it takes either way.
- */
+
 static int SetTexFlush_TagCnt(u_int *buffer) {
     if (buffer == NULL) {
     return 3;
@@ -1189,12 +1159,10 @@ void mgCTextureManager::ReloadTexture(int index, sceVif1Packet *packet) {
         mgCTextureBlock *base = blocks;
         anime = ((mgCTextureBlock *)((index << 4) + (int)base))->anime;
         if (anime != NULL) {
-            // An 8-bit texture in the Z buffer's VRAM sits in the upper byte of each 32-bit pixel.
             anime->TexAnime(index, packet);
         }
     }
     last_block = index;
-// Swizzled 8-bit pixels are uploaded as a 32-bit image of half the size.
 }
 #pragma global_optimizer reset
 #pragma schedule reset
@@ -1434,11 +1402,7 @@ mgCTextureAnime *mgCTextureManager::GetTexAnime(int index) {
 #pragma schedule reset
 #pragma schedule off
 #pragma optimization_level 1
-/**
- * Reorders one block of 8-bit pixels stored in 32-bit page order back
- * into linear order.
- */
-    // Each block is four columns of 64 bytes; odd columns use the second half of the table.
+
 static int BlockConv32to8(u_char *src, u_char *dst) {
     u_int column;
     u_int texel;
@@ -1464,10 +1428,7 @@ static int BlockConv32to8(u_char *src, u_char *dst) {
 #pragma schedule reset
 #pragma schedule off
 #pragma optimization_level 2
-/**
- * Reorders one page of 8-bit pixels stored in 32-bit page order back
- * into linear order, block by block.
- */
+
 static int PageConv32to8(int width, int height, u_char *src, u_char *dst) {
     int block_column[32];
     int block_row[32];
@@ -1524,10 +1485,6 @@ static int PageConv32to8(int width, int height, u_char *src, u_char *dst) {
 #pragma optimization_level 1
 #ifdef NONMATCHING
 
-/**
- * Converts 8-bit pixels stored in 32-bit page order back into linear
- * order in place; gives 0 when the image is too large to convert.
- */
 static int Conv32To8(int width, int height, u_char *image) {
     static u_char conv_work[0x10000];
     u_char work8[0x2000];
@@ -1601,14 +1558,11 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_texture", Conv32To8__FiiPUc);
 #pragma optimization_level reset
 #pragma schedule reset
 
-
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_texture", texflush_dma__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_texture", lut_1246__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_texture", block_table8_1266__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_texture", block_table32_1267__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_texture", at_497__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_texture", at_629__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_texture", at_866__DATA);
@@ -1617,5 +1571,4 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_texture", at_868__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_texture", at_869__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_texture", at_884__DATA);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(conv_work_1306, 0x10000);

@@ -40,7 +40,6 @@ extern mgCTexture *MenuChapter_Logo;
 #include "mg_tanime.hpp"
 #include "snd_mngr.hpp"
 
-
 extern mgCMemory MenuChapterStack;
 extern char *chap_voice_851[8];
 extern const unsigned char at_902__3__DATA[];
@@ -49,7 +48,6 @@ extern const unsigned char at_904__5__DATA[];
 extern const unsigned char at_905__5__DATA[];
 extern const unsigned char at_906__5__DATA[];
 
-// Code (.text)
 void MenuChapterInit(mgCMemory *stack, int *tex_block, int open_type, int chapter) {
     char image_path[96];
     union { mgCMemory sound_memory; };
@@ -213,16 +211,12 @@ void MenuChapterDraw(void) {
     ((mgCDrawPrim *)prim_storage)->End();
 }
 
-
-// Static initialiser (.init)
 extern "C" void __sinit_menucapt_cpp() {
     MenuChapterStack.Init();
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucapt", chap_voice_851__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucapt", at_852__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucapt", at_853__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucapt", at_854__3__DATA);
@@ -237,10 +231,8 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucapt", at_904__5__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucapt", at_905__5__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucapt", at_906__5__DATA);
 
-// Static initialiser table (.ctor)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucapt", D_0037B054__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(MenuChapterMode, 0x4);
 INCLUDE_BSS(MenuChapterInfo, 0x4);
 INCLUDE_BSS(MenuChapterBG, 0x4);
@@ -253,5 +245,4 @@ INCLUDE_BSS(init_919, 0x4);
 INCLUDE_BSS(voiceflag_921, 0x4);
 INCLUDE_BSS(init_922, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(MenuChapterStack, 0x30);

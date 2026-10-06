@@ -23,7 +23,6 @@
 #include "menusystemdata.hpp"
 #include <cstring>
 
-// Code (.text)
 CMenuSystemData::CMenuSystemData() {
     MenuSystemDataInit();
 }

@@ -42,14 +42,9 @@
 #include "prespr.hpp"
 #include "dng_object.hpp"
 
-/**
- *
- * Vector copied as four floats or one quadword.
- *
- */
 union CopyVector {
-    float f[4];      /**< Floating point components. */
-    u_long128 word;  /**< The same components as a quadword. */
+    float f[4];
+    u_long128 word;
 };
 extern "C" void *__ct__11mgCDrawPrimFv(void *);
 extern "C" void *__ct__12mgCFrameAttrFv(void *);
@@ -67,9 +62,7 @@ extern s8 init_1411;
 #include "userdata.hpp"
 
 #ifdef NONMATCHING
-/**
- * Japanese names of monster badge families.
- */
+
 static char *mons_attr_tbl[12] = {
     "",
     "\203P\203\202\203m",
@@ -85,9 +78,6 @@ static char *mons_attr_tbl[12] = {
     NULL,
 };
 
-/**
- * English names of monster badge families.
- */
 static char *mons_attr_tbl2[12] = {
     "",
     "Beast",
@@ -103,9 +93,6 @@ static char *mons_attr_tbl2[12] = {
     NULL,
 };
 
-/**
- * French names of monster badge families.
- */
 static char *mons_attr_tbl3[12] = {
     "",
     "Beast",
@@ -121,9 +108,6 @@ static char *mons_attr_tbl3[12] = {
     "Carte",
 };
 
-/**
- * German names of monster badge families.
- */
 static char *mons_attr_tbl4[12] = {
     "",
     "Tier",
@@ -139,9 +123,6 @@ static char *mons_attr_tbl4[12] = {
     NULL,
 };
 
-/**
- * Italian names of monster badge families.
- */
 static char *mons_attr_tbl5[12] = {
     "",
     "Bestia",
@@ -157,9 +138,6 @@ static char *mons_attr_tbl5[12] = {
     NULL,
 };
 
-/**
- * Spanish names of monster badge families.
- */
 static char *mons_attr_tbl6[12] = {
     "",
     "Bestia",
@@ -175,9 +153,6 @@ static char *mons_attr_tbl6[12] = {
     NULL,
 };
 
-/**
- * Messages displayed when a monster badge is already owned.
- */
 static char *dung_progtxt_badge_already[8] = {
     "\203\202\203\223\203X\203^\201[\202\326\202\361\202\260\203o\203b\203W\201i%s\201j\202\360\n\214\251\202\302\202\257\202\275\201A\202\265\202\251\202\265\202\267\202\305\202\311\223\374\216\350\202\265\202\304\202\242\202\351",
     "You got a Monster Transformation\201i%s\201jBadge,\nbut you already have it.",
@@ -189,9 +164,6 @@ static char *dung_progtxt_badge_already[8] = {
     NULL,
 };
 
-/**
- * Messages displayed when a monster badge is acquired.
- */
 static char *dung_progtxt_badge_get[8] = {
     "\203\202\203\223\203X\203^\201[\202\326\202\361\202\260\203o\203b\203W\201i%s\201j\202\360\n\216\350\202\311\223\374\202\352\202\275",
     "You got a Monster Transformation\201i%s\201jBadge.",
@@ -203,9 +175,6 @@ static char *dung_progtxt_badge_get[8] = {
     NULL,
 };
 
-/**
- * Messages displayed when the gate key is acquired.
- */
 static char *dung_progtxt_gkey_get[8] = {
     "\203Q\201[\203g\203L\201[\201u%s\201v\202\360\216\350\202\311\223\374\202\352\202\275",
     "You got the '%s'.",
@@ -217,9 +186,6 @@ static char *dung_progtxt_gkey_get[8] = {
     NULL,
 };
 
-/**
- * Messages displayed when a stolen item is recovered.
- */
 static char *dung_progtxt_steal[8] = {
     "\223G\202\251\202\347\201u%s\201v\202\360\223\220\202\335\216\346\202\301\202\275",
     "Stolen '%s' from the enemy.",
@@ -231,9 +197,6 @@ static char *dung_progtxt_steal[8] = {
     NULL,
 };
 
-/**
- * Singular and plural messages displayed when an item cannot fit.
- */
 static char *dung_progtxt_getitem_overnum[8][2] = {
     {"\201w%s\201x\202\252\223\374\202\301\202\304\202\242\202\351\201B\n\202\265\202\251\202\265\202\261\202\352\210\310\217\343\201A\202\261\202\314\203A\203C\203e\203\200\202\360\216\235\202\302\202\261\202\306\202\252\202\305\202\253\202\310\202\242\201B", "\201w%s\201x\202\252%d\214\302\201A\223\374\202\301\202\304\202\242\202\351\201B\n\202\265\202\251\202\265\202\261\202\352\210\310\217\343\201A\202\261\202\314\203A\203C\203e\203\200\202\360\216\235\202\302\202\261\202\306\202\252\202\305\202\253\202\310\202\242\201B"},
     {"%s inside. \n But you can't carry any more items!", "%d %s inside. \n But you can't carry any more items!"},
@@ -245,9 +208,6 @@ static char *dung_progtxt_getitem_overnum[8][2] = {
     {NULL, NULL},
 };
 
-/**
- * Singular and plural messages displayed when an item is acquired.
- */
 static char *dung_progtxt_getitem[8][2] = {
     {"\201w%s\201x\202\360%d\214\302\201A\216\350\202\311\223\374\202\352\202\275\201B", "\201w%s\201x\202\360%d\214\302\201A\216\350\202\311\223\374\202\352\202\275\201B"},
     {"You found %s.", "You found %d %s."},
@@ -259,9 +219,6 @@ static char *dung_progtxt_getitem[8][2] = {
     {NULL, NULL},
 };
 
-/**
- * Monster badge family names selected by the current language.
- */
 static char **mons_attr_list[8] = {
     mons_attr_tbl,
     mons_attr_tbl2,
@@ -274,8 +231,6 @@ static char **mons_attr_list[8] = {
 };
 #endif
 
-
-// Code (.text)
 void CRocketLauncher::SetPos(float *pos, float *muzzle_vec, float *direction_vec) {
     int i;
     Initialize();
@@ -705,7 +660,6 @@ void CLaserGun::SetVisualCode(int code) {
     }
 }
 void CLaserGun::Step(void) {
-
     CLaserGun *gun = this;
     float gravity = 0.1f;
     float speed2 = 30.0f;
@@ -963,7 +917,6 @@ void CLaserGun::Draw(void) {
             sprite.End();
         }
         if (draw_flags & 1) {
-
             __ct__12mgCFrameAttrFv(&attr);
             attr.no_light = 1;
             attr.color[0] = color[0];
@@ -1700,7 +1653,6 @@ void CRoboVoiceSystem::Step() {
     }
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_object", at_923__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_object", at_1112__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_object", at_1240__3__DATA);
@@ -1723,7 +1675,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_object", at_1802__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_object", at_1803__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_object", at_1806__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_object", at_961__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_object", at_1291__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_object", at_1428__2__DATA);
@@ -1834,10 +1785,8 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_object", at_1736__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_object", at_1853__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_object", at_1854__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_object", at_1804__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_object", at_1805__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(anim_1410, 0x4);
 INCLUDE_BSS(init_1411, 0x4);

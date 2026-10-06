@@ -10,14 +10,9 @@
 #include "mg_memory.hpp"
 #include "mg_visual.hpp"
 
-// Code (.text)
 #pragma schedule off
-/**
- * Writes the packet that loads the shadow projection matrix into VU1 memory, followed by the GS
- * packets the shadow microprogram sends, and returns its length in quadwords.
- */
+
 static int SetShadowData(u_int *packet, float (*matrix)[4]) {
-    // DMA CNT of eight quadwords, then VIF UNPACK of the matrix and the two GIF packets.
     packet[0] = 0x10000008;
     packet[1] = 0;
     packet[2] = 0;
@@ -50,14 +45,12 @@ static int SetShadowData(u_int *packet, float (*matrix)[4]) {
 #pragma optimization_level 2
 #ifdef NONMATCHING
 int mgCShadowMDT::CreateFacePacket(u_int *packet, mgCFace *face) {
-    // VIF MSCAL that starts the shadow microprogram on each batch.
     static u_int prog_vif[4] __attribute__((aligned(16))) = {0, 0, 0, 0x14000002};
 
     if (face == NULL) {
         return 0;
     }
 
-    // A packet in uncached memory is built in the scratchpad and copied out by DMA.
     int scratchpad = 0;
     if (((u_int)packet & 0xF0000000) == 0x20000000) {
         scratchpad = 1;
@@ -129,7 +122,6 @@ int mgCShadowMDT::CreateFacePacket(u_int *packet, mgCFace *face) {
     }
     packet += size;
 
-    // VIF FLUSHA.
     u_int flush[4] = {0x13000000, 0, 0, 0};
     *(u_long128 *)packet = *(u_long128 *)flush;
     return (packet + 4 - start) / 4;
@@ -138,7 +130,6 @@ int mgCShadowMDT::CreateFacePacket(u_int *packet, mgCFace *face) {
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_shadow", CreateFacePacket__12mgCShadowMDTFPUiP7mgCFace);
 #endif
 #pragma optimization_level reset
-
 
 #pragma schedule off
 #pragma global_optimizer off
@@ -149,7 +140,7 @@ FACES_ID *mgCShadowMDT::CreateFace(FACES_ID *source, mgCMemory *face_memory, mgC
     face->type = source->type;
     face->index_stride = 3;
     face->index_num = face->vertex_num * face->index_stride;
-    // Only the position index of each of a triangle's three vertices is kept.
+
     face->material = source->material;
     u_char *vertex;
     source = (FACES_ID *)(vertex = (u_char *)source->index);
@@ -169,7 +160,7 @@ FACES_ID *mgCShadowMDT::CreateFace(FACES_ID *source, mgCMemory *face_memory, mgC
         group->next = 0;
         group->face = NULL;
         group->material = (short)face->material;
-        group->vu_program = 1; // MG_VU_PROG_SHADOW
+        group->vu_program = 1;
         face_group = group;
     }
     mgCFace *last = group->face;
@@ -194,7 +185,6 @@ int mgSetPkTexFlush_TagCnt(u_int *);
 #pragma schedule off
 #pragma global_optimizer off
 u_int mgCShadowMDT::CreatePacket(mgCDrawManager *draw_manager) {
-
     GetTextureManager();
     mgFACE_GROUP *node = face_group;
     mgCMemory *packet_memory = (mgCMemory *)draw_manager->packet_memory;
@@ -207,7 +197,7 @@ u_int mgCShadowMDT::CreatePacket(mgCDrawManager *draw_manager) {
     while (node != NULL) {
         node->packet = (u_long128 *)cursor;
         mgCFace *group = node->face;
-            // DMA REF to the face's packet, built through the uncached mirror of the data memory.
+
         while (group != NULL) {
             tag = cursor;
             cursor += 4;
@@ -223,7 +213,7 @@ u_int mgCShadowMDT::CreatePacket(mgCDrawManager *draw_manager) {
         cursor += mgSetPkTexFlush_TagCnt(cursor) * 4;
         u_int *flush = cursor;
         cursor += 4;
-        // DMA RET.
+
         flush[0] = 0x60000000;
         flush[1] = 0;
         flush[2] = 0;
@@ -246,7 +236,7 @@ int mgCShadowMDT::DataAssignMDT(MDT_HEADER *header, mgCMemory *memory,
         return 0;
     }
     texture_manager = textures;
-    // A shadow needs neither normals nor texture coordinates.
+
     header->uv_num = 0;
     header->normal_num = 0;
     mgCVisualMDT::CopyMDTData(header, memory);
@@ -273,7 +263,6 @@ int mgCShadowMDT::CreateRenderInfoPacket(u_int *packet, float (*matrix)[4], mgRE
     u_int *write = start;
     info->GetpLightInfo();
 
-    // DMA CNT, its quadword count filled in below; VIF NOP, BASE, OFFSET and UNPACK.
     write[0] = 0x10000000;
     write[1] = 0;
     write[2] = 0;
@@ -314,14 +303,12 @@ int mgCShadowMDT::CreateRenderInfoPacket(u_int *packet, float (*matrix)[4], mgRE
     vu[34] = *(u_long128 *)info->clip_screen_full[3];
     write[7] = ((((u_int)((u_int *)&vu[35] - &write[4]) / 4) - 1) << 16) | 0x6C000000;
 
-    // VIF MSCAL of the shadow microprogram.
     write[140] = 0;
     write[141] = 0;
     write[142] = 0;
     write[143] = 0x14000000;
     write[0] |= ((u_int *)&vu[36] - &write[4]) / 4;
 
-    // DMA CNT and VIF DIRECT of the GS packet: PRMODECONT, PRMODE, RGBAQ, then the draw environment.
     write = (u_int *)&vu[36];
     write[0] = 0x10000008;
     write[1] = 0;
@@ -359,7 +346,6 @@ int mgCShadowMDT::CreateRenderInfoPacket(u_int *packet, float (*matrix)[4], mgRE
     mgMulMatrix(shadow, info->view_clip_full, shadow);
     write += SetShadowData(write, shadow) * 4;
 
-    // DMA RET.
     write[0] = 0x60000000;
     write[1] = 0;
     write[2] = 0;
@@ -374,13 +360,9 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_shadow", CreateRenderInfoPacket__12mgCS
 #endif
 #pragma schedule reset
 
-
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_shadow", prog_vif_208__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_shadow", at_243__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mg_shadow", __vt__12mgCShadowMDT__DATA);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(at_353, 0x10);

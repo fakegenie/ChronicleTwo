@@ -51,7 +51,6 @@ static inline u_int align16_blocks(u_int size) {
     return size >> 4;
 }
 
-// Code (.text)
 int CMapPiece::AssignMds(CMdsInfo *info) {
     if (info == NULL) {
         return 0;
@@ -577,7 +576,6 @@ int pcpMDS_END(SPI_STACK *stack, int argc) {
             break;
     }
     if (pcpAllScissor != 0 && frame != NULL) {
-
         mgCFrameAttr attr;
         attr.clip_enable = 1;
         frame->SetAttrParam(attr, 1, 0x20);
@@ -650,10 +648,8 @@ CCharacter2 *CreateChara(u_int *pack, char *config, mgCMemory *memory) {
     return chara;
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mdslist", pcp_tag__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mdslist", at_729__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mdslist", at_730__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mdslist", at_731__DATA);
@@ -664,11 +660,9 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mdslist", at_828__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mdslist", at_829__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mdslist", at_830__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mdslist", __vt__8CMdsInfo__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mdslist", __vt__9CMapPiece__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(now_mds_num, 0x4);
 INCLUDE_BSS(max_mds_num, 0x4);
 INCLUDE_BSS(pcpMdsList, 0x4);

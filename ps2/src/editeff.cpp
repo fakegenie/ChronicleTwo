@@ -36,7 +36,6 @@ extern CStarEffect _StarEffect[star_effect_count];
 extern mgCMemory CurPartsBuff;
 extern CPlaceAnime PlaceAnime[place_anime_count];
 
-// Code (.text)
 void EditSetEffectBuffer(mgCMemory *memory) {
     mgCTexture *texture = mgTexManager.GetTexture(at_821__5, -1);
     int i;
@@ -191,7 +190,6 @@ void EditPEffectDraw(int unused) {
         _StarEffect[i].Draw();
     }
     for (j = 0; j < paint_effect_count; j++) {
-
         PaintEffect[j].Draw();
     }
 }
@@ -637,7 +635,6 @@ int EditPlaceAnimeEndCheck(void) {
 }
 CStarEffect::CStarEffect() {}
 
-// Static initialiser (.init)
 extern "C" void *__construct_array(void *array, void *(*constructor)(void *),
                                   void *destructor, unsigned int element_size, unsigned int count);
 extern "C" void *__ct__11CStarEffectFv(void *effect);
@@ -646,29 +643,23 @@ extern "C" void __sinit_editeff_cpp() {
     CurPartsBuff.Init();
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editeff", at_1038__6__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editeff", at_1039__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editeff", at_1040__5__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editeff", at_1106__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editeff", at_1107__4__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editeff", at_821__5__DATA);
 
-// Static initialiser table (.ctor)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editeff", D_0037B070__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editeff", __vt__12CPaintEffect__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editeff", __vt__11CStarEffect__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(EffectFlag, 0x4);
 INCLUDE_BSS(EffectState, 0x4);
 INCLUDE_BSS(PaintEffect, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(_StarEffect, 0x300);
 INCLUDE_BSS(CurPartsBuff, 0x30);
 INCLUDE_BSS(at_1037__6, 0x20);

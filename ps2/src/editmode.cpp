@@ -92,7 +92,6 @@ extern "C" u8 now_balance_h[16];
 extern "C" u8 at_2213__3[10];
 extern "C" int GetPlaceParts__4CMapFPc(CMap *map, char *name);
 
-// Code (.text)
 static int CheckControl(void) {
     return CtrlLockFlag;
 }
@@ -408,26 +407,18 @@ void EndEditMode(CScene *scene, float *cursor_pos) {
     EditInitPlaceAnime();
 }
 #ifdef NONMATCHING
-/**
- *
- * Colour components and item number requested for part painting.
- *
- */
+
 struct PaintParams {
-    int red;   /**< Red component. */
-    int green; /**< Green component. */
-    int blue;  /**< Blue component. */
-    int item;  /**< Paint item number. */
+    int red;
+    int green;
+    int blue;
+    int item;
 };
-/**
- *
- * Red, green and blue components of a paint shade.
- *
- */
+
 struct PaintShade {
-    int red;   /**< Red component. */
-    int green; /**< Green component. */
-    int blue;  /**< Blue component. */
+    int red;
+    int green;
+    int blue;
 };
 int StartEditModeFromMenu(CScene *scene, int mode, int *params) {
     scene->GetMap(scene->active_map);
@@ -2082,7 +2073,6 @@ extern "C" void __sinit_editmode_cpp(void) {
     Font__2.Init();
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmode", at_1268__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmode", at_1362__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmode", at_1931__2__DATA);
@@ -2104,7 +2094,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmode", repaint_house_str__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmode", repaint_fence_str__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmode", at_2188__3__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmode", at_1067__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmode", at_1068__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmode", at_1069__5__DATA);
@@ -2218,13 +2207,10 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmode", at_2054__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmode", at_2103__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmode", at_2213__3__DATA);
 
-// Static initialiser table (.ctor)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmode", D_0037B068__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmode", SysMesNo__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(EditModeNo, 0x4);
 INCLUDE_BSS(MagnetEnable, 0x4);
 INCLUDE_BSS(HighSpeedMoveCnt, 0x4);
@@ -2266,7 +2252,6 @@ INCLUDE_BSS(init_1858, 0x4);
 INCLUDE_BSS(cnt_1939, 0x4);
 INCLUDE_BSS(init_1940, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(UndoData, 0x30);
 INCLUDE_BSS(PaintColor, 0x10);
 INCLUDE_BSS(eCurPos, 0x10);

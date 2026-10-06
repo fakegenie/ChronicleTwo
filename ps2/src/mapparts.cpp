@@ -16,23 +16,14 @@
 #include "occlusion.hpp"
 #include "mapparts.hpp"
 
-/**
- *
- * Centre and radius of a bounding sphere.
- *
- */
 struct SphereVec {
-    float v[3]; /**< Centre coordinates. */
-    float w;    /**< Radius. */
+    float v[3];
+    float w;
 };
-/**
- *
- * Map part vector viewed as floats or a quadword.
- *
- */
+
 union PartsVector {
-    float values[4]; /**< Floating point components. */
-    u_long128 quad;   /**< The same components as one quadword. */
+    float values[4];
+    u_long128 quad;
 };
 extern char at_244[];
 #include <cmath>
@@ -41,37 +32,28 @@ extern char at_244[];
 #include "intersection.hpp"
 #include "vtables.hpp"
 
-/**
- *
- * List node that tracks animation of a map part.
- *
- */
 struct PartsAnimeNode {
-    PartsAnimeNode *next; /**< Following animation node. */
-    PartsAnimeNode *prev; /**< Previous animation node. */
+    PartsAnimeNode *next;
+    PartsAnimeNode *prev;
     u_char unk_08[8];
-    CFuncPoint *func_point; /**< Function point tied to the animation. */
-    int frame; /**< Current animation frame. */
-    int piece; /**< Piece index. */
-    int parts; /**< Part index. */
-    int stop;  /**< Whether animation stops. */
-    int back;  /**< Whether animation runs backward. */
+    CFuncPoint *func_point;
+    int frame;
+    int piece;
+    int parts;
+    int stop;
+    int back;
     u_char unk_28[0x18];
-    void **vptr; /**< Virtual method table pointer. */
+    void **vptr;
     u_char unk_44[0xC];
 };
-/**
- *
- * List node holding one map piece.
- *
- */
+
 struct PartsPieceNode {
-    PartsPieceNode *next; /**< Following piece node. */
-    PartsPieceNode *prev; /**< Previous piece node. */
+    PartsPieceNode *next;
+    PartsPieceNode *prev;
     u_char unk_08[8];
-    void **piece_vptr; /**< Virtual method table of the piece. */
+    void **piece_vptr;
     u_char unk_14[0xAC];
-    void **vptr; /**< Virtual method table of the list node. */
+    void **vptr;
     u_char unk_c4[0xC];
 };
 extern "C" void AssignFuncAnime__9CObjAnimeFP10CFuncPointP9CMapParts(void *, CFuncPoint *, CMapParts *);
@@ -79,7 +61,6 @@ extern "C" void AssignFuncAnime__9CObjAnimeFP10CFuncPointP9CMapParts(void *, CFu
 #undef sceVu0ApplyMatrix
 extern "C" void sceVu0ApplyMatrix(float *dest, float *matrix, float *source);
 
-// Code (.text)
 void CMapParts::Initialize(void) {
     int i;
 
@@ -544,7 +525,6 @@ int CMapParts::CheckColBox(mgVu0FBOX *box) {
     sceVu0ApplyMatrix(sphere, (float *)lw_matrix, sphere);
     sphere[3] = col_bound_sphere[3];
 
-    // The sphere is tested first, on X and Z only.
     if (sphere[0] + sphere[3] < box->min[0]) {
         return 0;
     }
@@ -696,7 +676,6 @@ CFuncPoint *CMapParts::InScreenFunc(InScreenFuncInfo *info) {
             }
 
             mgGetDirFromCamera(to_point, point_matrix[3]);
-
 
             if (!(point->invent.angle <= 0.0f)) {
                 sceVu0ScaleVector(facing, point_matrix[2], -1.0f);
@@ -879,20 +858,20 @@ void CMapParts::Copy(CMapParts &dest, mgCMemory *memory) {
                 if ((new_node = (PartsPieceNode *)operator new(0xD0, (u_long128 *)memory->Alloc(15))) != NULL) {
                     new_node->vptr = __vt__17CList_9CMapPiece_;
                     new_node->piece_vptr = __vt__9mgCObject;
-                    ((CMapPiece *)((u_char *)new_node + 0x10))->Initialize();
+                    ((CList<CMapPiece> *)new_node)->data.Initialize();
                     new_node->piece_vptr = __vt__7CObject;
-                    ((CMapPiece *)((u_char *)new_node + 0x10))->Initialize();
+                    ((CList<CMapPiece> *)new_node)->data.Initialize();
                     new_node->piece_vptr = __vt__12CObjectFrame;
-                    ((CMapPiece *)((u_char *)new_node + 0x10))->Initialize();
+                    ((CList<CMapPiece> *)new_node)->data.Initialize();
                     new_node->piece_vptr = __vt__9CMapPiece;
-                    ((CMapPiece *)((u_char *)new_node + 0x10))->Initialize();
+                    ((CList<CMapPiece> *)new_node)->data.Initialize();
                     ((CList<CMapPiece> *)new_node)->Initialize();
                 }
                 if (new_node == NULL) {
                     return;
                 }
                 CMapPiece *source_piece = node->pGetData();
-                CMapPiece *dest_piece = (CMapPiece *)((u_char *)new_node + 0x10);
+                CMapPiece *dest_piece = ((CList<CMapPiece> *)new_node)->pGetData();
                 source_piece->Copy(*dest_piece, memory);
                 if (new_list != NULL) {
                     last = new_list;
@@ -1024,10 +1003,8 @@ void CCharacter2::SetPosition(float x, float y, float z) {
     SetPosition(new_position);
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapparts", at_244__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapparts", __vt__15CMapTreasureBox__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapparts", __vt__17CList_9CObjAnime___DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/mapparts", __vt__9CMapParts__DATA);

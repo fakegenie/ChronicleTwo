@@ -42,7 +42,6 @@ extern char at_1514__3[];
 extern char at_1623__3[];
 extern "C" int GetShiledKitLimmit__Fi(int);
 
-// Code (.text)
 char *GetHatena() {
     if (init_895 == 0) {
         MenuHatena_894 = at_905__4;
@@ -1209,18 +1208,15 @@ int CheckNowStateUseThisItem(CGameDataUsed *item, CItemUseTarget *target) {
     return MenuUseItemCheckFunc(item, target, 0);
 }
 
-// Static initialiser (.init)
 extern "C" void __sinit_menucls1_cpp() {
     MenuUsedTarget.type = ITEM_USE_TARGET_NONE;
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucls1", MenuBigNum__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucls1", sn_944__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucls1", at_1415__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucls1", st_bittable_1654__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucls1", at_905__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucls1", at_906__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucls1", at_907__4__DATA);
@@ -1250,13 +1246,10 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucls1", at_1513__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucls1", at_1514__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucls1", at_1623__3__DATA);
 
-// Static initialiser table (.ctor)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucls1", D_0037B028__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menucls1", at_1371__2__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(MenuHatena_894, 0x4);
 INCLUDE_BSS(init_895, 0x4);
 INCLUDE_BSS(MenuHatena_1byte_897, 0x4);
@@ -1267,6 +1260,5 @@ INCLUDE_BSS(MenuUsedItemType, 0x4);
 INCLUDE_BSS(MenuUsedNotErrorCode, 0x4);
 INCLUDE_BSS(MenuUsedTarget, 0x8);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(at_1407__2, 0x10);
 INCLUDE_BSS(at_1436__3, 0x18);

@@ -30,12 +30,6 @@ extern sceVu0FMATRIX tmp_BaseSkinMatrix_inv_922;
 #include "mg_visual.hpp"
 #include "mglib.hpp"
 
-/**
- *
- * Skinned frame whose bone matrices MotionProc2 and MotionProc3 last set up.
- *
- */
-// Small uninitialised data (.sbss)
 static mgCFrame *OldSkinFrame;
 
 struct FrameLinkRecord { int count; int link[11]; };
@@ -46,27 +40,10 @@ extern char at_966[];
 extern char at_967[];
 extern "C" int GetFootPoly__FPffP6CCPolyPfP6CCPolyii(float *, float, CCPolyCopy *, float *, CCPoly *, int, int);
 
-/**
- *
- * Skinned-vertex accumulator of the frame being skinned; w sums the weights.
- *
- */
-// Uninitialised data (.bss)
 float def_vrtx[800][4];
 
-/**
- *
- * Skinned-normal accumulator of the frame being skinned.
- *
- */
 static float def_nml[1][4];
 
-// Code (.text)
-/**
- *
- * Interpolates between two quaternions, stored w first, along the shorter arc.
- *
- */
 static void QuatSlerp(float *q0, float *q1, float t, float *out) {
     float cosTheta;
     float scale0;
@@ -243,7 +220,7 @@ Mot_List *MotionProc(mgCFrame *root, float time, Mot_List *list, mgCCamera *came
 
             break;
         case MOTION_KEY_CAMERA_TARGET:
-            // The look-at position is never interpolated from the keys here.
+
             if (camera != NULL) {
                 root->GetWorldPosition(value, value);
                 camera->SetRef(value[0], value[1], value[2]);
@@ -465,11 +442,6 @@ Mot_List *MotionProc(mgCFrame *root, unsigned int from_frame, unsigned int to_fr
     return list->next;
 }
 
-/**
- *
- * Adds a vertex moved by a bone matrix and scaled by its weight to an accumulated vertex, and writes the sum to both the accumulator and an output vertex.
- *
- */
 #pragma global_optimizer off
 static void testVUnew(float (*matrix)[4], float *point, float *scale, float *base, float *out) {
     asm {
@@ -501,7 +473,7 @@ Mot_List *MotionProc2(mgCFrame *frame, tagMOTION_TYPE *motion, tagFRAME_INF *fra
     float skinToFrame[4][4];
     float relativeInv[4][4];
     float keyMatrix[4][4];
-    
+
     float scratch[5];
     mgCFrame *target;
     mgCFrame *skin;
@@ -519,7 +491,7 @@ Mot_List *MotionProc2(mgCFrame *frame, tagMOTION_TYPE *motion, tagFRAME_INF *fra
         OldSkinFrame = frame->GetFrame(list->frame);
         vert_845 = ((mgCVisualMDT *)skin->visual)->vertex;
         left = ((tagFRAME_INF *)((list->frame << 5) + (int)frameInfo))->vertex_count;
-        
+
         clear = def_vrtx[0];
         while (left > 0) {
             asm {
@@ -566,7 +538,7 @@ Mot_List *MotionProc2(mgCFrame *frame, tagMOTION_TYPE *motion, tagFRAME_INF *fra
             *(float *)((u8 *)&def_vrtx[0][2] + vertexNo * 16) /=
                 *(float *)((u8 *)&def_vrtx[0][3] + vertexNo * 16);
             sceVu0CopyVectorXYZ(vert_845[vertexNo], def_vrtx[vertexNo]);
-            
+
             int off = vertexNo * 16;
             *(float *)((u8 *)&def_vrtx[0][3] + off) += 1.0f;
         }
@@ -641,7 +613,6 @@ Mot_List *MotionProc3(mgCFrame *root, tagMOTION_TYPE *motion, tagFRAME_INF *fram
     mgMulMatrix(skin_bone, tmp_SkinMatrix_inv_918, bone_matrix);
     mgMulMatrix(deform, skin_bone, bone_in_skin_inv);
 
-    // Normals turn with the bone but do not move with it.
     sceVu0CopyMatrix(rotate, deform);
     rotate[3][0] = 0.0f;
     rotate[3][1] = 0.0f;
@@ -695,13 +666,7 @@ void DeformMesh(mgCFrame *root, tagMOTION_TYPE *motion, tagFRAME_INF *frame_info
     OldSkinFrame = NULL;
 }
 
-/**
- *
- * Allocates a key list's values and key frames and fills them from the keys of a motion file.
- *
- */
 static void SetKeyFrame(Mot_List *list, FRAME_VECTOR_EX_DATA *keys, mgCMemory *memory) {
-    
     list->values = (float(*)[4])memory->Alloc((list->key_count * 16 / 16) + 1);
     list->key_frames = (u32 *)memory->Alloc((list->key_count * 4 >> 4) + 1);
     u32 i = 0;
@@ -755,7 +720,7 @@ void ChangeWeight(Mot_List *list, mgCMemory *memory, u8 *data, int frameNo, tagF
         header = (Mot_File_List *)cursor;
         channel = (Mot_List *)memory->Alloc(3);
         channel->frame = frameNo;
-        
+
         channel->target =
             frame->SearchFrameID(sourceFrame->GetFrame((u32)header->target)->name);
         channel->key_count = header->key_count;
@@ -840,12 +805,11 @@ int CreateAnimeDataEX(tagMOTION_TYPE *motion, mgCMemory *memory, MOTION_FILE_INF
     Mot_List *oldPrev;
     Mot_List *cur;
 
-    
     if (info[0].name != 0) {
         motion->base_matrices = (sceVu0FMATRIX *)memory->Alloc((info[0].size / 16) + 1);
         memcpy(motion->base_matrices, info[0].data, info[0].size);
     }
-    
+
     if (info[1].name != 0) {
         cursor = (FRAME_VECTOR_EX_DATA *)info[1].data;
         motion->motion_list = NULL;
@@ -867,7 +831,7 @@ int CreateAnimeDataEX(tagMOTION_TYPE *motion, mgCMemory *memory, MOTION_FILE_INF
                 channel->next = head;
             }
             motion->motion_list = channel;
-        } while ((u64)header->more != 0); 
+        } while ((u64)header->more != 0);
         prev = NULL;
         while ((cur = motion->motion_list) != NULL) {
             oldPrev = prev;
@@ -912,7 +876,6 @@ int CreateAnimeDataEX(tagMOTION_TYPE *motion, mgCMemory *memory, MOTION_FILE_INF
 }
 
 void AnimeDataInit(mgCFrame *root, tagMOTION_TYPE *motion, mgCMemory *memory, tagFRAME_INF **frame_info) {
-    // A frame's skinning data is built once, from the first key list that skins it.
     *frame_info = (tagFRAME_INF *) memory->stAlloc64((root->GetFrameNum() + 10) * sizeof(tagFRAME_INF) / 16 + 1);
     AnimeDataInit(root, motion, memory, *frame_info);
 }
@@ -939,7 +902,7 @@ int AnimeDataInit(mgCFrame *frame, tagMOTION_TYPE *motion, mgCMemory *memory,
         do {
             int frameNo =
                 ((int)frame->GetFrame(i)->parent - (int)frame) /
-                272; 
+                272;
             tagFRAME_INF *info = &frameInfo[i];
             i++;
             info->parent = frameNo;
@@ -954,7 +917,7 @@ int AnimeDataInit(mgCFrame *frame, tagMOTION_TYPE *motion, mgCMemory *memory,
                 target = frame->GetFrame(channel->frame);
                 if (frameInfo[channel->frame].vertex_count == 0 && target != NULL) {
                     mesh = (mgCVisualMDT *)target->visual;
-                    
+
                     if (mesh != NULL && mesh != NULL) {
                         srcVertices = (int *)mesh->vertex;
                         srcUvs = (int *)mesh->normal;
@@ -1044,7 +1007,7 @@ int CheckHit(CollisionInfo *collision, float *from, float *to, float *hit, int c
     best = -1;
     hasBest = 0;
     mgVectorMaxMin(segMax, segMin, from, to);
-    
+
     {
         float *minPtr;
         float *maxPtr;
@@ -1064,7 +1027,7 @@ int CheckHit(CollisionInfo *collision, float *from, float *to, float *hit, int c
         if (poly->ignore_mask & mask) {
             continue;
         }
-        
+
         mgVectorMaxMin(polyMax, polyMin, poly->vertex[0], poly->vertex[1], poly->vertex[2]);
         if (segMax[0] < polyMin[0] || segMax[1] < polyMin[1] || segMax[2] < polyMin[2]) {
             continue;
@@ -1073,7 +1036,7 @@ int CheckHit(CollisionInfo *collision, float *from, float *to, float *hit, int c
             !(segMin[2] <= polyMax[2])) {
             continue;
         }
-        
+
         sceVu0SubVector(offset, from, poly->vertex[0]);
         d0 = sceVu0InnerProduct(poly->normal, offset);
         sceVu0SubVector(offset, to, poly->vertex[0]);
@@ -1198,7 +1161,7 @@ int CheckHits(CollisionInfo *collision, float *from, float *to, int maxHits, int
 
     hits = 0;
     mgVectorMaxMin(segMax, segMin, from, to);
-    
+
     maxPtr = segMax;
     minPtr = segMin;
     asm {
@@ -1212,7 +1175,7 @@ int CheckHits(CollisionInfo *collision, float *from, float *to, int maxHits, int
         if (poly->ignore_mask & mask) {
             goto next;
         }
-        
+
         mgVectorMaxMin(polyMax, polyMin, poly->vertex[0], poly->vertex[1], poly->vertex[2]);
         if (segMax[0] < polyMin[0] || segMax[1] < polyMin[1] || segMax[2] < polyMin[2]) {
             goto next;
@@ -1221,7 +1184,7 @@ int CheckHits(CollisionInfo *collision, float *from, float *to, int maxHits, int
             !(segMin[2] <= polyMax[2])) {
             goto next;
         }
-        
+
         sceVu0SubVector(offset, from, poly->vertex[0]);
         d0 = sceVu0InnerProduct(poly->normal, offset);
         sceVu0SubVector(offset, to, poly->vertex[0]);
@@ -1239,7 +1202,7 @@ int CheckHits(CollisionInfo *collision, float *from, float *to, int maxHits, int
         if (hits < maxHits) {
             hitIndex[hits] = i;
             sceVu0CopyVector(hitPoint[hits], point);
-            
+
             *(float *)((hits << 4) + (int)hitPoint + 12) = mgDistVector(from, point);
             hits++;
         } else {
@@ -1252,7 +1215,7 @@ int CheckHits(CollisionInfo *collision, float *from, float *to, int maxHits, int
     if (sortDir == 0) {
         return hits;
     }
-    
+
     {
         if (sortDir > 0) {
             for (i = 0; i < hits - 1; i++) {
@@ -1324,7 +1287,6 @@ int CheckHitsPipeY(CCPoly *polys, int count, float *from, float height, int max_
             continue;
         }
 
-        // A wall that is nearly upright has no height under the pipe.
         normal_y = (poly->normal[1] < 0.0f) ? -poly->normal[1] : poly->normal[1];
 
         if (normal_y < 0.01f) {
@@ -1347,7 +1309,6 @@ int CheckHitsPipeY(CCPoly *polys, int count, float *from, float height, int max_
             continue;
         }
 
-        // Keep the highest point that lies within the pipe's height.
         found = 0;
 
         for (j = 0; j < point_count; j++) {
@@ -1393,7 +1354,6 @@ int CheckHitsPipeY(CCPoly *polys, int count, float *from, float height, int max_
             }
         }
 
-        // A descending sort was never written; it sorts ascending as well.
         if (sort < 0) {
             for (i = 0; i < hits - 1; i++) {
                 for (j = i + 1; j < hits; j++) {
@@ -1470,7 +1430,6 @@ int CheckHitsPipe(CCPoly *polys, int count, sceVu0FVECTOR from, float *to, int m
             continue;
         }
 
-        // Keep the point nearest the pipe's start among those along its length; w holds the distance.
         found = 0;
 
         for (j = 0; j < point_count; j++) {
@@ -1519,7 +1478,6 @@ int CheckHitsPipe(CCPoly *polys, int count, sceVu0FVECTOR from, float *to, int m
             }
         }
 
-        // A descending sort was never written; it sorts ascending as well.
         if (sort < 0) {
             for (i = 0; i < hits - 1; i++) {
                 for (j = i + 1; j < hits; j++) {
@@ -1614,7 +1572,6 @@ int CheckHitsSphere(CCPoly *polys, int count, float *sphere, int max_hits, int *
             }
         }
 
-        // A descending sort was never written; it sorts ascending as well.
         if (sort < 0) {
             for (i = 0; i < hits - 1; i++) {
                 for (j = i + 1; j < hits; j++) {
@@ -2296,7 +2253,6 @@ s32 CalcIntersectionPoint2PAnd2P(float ax0, float ay0, float ax1, float ay1, flo
     return CheckPosInOutFor2P(bx0, by0, bx1, by1, *out_x, *out_y) != 0;
 }
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gameutil", at_966__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/gameutil", at_967__DATA);
 

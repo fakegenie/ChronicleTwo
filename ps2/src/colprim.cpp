@@ -13,7 +13,6 @@
 #include "scenesnd.hpp"
 #include <cstring>
 
-// Code (.text)
 int CColPrim::SetDamage(char *name, int owner_id) {
     int index = 0;
     DAMAGE_PARAM *param = Damage_Param_Table;
@@ -207,18 +206,13 @@ int CColPrim::Step(void) {
     if (coord_type & 2) {
         if (step_count == 0) {
             int j = 0;
-            int frameOffset = 0;
-            int vecOffset = 0;
             do {
-                mgCFrame *frame = *(mgCFrame **)((u8 *)this + frameOffset + 0x38);
+                mgCFrame *frame = this->frame[j];
                 if (frame != 0) {
-                    frame->GetWorldPosition0((float *)((u8 *)this + vecOffset + 0x40));
+                    frame->GetWorldPosition0(pos[j]);
                 }
-                sceVu0CopyVector((float *)((u8 *)this + vecOffset + 0x60),
-                                 (float *)((u8 *)this + vecOffset + 0x40));
+                sceVu0CopyVector(old_pos[j], pos[j]);
                 j++;
-                frameOffset += 4;
-                vecOffset += 0x10;
             } while (j < 2);
         } else {
             int i = 0;
@@ -306,5 +300,4 @@ void CColPrimMan::Initialize(CScene *new_scene) {
     for (int i = 0; i < COLPRIM_MAX; ++i) { prim[i].Initialize(); prim[i].id = i; }
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/colprim", Damage_Param_Table__DATA);

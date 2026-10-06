@@ -75,7 +75,6 @@ int CheckGiftPack(CActiveMonster *monster, CColPrim *prim);
 int _MONSTER_NAME(SPI_STACK *stack, int argument_count);
 void LoadMonsterLanguage(int language);
 
-// Code (.text)
 int CActiveMonster::IsDraw(int view_state) {
     if (chara_kind != 2)
         return 0;
@@ -152,7 +151,6 @@ int CActiveMonster::CheckView(int rank_limit) {
         return view_state;
     }
     if (view_state == MONSTER_VIEW_IN) {
-
         if (!(target_dist <= 30.0f + clip_dist) || rank >= rank_limit) {
             view_state = MONSTER_VIEW_FADE_OUT;
         }
@@ -344,9 +342,6 @@ float CMonsterMan::IsBattleStyleDist() {
     }
     return nearest;
 }
-
-
-
 
 #ifdef NONMATCHING
 int CMonsterMan::CheckMonsterTolk(float *pos) {
@@ -752,7 +747,6 @@ void CMonsterMan::DrawLifeGage(int view, int mode) {
             pos[1] += active[i]->body_height;
             monster = active[i];
             if (monster->tbl->boss == 0) {
-
                 s8 boss = monster->tbl->boss;
                 monster->life_gage.Set(pos, monster->max_life, monster->life,
                                       fptosi(0.9f + monster->gekirin), (s8)boss);
@@ -1289,7 +1283,7 @@ void CMonsterMan::CheckDamage() {
             BASE_MONSTER_TBL *resist_tbl = monster->tbl;
             for (int e = 0; e < 8; e++) {
                 float power = 0.007843138f * (float)prim->element[e];
-                float resist = 0.01f * (float)resist_tbl->unk_6c[e];
+                float resist = 0.01f * (float)resist_tbl->element_resist[e];
                 if (area->unk_8c != 2) {
                     element_damage += resist * (damage * power);
                 } else {
@@ -1346,7 +1340,7 @@ void CMonsterMan::CheckDamage() {
             }
             int greyed = 0;
             BASE_MONSTER_TBL *status_tbl = monster->tbl;
-            s16 status_rate = status_tbl->unk_ac / prim->param->hit_count;
+            s16 status_rate = status_tbl->status_chance / prim->param->hit_count;
             int hit_damage = (int)damage;
             if (hit_damage > 0) {
                 if ((prim->status & 0x4) && !(status_tbl->resist_attr & 0x4) && status_rate >= iRand(100)) {
@@ -2139,10 +2133,6 @@ int CMonsterMan::CheckPhoto(CScene::InScreenCharaInfo *info) {
     return -1;
 }
 
-
-
-
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/monster", base_monster_define__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/monster", dung_progtxt_notlift_mons__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/monster", at_1707__DATA);
@@ -2159,7 +2149,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/monster", at_2294__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/monster", at_2699__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/monster", mos_data_anlyze_tag__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/monster", at_1200__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/monster", at_1201__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/monster", at_1202__DATA);
@@ -2188,12 +2177,9 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/monster", at_2589__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/monster", at_2802__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/monster", at_2809__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/monster", __vt__14CActiveMonster__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(dmg_sc_cnt_2104, 0x4);
 INCLUDE_BSS(init_2105, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(at_1704, 0x10);

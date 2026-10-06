@@ -3,7 +3,6 @@
 #include "mg_memory.hpp"
 #include "mglib.hpp"
 
-// Code (.text)
 mgCDrawPrim::mgCDrawPrim() {
     memory = NULL;
     vif_packet = NULL;
@@ -81,7 +80,6 @@ void mgCDrawPrim::EndDma() {
     int nloop = (write - (u_long128 *)giftag) - 1;
 
     if (dma_qwc < 1 || direct_qwc < 1) {
-        // An empty run is dropped.
         write = dma_start;
     } else {
         *dma_tag = dma_qwc | MG_DMA_CNT;
@@ -130,7 +128,6 @@ void mgCDrawPrim::Begin2() {
         draw_env.zbuf = zbuf;
         draw_env.SetZBuf(z_mask);
 
-        // DMA tag and VIF code for the seven quadwords of drawing state below.
         tag = (u_int *)write;
         tag[0] = MG_DMA_CNT | 7;
         tag[2] = 0;
@@ -415,7 +412,6 @@ void mgCDrawPrim::DepthTestEnable(int enable) {
     }
 }
 
-
 void mgCDrawPrim::DepthTest(int mode) {
     mgCDrawPrimDepthState *state = (mgCDrawPrimDepthState *)((u_char *)this + 0x20);
     state->enable = 1;
@@ -576,7 +572,7 @@ void mgCDrawManager::PreEndDraw() {
             packet_cursor[i] = packet_list[i];
         }
     }
-    // Only the first sort bucket is used.
+
     for (int j = 0; j < 1; j++) {
         mgSORT_PACKET *item = sort_table[j];
         if (item != 0) {
@@ -640,7 +636,7 @@ int mgCDrawManager::Draw(int group, sceVif1Packet *vif_packet) {
     start = tag;
     entry = &(*(mgSORT_PACKET ***)((u_char *)packet_list + offset))[*(int *)((u_char *)packet_num + offset) - 1];
     common = NULL;
-    // Packets are called in the reverse of their registration order.
+
     for (i = 0; i < *(int *)((u_char *)packet_num + offset); i++) {
         if (*entry != NULL) {
             tag += mgSendVuProg(tag, (*entry)->vu_program);
@@ -674,7 +670,6 @@ void mgCDrawManager::EndDraw(sceVif1Packet *vif_packet) {
 
     PreEndDraw();
     for (i = 0; i < group_num; i++) {
-        // Without a draw order the group is left as it was.
         if (draw_order != NULL) {
             group = draw_order[i];
         }
@@ -713,5 +708,4 @@ void mgCDrawManager::AddPacket(int group, u_long128 *common, u_long128 *packet, 
 }
 #pragma schedule reset
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(at_369, 0x10);

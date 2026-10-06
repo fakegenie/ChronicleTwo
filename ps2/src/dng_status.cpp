@@ -43,7 +43,7 @@ extern s8 init_1006;
 #include "actionchara.hpp"
 #include "scenesnd.hpp"
 #include "subgame.hpp"
-// Code (.text)
+
 void PrintV(int x, int y, int value, mgCTexture *texture, mgRect<int> rect, int digit_count,
             int right_align, int spacing, SP_RGBA *color) {
     int digits[6];
@@ -136,9 +136,6 @@ void DrawDrumCounter(int x, int y, int value) {
     sprite[0].End();
 }
 
-/**
- * Draws the rotating highlight around the active item slot with its fade alpha.
- */
 void DrawActiveItemCursor(int x, int y, float alpha) {
     CPreSprite sprite;
     CPreSprite spare;
@@ -210,40 +207,24 @@ void DrawMainUnitStatusBord(float rate) {
     CBattleCharaInfo *info;
     CGameDataUsed    *active_items;
     int               hp_max;
-    /**
-     *
-     * Screen positions of the charge display elements.
-     *
-     */
+
     struct charge_position_data {
-        int value[7][2]; /**< Position pairs. */
+        int value[7][2];
     };
     charge_position_data charge_position;
-    /**
-     *
-     * Glyph coordinates of the charge display.
-     *
-     */
+
     struct charge_glyph_data {
-        int value[4][2]; /**< Glyph coordinate pairs. */
+        int value[4][2];
     };
     charge_glyph_data charge_glyph;
-    /**
-     *
-     * Mask values used by the dungeon status display.
-     *
-     */
+
     struct status_mask_data {
-        int value[7]; /**< Status mask values. */
+        int value[7];
     };
     status_mask_data status_mask;
-    /**
-     *
-     * Glyph coordinates of the dungeon status display.
-     *
-     */
+
     struct status_glyph_data {
-        s16 value[7][2]; /**< Glyph coordinate pairs. */
+        s16 value[7][2];
     };
     status_glyph_data status_glyph;
     mgRect<int> item_glyph;
@@ -371,7 +352,6 @@ void DrawMainUnitStatusBord(float rate) {
     extern charge_glyph_data at_1049__DATA;
     charge_glyph = at_1049__DATA;
 
-
     sprite.Initialize(NULL, NULL);
     sprite.Preset2D();
     sprite.Begin(MG_PRIM_SPRITE);
@@ -393,7 +373,6 @@ void DrawMainUnitStatusBord(float rate) {
     status_mask = at_1058__2__DATA;
     extern status_glyph_data at_1059__2__DATA;
     status_glyph = at_1059__2__DATA;
-
 
     if (status_attr != 0) {
         status_x = 24;
@@ -626,7 +605,6 @@ void DrawRoboUnitStatusBord(float rate) {
     int               top_right;
     int               bottom_right;
 
-
     color[0] = 0x80;
     color[1] = 0x80;
     color[2] = 0x80;
@@ -772,8 +750,6 @@ void DrawRoboUnitStatusBord(float rate) {
     WarningGage2.rate[1] = whp_rate;
 }
 void DrawMonsterUnitStatusBord(float alpha) {
-
-
     int whp[2];
     int abs[2];
     CBattleCharaInfo *info;
@@ -929,13 +905,11 @@ void DrawStatusBord() {
     }
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_status", at_1048__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_status", at_1049__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_status", at_1058__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_status", at_1059__2__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(cur_ang_1005, 0x4);
 INCLUDE_BSS(init_1006, 0x4);
 INCLUDE_BSS(palanim_1023, 0x4);

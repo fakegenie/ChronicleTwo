@@ -9,18 +9,14 @@
 
 extern char at_33[];
 
-static s32              sbuff__2[16]; /**< Shared argument and response buffer for EZMIDI RPC calls. */
+static s32              sbuff__2[16];
 
-/**
- * Holds the RPC client and the alignment gap before the DMA descriptor.
- */
 struct EzMidiClientStorage {
-    sceSifClientData client; /**< Connection to the EZMIDI IOP server. */
+    sceSifClientData client;
     u8 unk_28[8];
 };
-static EzMidiClientStorage gCd; /**< Client storage for the EZMIDI IOP server. */
-static volatile sceSifDmaData transData; /**< Descriptor reused for EE-to-IOP transfers. */
-
+static EzMidiClientStorage gCd;
+static volatile sceSifDmaData transData;
 
 int ezMidiInit() {
     s32 wait;
@@ -48,7 +44,7 @@ int ezMidi(int command, int argument) {
 
     receive_size = 0;
     s32 wait = 0;
-    // Leave a short interval for the IOP sound server between commands.
+
     do {
         wait += 8;
     } while (wait < 2000);

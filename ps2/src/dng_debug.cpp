@@ -62,21 +62,8 @@ extern CFont dbFont;
 extern int command_int[];
 extern char *command_str[];
 
-/**
- * Closes the dungeon debug menu and applies its edited settings.
- */
 static void dngDebugExit();
-/**
- * Loads a chosen monster kind beside the player, refreshing monster memory on the first load.
- */
-/**
- * Draws the first dungeon system-parameter panel.
- */
-/**
- * Draws the second dungeon system-parameter panel.
- */
 
-// Code (.text)
 DNG_DEBUG_INFO *dngGetDebugInfo() { return &dbinfo; }
 void dngDebugInit() {
     dbinfo.active = 0;
@@ -373,14 +360,11 @@ void DrawDebugWindow() {
     if (command_int[DNG_DEBUG_CMD_INFORMATION * 2] == 3) DrawSystemParamInfo2();
 }
 
-// Static initialiser (.init)
 extern "C" void __sinit_dng_debug_cpp() { dbFont.Init(); }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_debug", command_str__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_debug", command_int__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_debug", at_871__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_debug", at_872__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_debug", at_873__2__DATA);
@@ -409,9 +393,7 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_debug", at_1107__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_debug", at_1132__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_debug", at_1133__2__DATA);
 
-// Static initialiser table (.ctor)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/dng_debug", D_0037B010__DATA);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(dbFont, 0xC0);
 INCLUDE_BSS(dbinfo, 0x20);

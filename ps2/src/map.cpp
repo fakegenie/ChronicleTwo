@@ -38,7 +38,6 @@ extern char at_1927[];
 #include "water.hpp"
 #include "vtables.hpp"
 
-// Code (.text)
 int CMapFlagData::SetFlag(int no, int on) {
     u32 mask;
     u32 old_flag;
@@ -147,7 +146,6 @@ CPartsGroup *CMap::SearchPartsGroup(char *name) {
 int CMap::SearchPartsGroupNo(char *name) {
     int i;
     for (i = 0; i < parts_group_max; i++) {
-
         u8 used = !!parts_group[i].name ^ 1;
         if (!used && strcmp(parts_group[i].name, name) == 0)
             return i;
@@ -531,7 +529,6 @@ int CMap::PreDraw(float *view_pos) {
     int                     active_occlusion;
     int                     index;
 
-
     if (bbox_valid != 0 && mgInsideScreen(&bbox) == 0) {
         draw_parts_num = 0;
         return 0;
@@ -678,7 +675,6 @@ int CMap::GetCharaLight(mgCObject *chara, CFuncPoint *points, int max, int use_p
         point_offset += 0x1C0;
     } while (index < light_num);
     }
-
     }
     if (use_parts != 0) {
         CMapParts *parts;
@@ -747,14 +743,14 @@ int CMap::SetFuncPLight(float *pos, CFuncPointCheck *check) {
     }
     count = func_point.GetLight(pos, ft_1248, 3, check, 0);
     for (i = 0; i < count; i++) {
-        u8 *point = (u8 *)ft_1248 + i * 0x1C0;
-        sceVu0ScaleVector((float *)color, (float *)(point + 0x20), GetLightAnimeWeight((CFuncPoint *)point, anime_frame));
-        mgSetPlight(3 - i, (float *)(point + 0x180), color, *(float *)(point + 0x30), *(float *)(point + 0x34));
+        CFuncPoint *point = &ft_1248[i];
+        sceVu0ScaleVector((float *)color, point->plight.color, GetLightAnimeWeight(point, anime_frame));
+        mgSetPlight(3 - i, point->position, color, point->plight.power, point->plight.range);
     }
     return count;
 }
 extern "C" void *__ct__10CFuncPointFv(void *point) {
-    __ct__8mgCFrameFv((u8 *)point + 0x70);
+    __ct__8mgCFrameFv(&((CFuncPoint *)point)->frame);
     return point;
 }
 
@@ -1103,7 +1099,7 @@ void CMap::DrawTrBox() {
         if (((CMapTreasureBox *)box)->active == 0) continue;
         CMapParts *link = ((CMapTreasureBox *)box)->parts;
         if (link != 0 && link->GetShow() == 0) continue;
-        if (*(unsigned int *)&func_point & 0x40) {
+        if (func_point.flag & 0x40) {
             ((CMapTreasureBox *)box)->GetPosition(position);
             position[3] = 40.0f;
             light_count = SetFuncPLight(position, &check);
@@ -1745,8 +1741,6 @@ int CheckFuncEvent(CFuncPoint *point, float *pos, int check_type, MapEventInfo *
 int CObject::Draw() { return 0; }
 int CObject::DrawDirect() { return 0; }
 
-
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/map", at_327__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/map", at_574__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/map", at_1352__DATA);
@@ -1754,19 +1748,15 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/map", at_1353__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/map", at_1927__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/map", at_2008__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/map", __vt__4CMap__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/map", __vt__18CList_P9CMapParts___DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/map", __vt__23CList_14PartsGroupData___DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/map", __vt__9CMapWater__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/map", CMapName__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(init_1249, 0x4);
 INCLUDE_BSS(init_1301, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(ft_1248, 0xE00);
 INCLUDE_BSS(attr_1300, 0x90);

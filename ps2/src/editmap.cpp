@@ -22,7 +22,6 @@ union EditVector {
     u_long128 quad;
 };
 
-
 const int kPartsInfoColorCountOffset = 0x1C;
 const int kPartsInfoRepaintOffset = 0x20;
 const int kPartsPolyAttrOffset = 0x48;
@@ -85,7 +84,6 @@ extern "C" void mgCreateMatrixPY__FPA4_fPff(float (*matrix)[4], float *pos, floa
 extern "C" void mgApplyMatrix__FPfPfPA4_fPfPf(float *outA, float *outB, float (*matrix)[4], float *inA,
                                               float *inB);
 
-// Code (.text)
 char *CEditMap::Iam(void) {
     return CEditMapName;
 }
@@ -137,7 +135,6 @@ void CEditMap::ClearGrid() {
     int i = 0;
     int offset = 0;
     for (; i < grid_max; i++) {
-
         CEditGrid *grid = *(CEditGrid **)((u8 *)this + offset + 0xF54);
         if (grid != 0) {
             grid->Clear();
@@ -2065,7 +2062,6 @@ void CEditMap::LoadEditInfo(char *script, int size, mgCMemory *stack) {
     }
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmap", at_830__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmap", at_988__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmap", at_1837__2__DATA);
@@ -2073,7 +2069,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmap", emap_tag__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmap", at_2257__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmap", at_2278__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmap", at_346__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmap", at_449__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmap", at_450__DATA);
@@ -2092,14 +2087,11 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmap", at_2080__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmap", at_2081__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmap", at_2082__2__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmap", __vt__14CEditCollision__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmap", __vt__8CEditMap__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/editmap", CEditMapName__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(emapMap, 0x4);
 INCLUDE_BSS(emapInfo, 0x4);
 INCLUDE_BSS(emapStack, 0x4);
@@ -2115,5 +2107,4 @@ INCLUDE_BSS(emapInitIdx, 0x4);
 INCLUDE_BSS(emapFix, 0x4);
 INCLUDE_BSS(emapInit, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(at_426, 0x10);
