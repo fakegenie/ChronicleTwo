@@ -230,7 +230,6 @@ void CThunderEffect::Init(void) {
     unk_94 = 0;
     unk_98 = 0;
 }
-#ifdef NONMATCHING
 void CWater::Hamon() {
     float  coefficient;
     float  center_coefficient;
@@ -240,15 +239,15 @@ void CWater::Hamon() {
     int    row;
     int    column;
     int    index;
-    float *current;
     float *next;
+    float *current;
 
     if (height == height_a) {
-        current = height_a;
         next = height_b;
+        current = height_a;
     } else {
-        current = height_b;
         next = height_a;
+        current = height_b;
     }
     height = next;
     coefficient = speed * speed;
@@ -258,16 +257,15 @@ void CWater::Hamon() {
         for (column = 1; column < columns - 1; column++) {
             index = row * columns + column;
             float *cell = &current[index];
-            old_height = next[index];
-            new_height = ((cell[-1] + cell[1] + cell[columns]) + *(cell - columns)) * coefficient +
-                         (center_coefficient * cell[0] - old_height);
-            next[index] = new_height - friction * (new_height - old_height);
+            float *out = &next[index];
+            old_height = *out;
+            new_height = (cell[-1] + cell[1] + cell[columns]) + *(cell - columns);
+            new_height = new_height * coefficient;
+            new_height += center_coefficient * cell[0] - old_height;
+            *out = new_height - friction * (new_height - old_height);
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/water", Hamon__6CWaterFv);
-#endif
 void CWater::SetVertex(float *a, float *b) {
     mgVectorMaxMin(max, min, a, b);
 }
