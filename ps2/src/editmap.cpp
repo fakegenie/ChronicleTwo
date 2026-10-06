@@ -1173,8 +1173,42 @@ float CEditMap::GetEditPartsAlt(CEditPartsInfo *info, float *position, float ang
     int count = GetNearParts(info, position, angle, near_parts, 512);
     return GetEditPartsAlt(info, position, angle, near_parts, count);
 }
-#ifdef NONMATCHING
 int CEditMap::MagnetParts(CEditPartsInfo *info, float *pos, float *rot, CEditParts **parts, int num) {
+    CEditParts *nearest;
+    float part_area;
+    float height_limit;
+    float half_len;
+    CEditParts *part;
+    int line_part;
+    float dist;
+    int n;
+    float height_gap;
+    float gap_z;
+    float nearest_dist;
+    float gap_x;
+    int angle;
+    float rate;
+    int relative_angle;
+    CEditParts *flat_part;
+    float flat_rate;
+    CEditParts *touch_part;
+    int flat_angle;
+    int unnamed;
+    CEditPartsInfo *part_info;
+    int other_angle;
+    float push_max_x;
+    float part_half_len;
+    int base_angle;
+    int shift_angle;
+    int near_count;
+    float area;
+    int part_angle;
+    float push_min_x;
+    float touch_rate;
+    int angle_gap;
+    float push_max_z;
+    float push_min_z;
+    int moved;
     float part_matrix[4][4];
     float rot_matrix[4][4];
     float matrix[4][4];
@@ -1185,45 +1219,43 @@ int CEditMap::MagnetParts(CEditPartsInfo *info, float *pos, float *rot, CEditPar
     if (!(info->attr & 0x20)) {
         return 0;
     }
-    int line_part = 0;
+    line_part = 0;
     if (info->attr & 0x100) {
         line_part = 1;
     }
-    int angle = ConvEditAngle(*rot);
+    angle = ConvEditAngle(*rot);
     GetMatrix(matrix, pos, angle);
     mgVu0FBOX box = info->area3_box;
-    box.max[3] = 1.0f;
     box.min[3] = 1.0f;
-    box.max[1] = 0.0f;
+    box.max[3] = 1.0f;
     box.min[1] = 0.0f;
-    sceVu0FVECTOR end_max;
-    sceVu0FVECTOR end_min;
-    sceVu0FVECTOR part_end_max;
-    sceVu0FVECTOR part_end_min;
+    box.max[1] = 0.0f;
+    sceVu0FVECTOR end[2];
+    sceVu0FVECTOR part_end[2];
     CEditParts *near_list[64];
     sceVu0FVECTOR flat_pos;
     sceVu0FVECTOR touch_pos;
-    sceVu0ApplyMatrix(end_max, matrix, box.max);
-    sceVu0ApplyMatrix(end_min, matrix, box.min);
-    end_max[1] = 0.0f;
-    end_min[1] = 0.0f;
-    float half_len = 0.5f * mgDistVector(box.min, box.max);
-    int near_count = 0;
-    CEditParts *nearest = NULL;
-    float nearest_dist = 0.0f;
-    CEditParts *flat_part = NULL;
-    CEditParts *touch_part = NULL;
-    int flat_angle = 0;
-    float flat_rate = 0.0f;
-    float touch_rate = 0.0f;
+    sceVu0ApplyMatrix(end[0], matrix, box.min);
+    sceVu0ApplyMatrix(end[1], matrix, box.max);
+    end[0][1] = 0.0f;
+    end[1][1] = 0.0f;
+    half_len = 0.5f * mgDistVector(box.max, box.min);
+    near_count = 0;
+    nearest = NULL;
+    nearest_dist = 0.0f;
+    flat_part = NULL;
+    touch_part = NULL;
+    flat_angle = 0;
+    flat_rate = 0.0f;
+    touch_rate = 0.0f;
 
-    for (int n = 0; n < num; n++) {
-        CEditParts *part = parts[n];
-        int unnamed = part->name[0] == 0;
+    for (n = 0; n < num; n++) {
+        part = parts[n];
+        unnamed = part->name[0] == 0;
         if (unnamed) {
             continue;
         }
-        CEditPartsInfo *part_info = part->info;
+        part_info = part->info;
         if (part_info == NULL || !(part_info->attr & 0x10)) {
             continue;
         }
@@ -1238,33 +1270,33 @@ int CEditMap::MagnetParts(CEditPartsInfo *info, float *pos, float *rot, CEditPar
         sceVu0FVECTOR offset;
         part->GetPosition(part_pos);
         mgVu0FBOX part_box = part_info->area3_box;
-        part_box.max[1] = 0.0f;
         part_box.min[1] = 0.0f;
-        float part_half_len = 0.5f * mgDistVector(part_box.min, part_box.max);
+        part_box.max[1] = 0.0f;
+        part_half_len = 0.5f * mgDistVector(part_box.max, part_box.min);
         sceVu0SubVector(offset, pos, part_pos);
         offset[1] = 0.0f;
         if (!(mgDistVector(offset) <= 50.0f + (part_half_len + half_len))) {
             continue;
         }
         if (!line_part) {
-            float area = mgAbs(info->col_floor.AreaXZ());
-            float part_area = mgAbs(part_info->col_area1.AreaXZ());
+            area = mgAbs(info->col_floor.AreaXZ());
+            part_area = mgAbs(part_info->col_area1.AreaXZ());
             if (mgAbs(part_area - area) < 1.0f) {
                 sceVu0FVECTOR other_pos;
                 sceVu0FVECTOR other_rot;
                 part->GetPosition(other_pos);
                 part->GetRotation(other_rot);
-                float height_gap = other_pos[1] - pos[1];
-                float height_limit = 1.0f + part_info->GetPartsHeight();
+                height_gap = other_pos[1] - pos[1];
+                height_limit = 1.0f + part_info->GetPartsHeight();
                 if (mgAbs(height_gap) <= height_limit) {
-                    int other_angle = ConvEditAngle(other_rot[1]);
+                    other_angle = ConvEditAngle(other_rot[1]);
                     float other_inverse[4][4];
                     float other_matrix[4][4];
                     float relative[4][4];
                     GetMatrix(other_matrix, other_pos, other_angle);
                     GetInversMatrix(other_inverse, other_matrix);
                     mgMulMatrix(relative, other_inverse, matrix);
-                    float rate = mgAbs(part_info->col_floor.OverlapXZ(info->col_area1, relative, NULL) / area);
+                    rate = mgAbs(part_info->col_floor.OverlapXZ(info->col_area1, relative, NULL) / area);
                     if (!(rate <= 0.01f) && (touch_part == NULL || !(rate <= touch_rate))) {
                         touch_part = part;
                         touch_rate = rate;
@@ -1285,45 +1317,36 @@ int CEditMap::MagnetParts(CEditPartsInfo *info, float *pos, float *rot, CEditPar
         if (part_pos[1] + part_info->GetPartsHeight() <= pos[1]) {
             continue;
         }
-        float dist;
         if (!line_part) {
             GetRotMatrix(rot_matrix, AngleLimit(-ConvEditAngle(part->rotation[1])));
             offset[3] = 0.0f;
             sceVu0ApplyMatrix(offset, rot_matrix, offset);
-            float gap_min_z = offset[2] - part_box.min[2];
-            float gap_max_z = part_box.max[2] - offset[2];
-            float gap_z;
-            if (mgAbs(gap_min_z) < mgAbs(gap_max_z)) {
-                gap_z = mgAbs(gap_min_z);
+            if (mgAbs(offset[2] - part_box.max[2]) < mgAbs(part_box.min[2] - offset[2])) {
+                gap_z = mgAbs(offset[2] - part_box.max[2]);
             } else {
-                gap_z = mgAbs(gap_max_z);
+                gap_z = mgAbs(part_box.min[2] - offset[2]);
             }
-            float gap_min_x = offset[0] - part_box.min[0];
-            float gap_max_x = part_box.max[0] - offset[0];
-            float gap_x;
-            if (mgAbs(gap_min_x) < mgAbs(gap_max_x)) {
-                gap_x = mgAbs(gap_min_x);
+            if (mgAbs(offset[0] - part_box.max[0]) < mgAbs(part_box.min[0] - offset[0])) {
+                gap_x = mgAbs(offset[0] - part_box.max[0]);
             } else {
-                gap_x = mgAbs(gap_max_x);
+                gap_x = mgAbs(part_box.min[0] - offset[0]);
             }
-            if (part_box.min[0] >= offset[0] && offset[0] >= part_box.max[0]) {
+            if (offset[0] <= part_box.max[0] && offset[0] >= part_box.min[0]) {
                 dist = gap_z;
-            } else if (part_box.min[2] >= offset[2] && offset[2] >= part_box.max[2]) {
+            } else if (offset[2] <= part_box.max[2] && offset[2] >= part_box.min[2]) {
                 dist = gap_x;
             } else {
                 dist = sqrtf(gap_x * gap_x + gap_z * gap_z);
             }
         } else {
             GetMatrix(part_matrix, part_pos, ConvEditAngle(part->rotation[1]));
-            sceVu0ApplyMatrix(part_end_max, part_matrix, part_box.max);
-            sceVu0ApplyMatrix(part_end_min, part_matrix, part_box.min);
-            part_end_max[1] = 0.0f;
-            part_end_min[1] = 0.0f;
-            if (mgDistVector(part_end_max, end_min) < mgDistVector(part_end_min, end_max)) {
-                dist = mgDistVector(part_end_max, end_min);
-            } else {
-                dist = mgDistVector(part_end_min, end_max);
-            }
+            sceVu0ApplyMatrix(part_end[0], part_matrix, part_box.min);
+            sceVu0ApplyMatrix(part_end[1], part_matrix, part_box.max);
+            part_end[0][1] = 0.0f;
+            part_end[1][1] = 0.0f;
+            dist = mgDistVector(part_end[0], end[1]) < mgDistVector(part_end[1], end[0])
+                       ? mgDistVector(part_end[0], end[1])
+                       : mgDistVector(part_end[1], end[0]);
         }
         if (near_count >= 64) {
             break;
@@ -1335,11 +1358,10 @@ int CEditMap::MagnetParts(CEditPartsInfo *info, float *pos, float *rot, CEditPar
         }
     }
 
-    int base_angle = 0;
+    base_angle = 0;
     if (nearest == NULL && flat_part == NULL) {
         return 0;
     }
-    int angle_gap;
     if (nearest != NULL) {
         base_angle = ConvEditAngle(nearest->rotation[1]);
         angle_gap = AngleLimit(angle - base_angle);
@@ -1347,7 +1369,7 @@ int CEditMap::MagnetParts(CEditPartsInfo *info, float *pos, float *rot, CEditPar
     if (flat_part != NULL) {
         base_angle = flat_angle;
         angle_gap = AngleLimit(angle - base_angle);
-        if (!(mgAbs((box.min[0] - box.max[0]) - (box.min[2] - box.max[2])) <= 1.0f)) {
+        if (!(mgAbs((box.max[0] - box.min[0]) - (box.max[2] - box.min[2])) <= 1.0f)) {
             if (angle_gap >= 6 && angle_gap < 18) {
                 angle = flat_angle + 12;
             } else {
@@ -1356,58 +1378,60 @@ int CEditMap::MagnetParts(CEditPartsInfo *info, float *pos, float *rot, CEditPar
             angle_gap = 0;
         }
     }
-    if (!line_part && angle_gap % 6 != 0) {
-        if (angle_gap >= 3 && angle_gap < 9) {
-            angle = base_angle + 6;
-        } else if (angle_gap >= 9 && angle_gap < 12) {
-            angle = base_angle + 12;
-        } else if (angle_gap >= 12 && angle_gap < 15) {
-            angle = base_angle + 12;
-        } else if (angle_gap >= 15 && angle_gap < 21) {
-            angle = base_angle + 18;
-        } else {
-            angle = base_angle;
+    while (!line_part) {
+        if (angle_gap % 6 != 0) {
+            if (angle_gap >= 3 && angle_gap < 9) {
+                angle = base_angle + 6;
+            } else if (angle_gap >= 9 && angle_gap < 12) {
+                angle = base_angle + 12;
+            } else if (angle_gap >= 12 && angle_gap < 15) {
+                angle = base_angle + 12;
+            } else if (angle_gap >= 15 && angle_gap < 21) {
+                angle = base_angle + 18;
+            } else {
+                angle = base_angle;
+            }
         }
+        break;
     }
-    int new_angle = AngleLimit(angle);
+    angle = AngleLimit(angle);
     if (flat_part != NULL) {
         pos[0] = flat_pos[0];
         pos[2] = flat_pos[2];
-        *rot = GetEditAngle(new_angle);
+        *rot = GetEditAngle(angle);
         return 1;
     }
-    int moved = 0;
+    moved = 0;
     sceVu0FVECTOR shift;
     mgZeroVector(shift);
-    int shift_angle = 0;
+    shift_angle = 0;
     if (line_part) {
         sceVu0FVECTOR near_pos;
-        sceVu0FVECTOR gap_min;
-        sceVu0FVECTOR gap_max;
+        sceVu0FVECTOR gap[2];
         nearest->GetPosition(near_pos);
         GetMatrix(part_matrix, near_pos, ConvEditAngle(nearest->rotation[1]));
         mgVu0FBOX near_box = nearest->info->area3_box;
-        near_box.max[1] = 0.0f;
         near_box.min[1] = 0.0f;
-        sceVu0ApplyMatrix(part_end_max, part_matrix, near_box.max);
-        sceVu0ApplyMatrix(part_end_min, part_matrix, near_box.min);
-        part_end_max[1] = 0.0f;
-        part_end_min[1] = 0.0f;
-        sceVu0SubVector(gap_max, part_end_max, end_min);
-        sceVu0SubVector(gap_min, part_end_min, end_max);
-        gap_max[1] = 0.0f;
-        gap_min[1] = 0.0f;
-        if (mgDistVector(gap_min) < mgDistVector(gap_max)) {
-            *(u_long128 *)shift = *(u_long128 *)gap_min;
+        near_box.max[1] = 0.0f;
+        sceVu0ApplyMatrix(part_end[0], part_matrix, near_box.min);
+        sceVu0ApplyMatrix(part_end[1], part_matrix, near_box.max);
+        part_end[0][1] = 0.0f;
+        part_end[1][1] = 0.0f;
+        sceVu0SubVector(gap[1], part_end[0], end[1]);
+        sceVu0SubVector(gap[0], part_end[1], end[0]);
+        gap[1][1] = 0.0f;
+        gap[0][1] = 0.0f;
+        if (mgDistVector(gap[0]) < mgDistVector(gap[1])) {
+            *(u_long128 *)shift = *(u_long128 *)gap[0];
         } else {
-            *(u_long128 *)shift = *(u_long128 *)gap_max;
+            *(u_long128 *)shift = *(u_long128 *)gap[1];
         }
         moved = 1;
     } else {
-        for (int n = 0; n < near_count; n++) {
+        for (n = 0; n < near_count; n++) {
             CEditParts *part = near_list[n];
-            int part_angle = ConvEditAngle(part->rotation[1]);
-            int relative_angle = AngleLimit(new_angle - part_angle);
+            part_angle = ConvEditAngle(part->rotation[1]);
+            relative_angle = AngleLimit(angle - part_angle);
             if (relative_angle % 6 != 0) {
                 continue;
             }
@@ -1421,25 +1445,29 @@ int CEditMap::MagnetParts(CEditPartsInfo *info, float *pos, float *rot, CEditPar
             local_pos[3] = 0.0f;
             sceVu0ApplyMatrix(local_pos, rot_matrix, local_pos);
             GetRotMatrix(rot_matrix, AngleLimit(relative_angle));
-            sceVu0ApplyMatrix(local_max, rot_matrix, box.min);
-            sceVu0ApplyMatrix(local_min, rot_matrix, box.max);
+            sceVu0ApplyMatrix(local_max, rot_matrix, box.max);
+            sceVu0ApplyMatrix(local_min, rot_matrix, box.min);
             mgVectorMaxMin(local_max, local_min, local_max, local_min);
             mgVu0FBOX target_box = part->info->area3_box;
             mgAddVector(local_max, local_pos);
             mgAddVector(local_min, local_pos);
             sceVu0FVECTOR push;
             mgZeroVector(push);
-            if (!(local_max[0] <= target_box.max[0]) && local_min[0] < target_box.min[0]) {
-                if (local_max[2] <= target_box.max[2]) {
-                    push[2] = target_box.max[2] - local_max[2];
+            push_max_x = target_box.max[0] - local_min[0];
+            push_min_x = target_box.min[0] - local_max[0];
+            push_max_z = target_box.max[2] - local_min[2];
+            push_min_z = target_box.min[2] - local_max[2];
+            if (!(local_max[0] <= target_box.min[0]) && local_min[0] < target_box.max[0]) {
+                if (local_max[2] <= target_box.min[2]) {
+                    push[2] = push_min_z;
                 } else {
-                    push[2] = target_box.min[2] - local_min[2];
+                    push[2] = push_max_z;
                 }
-            } else if (!(local_max[2] <= target_box.max[2]) && local_min[2] < target_box.min[2]) {
-                if (local_max[0] <= target_box.max[0]) {
-                    push[0] = target_box.max[0] - local_max[0];
+            } else if (!(local_max[2] <= target_box.min[2]) && local_min[2] < target_box.max[2]) {
+                if (local_max[0] <= target_box.min[0]) {
+                    push[0] = push_min_x;
                 } else {
-                    push[0] = target_box.min[0] - local_min[0];
+                    push[0] = push_max_x;
                 }
             }
             if (!(mgDistVector(push) <= 50.0f)) {
@@ -1451,14 +1479,18 @@ int CEditMap::MagnetParts(CEditPartsInfo *info, float *pos, float *rot, CEditPar
             moved = 1;
             GetRotMatrix(part_matrix, AngleLimit(part_angle - shift_angle));
             sceVu0ApplyMatrix(push, part_matrix, push);
-            if (shift[0] == 0.0f) {
-                shift[0] = push[0];
-            } else if (push[0] != 0.0f && !(mgAbs(shift[0]) <= mgAbs(push[0]))) {
+            if (shift[0] != 0.0f) {
+                if (push[0] != 0.0f && !(mgAbs(shift[0]) <= mgAbs(push[0]))) {
+                    shift[0] = push[0];
+                }
+            } else {
                 shift[0] = push[0];
             }
-            if (shift[2] == 0.0f) {
-                shift[2] = push[2];
-            } else if (push[2] != 0.0f && !(mgAbs(shift[2]) <= mgAbs(push[2]))) {
+            if (shift[2] != 0.0f) {
+                if (push[2] != 0.0f && !(mgAbs(shift[2]) <= mgAbs(push[2]))) {
+                    shift[2] = push[2];
+                }
+            } else {
                 shift[2] = push[2];
             }
         }
@@ -1471,12 +1503,9 @@ int CEditMap::MagnetParts(CEditPartsInfo *info, float *pos, float *rot, CEditPar
         pos[0] += shift[0];
         pos[2] += shift[2];
     }
-    *rot = GetEditAngle(new_angle);
+    *rot = GetEditAngle(angle);
     return moved;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editmap", MagnetParts__8CEditMapFP14CEditPartsInfoPfPfPP10CEditPartsi);
-#endif
 int CEditMap::MagnetParts(CEditPartsInfo *info, float *pos, float *magnet) {
     CEditParts *near_parts[512];
     int count = GetNearParts(info, pos, magnet[0], near_parts, 512);
