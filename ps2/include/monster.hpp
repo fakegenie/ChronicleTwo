@@ -112,7 +112,7 @@ struct BASE_MONSTER_TBL {
     s8    stagger;
     s8    boss;
     s8    sw_effect_num;
-    s16   unk_6c[8];
+    s16   element_resist[8];
     s16   ext_param[12];
     u32   unk_94;
     u32   unk_98;
@@ -122,7 +122,7 @@ struct BASE_MONSTER_TBL {
         s16 drop_items[3];
     };
     u32   resist_attr;
-    s16   unk_ac;
+    s16   status_chance;
     s16   unk_ae;
     s8    unk_b0;
     s16   unk_b2;

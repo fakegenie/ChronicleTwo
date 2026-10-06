@@ -5983,7 +5983,7 @@ void CMosBookMenu::SetMonsterInfo(BASE_MONSTER_TBL *monster) {
         weakCount = 0;
         *(MonsterBookBlock32 *)weakList = *(MonsterBookBlock32 *)at_5482;
         for (k = 0; k < 8; k++) {
-            if (monster->unk_6c[k] >= 50) {
+            if (monster->element_resist[k] >= 50) {
                 weakList[weakCount] = k;
                 weakCount++;
             }

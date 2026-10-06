@@ -1283,7 +1283,7 @@ void CMonsterMan::CheckDamage() {
             BASE_MONSTER_TBL *resist_tbl = monster->tbl;
             for (int e = 0; e < 8; e++) {
                 float power = 0.007843138f * (float)prim->element[e];
-                float resist = 0.01f * (float)resist_tbl->unk_6c[e];
+                float resist = 0.01f * (float)resist_tbl->element_resist[e];
                 if (area->unk_8c != 2) {
                     element_damage += resist * (damage * power);
                 } else {
@@ -1340,7 +1340,7 @@ void CMonsterMan::CheckDamage() {
             }
             int greyed = 0;
             BASE_MONSTER_TBL *status_tbl = monster->tbl;
-            s16 status_rate = status_tbl->unk_ac / prim->param->hit_count;
+            s16 status_rate = status_tbl->status_chance / prim->param->hit_count;
             int hit_damage = (int)damage;
             if (hit_damage > 0) {
                 if ((prim->status & 0x4) && !(status_tbl->resist_attr & 0x4) && status_rate >= iRand(100)) {
