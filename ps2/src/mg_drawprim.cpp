@@ -222,18 +222,15 @@ void mgCDrawPrim::End2() {
     }
 }
 
-#ifdef NONMATCHING
 void mgCDrawPrim::Data0(float *data) {
-    int converted[4];
-    for (int i = 0; i < 4; i++) {
-        converted[i] = (int)data[i];
-    }
-    *(u_long128 *)command_write = *(u_long128 *)converted;
+    u_long *packet = command_write;
     command_write += 2;
+    asm {
+        lqc2 vf1, 0(data)
+        vftoi0.xyzw vf1, vf1
+        sqc2 vf1, 0(packet)
+    }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_drawprim", Data0__11mgCDrawPrimFPf);
-#endif
 
 #ifdef NONMATCHING
 void mgCDrawPrim::Data4(float *data) {
