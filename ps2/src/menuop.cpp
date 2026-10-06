@@ -2274,7 +2274,6 @@ int CSaveMenuClass::KeyStep(void) {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuop", KeyStep__14CSaveMenuClassFv);
 #endif
-#ifdef STATEMATCHING
 void SaveFileListDraw(int &tex_block, float *pos, int alpha) {
     ScreenPos linePos[13];
     SAVEDATA_INFO *info[13];
@@ -2410,9 +2409,6 @@ void SaveFileListDraw(int &tex_block, float *pos, int alpha) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuop", SaveFileListDraw__FRiPfi);
-#endif
 void SetMCIconData(u_int *pack, int slot) {
     SaveIconSet icons = at_2609__2;
     for (int i = 0; i < 3; i++) {
