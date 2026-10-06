@@ -2565,7 +2565,6 @@ void CMenuPosDataForm::MenuPartsStep() {
         }
     }
 }
-#ifdef NONMATCHING
 static void DrawItemIconEffect2(mgCDrawPrim *prim, mgCTexture *tex, MENUFORMPARTS_TYPE *parts, mgRect<float> rect) {
     MENU_PARTS_EFFECT_STRUCT1 *effect;
     int i;
@@ -2609,12 +2608,12 @@ static void DrawItemIconEffect2(mgCDrawPrim *prim, mgCTexture *tex, MENUFORMPART
                 alpha = (int)(64.0f * sinf((3.1415927f / effect->param[1]) * effect->param[0]));
                 color = &star_color_table[(int)(3.0f * effect->param[4])];
                 prim->Color(color[0], color[1], color[2], alpha);
-                n = 0;
-                for (k = 0; k < 4; k++, n += 2) {
+                for (k = 0; k < 4; k++) {
                     dx = scale * ((float)center_x - corners[k][0]);
                     dy = scale * ((float)center_y - corners[k][1]);
                     corners[k][0] = center_x + dx * cos_angle - dy * sin_angle;
                     corners[k][1] = center_y + dx * sin_angle + dy * cos_angle;
+                    n = k * 2;
                     prim->TextureCrd(uv[n], uv[n + 1]);
                     prim->Vertex((int)corners[0][n], (int)corners[0][n + 1], 0);
                 }
@@ -2624,9 +2623,6 @@ static void DrawItemIconEffect2(mgCDrawPrim *prim, mgCTexture *tex, MENUFORMPART
         prim->End();
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", DrawItemIconEffect2__FP11mgCDrawPrimP10mgCTextureP18MENUFORMPARTS_TYPE9mgRect_f_);
-#endif
 void MenuItemBrdSetInfo(int unused, int pos, int max_line, int view_line) {
     float hidden_lines;
     MenuItemBrdMaxLine = max_line;
