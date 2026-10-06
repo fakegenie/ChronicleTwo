@@ -1566,7 +1566,6 @@ int CActionChara::HumanTameMoveIF() {
     return 1;
 }
 
-#ifdef STATEMATCHING
 int CActionChara::HumanGunMoveIF(char *stand_motion, char *move_motion) {
     sceVu0FVECTOR position;
     sceVu0FVECTOR move_velocity;
@@ -1614,9 +1613,6 @@ int CActionChara::HumanGunMoveIF(char *stand_motion, char *move_motion) {
     RockOn();
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/actionchara", HumanGunMoveIF__12CActionCharaFPcPc);
-#endif
 int CActionChara::RoboWalkMoveIF(int mode) {
     sceVu0FVECTOR position;
     sceVu0FVECTOR move_velocity;
