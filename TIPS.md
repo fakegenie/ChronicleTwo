@@ -420,3 +420,12 @@ only functions present in both objects can be replaced, the plain build keeps th
 - A function in a `drafts` state unit that matches only in the drafts compile cannot be ungated to plain C. `state.py` tries to splice it and fails on literal pairing ("differ in size"). Gate it `#ifdef STATEMATCHING` instead (`RoboAirMoveIF`).
 - MWCC splits webs: a variable reused for an unrelated later value can get a different register in each part. Renaming a reused variable alone does not fix register swaps.
 - The worktree sandbox rejects `sed` with a `$VAR` path argument and heredocs containing `return;`. Put generators in `.py` files.
+- When retail's saved registers are rotated from the very first `move sN,v0`, wrap how each object is fetched in a one-line static inline accessor (`ActiveSceneMap(scene)`, `ActiveSceneCamera(scene)`). That fixed `EditMode` where declaration order did nothing.
+- An abs written as `if (x < 0.0f) x = -x;` lets MWCC copy the branch target's first instruction into the `bc1f` delay slot. `x = mgAbs(x)` gives retail's `bc1f; nop; neg.s` with the slot left empty.
+- A brace-initialised vector whose template copy appears in retail after some computation is a brace initialiser with the computed values as elements, declared at that point: `sceVu0FVECTOR v = {move_x, 0.0f, move_z, 1.0f};`. Locals declared after it move up in the stack.
+- When retail's loop has a plain `b` to the bottom test and no guard, split the bound's computation into two statements (`n = f(); n *= 4;`).
+- A `neg.s` on a constant in retail, where we load a folded negative literal, comes from a named float local: `float r = 33.0f; ... -r * sinf(a)`.
+- When the two operands of a float multiply sit in swapped registers, a named float local for the constant fixed it (`float step = 0.5235988f; ... i * step`). Reordering the operands had no effect.
+- Retail's `in = x / 10` kept in a register and later updated with `+ y` comes from a named local for `x / 10` and `y + local` written at each use.
+- In a `drafts` unit, unused local declarations in a draft can change the objdiff state compile of later `STATEMATCHING` functions. Removing `HumanMoveIF`'s dead `abs_x` and `abs_z` put `HumanGunMoveIF` back to 100%.
+- Retail branch labels in perm's `-1` listing can show an offset 8 bytes past the real target. Check the instruction there before reading odd control flow into it.
