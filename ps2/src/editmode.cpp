@@ -214,7 +214,6 @@ void EditPreMenuAnime(int max_count) {
     PreMenuMaxCount = max_count;
     PreMenuCount = 0;
 }
-#ifdef NONMATCHING
 extern char at_1067__3[];
 extern char at_1068__3[];
 extern char at_1069__5[];
@@ -225,6 +224,10 @@ extern char at_1073__3[];
 extern char at_1074__3[];
 extern char at_1075__2[];
 extern char at_1076__2[];
+extern "C" void *__vt__9mgCObject[];
+extern "C" void *__vt__7CObject[];
+extern "C" void *__vt__12CObjectFrame[];
+extern "C" void *__vt__11CCharacter2[];
 extern mgCFrame *PaintCursor;
 extern mgCFrame *RemoveCursor;
 extern mgCFrame *ShovelCursor;
@@ -234,7 +237,7 @@ void LoadEditCursor(mgCMemory *memory, int block) {
     if (LoadFile2(at_1067__3, read_buffer, NULL, 0) != 0) {
         u_int *pack = (u_int *)read_buffer;
         u_int size;
-        u_int *image = GetPackFile(pack, at_1068__3, (int *)&size);
+        u_int *image = GetPackFile(pack, (char *)at_1068__3, (int *)&size);
         if (image != NULL) {
             u_int blocks;
             if (size & 0xF) {
@@ -260,7 +263,21 @@ void LoadEditCursor(mgCMemory *memory, int block) {
         }
         PaintCursor = NULL;
         PaintCursor2 = NULL;
-        PaintCurChr = new ((u_long128 *)memory->Alloc(0x68)) CCharacter2;
+        CCharacter2 *paint_chr;
+        if ((paint_chr = (CCharacter2 *)operator new(sizeof(CCharacter2), (u_long128 *)memory->Alloc(0x68))) != NULL) {
+            *(void ***)paint_chr = __vt__9mgCObject;
+            paint_chr->Initialize();
+            *(void ***)paint_chr = __vt__7CObject;
+            paint_chr->Initialize();
+            *(void ***)paint_chr = __vt__12CObjectFrame;
+            paint_chr->Initialize();
+            *(void ***)paint_chr = __vt__11CCharacter2;
+            paint_chr->shadow_link.num = 0;
+            paint_chr->shadow_link.dst_frame = 0;
+            paint_chr->shadow_link.src_frame = 0;
+            paint_chr->Initialize();
+        }
+        PaintCurChr = paint_chr;
         u_int *paint_model = GetPackFile(pack, at_1071__3, NULL);
         if (paint_model != NULL) {
             PaintCurChr->LoadPackNoLine(paint_model, at_1072__3, memory, memory, memory, block, NULL);
@@ -275,7 +292,21 @@ void LoadEditCursor(mgCMemory *memory, int block) {
         ShovelCursor = NULL;
         ShovelCurChr = NULL;
         RemoveCurChr = NULL;
-        RemoveCurChr = new ((u_long128 *)memory->Alloc(0x68)) CCharacter2;
+        CCharacter2 *remove_chr;
+        if ((remove_chr = (CCharacter2 *)operator new(sizeof(CCharacter2), (u_long128 *)memory->Alloc(0x68))) != NULL) {
+            *(void ***)remove_chr = __vt__9mgCObject;
+            remove_chr->Initialize();
+            *(void ***)remove_chr = __vt__7CObject;
+            remove_chr->Initialize();
+            *(void ***)remove_chr = __vt__12CObjectFrame;
+            remove_chr->Initialize();
+            *(void ***)remove_chr = __vt__11CCharacter2;
+            remove_chr->shadow_link.num = 0;
+            remove_chr->shadow_link.dst_frame = 0;
+            remove_chr->shadow_link.src_frame = 0;
+            remove_chr->Initialize();
+        }
+        RemoveCurChr = remove_chr;
         u_int *remove_model = GetPackFile(pack, at_1074__3, NULL);
         if (remove_model != NULL) {
             RemoveCurChr->LoadPackNoLine(remove_model, at_1072__3, memory, memory, memory, block, NULL);
@@ -286,7 +317,21 @@ void LoadEditCursor(mgCMemory *memory, int block) {
                 }
             }
         }
-        ShovelCurChr = new ((u_long128 *)memory->Alloc(0x68)) CCharacter2;
+        CCharacter2 *shovel_chr;
+        if ((shovel_chr = (CCharacter2 *)operator new(sizeof(CCharacter2), (u_long128 *)memory->Alloc(0x68))) != NULL) {
+            *(void ***)shovel_chr = __vt__9mgCObject;
+            shovel_chr->Initialize();
+            *(void ***)shovel_chr = __vt__7CObject;
+            shovel_chr->Initialize();
+            *(void ***)shovel_chr = __vt__12CObjectFrame;
+            shovel_chr->Initialize();
+            *(void ***)shovel_chr = __vt__11CCharacter2;
+            shovel_chr->shadow_link.num = 0;
+            shovel_chr->shadow_link.dst_frame = 0;
+            shovel_chr->shadow_link.src_frame = 0;
+            shovel_chr->Initialize();
+        }
+        ShovelCurChr = shovel_chr;
         u_int *shovel_model = GetPackFile(pack, at_1075__2, NULL);
         if (shovel_model != NULL) {
             ShovelCurChr->LoadPackNoLine(shovel_model, at_1072__3, memory, memory, memory, block, NULL);
@@ -304,10 +349,10 @@ void LoadEditCursor(mgCMemory *memory, int block) {
             unit_attr.z_write = -1;
             unit_attr.clip_enable = 1;
             unit_attr.color[0] = 128.0f;
-            unit_attr.color[3] = 32.0f;
             unit_attr.no_light = 1;
             unit_attr.color[1] = 64.0f;
             unit_attr.color[2] = 64.0f;
+            unit_attr.color[3] = 32.0f;
             UnitCursor->SetAttrParam(unit_attr, 1, 0);
         }
         Font__2.Init();
@@ -316,9 +361,6 @@ void LoadEditCursor(mgCMemory *memory, int block) {
         Font__2.SetClearance(0xF, 0x18);
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editmode", LoadEditCursor__FP9mgCMemoryi);
-#endif
 int GetSelPartsInfoID(void) {
     return PartsInfoID;
 }
@@ -408,27 +450,6 @@ void EndEditMode(CScene *scene, float *cursor_pos) {
     EditInitPlaceAnime();
 }
 #ifdef NONMATCHING
-/**
- *
- * Colour components and item number requested for part painting.
- *
- */
-struct PaintParams {
-    int red;   /**< Red component. */
-    int green; /**< Green component. */
-    int blue;  /**< Blue component. */
-    int item;  /**< Paint item number. */
-};
-/**
- *
- * Red, green and blue components of a paint shade.
- *
- */
-struct PaintShade {
-    int red;   /**< Red component. */
-    int green; /**< Green component. */
-    int blue;  /**< Blue component. */
-};
 int StartEditModeFromMenu(CScene *scene, int mode, int *params) {
     scene->GetMap(scene->active_map);
     EditModeNo = mode;
@@ -438,33 +459,33 @@ int StartEditModeFromMenu(CScene *scene, int mode, int *params) {
     if (EditModeNo == EDIT_MODE_PLACE || EditModeNo == EDIT_MODE_REMOVE || EditModeNo == EDIT_MODE_PAINT ||
         EditModeNo == EDIT_MODE_REPAINT) {
         ClearEditFlag();
-        PaintParams color = {0, 0, 0, 0};
-        PaintShade shade = {0, 0, 0};
-        color.red = params[0];
-        color.green = params[1];
-        color.blue = params[2];
-        color.item = params[3];
-        shade.red = params[0];
-        shade.green = params[1];
-        shade.blue = params[2];
+        int color[4] = {0, 0, 0, 0};
+        color[0] = params[0];
+        color[1] = params[1];
+        color[2] = params[2];
+        color[3] = params[3];
+        int shade[3] = {0, 0, 0};
+        shade[0] = color[0];
+        shade[1] = color[1];
+        shade[2] = color[2];
         if (EditModeNo == EDIT_MODE_REPAINT) {
-            color.red = -1;
-            color.green = -1;
-            color.blue = -1;
-            color.item = -1;
-            shade.red = 0xFF;
-            shade.green = 0xFF;
-            shade.blue = 0xFF;
+            color[0] = -1;
+            color[1] = -1;
+            color[2] = -1;
+            color[3] = -1;
+            shade[0] = 0xFF;
+            shade[1] = 0xFF;
+            shade[2] = 0xFF;
         }
         if (EditModeNo == EDIT_MODE_PAINT || EditModeNo == EDIT_MODE_REPAINT) {
             if (PaintCursor2 != NULL && PaintCursor2->attr != NULL) {
-                PaintCursor2->attr->color[0] = shade.red;
-                PaintCursor2->attr->color[1] = shade.green;
-                PaintCursor2->attr->color[2] = shade.blue;
-                PaintColor[0] = ConvColor(color.red);
-                PaintColor[1] = ConvColor(color.green);
-                PaintColor[2] = ConvColor(color.blue);
-                PaintItemNo = color.item;
+                PaintCursor2->attr->color[0] = shade[0];
+                PaintCursor2->attr->color[1] = shade[1];
+                PaintCursor2->attr->color[2] = shade[2];
+                PaintColor[0] = ConvColor(color[0]);
+                PaintColor[1] = ConvColor(color[1]);
+                PaintColor[2] = ConvColor(color[2]);
+                PaintItemNo = color[3];
             }
         } else {
             PartsInfoID = params[0];
