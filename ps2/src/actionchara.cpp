@@ -1250,7 +1250,6 @@ void CActionChara::RockOn() {
         }
     }
 }
-#ifdef NONMATCHING
 int CActionChara::HumanMoveIF() {
     sceVu0FVECTOR position;
     sceVu0FVECTOR rotation;
@@ -1270,8 +1269,6 @@ int CActionChara::HumanMoveIF() {
     float         relative_angle;
     float         facing;
     float         motion_speed;
-    float         abs_x;
-    float         abs_z;
     int           boss;
     GetPosition(position);
     GetRotation(rotation);
@@ -1292,11 +1289,12 @@ int CActionChara::HumanMoveIF() {
     if (lock_on != 0) {
         move_speed = 1.8f;
     }
+    acceleration = move_accel;
     acceleration_step = move_speed / 8.0f;
     if (acceleration_step > 0.5f) {
         acceleration_step = 0.5f;
     }
-    acceleration = move_accel + acceleration_step;
+    acceleration += acceleration_step;
     if (acceleration > 1.0f) {
         acceleration = 1.0f;
     }
@@ -1309,9 +1307,7 @@ int CActionChara::HumanMoveIF() {
     if (angle_change < -3.1415927f) {
         angle_change += 6.2831855f;
     }
-    if (angle_change < 0.0f) {
-        angle_change = -angle_change;
-    }
+    angle_change = mgAbs(angle_change);
     old_angle = stick_direction;
     turn_penalty = 1.5f * (angle_change / 3.1415927f);
     if (turn_penalty > 1.0f) {
@@ -1338,9 +1334,7 @@ int CActionChara::HumanMoveIF() {
     if (angle_change < -3.1415927f) {
         angle_change += 6.2831855f;
     }
-    if (angle_change < 0.0f) {
-        angle_change = -angle_change;
-    }
+    angle_change = mgAbs(angle_change);
     if (angle_change / 3.1415927f < 0.3f) {
         stick_time++;
     } else {
@@ -1382,12 +1376,10 @@ int CActionChara::HumanMoveIF() {
                 if (relative_angle > 3.1415927f) {
                     relative_angle -= 6.2831855f;
                 }
-                abs_x = move_x < 0.0f ? -move_x : move_x;
-                abs_z = move_z < 0.0f ? -move_z : move_z;
-                if (abs_x > abs_z) {
-                    motion_speed = abs_x;
+                if (mgAbs(move_x) > mgAbs(move_z)) {
+                    motion_speed = mgAbs(move_x);
                 } else {
-                    motion_speed = abs_z;
+                    motion_speed = mgAbs(move_z);
                 }
                 if (relative_angle > -1.0f && relative_angle < 1.0f) {
                     SetMotion("\x83o\x83g\x83\x8B\x95\xE0\x82\xAB\x81i\x91O\x81j", 0, 1);
@@ -1462,9 +1454,6 @@ int CActionChara::HumanMoveIF() {
     RockOn();
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/actionchara", HumanMoveIF__12CActionCharaFv);
-#endif
 int CActionChara::HumanShrowMoveIF() {
     float         camera_angle;
     sceVu0FVECTOR position;
