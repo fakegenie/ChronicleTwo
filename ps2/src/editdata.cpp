@@ -97,33 +97,35 @@ void CEditData::InitPlaceData(void) {
         grid[i] = 0;
     }
 }
-#ifdef NONMATCHING
+static inline int EditHouseIndex(CEditHouse *base, CEditHouse *target) {
+    return target - base;
+}
 void CEditMap::SaveData(CEditData *data) {
     EditDataParts *saved;
-    EditPlaceLog *log;
-    short remap[kEditPartsCount];
-    float local[4];
-    float rot[4];
-    float pos[4];
-    float color[4];
-    float gridPos[4];
-    int logCount;
-    int unnamed;
-    int unused;
-    int savedCount;
+    int part_no;
     int i;
-    int c;
-    int k;
-    int value;
+    int savedCount;
     CEditParts *part;
-    CEditGrid *river;
+    short remap[kEditPartsCount];
     u8 *out;
     EditDataGrid *header;
+    int logCount;
+    float local[4];
+    float rot[4];
     short gridY;
+    CEditGrid *river;
     short gridZ;
+    int c;
+    int unused;
     int x;
+    float pos[4];
+    float color[4];
+    int value;
+    float gridPos[4];
     int z;
-
+    int unnamed;
+    int k;
+    EditPlaceLog *log;
     if (data == NULL) {
         return;
     }
@@ -135,20 +137,18 @@ void CEditMap::SaveData(CEditData *data) {
     for (i = 0; i < kEditPlaceSlotCount; i++) {
         log[i].parts_no = -1;
     }
-    for (i = 0; i < place_log_max; i++) {
-        EditPlaceLog *entry = &place_log[i];
-        unused = entry->parts_no < 0;
+    for (int slot = 0; slot < place_log_max; slot++) {
+        EditPlaceLog *log_entry = &place_log[slot];
+        unused = log_entry->parts_no < 0;
         if (!unused) {
-            log[logCount].parts_no = entry->parts_no;
-            log[logCount].base_no = entry->base_no;
-            logCount++;
+            log[logCount++] = place_log[slot];
         }
     }
     for (i = 0; i < kEditPartsCount; i++) {
         remap[i] = -1;
     }
-    for (i = 0; i < edit_parts_max; i++) {
-        part = &edit_parts[i];
+    for (part_no = 0; part_no < edit_parts_max; part_no++) {
+        part = &edit_parts[part_no];
         unnamed = part->name[0] == 0;
         if (!unnamed && part->info != NULL) {
             saved->id = part->info->id;
@@ -164,7 +164,7 @@ void CEditMap::SaveData(CEditData *data) {
                 if (part->GetColor(c, color) != 0) {
                     for (k = 0; k < 3; k++) {
                         value = fptosi(128.0f * color[k]);
-                        if (value >= 0x100) {
+                        if (value > 0xFF) {
                             value = 0xFF;
                         }
                         if (value < 0) {
@@ -175,34 +175,35 @@ void CEditMap::SaveData(CEditData *data) {
                 }
             }
             if (part->house != NULL) {
-                saved->house_no = (part->house - house) + 1;
+                saved->house_no = EditHouseIndex(house, part->house) + 1;
             } else {
                 saved->house_no = 0;
             }
-            remap[i] = savedCount;
+            remap[part_no] = savedCount;
             savedCount++;
             saved++;
             if (savedCount >= data->parts_max) {
                 printf(at_713__3);
                 exit(0);
+                break;
             }
         }
     }
-    for (i = 0; i < logCount; i++) {
-        if (log[i].parts_no >= 0) {
-            log[i].parts_no = remap[log[i].parts_no];
+    for (int log_no = 0; log_no < logCount; log_no++) {
+        if (log[log_no].parts_no >= 0) {
+            log[log_no].parts_no = remap[log[log_no].parts_no];
         }
-        if (log[i].base_no >= 0) {
-            log[i].base_no = remap[log[i].base_no];
+        if (log[log_no].base_no >= 0) {
+            log[log_no].base_no = remap[log[log_no].base_no];
         }
     }
-    for (i = 0; i < kEditGroupCount; i++) {
-        data->house[i].npc_no = house[i].npc_no[0];
+    for (int group = 0; group < kEditGroupCount; group++) {
+        data->house[group].npc_no = house[group].npc_no[0];
     }
     out = data->grid;
     memset(out, 0, kEditPlaceFlagCount);
-    for (i = 0; i < grid_max; i++) {
-        river = grid[i];
+    for (k = 0; k < grid_max; k++) {
+        river = grid[k];
         if (river != NULL) {
             header = (EditDataGrid *)out;
             header->num_x = river->num_x;
@@ -229,14 +230,11 @@ void CEditMap::SaveData(CEditData *data) {
     }
     if (out - data->grid >= kEditPlaceFlagCount) {
         printf(at_714__2);
-        for (i = 0; i < 300; i++) {
+        for (int wait = 0; wait < 300; wait++) {
             sceGsSyncV(0);
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editdata", SaveData__8CEditMapFP9CEditData);
-#endif
 #ifdef NONMATCHING
 void CEditMap::LoadData(CEditData *data) {
     EditDataParts *saved;
