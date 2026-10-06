@@ -2651,19 +2651,18 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
         prim->Color(r, g, b, a);
         int part = 8;
         prim->Color(0, 0, 0, shadow_alpha = (int)(2.0f * a / 3.0f));
-        mgRect<float> corner(put_x, put_y, 40.0f, 32.0f);
-        PrimQuad(prim, corner, *parts[frmtbl0_2922[part++]]);
+        PrimQuad(prim, mgRect<float>(put_x, put_y, 40.0f, 32.0f), *parts[frmtbl0_2922[part++]]);
         put_x += 40.0f;
         int i;
         int j;
         int put_top;
         for (i = 0; i < 5; i++) {
-            mgRect<int> edge((int)put_x, put_top = (int)put_y, 40, 32);
-            PrimQuad(prim, edge, *parts[frmtbl0_2922[part++]]);
+            int edge_left = (int)put_x;
+            put_top = (int)put_y;
+            PrimQuad(prim, mgRect<int>(edge_left, put_top, 40, 32), *parts[frmtbl0_2922[part++]]);
             put_x += 40.0f;
         }
-        mgRect<int> end_corner((int)put_x, put_top, 32, 32);
-        PrimQuad(prim, end_corner, *parts[11]);
+        PrimQuad(prim, mgRect<int>((int)put_x, put_top, 32, 32), *parts[11]);
         prim->End();
         ResetMenuScissor();
         SetSpriteEnv(prim, 0);
@@ -2674,20 +2673,15 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
         part = 0;
         for (i = 0; i < 2; i++) {
             put_x = x;
-            mgRect<int> row_left((int)put_x, put_top = (int)put_y, 32, 40);
-            PrimQuad(prim, row_left, *parts[frmtbl0_2922[part++]]);
-            mgRect<int> row_join((int)(put_x + 32.0f), put_top, 8, 40);
-            PrimQuad(prim, row_join, *parts[frmtbl0_2922[part++]]);
+            PrimQuad(prim, mgRect<int>((int)put_x, put_top = (int)put_y, 32, 40), *parts[frmtbl0_2922[part++]]);
+            PrimQuad(prim, mgRect<int>((int)(put_x + 32.0f), put_top, 8, 40), *parts[frmtbl0_2922[part++]]);
             put_x += 40.0f;
             for (j = 0; j < 5; j++) {
-                mgRect<int> edge((int)put_x, put_top, 40, 40);
-                PrimQuad(prim, edge, *parts[frmtbl0_2922[part++]]);
+                PrimQuad(prim, mgRect<int>((int)put_x, put_top, 40, 40), *parts[frmtbl0_2922[part++]]);
                 put_x += 40.0f;
             }
-            mgRect<int> row_fill((int)(put_x - 8.0f), put_top, 6, 40);
-            PrimQuad(prim, row_fill, *parts[frmtbl0_2922[part - 1]]);
-            mgRect<int> row_right((int)(put_x - 2.0f), put_top, 32, 40);
-            PrimQuad(prim, row_right, *parts[frmtbl0_2922[part++]]);
+            PrimQuad(prim, mgRect<int>((int)(put_x - 8.0f), put_top, 6, 40), *parts[frmtbl0_2922[part - 1]]);
+            PrimQuad(prim, mgRect<int>((int)(put_x - 2.0f), put_top, 32, 40), *parts[frmtbl0_2922[part++]]);
             put_y += 250.0f;
         }
         put.right = 32;
@@ -2697,12 +2691,10 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
             put_y = y + 40;
             int put_left;
             for (j = 0; j < 5; ++j) {
-                mgRect<int> side(put_left = (int)put_x, (int)put_y, 32, 40);
-                PrimQuad(prim, side, *parts[frmtbl1_2938[part++]]);
+                PrimQuad(prim, mgRect<int>(put_left = (int)put_x, (int)put_y, 32, 40), *parts[frmtbl1_2938[part++]]);
                 put_y += 40.0f;
             }
-            mgRect<int> side_end(put_left, (int)put_y, 32, 10);
-            PrimQuad(prim, side_end, *parts[frmtbl1_2938[part - 1]]);
+            PrimQuad(prim, mgRect<int>(put_left, (int)put_y, 32, 10), *parts[frmtbl1_2938[part - 1]]);
             put_x += 238.0f;
         }
         prim->End();
@@ -2732,8 +2724,7 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
         }
         prim->Bilinear(1);
         prim->Begin(6);
-        mgRect<float> cursor(8.0f + bar_x, MenuItemBrdScrlBarY, ItemBoardCursor.right, MenuItemBrdScrlCurLen);
-        PrimQuad(prim, cursor, ItemBoardCursor);
+        PrimQuad(prim, mgRect<float>(8.0f + bar_x, MenuItemBrdScrlBarY, ItemBoardCursor.right, MenuItemBrdScrlCurLen), ItemBoardCursor);
         prim->End();
     }
 }
