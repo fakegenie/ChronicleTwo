@@ -53,22 +53,8 @@ extern int wave_status;
 extern int play_time_count;
 NowLoadingInfo LoadInfo;
 extern float ProgBarWidthStep;
-#include "mglib.hpp"
-#include "mg_texture.hpp"
-#include "mainloop.hpp"
-#include "scenesnd.hpp"
-#include "snd_mngr.hpp"
-#include "dataread.hpp"
-#include <cstdio>
-#include <cstring>
 #ifdef NONMATCHING
-#include "event.hpp"
-#include "gamepad.hpp"
-#include "padcontrol.hpp"
-#include "mg_drawprim.hpp"
 #include "mg_tanime.hpp"
-#include "savedata.hpp"
-#include "title.hpp"
 
 #endif
 
