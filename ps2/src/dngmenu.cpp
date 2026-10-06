@@ -134,6 +134,7 @@ extern char at_3451[];
 extern float stepCntTbl_1501[2];
 extern s16 get_moji_tbl_1524[4][4];
 extern s16 put_moji_tbl_1525[4][2];
+int CheckGeoramaMateria(TRESURE_BOX_FLOOR_INFO *tresure, int floor, int *materia);
 static void DrawDngRoomInfo(DNGMAP_ROOM_INFO *room);
 static void DrawGeoramaMateria(int y, char *title, int materia_num, int *materia, int tex_block);
 extern s16 TreeMapSaveDispY;
@@ -739,14 +740,12 @@ void CDngFreeMap::DrawGlid(mgRect<float> rect) {
     prim.Vertex(rect.left, top, 0.0f);
     prim.End();
 }
-#ifdef NONMATCHING
 int CheckGeoramaMateria(TRESURE_BOX_FLOOR_INFO *tresure, int floor, int *materia) {
     int cursor;
     int materia_num;
     int g;
     int group_id;
     TRESURE_BOX_GROUP *group;
-    int k;
     int pass;
 
     if (tresure == NULL) {
@@ -770,10 +769,9 @@ int CheckGeoramaMateria(TRESURE_BOX_FLOOR_INFO *tresure, int floor, int *materia
                 break;
             }
         }
-        k = 0;
         if (group != NULL) {
-            for (; k < group->item_num; k++) {
-                materia[materia_num++] = group->item[k].item_no;
+            for (g = 0; g < group->item_num; g++) {
+                materia[materia_num++] = group->item[g].item_no;
             }
         }
         cursor++;
@@ -787,9 +785,6 @@ int CheckGeoramaMateria(TRESURE_BOX_FLOOR_INFO *tresure, int floor, int *materia
     }
     return materia_num;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dngmenu", CheckGeoramaMateria__FP22TRESURE_BOX_FLOOR_INFOiPi);
-#endif
 #ifdef NONMATCHING
 static void DrawDngRoomInfo(DNGMAP_ROOM_INFO *room) {
     if (room != NULL && Floor_InfoTex != NULL) {
@@ -808,11 +803,11 @@ static void DrawDngRoomInfo(DNGMAP_ROOM_INFO *room) {
             }
         }
         float board_x;
-        float board_y = 92.0f;
         s16 *bottom_tbl = dngboardbrdtbl_1;
         int centre_x = mgScreenWidth >> 1;
-        int alpha = DngInfoDrawAlpha;
+        float board_y = 92.0f;
         board_x = (float)((0x200 - board_w) >> 1);
+        int alpha = DngInfoDrawAlpha;
         int box_alpha = alpha * 7 / 10;
         if (DngInfoRoomInfo != NULL) {
             if (DngInfoRoomInfo->geostone == 0) {
@@ -1027,12 +1022,13 @@ static void DrawGeoramaMateria(int y, char *title, int materia_num, int *materia
             int name_w;
             font.SetStr(name);
             font.CalcDrawWH(font.str, &name_w, &name_h);
+            int w = name_w;
             int column = i % 2;
             int x;
             if (column == 0) {
-                x = left_column - (name_w >> 1);
+                x = left_column - (w >> 1);
             } else {
-                x = right_column - (name_w >> 1);
+                x = right_column - (w >> 1);
             }
             font.SetPos(x, line_y);
             font.DrawDirect(font.str, font.pos_x, font.pos_y);
@@ -1042,9 +1038,11 @@ static void DrawGeoramaMateria(int y, char *title, int materia_num, int *materia
         }
     }
     char page[0x20];
+    i = left + 0x186;
+    line_y = y + 0xEF;
     sprintf(page, at_1993, GeoramaMateriaInfoDrawPage + 1, GeoramaMateriaNum / 14 + 1);
     font.SetStr(page);
-    font.SetPos(left + 0x186, y + 0xEF);
+    font.SetPos(i, line_y);
     font.DrawDirect(font.str, font.pos_x, font.pos_y);
 }
 #else
@@ -1373,6 +1371,7 @@ int CDngFreeMap::LoadDngInfo(mgCMemory *stack, int tex_block, int dng_no, int us
         float glid_y;
         float room_x;
         float room_y;
+        int j;
         glid_x = 0.0f;
         direction = -1;
         glid_y = 0.0f;
@@ -1622,18 +1621,18 @@ int CDngFreeMap::LoadDngInfo(mgCMemory *stack, int tex_block, int dng_no, int us
         s16(*room_points)[2] = RoomHokanTablePtrTable_2245[room_table];
         s8 room_reverse = is_reverse_tbl_room_2248[0][room_table];
         if (room_reverse == 0) {
-            for (int i = 0; i < 10; i++) {
+            for (j = 0; j < 10; j++) {
                 DNGMAP_KOMA_POS *pos = (DNGMAP_KOMA_POS *)work.Alloc(1);
-                pos->x = room_x + (float)room_points[i][0];
-                pos->y = room_y + (float)room_points[i][1];
+                pos->x = room_x + (float)room_points[j][0];
+                pos->y = room_y + (float)room_points[j][1];
                 tail->next = pos;
                 tail = pos;
             }
         } else if (room_reverse == 1) {
-            for (int i = 9; i >= 0; i--) {
+            for (j = 9; j >= 0; j--) {
                 DNGMAP_KOMA_POS *pos = (DNGMAP_KOMA_POS *)work.Alloc(1);
-                pos->x = room_x + (float)room_points[i][0];
-                pos->y = room_y + (float)room_points[i][1];
+                pos->x = room_x + (float)room_points[j][0];
+                pos->y = room_y + (float)room_points[j][1];
                 tail->next = pos;
                 tail = pos;
             }
@@ -1642,9 +1641,11 @@ int CDngFreeMap::LoadDngInfo(mgCMemory *stack, int tex_block, int dng_no, int us
         while (glid != NULL) {
             CalcGlidPutPos(glid, glid_x, glid_y, 0);
             glid->blink = 1;
+            s16(*points)[2];
+            s8 reverse;
             if (glid->type == 0) {
-                s16(*points)[2] = RootHokanTablePtrTable_2240[glid->root.shape];
-                s8 reverse = is_reverse_tbl_2246[glid->root.shape][direction];
+                points = RootHokanTablePtrTable_2240[glid->root.shape];
+                reverse = is_reverse_tbl_2246[glid->root.shape][direction];
                 if (reverse < 0) {
                     break;
                 }
@@ -1667,8 +1668,8 @@ int CDngFreeMap::LoadDngInfo(mgCMemory *stack, int tex_block, int dng_no, int us
                 }
             } else if (glid->type == 1) {
                 int table = old_hokantbl_useno_2247[1][direction];
-                s16(*points)[2] = RoomHokanTablePtrTable_2245[table];
-                s8 reverse = is_reverse_tbl_room_2248[1][table];
+                points = RoomHokanTablePtrTable_2245[table];
+                reverse = is_reverse_tbl_room_2248[1][table];
                 if (reverse == 0) {
                     for (i = 0; i < 10; i++) {
                         DNGMAP_KOMA_POS *pos = (DNGMAP_KOMA_POS *)work.Alloc(1);
@@ -1847,7 +1848,6 @@ void CMenuTreeMap::MsgInit() {
         help->SetMovePosGyou(1, 600, help_y);
     }
 }
-#ifdef NONMATCHING
 int CMenuTreeMap::Step() {
     int result = DNG_TREE_MAP_CONTINUE;
     CMenuKeyFunc *key = MenuCommonInfo;
@@ -2105,7 +2105,7 @@ int CMenuTreeMap::Step() {
                 int loop_no;
                 int map_no;
                 MakeDngTreeMapJumpNo(dng_no, NextFloorGlid_2836->room.floor_id, &loop_no, &map_no);
-                if (MenuMainScene->now_map_no == map_no) {
+                if (MenuMainScene->GetNowMapNo() == map_no) {
                     MenuSePlay(5);
                     break;
                 }
@@ -2444,9 +2444,6 @@ int CMenuTreeMap::Step() {
     }
     return result;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dngmenu", Step__12CMenuTreeMapFv);
-#endif
 void CMenuTreeMap::Draw() {
     float target[2];
     if ((mode & 2) && unk_11a == 1) {
