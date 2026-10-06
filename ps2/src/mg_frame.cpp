@@ -515,40 +515,42 @@ void mgCFrame::GetLocalMatrix(float (*matrix)[4]) {
 #pragma global_optimizer reset
 
 #pragma global_optimizer off
-#ifdef NONMATCHING
 void mgCFrame::GetBBoardMatrix(int mode, float (*matrix)[4], mgRENDER_INFO *render_info) {
-    sceVu0FMATRIX world;
-    GetLWMatrix(world);
+    sceVu0FVECTOR position;
+    sceVu0FVECTOR direction;
     sceVu0FVECTOR dimensions;
+    sceVu0FMATRIX world;
+    sceVu0FMATRIX pitch;
+
+    GetLWMatrix(world);
     dimensions[0] = mgDistVector(world[0]);
     dimensions[1] = mgDistVector(world[0]);
     dimensions[2] = mgDistVector(world[0]);
-    dimensions[3] = 1.0f;
-
+    *(u_long128 *)position = *(u_long128 *)world[3];
     sceVu0UnitMatrix(matrix);
     if (mode & 2) {
-        sceVu0SubVector(matrix[2], render_info->camera_pos, world[3]);
+        sceVu0SubVector(matrix[2], render_info->camera_pos, position);
         matrix[2][1] = 0.0f;
         matrix[2][3] = 0.0f;
         sceVu0Normalize(matrix[2], matrix[2]);
         matrix[0][0] = matrix[2][2];
         matrix[0][2] = -matrix[2][0];
+        matrix[2][0] = matrix[2][0];
+        matrix[2][2] = matrix[2][2];
     }
     if (mode & 1) {
-        sceVu0FMATRIX pitch;
         sceVu0UnitMatrix(pitch);
-        sceVu0FVECTOR direction;
-        sceVu0SubVector(direction, render_info->camera_pos, world[3]);
+        sceVu0SubVector(direction, render_info->camera_pos, position);
         sceVu0Normalize(direction, direction);
         float rise = direction[1];
         direction[1] = 0.0f;
         direction[3] = 0.0f;
         float horizontal = mgDistVector(direction);
         pitch[1][1] = horizontal;
+        pitch[2][2] = horizontal;
         pitch[1][2] = -rise;
         pitch[2][1] = rise;
-        pitch[2][2] = horizontal;
-        sceVu0SubVector(matrix[2], render_info->camera_pos, world[3]);
+        sceVu0SubVector(matrix[2], render_info->camera_pos, position);
         matrix[2][1] = 0.0f;
         matrix[2][3] = 0.0f;
         sceVu0Normalize(matrix[2], matrix[2]);
@@ -556,19 +558,29 @@ void mgCFrame::GetBBoardMatrix(int mode, float (*matrix)[4], mgRENDER_INFO *rend
         matrix[0][2] = -matrix[2][0];
         mgMulMatrix(matrix, matrix, pitch);
     }
-    for (int row = 0; row < 3; row++) {
-        for (int axis = 0; axis < 4; axis++) matrix[row][axis] *= dimensions[axis];
+    float *factor = dimensions;
+    asm {
+        lqc2 vf10, 0x0(factor)
+        lqc2 vf1, 0x0(matrix)
+        lqc2 vf2, 0x10(matrix)
+        lqc2 vf3, 0x20(matrix)
+        lqc2 vf4, 0x30(matrix)
+        vmul.xyzw vf1, vf1, vf10
+        vmul.xyzw vf2, vf2, vf10
+        vmul.xyzw vf3, vf3, vf10
+        vmulw.xyzw vf4, vf4, vf0w
+        sqc2 vf1, 0x0(matrix)
+        sqc2 vf2, 0x10(matrix)
+        sqc2 vf3, 0x20(matrix)
+        sqc2 vf4, 0x30(matrix)
     }
-    matrix[3][0] = world[3][0];
-    matrix[3][1] = world[3][1];
-    matrix[3][2] = world[3][2];
+    matrix[3][0] = position[0];
+    matrix[3][1] = position[1];
+    matrix[3][2] = position[2];
     sceVu0CopyMatrix(lw_matrix, matrix);
     changed = 0;
     ClearChildFlag();
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_frame", GetBBoardMatrix__8mgCFrameFiPA4_fP13mgRENDER_INFO);
-#endif
 #pragma global_optimizer reset
 
 #ifdef NONMATCHING
