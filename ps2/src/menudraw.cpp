@@ -278,7 +278,7 @@ extern board_button_color at_1814;
 
 extern s16 get_onoffbrdtbl_1789[2][3][4];
 
-extern u8 get_btntbl_1810[2][2];
+extern s8 get_btntbl_1810[2][2];
 
 extern float menu_cursor_rotation_angle;
 
@@ -1473,9 +1473,8 @@ void CommonBoardDraw(float *pos, int &tex_block) {
     prim->Begin(6);
     prim->Texture(Tex_CommonBoard);
     prim->Color(0x80, 0x80, 0x80, 0x80);
-    int row;
-    int height;
     int pass;
+    int row;
     for (row = 0; row < 5; row++) {
         int left = (int)(6.0f + pos[0]);
         int top = (int)(6.0f + board_y);
@@ -1486,8 +1485,7 @@ void CommonBoardDraw(float *pos, int &tex_block) {
             prim->TextureCrd(row_uv.uv[row][0][0], row_uv.uv[row][0][1]);
             prim->Vertex(left, top, 0);
             prim->TextureCrd(row_uv.uv[row][0][0] + row_uv.uv[row][0][2], row_uv.uv[row][0][1] + row_uv.uv[row][0][3]);
-            height = heights[row];
-            int bottom = top + height;
+            int bottom = top + heights[row];
             prim->Vertex(left + row_uv.uv[row][0][2], bottom, 0);
             left += row_uv.uv[row][0][2];
             prim->TextureCrd(row_uv.uv[row][1][0], row_uv.uv[row][1][1]);
@@ -1502,7 +1500,7 @@ void CommonBoardDraw(float *pos, int &tex_block) {
             top -= 6;
             left = (int)pos[0];
         }
-        board_y += height;
+        board_y += heights[row];
     }
     prim->End();
     float title_x = 16.0f + pos[0];
@@ -1512,8 +1510,8 @@ void CommonBoardDraw(float *pos, int &tex_block) {
     prim->Begin(6);
     prim->Texture(Tex_CommonBoard);
     prim->Color(0x80, 0x80, 0x80, 0x80);
-    mgRect<int> title((int)title_x, (int)title_y, title_uv.right, title_uv.bottom);
-    PrimQuad(prim, title, title_uv);
+    int title_top;
+    PrimQuad(prim, mgRect<int>((int)title_x, title_top = (int)title_y, title_uv.right, title_uv.bottom), title_uv);
     prim->End();
     float blink = 32.0f * sinf(0.05235988f * make_object_husoku_number_blink);
     int blink_rgba[4] = {(int)blink + 0x80, 0x80 - (int)blink, 0x80 - (int)blink, 0x80};
@@ -1522,49 +1520,36 @@ void CommonBoardDraw(float *pos, int &tex_block) {
     prim->Begin(6);
     prim->Texture(Tex_CommonBoard);
     prim->Color(0x80, 0x80, 0x80, 0x80);
-    int number_v;
-    int number_u;
     for (int i = 0, line_y = 0; i < 4; i++, line_y += 34) {
         MENUFORM_MAKEBRD_LINE *line = &CommonBoardDrawInfo.line[i];
-        float line_x = 20.0f + pos[0];
+        float line_x;
+        float x = line_x = 20.0f + pos[0];
         float line_top = 88.0f + pos[1] + line_y;
         s16 (*brd)[4] = get_onoffbrdtbl_1789[line->kind];
-        mgRect<int> left_uv(brd[0][0], brd[0][1], brd[0][2], brd[0][3]);
-        int top = (int)line_top;
-        mgRect<int> left_put((int)line_x, top, brd[0][2], brd[0][3]);
-        PrimQuad(prim, left_put, left_uv);
-        float middle_x = line_x + brd[0][2];
-        mgRect<int> middle_uv(brd[1][0], brd[1][1], brd[1][2], brd[1][3]);
-        mgRect<int> middle_put((int)middle_x, top, line_w, brd[1][3]);
-        PrimQuad(prim, middle_put, middle_uv);
-        float right_x = middle_x + line_w;
-        mgRect<int> right_uv(brd[2][0], brd[2][1], brd[2][2], brd[2][3]);
-        int number_x = (int)right_x;
-        mgRect<int> right_put(number_x, top, brd[2][2], brd[2][3]);
-        PrimQuad(prim, right_put, right_uv);
-        number_u = number_uv.uv[0][0];
-        number_v = number_uv.uv[0][1];
-        mgRect<int> number_rect(number_u, number_v, 10, 13);
-        int number_y = (int)(10.0f + line_top);
-        PrimDrawNumber2(prim, line->num, 0, number_x, number_y, number_rect, 0, 0);
-        int times_x = (int)(right_x - GetNumberKeta(line->num) * 10 - 12.0f);
-        mgRect<int> times_uv(0x14, 0x5C, 10, 12);
-        mgRect<int> times_put(times_x, (int)(9.0f + line_top) + 1, 10, 12);
-        PrimQuad(prim, times_put, times_uv);
+        int top;
+        PrimQuad(prim, mgRect<int>((int)x, top = (int)line_top, brd[0][2], brd[0][3]),
+                 mgRect<int>(brd[0][0], brd[0][1], brd[0][2], brd[0][3]));
+        PrimQuad(prim, mgRect<int>((int)(x += brd[0][2]), top, line_w, brd[1][3]),
+                 mgRect<int>(brd[1][0], brd[1][1], brd[1][2], brd[1][3]));
+        int number_x;
+        PrimQuad(prim, mgRect<int>(number_x = (int)(x += line_w), top, brd[2][2], brd[2][3]),
+                 mgRect<int>(brd[2][0], brd[2][1], brd[2][2], brd[2][3]));
+        int number_y;
+        PrimDrawNumber2(prim, line->num, 0, number_x, number_y = (int)(10.0f + line_top),
+                        mgRect<int>(number_uv.uv[0][0], number_uv.uv[0][1], 10, 13), 0, 0);
+        int times_x = (int)(x - GetNumberKeta(line->num) * 10 - 12.0f);
+        PrimQuad(prim, mgRect<int>(times_x, (int)(9.0f + line_top) + 1, 10, 12), mgRect<int>(0x14, 0x5C, 10, 12));
         if (line->sub_num > 0) {
             prim->Color(blink_rgba[0], blink_rgba[1], blink_rgba[2], 0x80);
-            mgRect<int> sub_rect(number_uv.uv[1][0], number_uv.uv[1][1], 10, 13);
-            PrimDrawNumber2(prim, line->sub_num, 0, times_x - 2, number_y, sub_rect, 0, 0);
-            mgRect<int> slash_uv(0x1E, 0x5C, 10, 12);
-            mgRect<int> slash_put(times_x - 14 - GetNumberKeta(line->sub_num) * 10, number_y, 10, 12);
-            PrimQuad(prim, slash_put, slash_uv);
+            PrimDrawNumber2(prim, line->sub_num, 0, times_x - 2, number_y,
+                            mgRect<int>(number_uv.uv[1][0], number_uv.uv[1][1], 10, 13), 0, 0);
+            PrimQuad(prim, mgRect<int>(times_x - 14 - GetNumberKeta(line->sub_num) * 10, number_y, 10, 12),
+                     mgRect<int>(0x1E, 0x5C, 10, 12));
             prim->Color(0x80, 0x80, 0x80, 0x80);
         }
         if (line->kind != 0) {
-            u8 *button = get_btntbl_1810[line->button];
-            mgRect<int> button_uv(button[0], button[1], 16, 16);
-            mgRect<int> button_put((int)(line_x - 3.0f), top, 16, 16);
-            PrimQuad(prim, button_put, button_uv);
+            s8 *button = get_btntbl_1810[line->button];
+            PrimQuad(prim, mgRect<int>((int)(line_x - 3.0f), top, 16, 16), mgRect<int>(button[0], button[1], 16, 16));
         }
     }
     MakeBoardDrawInfo[1] = 246.0f + pos[1];
@@ -1575,43 +1560,28 @@ void CommonBoardDraw(float *pos, int &tex_block) {
     mgRect<int> no_uv(0x44, 0x2E, 0x3C, 0x1A);
     int (*rgba)[4] = button_color.rgba[CommonBoardDrawInfo.unk_20];
     prim->Color(rgba[0][0], rgba[0][1], rgba[0][2], rgba[0][3]);
-    int yes_x = (int)MakeBoardDrawInfo[0];
-    mgRect<int> yes(yes_x, (int)MakeBoardDrawInfo[1], yes_uv.right, yes_uv.bottom);
-    PrimQuad(prim, yes, yes_uv);
+    PrimQuad(prim, mgRect<int>((int)MakeBoardDrawInfo[0], (int)MakeBoardDrawInfo[1], yes_uv.right, yes_uv.bottom), yes_uv);
     prim->Color(rgba[1][0], rgba[1][1], rgba[1][2], rgba[1][3]);
-    int no_x = (int)MakeBoardDrawInfo[2];
-    mgRect<int> no(no_x, (int)MakeBoardDrawInfo[3], no_uv.right, no_uv.bottom);
-    PrimQuad(prim, no, no_uv);
+    PrimQuad(prim, mgRect<int>((int)MakeBoardDrawInfo[2], (int)MakeBoardDrawInfo[3], no_uv.right, no_uv.bottom), no_uv);
     int arrow_x = (int)(10.0f + pos[0] + MakeBoardDrawInfo[4] / 2.0f + MakeBoardDrawInfo[4] / 10.0f + 2.0f);
     int arrow_y = (int)(250.0f + pos[1]);
     prim->Color(0x80, 0x80, 0x80, 0x80);
     if (CommonBoardDrawInfo.unk_24 > 0) {
         prim->Color(0xC4, 0xC4, 0xC4, 0x80);
     }
-    mgRect<int> down_uv(0x60, 0x48, 0x10, 0x16);
-    mgRect<int> down_put(arrow_x, arrow_y, 0x10, 0x16);
-    PrimQuad(prim, down_put, down_uv);
+    PrimQuad(prim, mgRect<int>(arrow_x, arrow_y, 0x10, 0x16), mgRect<int>(0x60, 0x48, 0x10, 0x16));
     prim->Color(0x80, 0x80, 0x80, 0x80);
     int count_y = (int)(250.0f + pos[1]);
     int count_x = arrow_x + 0x10;
-    mgRect<int> count_left_uv(0x36, 0x32, 6, 0x16);
-    mgRect<int> count_left(count_x, count_y, 6, 0x16);
-    PrimQuad(prim, count_left, count_left_uv);
-    mgRect<int> count_middle_uv(0x3C, 0x32, 2, 0x16);
-    mgRect<int> count_middle(count_x + 6, count_y, 0x14, 0x16);
-    PrimQuad(prim, count_middle, count_middle_uv);
-    mgRect<int> count_right_uv(0x3E, 0x32, 6, 0x16);
-    mgRect<int> count_right(count_x + 0x1A, count_y, 6, 0x16);
-    PrimQuad(prim, count_right, count_right_uv);
+    PrimQuad(prim, mgRect<int>(count_x, count_y, 6, 0x16), mgRect<int>(0x36, 0x32, 6, 0x16));
+    PrimQuad(prim, mgRect<int>(count_x + 6, count_y, 0x14, 0x16), mgRect<int>(0x3C, 0x32, 2, 0x16));
+    PrimQuad(prim, mgRect<int>(count_x + 0x1A, count_y, 6, 0x16), mgRect<int>(0x3E, 0x32, 6, 0x16));
     if (CommonBoardDrawInfo.unk_28 > 0) {
         prim->Color(0xC4, 0xC4, 0xC4, 0x80);
     }
-    mgRect<int> up_uv(0x70, 0x48, 0x10, 0x16);
-    mgRect<int> up_put(count_x + 0x22, arrow_y, 0x10, 0x16);
-    PrimQuad(prim, up_put, up_uv);
+    PrimQuad(prim, mgRect<int>(count_x + 0x22, arrow_y, 0x10, 0x16), mgRect<int>(0x70, 0x48, 0x10, 0x16));
     prim->Color(0x80, 0x80, 0x80, 0x80);
-    mgRect<int> count_rect(number_u, number_v, 10, 13);
-    PrimDrawNumber(prim, CommonBoardDrawInfo.unk_1c, 1, count_x + 0x15, count_y + 5, count_rect, 0, 0);
+    PrimDrawNumber(prim, CommonBoardDrawInfo.unk_1c, 1, count_x + 0x15, count_y + 5, mgRect<int>(number_uv.uv[0][0], number_uv.uv[0][1], 10, 13), 0, 0);
     prim->End();
 }
 #else
@@ -2676,19 +2646,18 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
         prim->Color(r, g, b, a);
         int part = 8;
         prim->Color(0, 0, 0, shadow_alpha = (int)(2.0f * a / 3.0f));
-        mgRect<float> corner(put_x, put_y, 40.0f, 32.0f);
-        PrimQuad(prim, corner, *parts[frmtbl0_2922[part++]]);
+        PrimQuad(prim, mgRect<float>(put_x, put_y, 40.0f, 32.0f), *parts[frmtbl0_2922[part++]]);
         put_x += 40.0f;
         int i;
         int j;
         int put_top;
-        for (i = 0; i < 5; i++) {
-            mgRect<int> edge((int)put_x, put_top = (int)put_y, 40, 32);
-            PrimQuad(prim, edge, *parts[frmtbl0_2922[part++]]);
+        for (int i = 0; i < 5; i++) {
+            int edge_left = (int)put_x;
+            put_top = (int)put_y;
+            PrimQuad(prim, mgRect<int>(edge_left, put_top, 40, 32), *parts[frmtbl0_2922[part++]]);
             put_x += 40.0f;
         }
-        mgRect<int> end_corner((int)put_x, put_top, 32, 32);
-        PrimQuad(prim, end_corner, *parts[11]);
+        PrimQuad(prim, mgRect<int>((int)put_x, put_top, 32, 32), *parts[11]);
         prim->End();
         ResetMenuScissor();
         SetSpriteEnv(prim, 0);
@@ -2699,20 +2668,15 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
         part = 0;
         for (i = 0; i < 2; i++) {
             put_x = x;
-            mgRect<int> row_left((int)put_x, put_top = (int)put_y, 32, 40);
-            PrimQuad(prim, row_left, *parts[frmtbl0_2922[part++]]);
-            mgRect<int> row_join((int)(put_x + 32.0f), put_top, 8, 40);
-            PrimQuad(prim, row_join, *parts[frmtbl0_2922[part++]]);
+            PrimQuad(prim, mgRect<int>((int)put_x, put_top = (int)put_y, 32, 40), *parts[frmtbl0_2922[part++]]);
+            PrimQuad(prim, mgRect<int>((int)(put_x + 32.0f), put_top, 8, 40), *parts[frmtbl0_2922[part++]]);
             put_x += 40.0f;
             for (j = 0; j < 5; j++) {
-                mgRect<int> edge((int)put_x, put_top, 40, 40);
-                PrimQuad(prim, edge, *parts[frmtbl0_2922[part++]]);
+                PrimQuad(prim, mgRect<int>((int)put_x, put_top, 40, 40), *parts[frmtbl0_2922[part++]]);
                 put_x += 40.0f;
             }
-            mgRect<int> row_fill((int)(put_x - 8.0f), put_top, 6, 40);
-            PrimQuad(prim, row_fill, *parts[frmtbl0_2922[part - 1]]);
-            mgRect<int> row_right((int)(put_x - 2.0f), put_top, 32, 40);
-            PrimQuad(prim, row_right, *parts[frmtbl0_2922[part++]]);
+            PrimQuad(prim, mgRect<int>((int)(put_x - 8.0f), put_top, 6, 40), *parts[frmtbl0_2922[part - 1]]);
+            PrimQuad(prim, mgRect<int>((int)(put_x - 2.0f), put_top, 32, 40), *parts[frmtbl0_2922[part++]]);
             put_y += 250.0f;
         }
         put.right = 32;
@@ -2722,12 +2686,10 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
             put_y = y + 40;
             int put_left;
             for (j = 0; j < 5; ++j) {
-                mgRect<int> side(put_left = (int)put_x, (int)put_y, 32, 40);
-                PrimQuad(prim, side, *parts[frmtbl1_2938[part++]]);
+                PrimQuad(prim, mgRect<int>(put_left = (int)put_x, (int)put_y, 32, 40), *parts[frmtbl1_2938[part++]]);
                 put_y += 40.0f;
             }
-            mgRect<int> side_end(put_left, (int)put_y, 32, 10);
-            PrimQuad(prim, side_end, *parts[frmtbl1_2938[part - 1]]);
+            PrimQuad(prim, mgRect<int>(put_left, (int)put_y, 32, 10), *parts[frmtbl1_2938[part - 1]]);
             put_x += 238.0f;
         }
         prim->End();
@@ -2737,7 +2699,7 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
         scroll_bar_parts bars = at_2951__2;
         prim->Begin(6);
         prim->Texture(tex);
-        for (i = 0; i < 2; i++) {
+        for (int i = 0; i < 2; i++) {
             int *layer = layers[i];
             prim->Color(layer[1], layer[2], layer[3], layer[4]);
             float bar_y = y + 9;
@@ -2757,8 +2719,7 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
         }
         prim->Bilinear(1);
         prim->Begin(6);
-        mgRect<float> cursor(8.0f + bar_x, MenuItemBrdScrlBarY, ItemBoardCursor.right, MenuItemBrdScrlCurLen);
-        PrimQuad(prim, cursor, ItemBoardCursor);
+        PrimQuad(prim, mgRect<float>(8.0f + bar_x, MenuItemBrdScrlBarY, ItemBoardCursor.right, MenuItemBrdScrlCurLen), ItemBoardCursor);
         prim->End();
     }
 }
