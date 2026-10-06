@@ -350,3 +350,9 @@ only functions present in both objects can be replaced, the plain build keeps th
 - For a compute-then-store statement (`x * 50 / 60`), assigning back into the local and storing afterwards gave a different schedule from storing directly. Try both (`_SET_MOVIE_CC`).
 - Reading two fields into locals before a branch, in source order, matched `_GET_DEF_BGM_NO`.
 - The container mounts only the worktree, so helper templates and scripts must live under `ps2/re/`, not in the scratchpad.
+- A literal written as `float(x)` (a converted double) and one written as `xf` can give different register choices for constants. The effect can also reach later functions in a state compile (`CharacterBonus` broke after `FishModifyParam` changed). Run a perm over `xf|||float(x)` for every literal in the function.
+- Unused local declarations change register allocation. Removing an unused `int turn;` from `LaneBattleStep` made it worse.
+- When retail leaves a0 and a1 free in a `primer=u64div` unit, check whether the draft uses `fptosi(...)` where retail used `(int)` casts. Under that primer only casts respond (`GetUkiWaitTime`).
+- Function-scope declarations in a searched order, and a fresh variable instead of reusing an earlier loop counter, fixed saved-register swaps (`sgInitGyoRace`, `InitUkiObj`). They did not fix caller-saved swaps between a loop index and its offset.
+- To promote a draft that only compiles with a unit's `#ifdef NONMATCHING` globals block, make the needed includes unconditional and add externs to the `#ifndef NONMATCHING` block.
+- `VAR=1 ./dev.sh ...` has no effect inside the container. Toggle tools with files instead.
