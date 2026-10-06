@@ -4963,7 +4963,6 @@ void MenuItemCharaDataLoadEndCheckAfter(MENU_BGREAD_INFO2 **info, int chara_no) 
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuchr", MenuItemCharaDataLoadEndCheckAfter__FPP17MENU_BGREAD_INFO2i);
 #endif
-#ifdef NONMATCHING
 void InitMainCharaBG(int chara_no, mgCMemory *stack, int mode) {
     int reason;
     mgCTextureManager *texManager;
@@ -5046,7 +5045,8 @@ void InitMainCharaBG(int chara_no, mgCMemory *stack, int mode) {
         case 3:
             NowReadMainCharaMonsterNo = GetUserDataMan()->monster_id;
             if (NowReadMainCharaMonsterNo < 0) {
-                GetUserDataMan()->monster_id = 0x34;
+                CUserDataManager *user = GetUserDataMan();
+                user->monster_id = 0x34;
                 NowReadMainCharaMonsterNo = 0x34;
             }
             for (int i = 1; i < 5; i++) {
@@ -5059,9 +5059,6 @@ void InitMainCharaBG(int chara_no, mgCMemory *stack, int mode) {
             break;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuchr", InitMainCharaBG__FiP9mgCMemoryi);
-#endif
 int ReadMainCharaBG() {
     char model[0x48];
     int size;
