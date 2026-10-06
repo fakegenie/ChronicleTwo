@@ -179,7 +179,18 @@ asm void mgVectorMin(float *min, float *a, float *b) {
     jr ra
     sqc2 vf18, 0x0(a0)
 }
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgVectorMin__FPfPfPfPfPf);
+asm void mgVectorMin(float *min, float *a, float *b, float *c, float *d) {
+    .set noreorder
+    lqc2 vf15, 0x0(a1)
+    lqc2 vf16, 0x0(a2)
+    lqc2 vf17, 0x0(a3)
+    lqc2 vf18, 0x0(t0)
+    vmini.xyzw vf20, vf15, vf16
+    vmini.xyzw vf20, vf20, vf17
+    vmini.xyzw vf20, vf20, vf18
+    jr ra
+    sqc2 vf20, 0x0(a0)
+}
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgVectorMaxMin__FPfPfPfPf);
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgVectorMaxMin__FPfPfPfPfPf);
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgVectorMaxMin__FPfPfPfPfPfPf);
