@@ -727,7 +727,7 @@ void SetMenuLoadItemNo(int who) {
         case 1: {
             CHARA_DATA *chara = userData->GetCharaDataPtr(who);
             do {
-                MenuLoadItemNo[count] = *(short *)((u8 *)chara + count * 0x6C + 0x172);
+                MenuLoadItemNo[count] = chara->equip[count].item_no;
                 count++;
             } while (count < 5);
             break;
@@ -5321,18 +5321,18 @@ int MenuNPCLoadCheck(CActionChara *chara, mgCMemory *memory, int texBlock) {
 }
 void CMenuCostumeSel::UpdateCostumeList(int mode, unsigned long charaFlag) {
     WornCostumes worn;
-    u8 *chara_data;
+    CHARA_DATA *chara_data;
     int kind;
     int index;
 
-    chara_data = (u8 *)GetUserDataMan()->GetCharaDataPtr(0);
+    chara_data = GetUserDataMan()->GetCharaDataPtr(0);
     if (mode == 0) {
         this->costume_num[0] = GetCostumeList(charaFlag, 6, this->costume_list[1]);
         this->costume_num[1] = GetCostumeList(charaFlag, 5, this->costume_list[0]);
         this->costume_num[2] = GetCostumeList(charaFlag, 7, this->costume_list[2]);
     }
     if (mode == 1) {
-        chara_data = (u8 *)GetUserDataMan()->GetCharaDataPtr(1);
+        chara_data = GetUserDataMan()->GetCharaDataPtr(1);
         this->costume_num[0] = GetCostumeList(charaFlag, 9, this->costume_list[1]);
         this->costume_num[1] = GetCostumeList(charaFlag, 8, this->costume_list[0]);
         this->costume_num[2] = GetCostumeList(charaFlag, 10, this->costume_list[2]);
@@ -5341,9 +5341,9 @@ void CMenuCostumeSel::UpdateCostumeList(int mode, unsigned long charaFlag) {
         return;
     }
     worn = *(WornCostumes *)at_4967__2;
-    worn.id[0] = *(short *)((u8*)chara_data + 0x24A);
-    worn.id[1] = *(short *)((u8*)chara_data + 0x322);
-    worn.id[2] = *(short *)((u8*)chara_data + 0x2B6);
+    worn.id[0] = chara_data->equip[2].item_no;
+    worn.id[1] = chara_data->equip[4].item_no;
+    worn.id[2] = chara_data->equip[3].item_no;
     for (kind = 0; kind < 3; kind++) {
         this->costume_select[kind] = 0;
         for (index = 0; index < this->costume_num[kind]; index++) {
