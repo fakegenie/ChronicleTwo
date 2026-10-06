@@ -121,33 +121,126 @@ int mgInsideScreen(float (*corners)[4], float (*matrix)[4]) {
     return mgInsideScreen(corners, matrix, max, min);
 }
 #pragma global_optimizer off
-#ifdef NONMATCHING
 int mgInsideScreen(float (*corners)[4], float (*matrix)[4], float *out_max, float *out_min) {
-    sceVu0FMATRIX screen_matrix;
-    sceVu0MulMatrix(screen_matrix, mgRenderInfo.world_screen_rel, matrix);
-
-    for (int i = 0; i < 8; i++) {
-        sceVu0FVECTOR transformed;
-        sceVu0ApplyMatrix(transformed, screen_matrix, corners[i]);
-        float depth = transformed[3];
-        if (depth < 0.0f) depth = -depth;
-        transformed[0] /= depth;
-        transformed[1] /= depth;
-        if (i == 0) {
-            sceVu0CopyVector(out_max, transformed);
-            sceVu0CopyVector(out_min, transformed);
-        } else {
-            for (int axis = 0; axis < 4; axis++) {
-                if (out_max[axis] < transformed[axis]) out_max[axis] = transformed[axis];
-                if (out_min[axis] > transformed[axis]) out_min[axis] = transformed[axis];
-            }
-        }
+    mgRENDER_INFO *info = &mgRenderInfo;
+    float (*screen)[4] = info->world_screen_rel;
+    asm {
+        lqc2 vf11, 0(screen)
+        lqc2 vf12, 0x10(screen)
+        lqc2 vf13, 0x20(screen)
+        lqc2 vf14, 0x30(screen)
+        lqc2 vf5, 0(matrix)
+        lqc2 vf6, 0x10(matrix)
+        lqc2 vf7, 0x20(matrix)
+        lqc2 vf8, 0x30(matrix)
+        vmulax.xyzw ACC, vf11, vf5x
+        vmadday.xyzw ACC, vf12, vf5y
+        vmaddaz.xyzw ACC, vf13, vf5z
+        vmaddw.xyzw vf1, vf14, vf5w
+        vmulax.xyzw ACC, vf11, vf6x
+        vmadday.xyzw ACC, vf12, vf6y
+        vmaddaz.xyzw ACC, vf13, vf6z
+        vmaddw.xyzw vf2, vf14, vf6w
+        vmulax.xyzw ACC, vf11, vf7x
+        vmadday.xyzw ACC, vf12, vf7y
+        vmaddaz.xyzw ACC, vf13, vf7z
+        vmaddw.xyzw vf3, vf14, vf7w
+        vmulax.xyzw ACC, vf11, vf8x
+        vmadday.xyzw ACC, vf12, vf8y
+        vmaddaz.xyzw ACC, vf13, vf8z
+        vmaddw.xyzw vf4, vf14, vf8w
+        lqc2 vf10, 0(corners)
+        lqc2 vf11, 0x10(corners)
+        lqc2 vf12, 0x20(corners)
+        lqc2 vf13, 0x30(corners)
+        lqc2 vf14, 0x40(corners)
+        lqc2 vf15, 0x50(corners)
+        lqc2 vf16, 0x60(corners)
+        lqc2 vf17, 0x70(corners)
+        vmulax.xyzw ACC, vf1, vf10x
+        vmadday.xyzw ACC, vf2, vf10y
+        vmaddaz.xyzw ACC, vf3, vf10z
+        vmaddw.xyzw vf10, vf4, vf10w
+        vmulax.xyzw ACC, vf1, vf11x
+        vmadday.xyzw ACC, vf2, vf11y
+        vmaddaz.xyzw ACC, vf3, vf11z
+        vabs.w vf20, vf10
+        vmaddw.xyzw vf11, vf4, vf11w
+        vdiv Q, vf0w, vf20w
+        vabs.w vf21, vf11
+        vwaitq
+        vmulq.xy vf10, vf10, Q
+        vdiv Q, vf0w, vf21w
+        vmulax.xyzw ACC, vf1, vf12x
+        vmadday.xyzw ACC, vf2, vf12y
+        vmaddaz.xyzw ACC, vf3, vf12z
+        vmaddw.xyzw vf12, vf4, vf12w
+        vmulax.xyzw ACC, vf1, vf13x
+        vwaitq
+        vmulq.xy vf11, vf11, Q
+        vabs.w vf22, vf12
+        vmadday.xyzw ACC, vf2, vf13y
+        vmaddaz.xyzw ACC, vf3, vf13z
+        vmaddw.xyzw vf13, vf4, vf13w
+        vdiv Q, vf0w, vf22w
+        vmulax.xyzw ACC, vf1, vf14x
+        vmadday.xyzw ACC, vf2, vf14y
+        vabs.w vf23, vf13
+        vmaddaz.xyzw ACC, vf3, vf14z
+        vmaddw.xyzw vf14, vf4, vf14w
+        vmax.xyzw vf30, vf10, vf11
+        vmini.xyzw vf31, vf10, vf11
+        vmulq.xy vf12, vf12, Q
+        vdiv Q, vf0w, vf23w
+        vabs.w vf24, vf14
+        vmulax.xyzw ACC, vf1, vf15x
+        vmadday.xyzw ACC, vf2, vf15y
+        vmaddaz.xyzw ACC, vf3, vf15z
+        vmaddw.xyzw vf15, vf4, vf15w
+        vmax.xyzw vf30, vf30, vf12
+        vmini.xyzw vf31, vf31, vf12
+        vmulq.xy vf13, vf13, Q
+        vdiv Q, vf0w, vf24w
+        vabs.w vf25, vf15
+        vmulax.xyzw ACC, vf1, vf16x
+        vmadday.xyzw ACC, vf2, vf16y
+        vmaddaz.xyzw ACC, vf3, vf16z
+        vmaddw.xyzw vf16, vf4, vf16w
+        vmax.xyzw vf30, vf30, vf13
+        vmini.xyzw vf31, vf31, vf13
+        vmulq.xy vf14, vf14, Q
+        vdiv Q, vf0w, vf25w
+        vabs.w vf26, vf16
+        vmulax.xyzw ACC, vf1, vf17x
+        vmadday.xyzw ACC, vf2, vf17y
+        vmaddaz.xyzw ACC, vf3, vf17z
+        vmaddw.xyzw vf17, vf4, vf17w
+        vmax.xyzw vf30, vf30, vf14
+        vmini.xyzw vf31, vf31, vf14
+        vmulq.xy vf15, vf15, Q
+        vdiv Q, vf0w, vf26w
+        vabs.w vf27, vf17
+        vnop
+        vmax.xyzw vf30, vf30, vf15
+        vmini.xyzw vf31, vf31, vf15
+        vnop
+        vwaitq
+        vmulq.xy vf16, vf16, Q
+        vdiv Q, vf0w, vf27w
+        vnop
+        vmax.xyzw vf30, vf30, vf16
+        vmini.xyzw vf31, vf31, vf16
+        vnop
+        vnop
+        vwaitq
+        vmulq.xy vf17, vf17, Q
+        vmax.xyzw vf30, vf30, vf17
+        vmini.xyzw vf31, vf31, vf17
+        sqc2 vf30, 0(out_max)
+        sqc2 vf31, 0(out_min)
     }
-    return mgClipBoxW(out_max, out_min, mgRenderInfo.screen_box_max, mgRenderInfo.screen_box_min);
+    return mgClipBoxW(out_max, out_min, info->screen_box_max, info->screen_box_min);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_frame", mgInsideScreen__FPA4_fPA4_fPfPf);
-#endif
 #pragma global_optimizer reset
 
 void mgCObject::SetPosition(float *position) {
