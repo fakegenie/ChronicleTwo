@@ -554,7 +554,21 @@ asm float mgDistVectorXZ(float *a, float *b) {
     jr ra
     nop
 }
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgDistVector2__FPfPf);
+asm float mgDistVector2(float *a, float *b) {
+    .set noreorder
+    lqc2 vf2, 0x0(a0)
+    lqc2 vf3, 0x0(a1)
+    vsub.xyz vf4, vf3, vf2
+    vmul.xyz vf4, vf4, vf4
+    vmr32.xy vf5, vf4
+    vmr32.x vf6, vf5
+    vadd.x vf7, vf4, vf5
+    vadd.x vf5, vf6, vf7
+    qmfc2.ni v0, vf5
+    mtc1 v0, f0
+    jr ra
+    nop
+}
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgDistVectorXZ2__FPfPf);
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgUnitMatrix__FPA4_f);
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgZeroMatrix__FPA4_f);
