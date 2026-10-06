@@ -3545,7 +3545,6 @@ void CRemovalMenu::MakeNPCList() {
         } while (j < kRemovalNpcMax);
     }
 }
-#ifdef NONMATCHING
 int CRemovalMenu::KeyStep() {
     int closed = 0;
     int select_key;
@@ -3876,25 +3875,24 @@ int CRemovalMenu::KeyStep() {
             model_state = 2;
             break;
         case 2:
-            if (ReadBGSync() != 0) {
-                break;
+            if (ReadBGSync() == 0) {
+                chara_stack.stReset();
+                chara.Initialize(NULL);
+                MenuNPCLoadCheck(&chara, &chara_stack, MenuCommonInfo->tex_block[4]);
+                chara.SetScale(1.0f, 1.0f, 1.0f);
+                chara.SetPosition(model_pos);
+                if (npc == 9) {
+                    MenuAdjustPolygonScale(&chara, 5.655f);
+                } else {
+                    MenuAdjustPolygonScale(&chara, 6.96f);
+                }
+                chara.SetRotation(0.0f, -0.07853982f, 0.0f);
+                chara.SetMotion(at_4268, 0, 1);
+                npc_chr_form->SetActionCharaPtr(&chara, MenuCommonInfo->tex_block[4], -1);
+                npc_chr_form->counter = -14;
+                model_state = 3;
+                mgTexManager.TexAnimeAllOff(MenuCommonInfo->tex_block[4]);
             }
-            chara_stack.stReset();
-            chara.Initialize(NULL);
-            MenuNPCLoadCheck(&chara, &chara_stack, MenuCommonInfo->tex_block[4]);
-            chara.SetScale(1.0f, 1.0f, 1.0f);
-            chara.SetPosition(model_pos);
-            if (npc == 9) {
-                MenuAdjustPolygonScale(&chara, 5.655f);
-            } else {
-                MenuAdjustPolygonScale(&chara, 6.96f);
-            }
-            chara.SetRotation(0.0f, -0.0785398f, 0.0f);
-            chara.SetMotion(at_4268, 0, 1);
-            npc_chr_form->SetActionCharaPtr(&chara, MenuCommonInfo->tex_block[4], -1);
-            npc_chr_form->counter = -14;
-            model_state = 3;
-            mgTexManager.TexAnimeAllOff(MenuCommonInfo->tex_block[4]);
         case 3:
             chara.Step();
             if (npc_chr_form->counter == 14) {
@@ -3920,12 +3918,10 @@ int CRemovalMenu::KeyStep() {
     }
     CMenuPosDataForm *culture_form = MenuPosData->GetFormInfo(at_3162);
     if (culture_form != NULL) {
-        int cpoint_no;
-        if (GetSaveData()->GetBitFlag(kBitFlagCulture) == 0 && MenuMainScene->now_map_no == 3) {
-            cpoint_no = 0;
+        int flag = GetSaveData()->GetBitFlag(kBitFlagCulture);
+        int cpoint_no = 0;
+        if (flag == 0 && MenuMainScene->now_map_no == 3) {
             cpoint_no |= 1;
-        } else {
-            cpoint_no = 0;
         }
         culture_form->SetNumber(at_2986, MenuMainMapInfo->CultureAnalyzeParts(place_no, cpoint_no));
     }
@@ -3933,8 +3929,9 @@ int CRemovalMenu::KeyStep() {
         int put_pos[2];
         if (clip_form != NULL) {
             list_form->GetPutPosXY(at_4270, put_pos[0], put_pos[1]);
-            clip_form->x = put_pos[0];
-            clip_form->y = put_pos[1];
+            CMenuPosDataForm *clip = clip_form;
+            clip->x = put_pos[0];
+            clip->y = put_pos[1];
         }
         if (info_mes != NULL) {
             list_form->GetPutPosXY(at_4271, put_pos[0], put_pos[1]);
@@ -3984,24 +3981,22 @@ int CRemovalMenu::KeyStep() {
         LocalFunc_AdjustScrlBar(scroll_parts, bar_pos, bar_size, top, bar_lines[0], bar_lines[1], 0);
     }
     SetMessagePositionNPCForm(npc_win_form, npc_mes);
-    if (mode != 0) {
-        return closed;
-    }
-    if (key_arg_no != 1) {
-        return closed;
-    }
-    {
-        int cursor_pos[2];
-        list_form->GetPutPosXY(at_4272, cursor_pos[0], cursor_pos[1]);
-        cursor_pos[0] -= 0x28;
-        cursor_pos[1] += list_mes->font_h * (select - top);
-        MenuCommonInfo->MenuPosStep(cursor_pos, NULL);
+    switch (mode) {
+        case 0:
+            switch (key_arg_no) {
+                case 1: {
+                    int cursor_pos[2];
+                    list_form->GetPutPosXY(at_4272, cursor_pos[0], cursor_pos[1]);
+                    cursor_pos[0] -= 0x28;
+                    cursor_pos[1] += list_mes->font_h * (select - top);
+                    MenuCommonInfo->MenuPosStep(cursor_pos, NULL);
+                    break;
+                }
+            }
+            break;
     }
     return closed;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editmenu", KeyStep__12CRemovalMenuFv);
-#endif
 #ifdef STATEMATCHING
 void MenuRemovalInit(mgCMemory *stack, int *arg) {
     int size;
