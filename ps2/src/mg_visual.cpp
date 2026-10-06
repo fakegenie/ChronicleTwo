@@ -1297,26 +1297,26 @@ void SetDrawEnv(mgCDrawEnv *env, mgCVisualAttr *attr, mgCDrawEnv *base) {
         env->SetAlpha(attr->alpha_blend);
     }
 }
-#ifdef NONMATCHING
 int mgCVisualPrim::CreateRenderInfoPacket(u_int *packet, float (*matrix)[4], mgRENDER_INFO *info) {
     u_int      *start;
     u_int      *write;
     mgCDrawEnv *environment;
     int         size;
 
-    start = GetScrPad();
+    write = GetScrPad();
+    start = write;
     u_int tag[4] __attribute__((aligned(16)));
     *(u_long128 *)tag = 0;
     tag[0] = 0x10000007;
     tag[3] = 0x50000007;
-    *(u_long *)&start[12] = 0;
-    *(u_long128 *)start = *(u_long128 *)tag;
+    *(u_long128 *)write = *(u_long128 *)tag;
     giftag.word0 = 0x8002;
-    *(u_long128 *)&start[4] = *(u_long128 *)&giftag;
-    *(u_long *)&start[8] = 1;
-    u_int *body = start + 8;
-    *(u_long *)&start[10] = MG_GS_PRMODECONT;
-    *(u_long *)&start[14] = SCE_GS_TEXFLUSH;
+    *(u_long128 *)&write[4] = *(u_long128 *)&giftag;
+    u_int *body = write + 8;
+    *(u_long *)&body[0] = 1;
+    *(u_long *)&body[2] = MG_GS_PRMODECONT;
+    *(u_long *)&body[4] = 0;
+    *(u_long *)&body[6] = SCE_GS_TEXFLUSH;
     environment = (mgCDrawEnv *)(body + 8);
     if (draw_env != NULL) {
         *environment = *draw_env;
@@ -1328,14 +1328,10 @@ int mgCVisualPrim::CreateRenderInfoPacket(u_int *packet, float (*matrix)[4], mgR
     write[1] = 0;
     write[2] = 0;
     write[3] = 0;
-    write += 4;
-    size = ((u_long128 *)write - (u_long128 *)start);
+    size = ((u_long128 *)environment + 5 - (u_long128 *)start);
     SendDMA(packet, size);
     return size;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_visual", CreateRenderInfoPacket__13mgCVisualPrimFPUiPA4_fP13mgRENDER_INFO);
-#endif
 void mgCVisualPrim::Initialize() {
     unk_00 = 0;
     draw_env = NULL;
