@@ -35,20 +35,20 @@ static inline u_int align16_blocks(u_int size) {
     return size >> 4;
 }
 
-void BindPosition(float *a, float *b, float length, float rate) {
+void BindPosition(float *pos_a, float *pos_b, float length, float rate) {
     float delta[4];
     float pull_a[4];
     float pull_b[4];
     float distance;
     float excess;
 
-    sceVu0SubVector(delta, a, b);
+    sceVu0SubVector(delta, pos_a, pos_b);
     distance = mgDistVector(delta);
     excess = distance - length;
     sceVu0ScaleVector(pull_a, delta, (1.0f - rate) * excess / distance);
     sceVu0ScaleVector(pull_b, delta, rate * excess / distance);
-    mgSubVector(a, pull_a);
-    mgAddVector(b, pull_b);
+    mgSubVector(pos_a, pull_a);
+    mgAddVector(pos_b, pull_b);
 }
 void CDynamicAnime::ResetPosition(void) {
     float matrix[4][4];

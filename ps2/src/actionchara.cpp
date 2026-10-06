@@ -715,28 +715,28 @@ float CActionChara::GetWaitToFrame(char *motion, float ratio, char *chara_name) 
     }
     return frame;
 }
-void CActionChara::SetMotion(int motion_no, int param) {
+void CActionChara::SetMotion(int motion_no, int flags) {
     CActionChara *current;
 
     current = this;
     if (this != NULL) {
         do {
-            current->CCharacter2::SetMotion(motion_no, param);
+            current->CCharacter2::SetMotion(motion_no, flags);
             current = current->next;
         } while (current != NULL);
     }
 }
-void CActionChara::SetMotion(char *name, int param, int chain) {
+void CActionChara::SetMotion(char *name, int flags, int chain) {
     CActionChara *current;
 
     current = this;
     if (chain == 0) {
-        CCharacter2::SetMotion(name, param);
+        CCharacter2::SetMotion(name, flags);
         return;
     }
     if (this != NULL) {
         do {
-            current->CCharacter2::SetMotion(name, param);
+            current->CCharacter2::SetMotion(name, flags);
             current = current->next;
         } while (current != NULL);
     }

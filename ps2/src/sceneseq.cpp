@@ -1632,7 +1632,7 @@ void CSceneCmrSeq::Move(float *eye_pos, float *ref_pos, int frames) {
         node->frame = frames;
     }
 }
-void CSceneCmrSeq::Move2(float *eye_pos, float *ref_pos, int frames, int param34, float param38) {
+void CSceneCmrSeq::Move2(float *eye_pos, float *ref_pos, int frames, int mode, float ease_rate) {
     _SEN_CMR_SEQ *node;
 
     node = SearchNextPrSeq();
@@ -1642,8 +1642,8 @@ void CSceneCmrSeq::Move2(float *eye_pos, float *ref_pos, int frames, int param34
         sceVu0CopyVector(node->vec0, eye_pos);
         sceVu0CopyVector(node->vec1, ref_pos);
         node->frame = frames;
-        node->mode = param34;
-        node->ease_rate = param38;
+        node->mode = mode;
+        node->ease_rate = ease_rate;
     }
 }
 void CSceneCmrSeq::MoveRef(float *ref_pos, int frames) {
@@ -1786,8 +1786,8 @@ void CSceneCmrSeq::MoveAHD(float new_angle, float new_height, float new_dist, in
         node->frame = frames;
     }
 }
-void CSceneCmrSeq::MoveAHD2(float new_angle, float new_height, float new_dist, int frames, int param34,
-                            float param38) {
+void CSceneCmrSeq::MoveAHD2(float new_angle, float new_height, float new_dist, int frames, int mode,
+                            float ease_rate) {
     _SEN_CMR_SEQ *node;
 
     node = SearchNextAhdSeq();
@@ -1798,8 +1798,8 @@ void CSceneCmrSeq::MoveAHD2(float new_angle, float new_height, float new_dist, i
         node->vec0[1] = new_height;
         node->vec0[2] = new_dist;
         node->frame = frames;
-        node->mode = param34;
-        node->ease_rate = param38;
+        node->mode = mode;
+        node->ease_rate = ease_rate;
     }
 }
 void CSceneCmrSeq::SetSyncObj(int kind, float *offset, float angle_offset, float height_offset,
@@ -2887,7 +2887,7 @@ void CSceneObjSeq::Move(float *dest, int frames, int mode) {
         node->mode = mode;
     }
 }
-void CSceneObjSeq::Move2(float *dest, int frames, int mode, float param28) {
+void CSceneObjSeq::Move2(float *dest, int frames, int mode, float ease_rate) {
     _SEN_OBJ_SEQ *node;
 
     node = SearchNextPosSeq();
@@ -2897,7 +2897,7 @@ void CSceneObjSeq::Move2(float *dest, int frames, int mode, float param28) {
         sceVu0CopyVector(node->vec, dest);
         node->frame = frames;
         node->mode = mode;
-        node->ease_rate = param28;
+        node->ease_rate = ease_rate;
     }
 }
 void CSceneObjSeq::InitPas(void) {
@@ -3021,7 +3021,7 @@ void CSceneObjSeq::Rotation(float *target, int frames) {
         node->frame = frames;
     }
 }
-void CSceneObjSeq::Rotation2(float *target, int frames, int mode, float param28) {
+void CSceneObjSeq::Rotation2(float *target, int frames, int mode, float ease_rate) {
     _SEN_OBJ_SEQ *node;
 
     node = SearchNextRotSeq();
@@ -3031,7 +3031,7 @@ void CSceneObjSeq::Rotation2(float *target, int frames, int mode, float param28)
         sceVu0CopyVector(node->vec, target);
         node->frame = frames;
         node->mode = mode;
-        node->ease_rate = param28;
+        node->ease_rate = ease_rate;
     }
 }
 void CSceneObjSeq::Reference(float *ref, int frames) {

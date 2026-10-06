@@ -177,39 +177,39 @@ int CEventSpriteMother::SetDraw(int index, int draw) {
     sprite[index].SetDraw(draw);
     return 1;
 }
-int CEventSpriteMother::SetGet(int index, int a, int b, int c, int d) {
+int CEventSpriteMother::SetGet(int index, int x, int y, int w, int h) {
     if (index < 0 || index >= 8) {
         return 0;
     }
-    sprite[index].SetGet(a, b, c, d);
+    sprite[index].SetGet(x, y, w, h);
     return 1;
 }
-int CEventSpriteMother::SetPut(int index, int a, int b, int c, int d) {
+int CEventSpriteMother::SetPut(int index, int x, int y, int w, int h) {
     if (index < 0 || index >= 8) {
         return 0;
     }
-    sprite[index].SetPut(a, b, c, d);
+    sprite[index].SetPut(x, y, w, h);
     return 1;
 }
-int CEventSpriteMother::SetMove(int index, int a, int b, int c) {
+int CEventSpriteMother::SetMove(int index, int x, int y, int frames) {
     if (index < 0 || index >= 8) {
         return 0;
     }
-    sprite[index].SetMove(a, b, c);
+    sprite[index].SetMove(x, y, frames);
     return 1;
 }
-int CEventSpriteMother::SetFade(int index, int a, int b) {
+int CEventSpriteMother::SetFade(int index, int fade_in, int frames) {
     if (index < 0 || index >= 8) {
         return 0;
     }
-    sprite[index].SetFade(a, b);
+    sprite[index].SetFade(fade_in, frames);
     return 1;
 }
-int CEventSpriteMother::SetColor(int index, int a, int b, int c, int d) {
+int CEventSpriteMother::SetColor(int index, int r, int g, int b, int a) {
     if (index < 0 || index >= 8) {
         return 0;
     }
-    sprite[index].SetColor(a, b, c, d);
+    sprite[index].SetColor(r, g, b, a);
     return 1;
 }
 void CEventSpriteMother::Step() {

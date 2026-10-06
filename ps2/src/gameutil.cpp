@@ -2128,8 +2128,8 @@ float LinerInterpolation(float from, float to, float rate) {
     return from + (rate * (to - from));
 }
 #pragma divbyzerocheck on
-int LinerInterpolationI(int from, int to, int t, int range) {
-    return from + (to - from) * t / range;
+int LinerInterpolationI(int from, int to, int step, int steps) {
+    return from + (to - from) * step / steps;
 }
 #pragma divbyzerocheck reset
 void RollPos(float *center, float *point, float angle, float *out) {
