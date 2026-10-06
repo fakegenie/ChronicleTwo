@@ -117,7 +117,7 @@ struct ITEMCMD_RET_PARA {
     s16 result;
     s16 item_no;
     s16 unk_8;
-    s16 unk_A;
+    s16 num;
     CGameDataUsed *item;
     CGameDataUsed *item2;
 };
@@ -168,9 +168,9 @@ public:
     MENU_SWAPITEM_INFO swap_info;
     s16 cmd_arg_pos;
     s32 unk_F8;
-    s32 unk_FC;
+    s32 make_item_no;
     int make_num;
-    s32 unk_104;
+    s32 make_space_no;
     s8 make_cursor;
     s16 make_num_max;
 

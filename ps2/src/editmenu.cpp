@@ -3214,7 +3214,7 @@ int MenuGeoramaMakePush(CMenuGeorama *menu, int keys, int pushed) {
                         MenuSePlay(5);
                     } else {
                         menu->make_cursor = 0;
-                        menu->unk_FC = menu->make_parts->id;
+                        menu->make_item_no = menu->make_parts->id;
                         menu->CBaseMenuClass::make_num = 1;
                         menu->make_num_max = *(short *)&menu->make_parts->max_num;
                         if (0 > menu->make_parts->map_no) {

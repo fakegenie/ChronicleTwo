@@ -527,14 +527,14 @@ void CGameDataUsed::TransToPassword(char *data, int length) {
                 memset(&buffer, 0, 14);
                 buffer.fish.item_no = item->item_no;
                 buffer.fish.sex = *(s8 *)&body->sex;
-                buffer.fish.field_4a = body->unk_3a;
+                buffer.fish.field_4a = body->color;
                 buffer.fish.param_3 = body->param[4];
                 buffer.fish.unknown_3c = body->param[3];
                 buffer.fish.length = body->size;
                 buffer.fish.weight = body->weight;
                 buffer.fish.param_0 = body->param[0];
                 buffer.fish.param_1 = body->param[1];
-                buffer.fish.color_no = body->unk_16;
+                buffer.fish.color_no = body->kind;
                 buffer.fish.param_2 = body->param[2];
                 buffer.fish.flags = body->flags;
                 src = buffer.bytes;
@@ -561,7 +561,7 @@ void CGameDataUsed::TransToData(char *data, int length) {
                 }
                 item->item_no = buffer.fish.item_no;
                 item->data.fish.sex = buffer.fish.sex;
-                item->data.fish.unk_3a = buffer.fish.field_4a;
+                item->data.fish.color = buffer.fish.field_4a;
                 item->data.fish.param[4] = buffer.fish.param_3;
                 item->data.fish.param[3] = buffer.fish.unknown_3c;
                 item->data.fish.size = buffer.fish.length;
@@ -569,7 +569,7 @@ void CGameDataUsed::TransToData(char *data, int length) {
                 item->data.fish.param[0] = buffer.fish.param_0;
                 item->data.fish.param[1] = buffer.fish.param_1;
                 item->data.fish.param[2] = buffer.fish.param_2;
-                item->data.fish.unk_16 = buffer.fish.color_no;
+                item->data.fish.kind = buffer.fish.color_no;
                 item->data.fish.flags = buffer.fish.flags;
             }
         }
@@ -1533,7 +1533,7 @@ int CGameDataUsed::CopyDataFish(int item_no) {
     fish->data.fish.weight = (u16)(value + GetRandF(500.0f));
     fish->data.fish.sex = GetRandI(2);
     fish->data.fish.unk_1c = GetRandI(4);
-    fish->data.fish.unk_16 = GetRandI(4);
+    fish->data.fish.kind = GetRandI(4);
     fish->data.fish.hp = 100;
     fish->data.fish.fatigue = 0;
     fish->data.fish.param[4] = *(u16 *)&record->unk_6;
@@ -1541,7 +1541,7 @@ int CGameDataUsed::CopyDataFish(int item_no) {
     fish->data.fish.param[1] = *(u16 *)&record->unk_c;
     fish->data.fish.param[2] = *(u16 *)&record->unk_e;
     fish->data.fish.param[3] = *(u16 *)&record->unk_8;
-    fish->data.fish.unk_36 = GetRandI(0x33) + 0xC8;
+    fish->data.fish.life = GetRandI(0x33) + 0xC8;
     fish->data.fish.unk_35 = 0;
     fish->data.fish.timer = 0;
     fish->data.fish.flags = 0;
@@ -2867,7 +2867,7 @@ int CUserDataManager::GetFishInAquarium(int fish_no, float size, float weight) {
     fish.data.fish.param[0] += GetRandI(3);
     fish.data.fish.param[1] += GetRandI(3);
     fish.data.fish.param[2] += GetRandI(3);
-    fish.data.fish.unk_36 = GetRandI(0x33) + 200;
+    fish.data.fish.life = GetRandI(0x33) + 200;
     fish.data.fish.unk_35 = 0;
     CGameDataUsed *slot = SearchSpaceUsedDataPtr();
     if (slot != 0) {

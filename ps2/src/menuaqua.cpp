@@ -1321,16 +1321,16 @@ int CAquaFish::ParamStep() {
         SetAdjustScale();
         if (eat_item == 0x168) {
             breed->flags |= 2;
-            breed->unk_36 = 200;
+            breed->life = 200;
         }
         if (!(breed->flags & 2)) {
-            int left = breed->unk_36 - 1;
+            int left = breed->life - 1;
 
             if (left <= 0) {
                 left = 0;
                 breed->flags |= 0x80;
             }
-            breed->unk_36 = left;
+            breed->life = left;
         }
         MenuSePlay(Aqua_SpSndID, 1);
         eat_item = 0;
@@ -2089,7 +2089,7 @@ int GetFishImgPath(char *out, int item_no, BREEDFISH_USED *fish) {
     }
     for (info = aquafish_info; info->item_no > 0; info++) {
         if (info->item_no == item_no) {
-            sprintf(out, (char *)at_2415, info->img_path, fish->unk_3a);
+            sprintf(out, (char *)at_2415, info->img_path, fish->color);
             return 1;
         }
     }
@@ -2225,7 +2225,7 @@ void DrawFishParam(int x, int y, mgCTexture *tex, CGameDataUsed *data) {
         Menu3DivideTextureDraw(pen, board, u_brdtbl_2493, 1);
         if (i == 0) {
             mgRect<int> kind_rect;
-            u8 *kind = chrtbl_2503[lang][breed->unk_16];
+            u8 *kind = chrtbl_2503[lang][breed->kind];
 
             kind_rect.Set(kind[0], kind[1], 0x4C, 0x12);
             PrimQuad(pen, bx + 8, by + 2, kind_rect);
@@ -2831,9 +2831,9 @@ void CAquarium::CombineFish(int no1, int no2) {
     CGameDataUsed child;
     child.Init();
     int child_no = GetChildFishNo(data1->item_no, data2->item_no);
-    life = breed1->unk_36;
-    if (life < breed2->unk_36) {
-        life = breed2->unk_36;
+    life = breed1->life;
+    if (life < breed2->life) {
+        life = breed2->life;
     }
     life += 20;
     if (life < 0) {
@@ -2852,25 +2852,25 @@ void CAquarium::CombineFish(int no1, int no2) {
     child_breed->param[2] = CombineParam(breed1->param[2], breed2->param[2]);
     child_breed->param[3] = CombineParam(breed1->param[3], breed2->param[3]);
     child_breed->param[4] = CombineParam(breed1->param[4], breed2->param[4]);
-    child_breed->unk_36 = life;
-    if (child_breed->unk_36 > 250) {
-        child_breed->unk_36 = 250;
+    child_breed->life = life;
+    if (child_breed->life > 250) {
+        child_breed->life = 250;
     }
     child_breed->unk_35 = 5;
     child_breed->flags = 0;
     child_breed->flags |= 1;
-    child_breed->unk_16 = breed1->unk_16;
+    child_breed->kind = breed1->kind;
     total1 = CalcFishParam(breed1);
     total2 = CalcFishParam(breed2);
     int parent_color[2];
     parent_color[0] = 0;
     parent_color[1] = 0;
-    parent_color[0] = breed1->unk_3a;
-    if (breed1->unk_3a == 0) {
+    parent_color[0] = breed1->color;
+    if (breed1->color == 0) {
         parent_color[0] = GetFishImageColor(data1->item_no, 0);
     }
-    parent_color[1] = breed2->unk_3a;
-    if (breed2->unk_3a == 0) {
+    parent_color[1] = breed2->color;
+    if (breed2->color == 0) {
         parent_color[1] = GetFishImageColor(data2->item_no, 0);
     }
     if (total1 < total2) {
@@ -2883,7 +2883,7 @@ void CAquarium::CombineFish(int no1, int no2) {
     if (color == GetFishImageColor(child.item_no, 0)) {
         color = 0;
     }
-    child_breed->unk_3a = color;
+    child_breed->color = color;
     data1->CopyGameData(&child);
     data1->CheckParamLimmit();
     if (LoadFish(no1, data1) != 0) {
@@ -3769,7 +3769,7 @@ int CAquarium::Step() {
                         }
                     }
                     if (menu_debug_select == 5) {
-                        int value = breed->unk_3a + add;
+                        int value = breed->color + add;
 
                         if (value < 0) {
                             value = 18;
@@ -3777,7 +3777,7 @@ int CAquarium::Step() {
                         if (value >= 19) {
                             value = 0;
                         }
-                        breed->unk_3a = value;
+                        breed->color = value;
                     }
                     if (menu_debug_select == 6) {
                         int value = breed->size + add;
@@ -3816,7 +3816,7 @@ int CAquarium::Step() {
                         breed->timer = value;
                     }
                     if (menu_debug_select == 9) {
-                        int value = breed->unk_36 + add;
+                        int value = breed->life + add;
 
                         if (value <= 0) {
                             value = 1;
@@ -3824,7 +3824,7 @@ int CAquarium::Step() {
                         if (value > 50000) {
                             value = 50000;
                         }
-                        breed->unk_36 = value;
+                        breed->life = value;
                     }
                     if (menu_debug_select == 10) {
                         int value = breed->unk_35 + add;
@@ -4613,7 +4613,7 @@ void CAquarium::Draw() {
             };
             int values[12] = {
                 breed->param[4], breed->param[3], breed->param[0], breed->param[1], breed->param[2],
-                breed->unk_3a, breed->size, breed->weight, breed->timer, breed->unk_36, breed->unk_35,
+                breed->color, breed->size, breed->weight, breed->timer, breed->life, breed->unk_35,
                 breed->hp,
             };
             for (i = 0; i < 12; i++, y += 0x14) {
@@ -5062,7 +5062,7 @@ static int _GYORACE_DATA(SPI_STACK *stack, int arg_count) {
 
     fish = &entry->data.fish;
     entry->SetName(spiGetStackString(stack++));
-    fish->unk_16 = spiGetStackInt(stack++);
+    fish->kind = spiGetStackInt(stack++);
     fish->param[4] = spiGetStackInt(stack++);
     fish->param[0] = spiGetStackInt(stack++);
     fish->param[1] = spiGetStackInt(stack++);

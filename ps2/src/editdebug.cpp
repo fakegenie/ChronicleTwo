@@ -547,8 +547,8 @@ int tagGyoFish(SPI_STACK *stack, int argument_count) {
         strcpy(fish->name, name);
     }
     racer->item_no = spiGetStackInt(stack++);
-    fish->unk_3a = spiGetStackInt(stack++);
-    fish->unk_16 = spiGetStackInt(stack++);
+    fish->color = spiGetStackInt(stack++);
+    fish->kind = spiGetStackInt(stack++);
     int tactics = spiGetStackInt(stack++);
     fish->param[4] = spiGetStackInt(stack++);
     fish->param[3] = spiGetStackInt(stack++);

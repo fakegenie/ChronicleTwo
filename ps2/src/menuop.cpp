@@ -1004,7 +1004,7 @@ int CMenuOption::KeyStep(void) {
                 CBaseMenuClass::ExeScript(at_1428__4);
                 if (MenuConfigPtr != NULL) {
                     printf(at_1650__3, MenuConfigPtr->eye_reverse);
-                    printf(at_1651__2, MenuConfigPtr->unk_37);
+                    printf(at_1651__2, MenuConfigPtr->rot_normal);
                     if (MenuConfigPtr->sound_mode != 0) {
                         CSnd.SetStereoMode(0);
                     } else {
@@ -1053,7 +1053,7 @@ int CMenuOption::KeyStep(void) {
                     } else if (select == 14) {
                         config.eye_reverse = choice;
                     } else if (select == 15) {
-                        config.unk_37 = choice;
+                        config.rot_normal = choice;
                     } else if (select != 8 || config.enemy_hp != 1) {
                         *value[select] = choice;
                         if (select == 7 && choice == 1) {
@@ -1326,7 +1326,7 @@ void CMenuOption::UpdateOptionForm(void) {
                 row = this->button[15];
                 if (row != NULL) {
                     DefaultButton(row);
-                    EnableButton(row[config->unk_37]);
+                    EnableButton(row[config->rot_normal]);
                 }
             }
         }

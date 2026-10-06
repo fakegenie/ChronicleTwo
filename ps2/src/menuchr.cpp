@@ -1806,7 +1806,7 @@ int CMenuChrCngMenu::KeyChangeMain() {
                         if (bitCtrl & 1) {
                             used = 0;
                         }
-                        if (MenuMainScene->battle_area.boss_map && MenuMainScene->battle_area.unk_5c) {
+                        if (MenuMainScene->battle_area.boss_map && MenuMainScene->battle_area.battle_clear) {
                             used = 0;
                         }
                     }

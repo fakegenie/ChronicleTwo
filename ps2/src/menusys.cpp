@@ -372,7 +372,7 @@ int CBaseMenuClass::MenuItemMoveItemCommand(CGameDataUsed *item, int arg_pos, in
         MenuItemCmdRet.unk_2 = -2;
         MenuItemCmdRet.item2 = NULL;
         MenuItemCmdRet.item = NULL;
-        MenuItemCmdRet.unk_A = 0;
+        MenuItemCmdRet.num = 0;
         MenuItemCmdRet.item_no = 0;
         mode = MENU_ASK_MODE_ITEM_COMMAND;
         step = 0;
@@ -560,8 +560,8 @@ int CBaseMenuClass::MenuItemCommandSelect(int select_key, int push_button) {
                     MenuItemCmdRet.cmd = 1;
                     MenuItemCmdRet.item = &chara->active_item[active_slot];
                     if (ask_para.item->item_no == MenuItemCmdRet.item->item_no) {
-                        MenuItemCmdRet.unk_A = MenuItemCmdRet.item->GetActiveSetNum() - MenuItemCmdRet.item->GetNum();
-                        if (ask_para.item->GetNum() > MenuItemCmdRet.unk_A) {
+                        MenuItemCmdRet.num = MenuItemCmdRet.item->GetActiveSetNum() - MenuItemCmdRet.item->GetNum();
+                        if (ask_para.item->GetNum() > MenuItemCmdRet.num) {
                             MenuItemCmdRet.item_no = 10;
                         }
                     }
@@ -574,7 +574,7 @@ int CBaseMenuClass::MenuItemCommandSelect(int select_key, int push_button) {
                     MenuItemCmdRet.item = &used_data[space];
                     int num = MenuItemCmdRet.item->GetNum();
                     if (num > 0) {
-                        MenuItemCmdRet.unk_A = num;
+                        MenuItemCmdRet.num = num;
                     }
                     MenuItemCmdRet.cmd = 1;
                 }
@@ -1712,7 +1712,7 @@ int CheckFishCondition(void) {
     }
     result = enabled;
     if (GetMenuLoopType() == 1) {
-        if (battle_scene->unk_5c == 0) {
+        if (battle_scene->battle_clear == 0) {
             enabled = 0;
         }
         result = enabled;
@@ -4359,7 +4359,7 @@ int CMenuItemInfo::ItemCmdAfter(int cmd_ret, ITEMCMD_RET_PARA *ret) {
                 int move_type = 1;
                 if (ret->item_no == 10) {
                     memcpy(&MenuMoveTempGameDataUsed, ask_para.item, sizeof(CGameDataUsed));
-                    ask_para.item->DeleteNum(ret->unk_A);
+                    ask_para.item->DeleteNum(ret->num);
                     MenuMoveTempGameDataUsed.DeleteNum(ask_para.item->GetNum());
                     move_type = 3;
                 }

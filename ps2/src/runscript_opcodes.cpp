@@ -929,7 +929,7 @@ int _SET_CAMERA_MODE(RS_STACKDATA *stack, int argc) {
     if (area == NULL) {
         return 0;
     }
-    area->unk_54 = mode;
+    area->camera_mode = mode;
     return 1;
 }
 int _SET_CAMERA_SPEED(RS_STACKDATA *stack, int argc) {

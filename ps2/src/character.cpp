@@ -1825,7 +1825,7 @@ int _SHADOW_MOTION(SPI_STACK *stack, int argc) {
         AnimeDataInit(
             (mgCFrame *)nowChr->shadow_frame, motion, base_stack, &nowChr->shadow_frame_info);
     }
-    *(tagFRAME_INF **)((u8 *)motion + 0x10) = nowChr->shadow_frame_info;
+    motion->frame_info = nowChr->shadow_frame_info;
     return 1;
 }
 int _VERTEX_ANIME(SPI_STACK *stack, int argc) {

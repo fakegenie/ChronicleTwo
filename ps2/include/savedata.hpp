@@ -59,7 +59,7 @@ struct SV_CONFIG_OPTION {
     u8  caption_off;
     u8  unk_35;
     s8  eye_reverse;
-    s8  unk_37;
+    s8  rot_normal;
     u8  unk_38[8];
 };
 

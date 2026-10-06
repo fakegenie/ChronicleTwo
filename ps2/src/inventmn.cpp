@@ -2772,7 +2772,7 @@ void CMenuInvent::CalcMakeBrd(int message_index) {
         make_board.unk_1c = make_num;
         make_board.material_num = 4;
         MakeItemNeeds needs;
-        InventManagePt->HowMuchZairyouMakeItem(unk_FC, make_num, (int *)&needs);
+        InventManagePt->HowMuchZairyouMakeItem(make_item_no, make_num, (int *)&needs);
         int index = 0;
         for (; index < needs.num; index++) {
             make_board.line[index].kind = 1;
@@ -2912,24 +2912,24 @@ int CMenuInvent::IsMakeObject(int keys, int button) {
         switch (button) {
         case 1:
             if (make_cursor == 0) {
-                int enough = InventManagePt->CheckMakeItem(unk_FC, make_num, MenuUserParam.used_data);
-                unk_104 = GetUserDataMan()->SearchSpaceUsedData();
+                int enough = InventManagePt->CheckMakeItem(make_item_no, make_num, MenuUserParam.used_data);
+                make_space_no = GetUserDataMan()->SearchSpaceUsedData();
                 if (enough == 0) {
                     step = 3;
                     ExeScript(at_3348__2);
-                } else if (unk_104 < 0) {
+                } else if (make_space_no < 0) {
                     step = 3;
                     ExeScript(at_3349__2);
                 } else {
-                    if (unk_FC == 0xA5) {
+                    if (make_item_no == 0xA5) {
                         GetSaveData()->SetBitFlag(13, 1);
                     }
-                    if (unk_FC == 0x12F) {
+                    if (make_item_no == 0x12F) {
                         GetSaveData()->SetBitFlag(48, 1);
                     }
-                    InventManagePt->DeleteUserUsedItem(unk_FC, make_num);
-                    unk_104 = GetUserDataMan()->SearchSpaceUsedData();
-                    int row = unk_104 / 6;
+                    InventManagePt->DeleteUserUsedItem(make_item_no, make_num);
+                    make_space_no = GetUserDataMan()->SearchSpaceUsedData();
+                    int row = make_space_no / 6;
                     if (item_top > row) {
                         while (row < item_top) {
                             item_top--;
@@ -2939,7 +2939,7 @@ int CMenuInvent::IsMakeObject(int keys, int button) {
                             item_top++;
                         }
                     }
-                    item_cursor = unk_104;
+                    item_cursor = make_space_no;
                     step = 10;
                     MenuCharaLoadStack.stack_used = 0;
                     MenuCharaLoadStack.lock = 0;
@@ -2965,7 +2965,7 @@ int CMenuInvent::IsMakeObject(int keys, int button) {
     case 10:
         if (ReadBGSync() == 0) {
             ItemBoardKoma koma = at_3306;
-            MenuPosData->GetPosMenuItemBrdKoma(koma.pos, unk_104, 0);
+            MenuPosData->GetPosMenuItemBrdKoma(koma.pos, make_space_no, 0);
             mgCTexture *effect_tex = MenuPosData->icon_effect_tex;
             MenuEffect[0]->PresetEffect(&MenuCharaLoadStack, effect_tex, 0, koma.pos);
             MenuEffect[0]->EffectStart();
@@ -2987,8 +2987,8 @@ int CMenuInvent::IsMakeObject(int keys, int button) {
         if (MenuEffect[1]->counter == 0x70) {
             CGameDataUsed *space = GetUserDataMan()->SearchSpaceUsedDataPtr();
             for (int i = 0; i < make_num; i++) {
-                GetUserDataMan()->CopyGameData(space, unk_FC);
-                GetUserDataMan()->GetCostume(unk_FC);
+                GetUserDataMan()->CopyGameData(space, make_item_no);
+                GetUserDataMan()->GetCostume(make_item_no);
             }
             CheckEnableHaveItemNum();
         }
@@ -2996,7 +2996,7 @@ int CMenuInvent::IsMakeObject(int keys, int button) {
             step++;
             ExeScript(at_3352);
             ItemNameList2 names = at_3317;
-            names.name[0] = GetItemMessage(unk_FC);
+            names.name[0] = GetItemMessage(make_item_no);
             CDC2Mes *message = MenuDCMsg[4];
             message->SetMsgItemNo(names.name, 1);
             message->SetMsgVolumeNoOne(make_num);
@@ -3357,7 +3357,7 @@ void CMenuInvent::CalcTex() {
     }
     if (mode == 6 && step == 1) {
         int effect_pos[2];
-        MenuPosData->GetPosMenuItemBrdForEffect(effect_pos, unk_104, 0);
+        MenuPosData->GetPosMenuItemBrdForEffect(effect_pos, make_space_no, 0);
         MenuEffect[0]->base_info[0] = effect_pos[0];
         MenuEffect[0]->base_info[1] = effect_pos[1];
         MenuEffect[1]->base_info[0] = effect_pos[0] + 2;
@@ -5901,14 +5901,14 @@ int MenuInventPushKey(int pad, int pushed) {
                 if (item_id <= 0) {
                     CMenuInventPt->PrepareNextMode(0);
                 } else {
-                    CMenuInventPt->unk_FC = item_id;
+                    CMenuInventPt->make_item_no = item_id;
                     CMenuInventPt->make_num = 1;
                     CMenuInventPt->make_material =
                         &InventManagePt->GetInventDataInfoByItemID(item_id)->materials;
                     CMenuInventPt->mode = 6;
                     CMenuInventPt->step = 0;
                     CMenuInventPt->make_cursor = 1;
-                    CDataCommon *common = GetCommonItemData(CMenuInventPt->unk_FC);
+                    CDataCommon *common = GetCommonItemData(CMenuInventPt->make_item_no);
                     CMenuInventPt->make_num_max = 1;
                     if (common != NULL) {
                         CMenuInventPt->make_num_max = common->max_num;
@@ -5919,7 +5919,7 @@ int MenuInventPushKey(int pad, int pushed) {
                         CMenuInventPt->step = 3;
                         CMenuInventPt->ExeScript(at_5555);
                         ItemNameList1 item_name = at_5457;
-                        item_name.name[0] = GetItemMessage(CMenuInventPt->unk_FC);
+                        item_name.name[0] = GetItemMessage(CMenuInventPt->make_item_no);
                         MenuDCMsg[4]->SetMsgItemNo(item_name.name, 1);
                         MenuDCMsg[4]->SetMsgVolumeNoOne(common->max_num);
                     } else {
@@ -5927,7 +5927,7 @@ int MenuInventPushKey(int pad, int pushed) {
                             CMenuInventPt->make_num_max = 1;
                         }
                         ItemNameList5 names = at_5460;
-                        names.name[0] = GetItemMessage(CMenuInventPt->unk_FC);
+                        names.name[0] = GetItemMessage(CMenuInventPt->make_item_no);
                         for (int i = 0; i < CMenuInventPt->make_material->num; i++) {
                             names.name[1 + i] =
                                 GetItemMessage(CMenuInventPt->make_material->material[i].item_id);
