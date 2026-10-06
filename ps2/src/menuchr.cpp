@@ -2349,6 +2349,7 @@ void CMenuChrCngMenu::UpdataLife() {
     }
 }
 #ifdef NONMATCHING
+extern "C" void Set__9mgRect_s_Fssss(mgRect<short> *rect, short x, short y, short w, short h);
 void MenuCharaChangeStarDraw() {
     mgCTextureManager *texManager = &mgTexManager;
 
@@ -2361,20 +2362,15 @@ void MenuCharaChangeStarDraw() {
     float offset = size / 2.0f - 2.0f;
     RingCenter center = at_2371__4;
     center.x = menu->star_x + offset;
-    float center_y;
-    center_y = menu->star_y + 1.1538461f * offset;
+    center.y = menu->star_y + 1.1538461f * offset;
     float angle = menu->star_angle;
     mgCDrawPrim *prim = GetMenuPrim();
     mgRect<int> baseRect(0x13F, 0xC0, 0x40, 0x40);
-    QuadTexCoords crd = at_2372__4;
-    crd.uv[0][0] = baseRect.left;
-    crd.uv[3][0] = baseRect.left;
-    crd.uv[1][0] = baseRect.left + baseRect.right;
-    crd.uv[2][0] = baseRect.left + baseRect.right;
-    crd.uv[2][1] = baseRect.top + baseRect.bottom;
-    crd.uv[3][1] = baseRect.top + baseRect.bottom;
-    crd.uv[0][1] = baseRect.top;
-    crd.uv[1][1] = baseRect.top;
+    float u0 = baseRect.left;
+    float u1 = baseRect.left + baseRect.right;
+    float v1 = baseRect.top + baseRect.bottom;
+    float v0 = baseRect.top;
+    QuadTexCoords crd = {{{u0, v0}, {u1, v0}, {u1, v1}, {u0, v1}}};
     SetSpriteEnv(prim, 4);
     prim->Bilinear(1);
     prim->Begin(5);
@@ -2383,7 +2379,7 @@ void MenuCharaChangeStarDraw() {
     for (int i = 0; i < 4; i++) {
         prim->TextureCrd((int)crd.uv[i][0], (int)crd.uv[i][1]);
         float x = 1.0f + (center.x + size * cosf(angle));
-        prim->Vertex(x, center_y + 1.1538461f * (size * sinf(angle)), 0.0f);
+        prim->Vertex(x, center.y + 1.1538461f * (size * sinf(angle)), 0.0f);
         angle += 1.5707964f;
     }
     prim->End();
@@ -2404,12 +2400,12 @@ void MenuCharaChangeStarDraw() {
         float x = ringSize * cosf(angle);
         float y = ringSize * sinf(angle);
         x = center.x + x;
-        mgRect<float> inner(x - 0.5f * circle, 6.0f + (center_y + 1.1538461f * (y - 0.5f * circle)), circle,
+        mgRect<float> inner(x - 0.5f * circle, 6.0f + (center.y + 1.1538461f * (y - 0.5f * circle)), circle,
                             circle);
         DrawWakuCircle(prim, MenuCharaChangeBase_Tex, inner, wakuRect, wave, ringSize, (int)alpha, 0x80, 0x80,
                        0x80);
         circle *= 1.4f;
-        mgRect<float> outer(x - 0.5f * circle, 6.0f + (center_y + 1.1538461f * (y - 0.5f * circle)), circle,
+        mgRect<float> outer(x - 0.5f * circle, 6.0f + (center.y + 1.1538461f * (y - 0.5f * circle)), circle,
                             circle);
         DrawWakuCircle(prim, MenuCharaChangeBase_Tex, outer, wakuRect, wave, ringSize, (int)pulseAlpha, 0x80, 0x80,
                        0x80);
@@ -2421,20 +2417,19 @@ void MenuCharaChangeStarDraw() {
         return;
     }
     texManager->ReloadTexture(MenuCharaChangeStar_Tex->block, (sceVif1Packet *)NULL);
-    mgRect<short> starRect;
-    starRect.Set(0, 0x20, 8, 8);
+    short starRect[4];
+    Set__9mgRect_s_Fssss((mgRect<short> *)starRect, 0, 0x20, 8, 8);
     prim->Begin(6);
     prim->Texture(MenuCharaChangeStar_Tex);
     for (int k = 0; k < CHR_CNG_STAR_NUM; k++) {
-        CHR_CNG_STAR *star = &ChrChangMenuPt->star[k];
-        if (star->alpha > 0.0f) {
-            float starX = star->x + ChrChangMenuPt->star_x;
-            float starY = star->y + ChrChangMenuPt->star_y;
-            prim->Color(0x80, 0x80, 0x80, (int)star->alpha);
-            prim->TextureCrd(starRect.left, starRect.top);
+        if (0.0f < ChrChangMenuPt->star[k].alpha) {
+            float starX = ChrChangMenuPt->star[k].x + ChrChangMenuPt->star_x;
+            float starY = ChrChangMenuPt->star[k].y + ChrChangMenuPt->star_y;
+            prim->Color(0x80, 0x80, 0x80, (int)ChrChangMenuPt->star[k].alpha);
+            prim->TextureCrd(starRect[0], starRect[1]);
             prim->Vertex(starX, starY, 0.0f);
-            prim->TextureCrd(starRect.left + starRect.right, starRect.top + starRect.bottom);
-            prim->Vertex(starX + starRect.right, starY + starRect.bottom, 0.0f);
+            prim->TextureCrd(starRect[0] + starRect[2], starRect[1] + starRect[3]);
+            prim->Vertex(starX + starRect[2], starY + starRect[3], 0.0f);
         }
     }
     prim->End();
