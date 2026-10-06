@@ -2984,10 +2984,8 @@ void CWeaponElement::Step_Thunder(void) {
         }
     }
 }
-#ifdef NONMATCHING
 void CWeaponElement::Draw_Thunder(void) {
-    int head_quad[2][4];
-    int tail_quad[2][4];
+    int quad[4][4];
     float base[4];
     mgCTexture *tex;
     int i;
@@ -3036,47 +3034,45 @@ void CWeaponElement::Draw_Thunder(void) {
     for (j = 0; j < bolt_count; j++) {
         sceVu0CopyVector(head, offset[bolt_head[j]]);
         head[1] += 1.0f;
-        mgTransWorldPrim(head_quad[0], head);
+        mgTransWorldPrim(quad[0], head);
         head[1] -= 2.0f;
-        mgTransWorldPrim(head_quad[1], head);
+        mgTransWorldPrim(quad[1], head);
         sceVu0CopyVector(tail, offset[bolt_tail[j]]);
         head[1] += 1.0f;
-        mgTransWorldPrim(tail_quad[0], head);
+        mgTransWorldPrim(quad[2], head);
         head[1] -= 2.0f;
-        mgTransWorldPrim(tail_quad[1], head);
+        mgTransWorldPrim(quad[3], head);
         int u = bolt_uv[bolt_frame[j]][0];
         int v = bolt_uv[bolt_frame[j]][1];
-        prim.Color(0x80, 0x80, 0x80, fptosi(1.6f * alpha[bolt_head[j]]));
+        float bolt_alpha = 1.6f * alpha[bolt_head[j]];
+        prim.Color(0x80, 0x80, 0x80, bolt_alpha);
         prim.TextureCrd(u, v);
-        prim.Vertex4(head_quad[0]);
+        prim.Vertex4(quad[0]);
         prim.TextureCrd(u + 0x18, v);
-        prim.Vertex4(head_quad[1]);
+        prim.Vertex4(quad[1]);
         prim.TextureCrd(u, v + 0x68);
-        prim.Vertex4(tail_quad[0]);
+        prim.Vertex4(quad[2]);
         prim.TextureCrd(u + 0x18, v + 0x68);
-        prim.Vertex4(tail_quad[1]);
+        prim.Vertex4(quad[3]);
         sceVu0SubVector(tail, head, base);
         sceVu0Normalize(tail, tail);
         sceVu0ScaleVector(tail, tail, fRand(15.0f));
         sceVu0AddVector(tail, tail, offset[j]);
         tail[1] += 1.0f;
-        mgTransWorldPrim(head_quad[0], tail);
+        mgTransWorldPrim(quad[0], tail);
         tail[1] -= 2.0f;
-        mgTransWorldPrim(head_quad[1], tail);
+        mgTransWorldPrim(quad[1], tail);
         prim.TextureCrd(u, v);
-        prim.Vertex4(head_quad[0]);
+        prim.Vertex4(quad[0]);
         prim.TextureCrd(u + 0x18, v);
-        prim.Vertex4(head_quad[1]);
+        prim.Vertex4(quad[1]);
         prim.TextureCrd(u, v + 0x68);
-        prim.Vertex4(tail_quad[0]);
+        prim.Vertex4(quad[2]);
         prim.TextureCrd(u + 0x18, v + 0x68);
-        prim.Vertex4(tail_quad[1]);
+        prim.Vertex4(quad[3]);
     }
     prim.End();
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dng_effect", Draw_Thunder__14CWeaponElementFv);
-#endif
 #ifdef NONMATCHING
 int CreatSmoothPass(sceVu0FVECTOR *out, sceVu0FVECTOR *ring, int point_num, int division, int start, int ring_size) {
     sceVu0FMATRIX coefficients;
