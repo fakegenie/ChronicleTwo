@@ -1857,7 +1857,6 @@ int CActionChara::RoboTankMoveIF(int mode) {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/actionchara", RoboTankMoveIF__12CActionCharaFi);
 #endif
-#ifdef NONMATCHING
 int CActionChara::RoboBikeMoveIF(int mode) {
     sceVu0FVECTOR position;
     sceVu0FVECTOR leg_rotation;
@@ -1872,7 +1871,9 @@ int CActionChara::RoboBikeMoveIF(int mode) {
     float         target_angle;
     CActionChara *leg;
     float         slope_angle;
-    mgCFrame     *wheel;
+    mgCFrame     *front_wheel;
+    mgCFrame     *back_wheel;
+    mgCFrame     *tilt;
 
     leg = SearchChara("leg");
     if (leg == NULL) {
@@ -1990,14 +1991,14 @@ int CActionChara::RoboBikeMoveIF(int mode) {
     box.max[3] = 1.0f;
     box.min[3] = 1.0f;
     poly_count = map->GetColPoly(polys, box, 128);
-    wheel = SearchObject("f_tire");
-    if (wheel != NULL) {
-        wheel->SetRotType(2);
-        wheel->GetRotation(wheel_rotation);
+    front_wheel = SearchObject("f_tire");
+    if (front_wheel != NULL) {
+        front_wheel->SetRotType(2);
+        front_wheel->GetRotation(wheel_rotation);
         wheel_rotation[2] += 0.034906585f * -accele.speed;
         wheel_rotation[2] = mgAngleLimit(wheel_rotation[2]);
-        wheel->SetRotation(wheel_rotation);
-        wheel->GetWorldPosition0(front_wheel_position);
+        front_wheel->SetRotation(wheel_rotation);
+        front_wheel->GetWorldPosition0(front_wheel_position);
         front_wheel_position[1] = 50.0f + position[1];
         if (CheckHitVertical(polys, poly_count, front_wheel_position, -100.0f, front_hit, 1) < 0) {
             sceVu0CopyVector(front_hit, front_wheel_position);
@@ -2007,14 +2008,14 @@ int CActionChara::RoboBikeMoveIF(int mode) {
             front_hit[1] = position[1] - 20.0f;
         }
     }
-    wheel = SearchObject("b_tire");
-    if (wheel != NULL) {
-        wheel->SetRotType(2);
-        wheel->GetRotation(wheel_rotation);
+    back_wheel = SearchObject("b_tire");
+    if (back_wheel != NULL) {
+        back_wheel->SetRotType(2);
+        back_wheel->GetRotation(wheel_rotation);
         wheel_rotation[2] += 0.034906585f * -accele.speed;
         wheel_rotation[2] = mgAngleLimit(wheel_rotation[2]);
-        wheel->SetRotation(wheel_rotation);
-        wheel->GetWorldPosition0(back_wheel_position);
+        back_wheel->SetRotation(wheel_rotation);
+        back_wheel->GetWorldPosition0(back_wheel_position);
         back_wheel_position[1] = 50.0f + position[1];
         if (CheckHitVertical(polys, poly_count, back_wheel_position, -100.0f, back_hit, 1) < 0) {
             sceVu0CopyVector(back_hit, back_wheel_position);
@@ -2029,11 +2030,11 @@ int CActionChara::RoboBikeMoveIF(int mode) {
     back_hit[3] = 1.0f;
     back_hit[1] = 0.0f;
     slope_angle = atan2f(front_hit[1], mgDistVector(back_hit));
-    wheel = SearchObject("katamuki");
-    if (wheel != NULL) {
+    tilt = SearchObject("katamuki");
+    if (tilt != NULL) {
         sceVu0FVECTOR slope_rotation = { slope_angle, 0.0f, 0.0f, 1.0f };
-        wheel->SetRotType(2);
-        wheel->SetRotation(slope_rotation);
+        tilt->SetRotType(2);
+        tilt->SetRotation(slope_rotation);
     }
     sceVu0FVECTOR old_velocity;
     sceVu0CopyVector(old_velocity, velocity);
@@ -2043,9 +2044,6 @@ int CActionChara::RoboBikeMoveIF(int mode) {
     RockOn();
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/actionchara", RoboBikeMoveIF__12CActionCharaFi);
-#endif
 #ifdef NONMATCHING
 int CActionChara::RoboAirMoveIF(int unk, int mode) {
     sceVu0FVECTOR position;
