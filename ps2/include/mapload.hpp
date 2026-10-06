@@ -131,8 +131,8 @@ public:
 
     struct SoundData {
         int           se_no;
-        float         unk_24;
-        float         unk_28;
+        float         near_dist;
+        float         far_dist;
         float         unk_2c;
         int           shape;
         sceVu0FVECTOR start;

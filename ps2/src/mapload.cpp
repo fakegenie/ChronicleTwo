@@ -1337,8 +1337,8 @@ int mapFUNC_SOUND_DATA(SPI_STACK *stack, int argc) {
         return 0;
     }
     sound->se_no = spiGetStackInt(stack++);
-    sound->unk_24 = spiGetStackFloat(stack++);
-    sound->unk_28 = spiGetStackFloat(stack++);
+    sound->near_dist = spiGetStackFloat(stack++);
+    sound->far_dist = spiGetStackFloat(stack++);
     sound->unk_2c = (float)spiGetStackInt(stack++);
     sound->shape = spiGetStackInt(stack++);
     spiGetStackVector(sound->start, stack);

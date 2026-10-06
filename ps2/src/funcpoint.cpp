@@ -1056,12 +1056,12 @@ int GetSeSrcVolPan(
                         mgMulMatrix(m_b0, m_b0, mat);
                         sceVu0ApplyMatrix(q90.v, m_b0, p->sound.start);
                         sceVu0ApplyMatrix(v_a0, m_b0, p->sound.end);
-                        sndGetVolPan(vols, pans, q90.v, v_a0, p->sound.unk_24, p->sound.unk_28);
+                        sndGetVolPan(vols, pans, q90.v, v_a0, p->sound.near_dist, p->sound.far_dist);
                     } else {
                         *(u_long128 *)q90.v = *(u_long128 *)p->position;
                         q90.w = 0x3F800000;
                         sceVu0ApplyMatrix(q90.v, mat, q90.v);
-                        sndGetVolPan(vols, pans, q90.v, p->sound.unk_24, p->sound.unk_28);
+                        sndGetVolPan(vols, pans, q90.v, p->sound.near_dist, p->sound.far_dist);
                     }
                     if (*vols > 0.01f) {
                         vols++;
