@@ -8093,9 +8093,9 @@ void MenuWeaponBuildUpDraw(int &tex_block) {
     prim->Texture(Tex_BuildUpBoard);
     prim->Color(0x80, 0x80, 0x80, 0x80);
     int row;
+    int col;
     for (row = 0; row < 3; row++) {
         for (int n = 0; n < backboard_y_repeat_drawnum_7629[row]; n++) {
-            int col;
             int k;
             int x = 20;
             for (col = 0; col < 5; col++) {
@@ -8221,7 +8221,7 @@ void MenuWeaponBuildUpDraw(int &tex_block) {
                 for (int n = 0; n < mos_rows[row]; n++) {
                     int k;
                     int x = 232;
-                    for (int col = 0; col < 5; col++) {
+                    for (col = 0; col < 5; col++) {
                         mgRect<int> tile(backboard_table_x_7625[col], backboard_table_y_7626[row],
                                          backboard_table_w_7627[col], 28);
                         for (k = 0; k < mos_repeat_table_x_7694[col]; k++) {
