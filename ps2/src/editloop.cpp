@@ -1740,36 +1740,36 @@ int EditDraw() {
     static int                 flag;
     static char                init;
     CMap                      *maps[8];
-    mgCTextureManager        *tex_manager;
-    CInventUserData           *invent;
-    int                       map_index;
     USER_PICTURE_INFO         *picture;
-    int                       chara_no;
+    int                       map_index;
+    CInventUserData           *invent;
+    CCharacter2               *chara;
     mgCTexture                *overlay;
     mgCTexture                *water;
     int                       ghost_visible;
-    int                       dof_off;
+    int                       texture_group;
     int                       block;
     CPartsGroup               *ghost_group;
     CList<PartsGroupData>     *group_entry;
     int                       water_block;
     int                       map_count;
     mgCCamera                 *camera;
+    mgCTextureManager        *tex_manager;
     CMapParts                 *parts;
-    int                       show_system;
+    bool                      show_system;
     int                       main_map_no;
     CList<CMapPiece>          *piece;
     CFuncPoint                *subject;
-    CCharacter2               *chara;
+    int                       map_draw;
+    int                       chara_no;
     CMap                      *map;
     mgCTexture                *screen;
-    int                       texture_group;
+    CEditMap                  *edit_map;
     int                       block_count;
     int                       block_index;
     int                       idea_no;
     int                       exit_flag;
-    CEditMap                  *edit_map;
-    int                       map_draw;
+    int                       dof_off;
     sceVu0FMATRIX             view_matrix;
 
     if (EditDrawCancelFlag != 0) {
@@ -1805,7 +1805,7 @@ int EditDraw() {
     }
 
     ghost_visible = GhostPhotoTiming();
-    if (CheckTime(MainScene__2->time, 0.0f, 4.0f) == 0) {
+    if (CheckTime(MainScene__2->time, float(0), float(4)) == 0) {
         ghost_visible = 0;
     }
     for (map_index = 0; map_index < map_count; map_index++) {
@@ -1835,7 +1835,7 @@ int EditDraw() {
     WorkBuffer.stack_used = 0;
     WorkBuffer.lock = 0;
     int texture_order[65];
-    for (block_index = 0; block_index < 64; block_index++) {
+    for (int block_index = 0; block_index < 64; block_index++) {
         texture_order[block_index] = block_index;
     }
     texture_order[64] = -1;
@@ -1870,9 +1870,10 @@ int EditDraw() {
         int texture_blocks[128];
         for (texture_group = 0; texture_group < 6; texture_group++) {
             block_count = MainScene__2->mds_list_set.GetTextureBlockNo(texture_group, texture_blocks, 128);
-            for (block_index = 0; block_index < block_count; block_index++) {
-                block = texture_blocks[block_count - block_index - 1];
-                if (mgEndDrawReloadTexture(block, NULL) != 0 && water_block == block) {
+            for (int block_index = 0; block_index < block_count; block_index++) {
+                int *entry = &texture_blocks[block_count - block_index - 1];
+                block = *entry;
+                if (mgEndDrawReloadTexture(block, NULL) != 0 && water_block == *entry) {
                     WaveTable.CreateTexture(water);
                 }
                 mgEndDraw(block, NULL);
@@ -1881,12 +1882,12 @@ int EditDraw() {
         mgSetPkTextureRepeat(0);
         sgDrawSubGameMap();
         map = MainScene__2->GetMap(MainScene__2->active_map);
-        dof_off = 0;
         if (map != NULL) {
             map->GetNowTimeBand();
         }
+        dof_off = 0;
         if (GetSaveData() != NULL) {
-            dof_off = GetSaveData()->config.dof_off;
+            dof_off = GetSaveData()->GetConfig()->dof_off;
         }
         if (dof_off != 0 && IsEditMode() == 0) {
             float blur_range[2] = {1000.0f, 2000.0f};
@@ -1931,10 +1932,10 @@ int EditDraw() {
     mgSetPkTextureRepeat(1);
     if (map_draw != 0) {
         int later_texture_blocks[128];
-        for (texture_group = 6; texture_group < 16; texture_group++) {
+        for (int texture_group = 6; texture_group < 16; texture_group++) {
             block_count = MainScene__2->mds_list_set.GetTextureBlockNo(texture_group, later_texture_blocks, 128);
-            for (block_index = 0; block_index < block_count; block_index++) {
-                block = later_texture_blocks[block_index];
+            for (int block_index = 0; block_index < block_count; block_index++) {
+                int block = later_texture_blocks[block_index];
                 mgEndDrawReloadTexture(block, NULL);
                 mgEndDraw(block, NULL);
             }
@@ -2017,6 +2018,7 @@ int EditDraw() {
         screen_chara.dist = 0.0f;
         screen_chara.in_center = 0;
         chara_no = MainScene__2->InScreenChara(&screen_chara, screen_range);
+        int screen_no = screen_chara.chara_no;
         chara = MainScene__2->GetCharacter(chara_no);
         if (chara_no >= 0 && chara != NULL && chara->GetKeyListPtr("\x83\x4A\x83\x81\x83\x89", NULL) != NULL) {
             MainScene__2->ExModeVillager(chara_no);
@@ -2040,8 +2042,8 @@ int EditDraw() {
                 idea_no = 2006;
             }
             if (screen_chara.dist < 5.0f + photo_dist) {
-                picture->npc_no = screen_chara.chara_no;
-                if (screen_chara.in_center != 0 && screen_chara.chara_no == 14) {
+                picture->npc_no = screen_no;
+                if (screen_chara.in_center != 0 && screen_no == 14) {
                     idea_no = 36;
                     picture->npc_no = -1;
                 }
@@ -2058,7 +2060,7 @@ int EditDraw() {
         }
     }
 
-    show_system = DebugInfo.param_off == 0;
+    show_system = !DebugInfo.param_off;
     if ((GetSaveData()->GetBitCtrl() & 0x2) != 0) {
         show_system = 0;
     }
@@ -2078,7 +2080,7 @@ int EditDraw() {
     if (SubGameRunning() != 0) {
         show_system = 0;
     }
-    if (show_system != 0) {
+    if (show_system) {
         sceVu0FVECTOR system_pos;
         chara = MainScene__2->GetCharacter(MainScene__2->player_chara);
         if (chara != NULL) {
