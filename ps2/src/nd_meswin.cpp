@@ -3016,9 +3016,13 @@ void ClsMes::MakeMesWin(int message) {
             extra_width = 0;
             fukidashi_w = text_w + 60;
             for (current_page = 0; current_page < page_num; current_page++) {
-                character_count = 0;
-                for (index = 0; index < current_page + 1; index++) {
-                    character_count += page_chars[index];
+                if (current_page + 1 <= 0) {
+                    character_count = 0;
+                } else {
+                    character_count = 0;
+                    for (index = 0; index < current_page + 1; index++) {
+                        character_count += page_chars[index];
+                    }
                 }
                 if (text_w <= line_w[character_count - 1]) {
                     extra_width = 1;
