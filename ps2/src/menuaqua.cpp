@@ -4816,13 +4816,13 @@ void MenuGyoraceFishSelInit(mgCMemory *memory, int *tex_block, int) {
     GyoraceFishSelNum = 0;
     GyoraceFish = NULL;
 }
-#ifdef NONMATCHING
 int MenuGyoraceFishSelKey() {
     char *names[8];
     char name_buf[8][0x28];
     CDC2Mes *mes;
     short *menu_mes;
     CGameDataUsed *fish;
+    CDC2Mes *list;
     int i;
 
     switch (GyoraceFishSelectMode) {
@@ -4843,13 +4843,13 @@ int MenuGyoraceFishSelKey() {
                 mes->fade_speed = 1.0f;
                 mes->StepMsg();
                 mes->SetPutPos(((mgScreenWidth - mes->line_w[0]) >> 1) - 0xC, 8, -1, -1);
-                mes = MenuDCMsg[1];
-                mes->SetMessData(GetSystemMesBuffer(), menu_mes);
-                mes->MsgPreset(0xA);
-                mes->push_button = 0;
-                mes->fade_speed = 1.0f;
-                mes->select_top = 0;
-                mes->SetMsgCursor(0);
+                list = MenuDCMsg[1];
+                list->SetMessData(GetSystemMesBuffer(), menu_mes);
+                list->MsgPreset(0xA);
+                list->push_button = 0;
+                list->fade_speed = 1.0f;
+                list->select_top = 0;
+                list->SetMsgCursor(0);
                 fish = GetAquariumData()->GetAquariumFishTop(0);
                 for (i = 0; i < 6; i++, fish++) {
                     if (fish->item_no > 0) {
@@ -4866,9 +4866,9 @@ int MenuGyoraceFishSelKey() {
                     }
                 }
                 names[GyoraceFishSelNum] = NULL;
-                mes->SetMsgItemNo(names, GyoraceFishSelNum);
-                mes->MakeMsg(GyoraceFishSelNum + 0x31);
-                mes->SetPutPos((mgScreenWidth >> 1) - 0x64, 0x5A, 0xC8, -1);
+                list->SetMsgItemNo(names, GyoraceFishSelNum);
+                list->MakeMsg(GyoraceFishSelNum + 0x31);
+                list->SetPutPos((mgScreenWidth >> 1) - 0x64, 0x5A, 0xC8, -1);
                 GyoraceFishSelectNo = 0;
                 MenuCommonInfo->key_enable = 1;
                 GyoraceFishSelectMode++;
@@ -4937,9 +4937,6 @@ int MenuGyoraceFishSelKey() {
     }
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuaqua", MenuGyoraceFishSelKey__Fv);
-#endif
 void MenuGyoraceFishSelDraw(void) {
     mgCTextureManager *tex_manager = &mgTexManager;
     mgRect<int> dest;
