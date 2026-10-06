@@ -2200,13 +2200,13 @@ int MenuItemBrdKey(int keys, int *cursor, int *scroll, int board) {
 extern s8 ret_tbl1_2511[2];
 #ifdef NONMATCHING
 int MenuDataSwap(CGameDataUsed *destination, CGameDataUsed *source, int quantity) {
+    int dst_type;
+    int dst_no;
     CDataCommon *src_common;
     int src_used;
     int src_type;
     CDataCommon *dst_common;
-    int dst_no;
     int src_no;
-    int dst_type;
     int result;
     int dst_used;
     if (destination == NULL || source == NULL) {
@@ -2222,14 +2222,10 @@ int MenuDataSwap(CGameDataUsed *destination, CGameDataUsed *source, int quantity
     dst_common = GetCommonItemData(dst_no);
     src_common = GetCommonItemData(src_no);
     if (dst_used == USED_ITEM_TYPE_GIFT_BOX && destination->GetGiftBoxItemNum() < 3 && src_common != NULL && (src_common->attribute & ITEM_ATTRIBUTE_TRUSH) && ((src_used == USED_ITEM_TYPE_ITEM && src_type != 0x1D && src_type != 0x1E && src_type != 0x15 && src_type != 0x1A && src_type != 0x1B) || (src_used == USED_ITEM_TYPE_ATTACH && src_type != 0x11 && src_type != 0x22))) {
-        int slot = destination->SetGiftBoxItem(src_no, -1);
-        result = 4;
-        if (slot >= 0) {
+        if (destination->SetGiftBoxItem(src_no, -1) >= 0) {
             source->DeleteNum(1);
-            result = 4;
-        } else {
-            result = 4;
         }
+        result = 4;
     } else if (dst_type == 0x1D && src_used == USED_ITEM_TYPE_FISH) {
         MenuUserDataManPtr->FishInAquarium(source, 0);
         result = 7;
