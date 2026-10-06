@@ -42,7 +42,6 @@ extern char at_1107__2[];
 extern int chill_tex_rect_910[6][3];
 extern "C" void *__construct_new_array(void *buffer, void *(*constructor)(void *), void *destructor, unsigned int size, int count);
 extern char at_1051[];
-extern char at_1214__2[];
 
 // Code (.text)
 float trans_effect_rate(int rate) {
@@ -172,9 +171,11 @@ void CChillAfterHit::Step() {
     }
 }
 #ifdef NONMATCHING
-static inline void LocalPrimCorner(int *out, float *corner, float *center, float half_w, float half_h, float angle) {
-    float reach_x = 1.0f * half_w;
-    float reach_y = 1.0f * half_h;
+static inline void LocalPrimCorner(int *out, float *corner, float *center, float half_w, float half_h, float angle, float scale) {
+    float reach_x = scale;
+    float reach_y = scale;
+    reach_x *= half_w;
+    reach_y *= half_h;
     float shift_x = reach_x * cosf(angle) - reach_y * sinf(angle);
     float shift_y = reach_x * sinf(angle) + reach_y * cosf(angle);
     *(u_long128 *)corner = *(u_long128 *)center;
@@ -187,10 +188,7 @@ static inline void LocalPrimCorner(int *out, float *corner, float *center, float
 }
 int LocalTransWorldPrimPos(int (*corners)[4], float *pos, float width, float height, float angle) {
     float screen[4];
-    float corner0[4];
-    float corner1[4];
-    float corner2[4];
-    float corner3[4];
+    float corner[4][4];
     float half_w = width * mgRenderInfo.view_screen[0][0];
     float half_h = height * mgRenderInfo.view_screen[1][1];
 
@@ -199,23 +197,25 @@ int LocalTransWorldPrimPos(int (*corners)[4], float *pos, float width, float hei
         return 0;
     }
     float inv_w = 1.0f / screen[3];
-    screen[2] *= inv_w;
-    half_w = half_w * inv_w * 0.5f;
-    half_h = half_h * inv_w * 0.5f;
-    screen[1] *= inv_w;
     screen[0] *= inv_w;
+    screen[1] *= inv_w;
+    screen[2] *= inv_w;
+    half_w *= inv_w;
+    half_h *= inv_w;
+    half_w *= 0.5f;
+    half_h *= 0.5f;
     angle += 1.5707964f;
-    LocalPrimCorner(corners[0], corner0, screen, half_w, half_h, angle);
+    LocalPrimCorner(corners[0], corner[0], screen, half_w, half_h, angle, 1.0f);
     angle = mgAngleLimit(angle - 1.5707964f);
-    LocalPrimCorner(corners[1], corner1, screen, half_w, half_h, angle);
+    LocalPrimCorner(corners[1], corner[1], screen, half_w, half_h, angle, 1.0f);
     angle = mgAngleLimit(angle - 1.5707964f);
-    LocalPrimCorner(corners[2], corner2, screen, half_w, half_h, angle);
+    LocalPrimCorner(corners[2], corner[2], screen, half_w, half_h, angle, 1.0f);
     angle = mgAngleLimit(angle - 1.5707964f);
-    LocalPrimCorner(corners[3], corner3, screen, half_w, half_h, angle);
-    if (corner0[0] < 0.0f || !(corner0[0] <= 4095.0f)) {
+    LocalPrimCorner(corners[3], corner[3], screen, half_w, half_h, angle, 1.0f);
+    if (corner[0][0] < 0.0f || !(corner[0][0] <= 4095.0f)) {
         return 0;
     }
-    if (corner0[1] < 0.0f || !(corner0[1] <= 4095.0f)) {
+    if (corner[0][1] < 0.0f || !(corner[0][1] <= 4095.0f)) {
         return 0;
     }
     return 1;
@@ -679,15 +679,26 @@ void CThunder::SetPos(float *pos, float width, float power) {
         bolt++;
     }
 }
-#ifdef NONMATCHING
 extern float thn_tbl[6][4];
 extern float thn_uv[6][4];
+static inline void ClearSprite(mgC3DSprite *sprite) {
+    sprite->packet = 0;
+    sprite->unk_00 = 0;
+    sprite->draw_env = 0;
+    sprite->texture_manager = 0;
+    sprite->vu1_offset = 0;
+    sprite->vu1_base = 0;
+}
 void CThunder::Draw(void) {
-    if (active == 0 || live_num <= 0) {
+    if (active == 0) {
+        return;
+    }
+    if (live_num <= 0) {
         return;
     }
     mgC3DSprite sprite;
     mgC3DSprite *packet = &sprite;
+    ClearSprite(&sprite);
     mgCDrawEnv env = *mgGetpDrawEnv(0);
     sceGsTest *test = &env.test;
     test->bits.zte = 1;
@@ -699,24 +710,26 @@ void CThunder::Draw(void) {
     packet->CPSetTexture(TEX_ExFx_THUN);
     THUNDER_SPARK *bolt = spark;
     for (int i = 0; i < THUNDER_SPARK_MAX; i++) {
-        if (bolt->life > 0.0f) {
-            float size[4];
-            float uv0[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-            float uv1[4] = {128.0f, 128.0f, 0.0f, 0.0f};
-            float color[4] = {128.0f, 128.0f, 128.0f, 96.0f};
-            size[0] = (0.2f + 0.8f * rate) * (bolt->scale * (4.0f * thn_tbl[bolt->frame][0]));
-            size[1] = (0.2f + 0.8f * rate) * (bolt->scale * (4.0f * thn_tbl[bolt->frame][1]));
-            float *angle = &size[2];
-            *angle = bolt->angle;
-            *angle = mgAngleLimit(*angle);
-            uv0[0] = thn_uv[bolt->frame][0];
-            uv0[1] = thn_uv[bolt->frame][1];
-            uv1[0] = uv0[0] + thn_uv[bolt->frame][2];
-            uv1[1] = uv0[1] + thn_uv[bolt->frame][3];
-            packet->BeginCPSprite();
-            packet->CPSetSprite(bolt->pos, size, color, uv0, uv1);
-            packet->EndCPSprite();
+        if (bolt->life <= 0.0f) {
+            bolt++;
+            continue;
         }
+        float size[4];
+        size[0] = (0.2f + 0.8f * rate) * (bolt->scale * (4.0f * thn_tbl[bolt->frame][0]));
+        size[1] = (0.2f + 0.8f * rate) * (bolt->scale * (4.0f * thn_tbl[bolt->frame][1]));
+        float *angle = &size[2];
+        *angle = bolt->angle;
+        *angle = mgAngleLimit(*angle);
+        float uv0[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+        float uv1[4] = {32.0f, 32.0f, 0.0f, 0.0f};
+        uv0[0] = thn_uv[bolt->frame][0];
+        uv0[1] = thn_uv[bolt->frame][1];
+        uv1[0] = uv0[0] + thn_uv[bolt->frame][2];
+        uv1[1] = uv0[1] + thn_uv[bolt->frame][3];
+        float color[4] = {128.0f, 128.0f, 128.0f, 96.0f};
+        packet->BeginCPSprite();
+        packet->CPSetSprite(bolt->pos, size, color, uv0, uv1);
+        packet->EndCPSprite();
         bolt++;
     }
     packet->EndCreatePacket();
@@ -726,9 +739,6 @@ void CThunder::Draw(void) {
         mgDrawDirect(&frame);
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dng_effect", Draw__8CThunderFv);
-#endif
 void CThunder::Step(void) {
     if (active != 0) {
         THUNDER_SPARK *bolt = spark;
