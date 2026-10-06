@@ -396,3 +396,10 @@ only functions present in both objects can be replaced, the plain build keeps th
 - The operand order of `addu` follows source order, and `red += pulse` allocates registers differently from `x = c + pulse`.
 - In this compiler `(int)f` also emits a call to `fptosi`. The optimiser can move a cast but not an explicit `fptosi()` call, so choose per site.
 - A `goto` can give retail's `beq 1 -> body; bne 2 -> other` dispatch where a switch or if chain does not (`FramePose`).
+- perm.py's word compare masks LO16 relocations, so it misses a store to the wrong field. Compare `%lo(sym + off)` against the draft's relocation addend instead. An aligned difflib count is not thrown off by inserted or removed instructions, and the older jump-and-immediate-counting version inflates scores (`EditInit` showed 1116 against 245).
+- When retail stores a callee-saved register that is never assigned, the source copied fields of a local struct whose constructor leaves them unset. MWCC splits small local structs into scalars.
+- A zero kept in a register (`daddu v0,zero,zero` then `sw v0`) instead of `sw zero` came from a chained assignment, `a = b = 0;`.
+- A spill slot that retail has and the draft lacks means retail has one more value live across calls. In `EditDraw` the fix was an array-element address that is reused, re-reading `*entry` after a call.
+- `sltu; xori 1; andi 0xFF` is `bool b = !x;` (or `int = !x`), tested as `if (b)`. Writing `x == 0` gives `xor; sltiu` instead.
+- `lui/ori K; addu; lw off(base)` instead of one folded offset is an inline accessor that returns a member's address, such as `GetSaveData()->GetConfig()->field`.
+- Running several perm jobs at once on a 12-core machine slows each badly. Keep the total worker count at or below the core count.
