@@ -855,7 +855,7 @@ void CMenuMoveItem::SetMoveItemInfo(MENU_ITEM_MOVE_INFO *request, int *start, in
 }
 int CheckRoboShieldKit(CUserDataManager *manager, CGameDataUsed *item, int apply, int *kit_count,
                        int *applied_count) {
-    if (item->item_type == 0xB) {
+    if (item->item_type == ITEM_DATA_ROBO_CORE) {
         int limit = GetShiledKitLimmit__Fi(item->item_no);
         ROBO_DATA *robo = &manager->robo_data;
         if (robo == 0) {
@@ -1101,7 +1101,7 @@ int MenuUseItemCheckFunc(CGameDataUsed *item, CItemUseTarget *target, int apply)
                 count++;
                 if (apply != 0) {
                     int amount = 999;
-                    if (weapon->item_type == 13) {
+                    if (weapon->item_type == ITEM_DATA_ROBO_PART_D) {
                         amount = (int)(weapon->data.robopart.gage1.max / 2.0f);
                     }
                     weapon->Repair(amount);

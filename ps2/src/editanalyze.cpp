@@ -415,7 +415,7 @@ void AnalyzeHeim(CEditData *data, CEditMap *map) {
         condition[i] = 0;
         target[i] = -1;
     }
-    int bit_a = GetSaveData()->GetBitFlag(0x208);
+    int bit_a = GetSaveData()->GetBitFlag(SAVE_FLAG_EDIT_BLOCKED);
     int bit_b = GetSaveData()->GetBitFlag(0x218);
     int placed = 0;
     int house_num = GetHouseParts(map, house_nos, parts_list_max);

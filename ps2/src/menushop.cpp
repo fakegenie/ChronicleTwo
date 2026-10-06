@@ -147,7 +147,7 @@ void CShop::CheckEventItem() {
         if (item_no[cursor] == 0x166 && userData->GetNumSameItem(0x166) > 0) {
             local_sort1(cursor, &item_num, item_no);
         }
-        if (GetItemDataType__Fi(item_no[cursor]) == 0xB) {
+        if (GetItemDataType__Fi(item_no[cursor]) == ITEM_DATA_ROBO_CORE) {
             int core = CheckRobotCore();
             if (core >= 0xF6 && core < 0xFC) {
                 item_no[cursor] = core + 1;
@@ -524,7 +524,7 @@ int CShopMenu::KeyStep() {
             push = 0;
         }
         if (menu_debug_flag != 0) {
-            if (GamePad__2.On(0x20)) {
+            if (GamePad__2.On(PAD_CIRCLE)) {
                 GetUserDataMan()->AddYarikomiMedal(1);
             }
             return 0;
@@ -814,7 +814,7 @@ int CShopMenu::KeyStep() {
                 }
             }
             if (item_no == 0x1A6 || item_no == 0x1A8 || item_no == 0x1AB || item_no == 0x1AC ||
-                GetItemDataType(item_no) == 0xB) {
+                GetItemDataType(item_no) == ITEM_DATA_ROBO_CORE) {
                 room = 1;
             }
             if (room <= 0) {
@@ -858,7 +858,7 @@ int CShopMenu::KeyStep() {
         }
         case 0x3ED: {
             key_arg_no = 0;
-            if (GetItemDataType(item_no) == 0xB) {
+            if (GetItemDataType(item_no) == ITEM_DATA_ROBO_CORE) {
                 user->DeleteItem(item_no - 1, 1);
             }
             int no_get = 0;

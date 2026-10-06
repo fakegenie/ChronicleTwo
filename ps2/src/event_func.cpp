@@ -2265,7 +2265,7 @@ void EdEventInfoCommandInitialize(void) {
 
     EdEventInfo.request = 0;
     EdEventInfo.command_mode = 0;
-    EdEventInfo.skip_button = 15;
+    EdEventInfo.skip_button = PAD_BTN_START;
     EdEventInfo.env_bgm_volume = 1.0f;
     EdEventInfo.skip_state = 0;
     EdEventInfo.skip_fade_color[0] = 0;
@@ -2729,7 +2729,7 @@ void InitDramaScene(void) {
     EdEventInfo.skip_fade_color[0] = 0;
     EdEventInfo.skip_fade_color[1] = 0;
     EdEventInfo.skip_state = 1;
-    EdEventInfo.skip_button = 15;
+    EdEventInfo.skip_button = PAD_BTN_START;
     EdEventInfo.skip_fade_color[2] = 0;
     EdEventInfo.skip_fade_color[3] = 0;
 }
@@ -3749,7 +3749,7 @@ int LoadMovie(char *name, mgCMemory *memory, bool skip) {
             mgBeginFrame(NULL);
         }
         GamePad__2.UpDate();
-        if (movie.EndCheck() != 0 || (DebugFlag != 0 && GamePad__2.Down(0x800) != 0)) {
+        if (movie.EndCheck() != 0 || (DebugFlag != 0 && GamePad__2.Down(PAD_START) != 0)) {
         movie.Term();
         textures->ReloadTexture(movieBlock, (sceVif1Packet *)NULL);
         mgBeginFrame(NULL);
@@ -5576,9 +5576,9 @@ int _GET_LANGUAGE(RS_STACKDATA *stack, int argc) {
     SetStack(stack, LanguageCode);
     return 1;
 }
-static int _CHECK_INVENT_ITEM(RS_STACKDATA *arg0, int arg1) {
-    int item = GetStackInt(arg0++);
-    SetStack(arg0, CheckInventItem__Fi(item));
+static int _CHECK_INVENT_ITEM(RS_STACKDATA *stack, int argc) {
+    int item = GetStackInt(stack++);
+    SetStack(stack, CheckInventItem__Fi(item));
     return 1;
 }
 int _SET_AI(RS_STACKDATA *stack, int argc) {

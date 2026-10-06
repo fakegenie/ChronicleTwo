@@ -343,14 +343,14 @@ int _RESET_ACUMU_PAD(RS_STACKDATA *stack, int argc) {
     return 1;
 }
 int _RUN_MAIN_MOVE(RS_STACKDATA *stack, int argc) {
-    int chara_type;
+    int move_type;
 
-    chara_type = action_info.chara->move_type;
-    switch (chara_type) {
-        case 0:
+    move_type = action_info.chara->move_type;
+    switch (move_type) {
+        case ACTION_MOVE_HUMAN:
             action_info.chara->HumanMoveIF();
             break;
-        case 3:
+        case ACTION_MOVE_MONSTER:
             action_info.chara->MonsterMoveIF();
             break;
     }
@@ -375,19 +375,19 @@ int _RUN_HOLD_MOVE(RS_STACKDATA *stack, int argc) {
 int _RUN_ROBO_MOVE(RS_STACKDATA *stack, int argc) {
     int input = GetStackInt(stack);
     switch (action_info.chara->move_type) {
-        case 1:
-        case 4:
+        case ACTION_MOVE_ROBO_WALK:
+        case ACTION_MOVE_ROBO_WALK2:
             action_info.chara->RoboWalkMoveIF(input);
             break;
-        case 2:
-        case 5:
+        case ACTION_MOVE_ROBO_TANK:
+        case ACTION_MOVE_ROBO_TANK2:
             action_info.chara->RoboTankMoveIF(input);
             break;
-        case 3:
+        case ACTION_MOVE_ROBO_BIKE:
             action_info.chara->RoboBikeMoveIF(input);
             break;
-        case 6:
-        case 7:
+        case ACTION_MOVE_ROBO_AIR:
+        case ACTION_MOVE_ROBO_AIR2:
             action_info.chara->RoboAirMoveIF(1, input);
             break;
     }
@@ -799,11 +799,11 @@ int _RELEASE_OBJ(RS_STACKDATA *stack, int argc) {
         !(input->pause_flag & 0x2000)) {
         action_info.chara->Show(1, 1);
     }
-    if (action_info.chara->hold_type == 1 && throw_it == 0) {
+    if (action_info.chara->hold_type == ACTION_HOLD_ITEM && throw_it == 0) {
         RemoveThrowItem__12CActionCharaFv(action_info.chara);
     }
     int chara_no = 0x18;
-    if (action_info.chara->hold_type == 3) {
+    if (action_info.chara->hold_type == ACTION_HOLD_ENEMY) {
         do {
             CActionChara *held = (CActionChara *)nowScene__2->GetCharacter(chara_no);
             if (held != NULL && held->catch_state == 1) {
@@ -851,12 +851,12 @@ int _RELEASE_OBJ(RS_STACKDATA *stack, int argc) {
             chara_no++;
         } while (chara_no <= 0x2F);
     }
-    if (action_info.chara->hold_type == 4) {
+    if (action_info.chara->hold_type == ACTION_HOLD_STONE) {
         action_info.chara->hold_parts = 0;
         action_info.chara->hold_frame = 0;
         action_info.chara->release_timing = 3;
     }
-    action_info.chara->hold_type = 0;
+    action_info.chara->hold_type = ACTION_HOLD_NONE;
     return 1;
 }
 void ShotMonicaMagic(float *position, float *direction, float scale) {

@@ -556,7 +556,7 @@ int CheckPhotoDataNoNeed(USER_PICTURE_INFO *photos, int count, int *unneeded) {
 }
 int IsTakePhoto(void) {
     CUserDataManager *user = GetUserDataMan();
-    if (user != NULL && ((CUserDataManager *)user)->active_chr_no == 0 &&
+    if (user != NULL && ((CUserDataManager *)user)->active_chr_no == USER_CHARA_MAX &&
         user->SearchEquip(0, 0x171) != 0) {
         return 1;
     }

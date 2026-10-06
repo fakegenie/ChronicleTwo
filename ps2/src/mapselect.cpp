@@ -347,10 +347,10 @@ int MapTypeSelect(void) {
         select_1009 = 0;
         init_1010 = 1;
     }
-    if (GamePad__2.Down(0x1000)) {
+    if (GamePad__2.Down(PAD_UP)) {
         select_1009--;
     }
-    if (GamePad__2.Down(0x4000)) {
+    if (GamePad__2.Down(PAD_DOWN)) {
         select_1009++;
     }
     if (select_1009 < 0) {
@@ -359,13 +359,13 @@ int MapTypeSelect(void) {
     if (select_1009 >= 8) {
         select_1009 = 0;
     }
-    if (GamePad__2.Down(0x20)) {
+    if (GamePad__2.Down(PAD_CIRCLE)) {
         if (SelectMapNum[select_1009] > 0) {
             SelectMapType = select_1009;
             SelectMode = 1;
         }
     }
-    if (GamePad__2.Down(0x40)) {
+    if (GamePad__2.Down(PAD_CROSS)) {
         SelectMode = -1;
     }
     cursor += sprintf(cursor, at_1040__4);
@@ -396,18 +396,18 @@ int MapSelect(void) {
     selected = &select__1049[SelectMapType];
     top = &top__1050[SelectMapType];
     offset = *selected - *top;
-    if (GamePad__2.Down(0x1000)) {
+    if (GamePad__2.Down(PAD_UP)) {
         (*selected)--;
     }
-    if (GamePad__2.Down(0x4000)) {
+    if (GamePad__2.Down(PAD_DOWN)) {
         (*selected)++;
     }
     paged = 0;
-    if (GamePad__2.Down(4)) {
+    if (GamePad__2.Down(PAD_L1)) {
         paged = 1;
         *top -= 8;
     }
-    if (GamePad__2.Down(8)) {
+    if (GamePad__2.Down(PAD_R1)) {
         paged = 1;
         *top += 8;
     }
@@ -465,10 +465,10 @@ int MapSelect(void) {
         cursor += sprintf(cursor, at_1045__3);
     }
     GetDebugFont()->DrawDirect(text, 10, 10);
-    if (GamePad__2.Down(0x40)) {
+    if (GamePad__2.Down(PAD_CROSS)) {
         SelectMode = 0;
     }
-    if (GamePad__2.Down(0x20)) {
+    if (GamePad__2.Down(PAD_CIRCLE)) {
         strcpy(SelectMapName, SelectMapList[SelectMapType][*selected]);
         SelectMode = 2;
     }
@@ -602,16 +602,16 @@ int EventViewLoop(void) {
         }
     }
     GetDebugFont()->DrawDirect(text, 10, 10);
-    if (GamePad__2.Down(0x1000)) {
+    if (GamePad__2.Down(PAD_UP)) {
         sel_event--;
     }
-    if (GamePad__2.Down(0x4000)) {
+    if (GamePad__2.Down(PAD_DOWN)) {
         sel_event++;
     }
-    if (GamePad__2.Down(0x8004)) {
+    if (GamePad__2.Down(PAD_L1 | PAD_LEFT)) {
         top_event -= 10;
     }
-    if (GamePad__2.Down(0x2008)) {
+    if (GamePad__2.Down(PAD_R1 | PAD_RIGHT)) {
         top_event += 10;
     }
     if (top_event < 0) {
@@ -629,7 +629,7 @@ int EventViewLoop(void) {
     if (sel_event >= 10 || top_event + sel_event >= EventInfoNum) {
         sel_event = 0;
     }
-    if (GamePad__2.Down(0x20)) {
+    if (GamePad__2.Down(PAD_CIRCLE)) {
         INIT_LOOP_ARG loopArg;
         EVENT_VIEW_INFO *chosen = &EventInfo[top_event + sel_event];
         if (chosen->map_no >= 0) {
@@ -644,7 +644,7 @@ int EventViewLoop(void) {
             return 1;
         }
     }
-    if (GamePad__2.Down(0x40)) {
+    if (GamePad__2.Down(PAD_CROSS)) {
         return 2;
     }
     return 0;

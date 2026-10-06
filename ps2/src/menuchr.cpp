@@ -3483,7 +3483,7 @@ int CMenuMosSelect::KeyStep() {
                 MOS_CHANGE_PARAM *debugBadge = &badge[menu_debug_select__2];
                 if (debugBadge != NULL) {
                     COMMON_GAGE *gauge = &debugBadge->hp;
-                    if (GamePad__2.On(0x80)) {
+                    if (GamePad__2.On(PAD_SQUARE)) {
                         gauge = &debugBadge->abs;
                     }
                     if (keys & 8) {
@@ -3756,7 +3756,7 @@ int CMenuMosSelect::KeyStep() {
                             view_monster = monster_progress_tbl[select_badge->progress * (1 + MONSTER_PROGRESS_LEVEL_NUM) + 1 + cursor];
                             switch (buttons) {
                                 case 1:
-                                    if (GetUserDataMan()->active_chr_no == 3 &&
+                                    if (GetUserDataMan()->active_chr_no == USER_CHARA_MONSTER &&
                                         view_monster == GetUserDataMan()->monster_id) {
                                         MenuSePlay(5);
                                     } else {
@@ -3874,7 +3874,7 @@ int CMenuMosSelect::KeyStep() {
                     MonsterNameTable names = at_3511;
                     for (i = 0; i < select_badge->class_level + 1; i++) {
                         names.name[i] = GetMonsterName(monster_progress_tbl[select_badge->progress * (1 + MONSTER_PROGRESS_LEVEL_NUM) + 1 + i]);
-                        if (GetUserDataMan()->active_chr_no == 3 &&
+                        if (GetUserDataMan()->active_chr_no == USER_CHARA_MONSTER &&
                             monster_progress_tbl[select_badge->progress * (1 + MONSTER_PROGRESS_LEVEL_NUM) + 1 + i] == GetUserDataMan()->monster_id &&
                             i >= 0 && i < 20) {
                             info->line_color[i] = 0x80202020;

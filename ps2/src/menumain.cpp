@@ -757,7 +757,7 @@ int MenuMainKey(void) {
     MenuCommonInfo->SelDataInit();
     MenuMainFrameStep();
     MenuAreaBoardNameStep();
-    if (DebugFlag != 0 && GamePad__2.Down(0x400) != 0) {
+    if (DebugFlag != 0 && GamePad__2.Down(PAD_R3) != 0) {
         menu_debug_flag ^= 1;
     }
     result = menu_keyfunctbl[MenuCommonInfo->now_mode]();
@@ -1673,20 +1673,20 @@ int MenuInternSelectKey(void) {
             }
         }
         if (menu_debug_flag != 0) {
-            if (GamePad__2.Down(0x20) != 0) {
+            if (GamePad__2.Down(PAD_CIRCLE) != 0) {
                 MenuActiveSaveData->day += 1;
                 MenuSePlay(1);
             }
-            if (GamePad__2.Down(0x40) != 0) {
+            if (GamePad__2.Down(PAD_CROSS) != 0) {
                 MenuActiveSaveData->SetBitFlag(0x36, 1);
             }
-            if (GamePad__2.Down(0x10) != 0) {
+            if (GamePad__2.Down(PAD_TRIANGLE) != 0) {
                 MenuActiveSaveData->SetBitFlag(0x36, 1);
-                MenuActiveSaveData->SetBitFlag(0x158, 1);
-                MenuActiveSaveData->SetBitFlag(0x1A8, 1);
+                MenuActiveSaveData->SetBitFlag(SAVE_FLAG_TOURNAMENT_STARTED, 1);
+                MenuActiveSaveData->SetBitFlag(SAVE_FLAG_TOURNAMENT_CYCLE, 1);
                 MenuActiveSaveData->ForceBootTour(MenuActiveSaveData->day, 1);
             }
-            GamePad__2.Down(0x80);
+            GamePad__2.Down(PAD_SQUARE);
             return 0;
         }
         switch (push) {

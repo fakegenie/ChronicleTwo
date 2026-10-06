@@ -753,7 +753,7 @@ int SetModeMenuDrawItemBoard(int mode) {
         }
         used = MenuUserParam.used_data;
         for (i = 0; i < 150; i++, used++) {
-            if (used->item_type == 0xD) {
+            if (used->item_type == ITEM_DATA_ROBO_PART_D) {
                 MenuDrawItemInfo[MenuDrawItemInfoNum] = used;
                 MenuDrawItemInfoNum++;
             }
@@ -766,7 +766,7 @@ int SetModeMenuDrawItemBoard(int mode) {
         }
         used = MenuUserParam.used_data;
         for (i = 0; i < 150; i++, used++) {
-            if (used->item_type == 0xF) {
+            if (used->item_type == ITEM_DATA_ROBO_WEAPON) {
                 MenuDrawItemInfo[MenuDrawItemInfoNum] = used;
                 MenuDrawItemInfoNum++;
             }

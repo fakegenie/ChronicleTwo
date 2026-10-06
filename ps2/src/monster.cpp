@@ -76,7 +76,7 @@ int _MONSTER_NAME(SPI_STACK *stack, int argument_count);
 void LoadMonsterLanguage(int language);
 
 int CActiveMonster::IsDraw(int view_state) {
-    if (chara_kind != 2)
+    if (chara_kind != ACTION_KIND_SCRIPT)
         return 0;
     if (life <= 0 && (view_state & 1))
         return 0;
@@ -325,7 +325,7 @@ float CMonsterMan::IsBattleStyleDist() {
     CActiveMonster *found;
     float nearest;
 
-    if (DngUserData->active_chr_no != 3 || mons_base == -1) {
+    if (DngUserData->active_chr_no != USER_CHARA_MONSTER || mons_base == -1) {
         found = GetPriorityLevelIndex(0, NULL);
         if (found != NULL) {
             return found->target_dist;
@@ -367,7 +367,7 @@ int CMonsterMan::CheckMonsterTolk(float *pos) {
         } while (i < MONSTER_ACTIVE_MAX);
         return found;
     }
-    if (DngUserData->active_chr_no != 3) {
+    if (DngUserData->active_chr_no != USER_CHARA_MONSTER) {
         return -1;
     }
     int mons_base = GetBattleCharaInfo()->unk_2;
@@ -443,7 +443,7 @@ int CMonsterMan::GetMonsterNum(float limit) {
     int i;
 
     for (i = 0; i < MONSTER_ACTIVE_MAX; i++) {
-        if (active[i] != NULL && active[i]->chara_kind == 2 &&
+        if (active[i] != NULL && active[i]->chara_kind == ACTION_KIND_SCRIPT &&
             (active[i]->target_dist <= limit || limit < 0.0f)) {
             count++;
         }
@@ -619,7 +619,7 @@ CActiveMonster *CMonsterMan::SetActiveMonster(int refer_no, float *pos, float *r
     monster->tbl = &monster->param;
     monster->monster_id = source->id;
     monster->chara_type = slot + MONSTER_ACTIVE_MAX;
-    monster->chara_kind = 2;
+    monster->chara_kind = ACTION_KIND_SCRIPT;
     monster->Show(1, 1);
     monster->refer_no = refer_no;
     monster->view_state = MONSTER_VIEW_INIT;
@@ -701,7 +701,7 @@ void CMonsterMan::DrawMiniMapSymbol(CMiniMapSymbol *symbol) {
         battle_info = GetBattleCharaInfo();
         for (i = 0; i < MONSTER_ACTIVE_MAX; i++) {
             monster = active[i];
-            if (monster != NULL && monster->chara_kind == 2 && monster->catch_state != 1 &&
+            if (monster != NULL && monster->chara_kind == ACTION_KIND_SCRIPT && monster->catch_state != 1 &&
                 (monster->target_dist <= monster->clip_dist || show_all)) {
                 symbol_no = 0;
                 if (monster->gate_key > 0 && battle_info->GetNowNPC() == 9) {
@@ -782,7 +782,7 @@ void CMonsterMan::DrawActMonster() {
 
     for (i = 0; i < MONSTER_ACTIVE_MAX; i++) {
         monster = active[i];
-        if (monster != NULL && monster->chara_kind == 2 && monster->view_state != 1 &&
+        if (monster != NULL && monster->chara_kind == ACTION_KIND_SCRIPT && monster->view_state != 1 &&
             !(monster->alpha < 1.0f) && !(monster->view_alpha < 1.0f) &&
             !(monster->camera_alpha < 1.0f)) {
             tex->ReloadTexture(monster->refer_no + 0x28, (sceVif1Packet *)NULL);
@@ -798,7 +798,7 @@ void CMonsterMan::DrawInvisibleMonster() {
 
     for (index = 0; index < MONSTER_ACTIVE_MAX; index++) {
         monster = active[index];
-        if (monster != NULL && monster->chara_kind == 2) {
+        if (monster != NULL && monster->chara_kind == ACTION_KIND_SCRIPT) {
             float &alpha = monster->alpha;
             saved_alpha = alpha;
             if ((saved_alpha < 1.0f || monster->view_alpha < 1.0f || monster->camera_alpha < 1.0f) &&
@@ -825,7 +825,7 @@ void CMonsterMan::PriorityLevelCheck() {
     for (i = 0; i < MONSTER_ACTIVE_MAX; i++) {
         if (active[i] != NULL) {
             active[i]->priority = -1;
-            if (active[i]->chara_kind == 2 && active[i]->state != 0) {
+            if (active[i]->chara_kind == ACTION_KIND_SCRIPT && active[i]->state != 0) {
                 order[count] = i;
                 count++;
             }
@@ -849,7 +849,7 @@ CActiveMonster *CMonsterMan::GetPriorityLevelIndex(int level, int *slot) {
     int i;
 
     for (i = 0; i < MONSTER_ACTIVE_MAX; i++) {
-        if (active[i] != NULL && active[i]->chara_kind == 2 &&
+        if (active[i] != NULL && active[i]->chara_kind == ACTION_KIND_SCRIPT &&
             active[i]->priority == level) {
             if (slot != NULL) {
                 *slot = i + MONSTER_ACTIVE_MAX;
@@ -866,7 +866,7 @@ void CMonsterMan::SetNearAreaPiyori(float limit) {
 
     for (i = 0; i < MONSTER_ACTIVE_MAX; i++) {
         monster = active[i];
-        if (monster != NULL && monster->chara_kind == 2 && monster->target_dist <= limit &&
+        if (monster != NULL && monster->chara_kind == ACTION_KIND_SCRIPT && monster->target_dist <= limit &&
             monster->catch_state == 0 && monster->damage_time <= 0 && !(monster->attrib & 0x20)) {
             monster->req_prog = MONSTER_PROG_PIYORI;
             monster->piyori_time = 120;
@@ -917,7 +917,7 @@ void CMonsterMan::CollisionCheck(CActiveMonster *monster, float *pos, float *mov
         if (i != 0) {
             other = active[i - 1];
         }
-        if (other == NULL || other == monster || other->chara_kind != 2 ||
+        if (other == NULL || other == monster || other->chara_kind != ACTION_KIND_SCRIPT ||
             (monster->catch_state == 2 && i == 0)) {
             continue;
         }
@@ -1788,7 +1788,7 @@ void CMonsterMan::ThinkHost() {
         camera->GetPos(camera_pos);
     }
     int user_monster = -1;
-    if (DngUserData->active_chr_no == 3) {
+    if (DngUserData->active_chr_no == USER_CHARA_MONSTER) {
         user_monster = GetBattleCharaInfo()->unk_2;
     }
     for (int i = 0; i < MONSTER_ACTIVE_MAX; i++) {
@@ -1920,7 +1920,7 @@ void CMonsterMan::ThinkHost() {
                 KillMonsterCount(monster->tbl->id, 1);
                 monster->dead_alpha = 0;
                 monster->state = ACTIVE_MONSTER_NONE;
-                monster->chara_kind = 0;
+                monster->chara_kind = ACTION_KIND_NONE;
                 if (NowFloorInfoPtr != NULL) {
                     NowFloorInfoPtr->kill_count++;
                 }
@@ -2057,7 +2057,7 @@ void CMonsterMan::DrawShadowActMonster() {
     *(EffectVector *)shadow_normal = at_1707;
     for (index = 0; index < MONSTER_ACTIVE_MAX; index++) {
         monster = active[index];
-        if (monster != NULL && monster->chara_kind == 2 && monster->catch_state != 1 &&
+        if (monster != NULL && monster->chara_kind == ACTION_KIND_SCRIPT && monster->catch_state != 1 &&
             monster->target_dist <= 0.6f * monster->clip_dist && monster->priority < priority_limit &&
             !(monster->alpha < 0.6f)) {
             *(EffectVector *)shadow_position = at_1724__2;
@@ -2086,7 +2086,7 @@ int CMonsterMan::CheckPhoto(CScene::InScreenCharaInfo *info) {
 
     info->chara_no = -1;
     for (int index = 0; index < MONSTER_ACTIVE_MAX; index++) {
-        if (active[index] == NULL || active[index]->chara_kind != 2 || active[index]->alpha < 1.0f) {
+        if (active[index] == NULL || active[index]->chara_kind != ACTION_KIND_SCRIPT || active[index]->alpha < 1.0f) {
             continue;
         }
         active[index]->GetRotation(rotation);

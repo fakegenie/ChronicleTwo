@@ -1105,10 +1105,10 @@ int PauseMenu() {
             break;
         case PAUSE_MENU_SELECT:
             previous_select = PauseSel;
-            if (PadCtrl.Btn(9)) {
+            if (PadCtrl.Btn(PAD_BTN_RIGHT)) {
                 PauseSel = 1;
             }
-            if (PadCtrl.Btn(10)) {
+            if (PadCtrl.Btn(PAD_BTN_LEFT)) {
                 PauseSel = 0;
             }
             if (PadCtrl.Analog(0) > 0.8f) {
@@ -1125,7 +1125,7 @@ int PauseMenu() {
             if (previous_select != PauseSel) {
                 sndSePlay(GetSystemSndID(), 0, 0);
             }
-            if (PadCtrl.Btn(0)) {
+            if (PadCtrl.Btn(PAD_BTN_CONFIRM)) {
                 if (PauseSel == 0) {
                     BlackFade = 0.0f;
                     PauseMenuMode = PAUSE_MENU_FADE_OUT;

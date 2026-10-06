@@ -2416,7 +2416,7 @@ int _GET_USER_MONS_ID(RS_STACKDATA *stack, int argc) {
     }
     int chara_id = -1;
 
-    if (DngUserData->active_chr_no == 3) {
+    if (DngUserData->active_chr_no == USER_CHARA_MONSTER) {
         chara_id = GetBattleCharaInfo()->unk_2;
         if (nowMonster->tbl->user_mons_id != chara_id) {
             chara_id = -1;

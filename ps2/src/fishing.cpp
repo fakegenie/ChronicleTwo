@@ -1200,7 +1200,7 @@ static void CharaControl(CScene *scene, CPadControl *pad) {
             move_x *= 3.5f;
             move_z *= 3.5f;
             if (DebugInfo.chara_move != 0) {
-                if (GamePad__2.On(1) != 0) {
+                if (GamePad__2.On(PAD_L2) != 0) {
                     move_x *= 3.0f;
                     move_z *= 3.0f;
                 }

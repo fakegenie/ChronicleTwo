@@ -402,8 +402,8 @@ int PauseLoop() {
     GamePad__2.UpDate();
     PadCtrl.Update(&GamePad__2);
     int quit = 0;
-    if (InitFlag > PAUSE_QUIT_ENABLE_FRAME && PadCtrl.Btn(21)) quit = 1;
-    if (PauseInfo.event_skip == 1 && PadCtrl.Btn(22)) { SkipEventStart(); quit = 1; }
+    if (InitFlag > PAUSE_QUIT_ENABLE_FRAME && PadCtrl.Btn(PAD_BTN_PAUSE)) quit = 1;
+    if (PauseInfo.event_skip == 1 && PadCtrl.Btn(PAD_BTN_EVENT_SKIP)) { SkipEventStart(); quit = 1; }
     if (quit) { PauseEnd(); return 0; }
     return 1;
 }

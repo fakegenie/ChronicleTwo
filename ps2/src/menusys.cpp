@@ -1778,7 +1778,7 @@ int IsEnableChangeRoboParts(CGameDataUsed *part) {
             enabled = 1;
             MenuItemCommand_RoboPackBreakFlag = 0;
         }
-        if (part->item_type == 0xF) {
+        if (part->item_type == ITEM_DATA_ROBO_WEAPON) {
             if (part->IsBroken() != 0) {
                 enabled = 0;
                 MenuItemCommand_RoboPackBreakFlag = 2;
@@ -3058,7 +3058,7 @@ int GetItemCommandMsg(CGameDataUsed *item, int *cmds, u32 *colors, short *values
         if (cmds[i] == 0x1389 && (!item->IsTrush() || !trush_ok || trush_ng)) {
             local_sort1(i, &num, cmds);
         }
-        if (cmds[i] == 0x138B && item->item_type == 11 && !robo_member) {
+        if (cmds[i] == 0x138B && item->item_type == ITEM_DATA_ROBO_CORE && !robo_member) {
             local_sort1(i, &num, cmds);
         }
         if (cmds[i] == 0x13AA) {
@@ -3108,14 +3108,14 @@ void CMenuKeyFunc::SelDataInit(void) {
     key_input = 0;
 }
 int CMenuKeyFunc::CheckSelectKey() {
-    if (GamePad__2.Down(0x1000) != 0) {
+    if (GamePad__2.Down(PAD_UP) != 0) {
         select_key |= 1;
-    } else if (GamePad__2.Down(0x4000) != 0) {
+    } else if (GamePad__2.Down(PAD_DOWN) != 0) {
         select_key |= 2;
     }
-    if (GamePad__2.Down(0x8000) != 0) {
+    if (GamePad__2.Down(PAD_LEFT) != 0) {
         select_key |= 4;
-    } else if (GamePad__2.Down(0x2000) != 0) {
+    } else if (GamePad__2.Down(PAD_RIGHT) != 0) {
         select_key |= 8;
     }
     if (key_enable == 0) {
@@ -3124,13 +3124,13 @@ int CMenuKeyFunc::CheckSelectKey() {
     return select_key;
 }
 int CMenuKeyFunc::CheckLRKey() {
-    if (GamePad__2.Down(4) != 0) {
+    if (GamePad__2.Down(PAD_L1) != 0) {
         select_key = 0x10;
-    } else if (GamePad__2.Down(8) != 0) {
+    } else if (GamePad__2.Down(PAD_R1) != 0) {
         select_key = 0x20;
-    } else if (GamePad__2.Down(1) != 0) {
+    } else if (GamePad__2.Down(PAD_L2) != 0) {
         select_key = 0x40;
-    } else if (GamePad__2.Down(2) != 0) {
+    } else if (GamePad__2.Down(PAD_R2) != 0) {
         select_key = 0x80;
     }
     if (key_enable == 0) {
@@ -3147,21 +3147,21 @@ int MenuCheckPushButton() {
     if (LanguageCode > 0) {
         table = (int *)(padtbl_3359 + 8);
     }
-    if (GamePad__2.Down(0x20) != 0) {
+    if (GamePad__2.Down(PAD_CIRCLE) != 0) {
         pushed = table[0];
-    } else if (GamePad__2.Down(0x40) != 0) {
+    } else if (GamePad__2.Down(PAD_CROSS) != 0) {
         pushed = table[1];
-    } else if (GamePad__2.Down(0x10) != 0) {
+    } else if (GamePad__2.Down(PAD_TRIANGLE) != 0) {
         pushed = 4;
-    } else if (GamePad__2.Down(0x80) != 0) {
+    } else if (GamePad__2.Down(PAD_SQUARE) != 0) {
         pushed = 8;
-    } else if (GamePad__2.Down(0x100) != 0) {
+    } else if (GamePad__2.Down(PAD_SELECT) != 0) {
         pushed = 0x20;
-    } else if (GamePad__2.Down(0x800) != 0) {
+    } else if (GamePad__2.Down(PAD_START) != 0) {
         pushed = 0x10;
-    } else if (GamePad__2.Down(0x200) != 0) {
+    } else if (GamePad__2.Down(PAD_L3) != 0) {
         pushed = 0x80;
-    } else if (GamePad__2.Down(0x400) != 0) {
+    } else if (GamePad__2.Down(PAD_R3) != 0) {
         pushed = 0x40;
     }
     return pushed;
@@ -3212,38 +3212,38 @@ u8 CMenuKeyFunc::CheckKeyInput(void) {
 int CMenuKeyFunc::GetDebugInputKey(int &held, int &pressed) {
     held = 0;
     pressed = 0;
-    if (GamePad__2.On2(0x1000) != 0) {
+    if (GamePad__2.On2(PAD_UP) != 0) {
         held |= 1;
     }
-    if (GamePad__2.On2(0x4000) != 0) {
+    if (GamePad__2.On2(PAD_DOWN) != 0) {
         held |= 2;
     }
-    if (GamePad__2.On2(0x8000) != 0) {
+    if (GamePad__2.On2(PAD_LEFT) != 0) {
         held |= 4;
     }
-    if (GamePad__2.On2(0x2000) != 0) {
+    if (GamePad__2.On2(PAD_RIGHT) != 0) {
         held |= 8;
     }
-    if (GamePad__2.On2(4) != 0) {
+    if (GamePad__2.On2(PAD_L1) != 0) {
         held |= 0x10;
-    } else if (GamePad__2.On2(8) != 0) {
+    } else if (GamePad__2.On2(PAD_R1) != 0) {
         held |= 0x20;
-    } else if (GamePad__2.On2(1) != 0) {
+    } else if (GamePad__2.On2(PAD_L2) != 0) {
         held |= 0x40;
-    } else if (GamePad__2.On2(2) != 0) {
+    } else if (GamePad__2.On2(PAD_R2) != 0) {
         held |= 0x80;
     }
-    if (GamePad__2.Down2(0x20) != 0) {
+    if (GamePad__2.Down2(PAD_CIRCLE) != 0) {
         pressed = 1;
-    } else if (GamePad__2.Down2(0x40) != 0) {
+    } else if (GamePad__2.Down2(PAD_CROSS) != 0) {
         pressed = 2;
-    } else if (GamePad__2.Down2(0x10) != 0) {
+    } else if (GamePad__2.Down2(PAD_TRIANGLE) != 0) {
         pressed = 4;
-    } else if (GamePad__2.Down2(0x80) != 0) {
+    } else if (GamePad__2.Down2(PAD_SQUARE) != 0) {
         pressed = 8;
-    } else if (GamePad__2.Down2(0x100) != 0) {
+    } else if (GamePad__2.Down2(PAD_SELECT) != 0) {
         pressed = 0x20;
-    } else if (GamePad__2.Down2(0x800) != 0) {
+    } else if (GamePad__2.Down2(PAD_START) != 0) {
         pressed = 0x10;
     }
     return 1;
@@ -4518,7 +4518,7 @@ int CMenuItemInfo::ItemCmdAfter(int cmd_ret, ITEMCMD_RET_PARA *ret) {
             if (ret->cmd == 1) {
                 Nameregi_Target.target = 0;
                 Nameregi_Target.item = ask_para.item;
-                if (ask_para.item->item_type == 11) {
+                if (ask_para.item->item_type == ITEM_DATA_ROBO_CORE) {
                     Nameregi_Target.target = 1;
                     Nameregi_Target.item = NULL;
                 }
@@ -9102,7 +9102,7 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/menusys", MenuItemInfoCursorDraw__FRi);
 #endif
 void CMenuItemInfo::KeyStepLocal(int select_key, int push_button, int flag) {
     int select = -1;
-    if (GamePad__2.Down(0x400) && menu_debug_flag == 1) {
+    if (GamePad__2.Down(PAD_R3) && menu_debug_flag == 1) {
         int rest = MenuCharaLoadStack.stGetRest();
         MenuDebugStack.stSetBuffer(MenuCharaLoadStack.stGetTop(), rest);
         MenuDebugItemModel = NULL;
