@@ -29,6 +29,7 @@
 #include "actionchara.hpp"
 #include "event_func.hpp"
 #include <cstring>
+#include "vtables.hpp"
 
 extern "C" void *__ct__14CBaseMenuClassFv(void *);
 extern "C" void *__ct__9CMenuFontFv(void *font);
@@ -113,8 +114,6 @@ extern CSound CSnd;
 extern CGamePad GamePad__2;
 extern "C" void *__ct__18CMemoryCardManagerFv(void *);
 extern "C" void *__ct__7CDC2MesFv(void *);
-extern "C" void *__vt__11CManualMenu[];
-extern "C" void *__vt__11CMenuOption[];
 extern char at_1900[];
 extern char at_1901[];
 extern char at_1902[];
@@ -141,7 +140,6 @@ extern short fillw_1125[];
 extern "C" void *__ct__12CSubGameDataFv(void *);
 extern char at_2895[];
 extern CScene::BGM_STATUS SubGameDataBgm;
-extern "C" void *__vt__14CSaveMenuClass[];
 mgCMemory SaveMenuStack;
 extern CDC2Mes *SaveFileList[13];
 extern char *space_2549;

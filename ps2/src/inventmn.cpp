@@ -27,6 +27,7 @@
 #include "gamepad.hpp"
 #include "mg_math.hpp"
 #include <cmath>
+#include "vtables.hpp"
 
 /**
  *
@@ -1628,11 +1629,6 @@ void CMenuInvent::AttachFormInfo() {
     }
     AttachMessageForm();
 }
-extern void *__vt__9mgCObject[];
-extern void *__vt__7CObject[];
-extern void *__vt__12CObjectFrame[];
-extern void *__vt__11CCharacter2[];
-extern void *__vt__12CActionChara[];
 extern "C" void *__ct__10CRunScriptFv(void *);
 
 static inline int StackBlocks(int bytes) {

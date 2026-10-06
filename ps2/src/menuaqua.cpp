@@ -34,6 +34,7 @@ struct fish_prize_record;
 #include <cstdlib>
 #include <cmath>
 #include <cstring>
+#include "vtables.hpp"
 
 /**
  *
@@ -276,10 +277,6 @@ extern u16 aqua_frame_sizetbl_2934[3];
 extern s16 AquaBattleBubble_Generate_Wait;
 extern int AquaBattleBubble_Generate_Counter;
 extern CBubble *AquaBattleBubble;
-extern "C" void *__vt__9mgCObject[];
-extern "C" void *__vt__7CObject[];
-extern "C" void *__vt__12CObjectFrame[];
-extern "C" void *__vt__11CCharacter2[];
 extern "C" aqua_quad at_2975;
 extern "C" aqua_quad at_2976;
 extern "C" aqua_quad at_3016;

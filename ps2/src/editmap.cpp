@@ -15,6 +15,7 @@
 #include "mdslist.hpp"
 #include "mapload.hpp"
 #include <cstring>
+#include "vtables.hpp"
 
 union EditVector {
     float values[4];
@@ -1705,10 +1706,6 @@ int CEditMap::DrawSub(int mode) {
 int emapEDIT_RIVER(SPI_STACK *stack, int argc) {
     return 1;
 }
-extern "C" void *__vt__9mgCObject[];
-extern "C" void *__vt__7CObject[];
-extern "C" void *__vt__12CObjectFrame[];
-extern "C" void *__vt__9CMapPiece[];
 int emapRIVER_PARTS_NAME(SPI_STACK *stack, int argc) {
     int index = spiGetStackInt(stack++);
     if (index < 0 || index >= EDIT_MAP_RIVER_PARTS_MAX) {

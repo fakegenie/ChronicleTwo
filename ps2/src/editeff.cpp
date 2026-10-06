@@ -8,11 +8,8 @@
 #include "editparts.hpp"
 #include "mg_drawenv.hpp"
 #include "mglib.hpp"
+#include "vtables.hpp"
 
-extern void *__vt__9mgCObject[];
-extern void *__vt__7CObject[];
-extern void *__vt__9CMapParts[];
-extern void *__vt__14CFuncPointMngr[];
 extern "C" void *__ct__8mgCFrameFv(void *);
 
 static const float paint_color_max = 255.0f;

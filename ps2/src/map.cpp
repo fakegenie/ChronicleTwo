@@ -45,6 +45,7 @@ extern char at_1927[];
 #include "mg_texture.hpp"
 #include "mglib.hpp"
 #include "water.hpp"
+#include "vtables.hpp"
 
 // Code (.text)
 int CMapFlagData::SetFlag(int no, int on) {
@@ -123,7 +124,6 @@ CPartsGroup *CMap::GetPartsGroup(int no) {
     }
     return &parts_group[no];
 }
-extern void *__vt__23CList_14PartsGroupData_[];
 int CMap::AddPartsGroup(char *name, CMapParts *parts, mgCMemory *memory) {
     int groupNo;
     char *newName;
@@ -318,7 +318,6 @@ CMapParts *CMap::GetParts(char *name) {
 }
 extern "C" int __as__9mgVu0FBOXFR9mgVu0FBOX(mgVu0FBOX *, mgVu0FBOX *);
 extern "C" int GetBoundBox__9CMapPartsFP9mgVu0FBOX(void *, float *);
-extern void *__vt__18CList_P9CMapParts_[];
 void CMap::CreateDrawRect(mgCMemory *memory, mgVu0FBOX *rect, mgVu0FBOX *clip, int outside) {
     float parts_box[4];
     float view_box[4];

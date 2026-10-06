@@ -27,6 +27,7 @@ extern "C" int sprintf(...);
 #include <cstdlib>
 #include <cmath>
 #include <cstring>
+#include "vtables.hpp"
 
 /**
  *
@@ -5079,11 +5080,6 @@ void CRepairManager::SetRepairData(mgCMemory *memory, int block, unsigned int *p
     SetStack(memory, 1);
     keep = 1;
 }
-extern void *__vt__9mgCObject[];
-extern void *__vt__7CObject[];
-extern void *__vt__12CObjectFrame[];
-extern void *__vt__11CCharacter2[];
-extern void *__vt__12CActionChara[];
 extern "C" void *__ct__10CRunScriptFv(void *);
 
 void CRepairManager::GeneratePoly(float *pos, int block) {

@@ -34,6 +34,7 @@
 #include <cstdio>
 #include "intersection.hpp"
 #include <cstdlib>
+#include "vtables.hpp"
 
 /**
  *
@@ -300,10 +301,6 @@ static inline u_char *FreeTop(mgCMemory *memory) {
     return (u_char *)(memory->stack + memory->stack_used);
 }
 
-extern "C" void *__vt__9mgCObject[];
-extern "C" void *__vt__7CObject[];
-extern "C" void *__vt__12CObjectFrame[];
-extern "C" void *__vt__11CCharacter2[];
 
 extern "C" void __ct__11mgCDrawPrimFv(mgCDrawPrim *prim);
 

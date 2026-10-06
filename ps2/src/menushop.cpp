@@ -28,6 +28,7 @@
 #include "quest.hpp"
 #include "inventmn.hpp"
 #include "editmenu.hpp"
+#include "vtables.hpp"
 
 mgCMemory MenuLocalStack;
 
@@ -1390,7 +1391,6 @@ extern char at_2117__2[];
 extern char at_2118__2[];
 extern "C" void *__ct__14CBaseMenuClassFv(void *);
 extern "C" void *__ct__13CGameDataUsedFv(void *);
-extern "C" void *__vt__9CShopMenu[];
 void MenuShopInit(mgCMemory *stack, int *tex_block, int arg) {
     int cfg_size;
     CMenuPosDataForm *form;
@@ -1822,7 +1822,6 @@ int CMenuQuestView::KeyStep() {
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/menushop", KeyStep__14CMenuQuestViewFv);
 #endif
 extern "C" void *__ct__14CBaseMenuClassFv(void *);
-extern "C" void *__vt__14CMenuQuestView[];
 void MenuNPCQuestViewInit(mgCMemory *stack, int *tex_block, int view_mode) {
     Menu_Memo_ViewMode = 0;
     if (view_mode == 1) {

@@ -26,8 +26,6 @@ extern char at_920__5[];
 extern char at_921__4[];
 extern char at_1143__2[];
 extern char at_1259[];
-extern void *__vt__9mgCVisual[];
-extern void *__vt__11mgC3DSprite[];
 extern mgVec4 at_1327;
 extern mgVec4 at_1328__2;
 extern mgVec4 at_1329;
@@ -80,6 +78,7 @@ static inline u32 align16_blocks(u32 bytes) {
 }
 #include "mg_math.hpp"
 #include "mg_memory.hpp"
+#include "vtables.hpp"
 #include "mg_frame.hpp"
 #include "mg_drawenv.hpp"
 #include "mg_texture.hpp"
