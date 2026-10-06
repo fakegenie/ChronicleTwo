@@ -298,7 +298,7 @@ int IsLightingEditMode() { return LEditFlag; }
 #ifdef NONMATCHING
 void LightingEdit(CScene *scene) {
     if (!LEditFlag) {
-        if (GamePad__2.Down2(PAD_L3)) {
+        if (GamePad__2.Down2(PAD_R3)) {
             LEditFlag = 1;
             GamePad__2.SetAutoRepeat2(PAD_LEFT | PAD_RIGHT, 10, 1);
             GamePad__2.SetAutoRepeat2(PAD_DOWN | PAD_UP, 15, 3);
@@ -616,7 +616,7 @@ void LightingEdit(CScene *scene) {
         if (angle < 0.0f) magnitude = -angle;
         if (!(magnitude <= 0.001f)) ((CCameraControl *)camera)->Rotate(angle);
     }
-    if (GamePad__2.Down2(PAD_L3)) {
+    if (GamePad__2.Down2(PAD_R3)) {
         LEditFlag = 0;
         EndLightingEdit();
         GamePad__2.CancelAutoRepeat2(PAD_UP | PAD_DOWN | PAD_LEFT | PAD_RIGHT);
