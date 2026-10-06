@@ -307,3 +307,10 @@ only functions present in both objects can be replaced, the plain build keeps th
 - Large struct locals that retail places below the char arrays: declare the arrays in the inner blocks that use them instead of hoisting the struct, which also moves its constructor call.
 - Retail can inline only part of a header inline (`CTreasureBoxManager::Initialize`). When stores are missing at the end, write the partial loop in the caller.
 - A hill-climb over which locals are hoisted to the top, and in what order (add, remove, swap, move one declaration per step), finished `LoadDungeonMapFile` where random sampling had stalled. Check that every generated variant compiles; a broken template scores like a bad variant.
+- Restore order in the epilogue (f-regs versus s-regs) follows control-flow structure. `if (p == NULL) { return; } else { body }` fixed `DrawEsaDropRoot`, while `if (p != NULL) { body }` and a plain early return with a flat body did not.
+- Splitting an expression into two statements (`right = x + w; right = 2.0f + right;`) changes float register colouring without changing instructions (`PictureDraw`).
+- A fresh block-scoped index (`for (int k = 0; ...)`) per loop can fix an index/offset register swap where reusing `i` does not (`InitUkiObj`).
+- When a brace-initialised local replaces an `extern at_NNNN` template copy and the template lives in `.sbss`, keep the `INCLUDE_BSS(at_NNNN, ...)` placeholder. Postprocess points the compiler's own template at it; removing it fails `check_objects` with a missing sbss piece.
+- An unused local declaration, or `} else { }` after an early return, can change register colouring. It is a cheap knob for a permutation search.
+- `./dev.sh` does not pass environment variables into the container; use `./dev.sh env VAR=1 python3 ...`.
+- The perm.py word-diff score misleads when an instruction is inserted or removed, because everything after shifts. Read the diff with mode `-1`.
