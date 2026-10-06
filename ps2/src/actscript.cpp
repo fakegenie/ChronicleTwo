@@ -594,8 +594,8 @@ static int _SW_EFFECT(RS_STACKDATA *stack, int argc) {
     effect->end = end;
     effect->frame0 = first;
     effect->frame1 = second;
-    effect->unk_1c = flag_a;
-    effect->unk_1d = flag_b;
+    effect->length = flag_a;
+    effect->hold_time = flag_b;
     effect->fade_time = flag_c;
     effect->wait = 0;
     action_info.chara->sw_effect_num++;

@@ -86,7 +86,7 @@ struct INIT_LOOP_ARG {
     s8 unk_4[0x40];
     int floor_no;
     int event_no;
-    int unk_4c;
+    int mc_load;
 };
 STATIC_ASSERT(sizeof(INIT_LOOP_ARG) == 0x50);
 

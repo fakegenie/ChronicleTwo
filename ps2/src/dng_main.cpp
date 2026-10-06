@@ -272,7 +272,7 @@ void InitDungeonMain(INIT_LOOP_ARG arg) {
     nowload.tex_block = 0x51;
     nowload.unk_4 = 1;
     nowload.step_count = 10;
-    arg.unk_4c = 0;
+    arg.mc_load = 0;
     nowload.memory.stSetBuffer(BuffReadData + 0x2E630, 10000);
     CreateNowLoading(&nowload);
     DngSaveData = GetSaveData();

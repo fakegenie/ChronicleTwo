@@ -85,8 +85,8 @@ struct ACTION_SW_EFFECT {
     float end;
     char *frame0;
     char *frame1;
-    s8    unk_1c;
-    s8    unk_1d;
+    s8    length;
+    s8    hold_time;
     s8    fade_time;
     s8    wait;
 };

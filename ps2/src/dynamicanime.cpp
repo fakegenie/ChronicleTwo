@@ -824,12 +824,12 @@ int dynBOUNDING_BOX(SPI_STACK *stack, int argc) {
     }
     box->frame_id = spiGetStackInt(stack++);
     if (argc >= 4) {
-        spiGetStackVector(box->unk_0, stack);
+        spiGetStackVector(box->min, stack);
         stack += 3;
-        *(u_long128 *)box->unk_10 = *(u_long128 *)box->unk_0;
+        *(u_long128 *)box->max = *(u_long128 *)box->min;
     }
     if (argc >= 7) {
-        spiGetStackVector(box->unk_10, stack);
+        spiGetStackVector(box->max, stack);
     }
     return 1;
 }

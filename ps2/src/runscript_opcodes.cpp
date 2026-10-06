@@ -2703,8 +2703,8 @@ int _SW_EFFECT(RS_STACKDATA *stack, int argc) {
     effect->end = end_frame;
     effect->frame0 = startName;
     effect->frame1 = endName;
-    effect->unk_1c = arg_a;
-    effect->unk_1d = arg_c;
+    effect->length = arg_a;
+    effect->hold_time = arg_c;
     effect->fade_time = arg_b;
     effect->wait = 0;
     nowMonster->sw_effect_num += 1;

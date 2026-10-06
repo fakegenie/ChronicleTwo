@@ -865,8 +865,8 @@ void CActionChara::StepEffect() {
                         end_frame = watched->SearchObject(slot->frame1);
                         if (start_frame != NULL && end_frame != NULL) {
                             sword_effect[slot->sword_no]->StartEffect(
-                                start_frame, end_frame, slot->unk_1c, slot->fade_time,
-                                slot->unk_1d);
+                                start_frame, end_frame, slot->length, slot->fade_time,
+                                slot->hold_time);
                             slot->wait = 5;
                         }
                     }
