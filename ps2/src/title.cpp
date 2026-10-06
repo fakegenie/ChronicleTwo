@@ -1020,11 +1020,13 @@ int TitleModeKey() {
         TitlePhase == TITLE_PHASE_MC_MESSAGE) {
         CMemoryCardManager *card_manager = TitleMCCheck;
         u8 inport1;
+        MC_CARD_INFO *card0;
         u8 inport0;
-        inport0 = TitleMCCheckInport[0];
+        MC_CARD_INFO *card1;
         inport1 = TitleMCCheckInport[1];
-        MC_CARD_INFO *card0 = &card_manager->card[0];
-        MC_CARD_INFO *card1 = &card_manager->card[1];
+        inport0 = TitleMCCheckInport[0];
+        card0 = &card_manager->card[0];
+        card1 = &card_manager->card[1];
         if (TitleMCCheckNow != 0) {
             switch (TitleMainMCCheckPhase) {
             case 0:
