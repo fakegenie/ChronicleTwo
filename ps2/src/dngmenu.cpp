@@ -2287,7 +2287,7 @@ int CMenuTreeMap::Step() {
             if (skip_bgm != 0) {
                 MenuMainScene->skip_load_bgm = 1;
             }
-            unk_11a = 0;
+            draw_hidden = 0;
             mode = 2;
             FadeOutMenu(0x28, 0.0f);
             break;
@@ -2322,7 +2322,7 @@ int CMenuTreeMap::Step() {
         case 200:
             MenuSePlay(5);
             FadeOutMenu(0x28, 0.0f);
-            unk_11a = 0;
+            draw_hidden = 0;
             mode = 2;
             cursor_view = 0;
             break;
@@ -2445,7 +2445,7 @@ int CMenuTreeMap::Step() {
 }
 void CMenuTreeMap::Draw() {
     float target[2];
-    if ((mode & 2) && unk_11a == 1) {
+    if ((mode & 2) && draw_hidden == 1) {
         return;
     }
     MenuDngMap->Draw();
@@ -2586,7 +2586,7 @@ int CMenuTreeMap::FadeInOutMenu() {
             }
             break;
         case 2:
-            if (unk_11a == 0) {
+            if (draw_hidden == 0) {
                 fade_done = FadeCheckMenu();
             }
             break;
@@ -2594,7 +2594,7 @@ int CMenuTreeMap::FadeInOutMenu() {
     return fade_done;
 }
 inline CMenuTreeMap::CMenuTreeMap() {
-    unk_11a = 0;
+    draw_hidden = 0;
     select_glid = NULL;
     mes_data = NULL;
     key_arg_no = 0;
@@ -2697,7 +2697,7 @@ extern "C" void Init__6ClsMesFv(ClsMes *mes) {
     mes->page_time = 0;
     mes->page_auto_time = 0x1E;
     mes->mes_no = -1;
-    mes->unk_1e40 = 0;
+    mes->text_ptr = 0;
     mes->alpha = 0x80;
     for (j = 0; j < 16; j++) {
         memset(mes->name[j], 0, sizeof(mes->name[j]));

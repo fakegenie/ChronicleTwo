@@ -204,7 +204,7 @@ public:
     s32 page_time;
     s32 page_auto_time;
     s32 mes_no;
-    s32 unk_1e40;
+    s32 text_ptr;
     char *mes_data;
     s32 mes_data_size;
     s32 push_button;
@@ -444,7 +444,7 @@ public:
         page_time = 0;
         page_auto_time = 30;
         mes_no = -1;
-        unk_1e40 = 0;
+        text_ptr = 0;
         alpha = 0x80;
         name_count = 0;
         name_offset = 0;

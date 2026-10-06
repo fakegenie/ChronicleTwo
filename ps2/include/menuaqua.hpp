@@ -164,7 +164,7 @@ public:
     s32                  route_time;
     u8                   unk_918[0x8];
     s16                  eat_item;
-    s8                   unk_922;
+    s8                   swim_variant;
     u32                  col_flags;
     s32                  wall_time;
     s32                  fatigue;

@@ -156,7 +156,7 @@ class CMenuTreeMap : public CBaseMenuClass {
 public:
     float cursor_pos[2];
     s16 dng_no;
-    s16 unk_11a;
+    s16 draw_hidden;
     s16 jump_pay;
     u8 unk_11e[0x2];
     GLID_INFO *select_glid;

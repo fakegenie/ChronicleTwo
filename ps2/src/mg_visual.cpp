@@ -1089,7 +1089,7 @@ int mgCVisualMDT::CreateRenderInfoPacket(u_int *packet, float (*matrix)[4], mgRE
         write += 36;
     }
     setup->dma[0] |= (write - (start + 4)) / 4;
-    if (info->plight_hit != 0 && info->unk_fac != 0) {
+    if (info->plight_hit != 0 && info->lighting_enabled != 0) {
         for (i = 0; i < 4; i++) {
             sceVu0SubVector(point_position[i], lighting->point_light[i].pos, matrix[3]);
             point_position[i][3] = lighting->point_light[i].power;
@@ -1129,7 +1129,7 @@ int mgCVisualMDT::CreateRenderInfoPacket(u_int *packet, float (*matrix)[4], mgRE
     if (info->motion != 0) {
         flags |= 0x40;
     }
-    if (info->attr->no_light != 0 || info->unk_fac == 0 || info->attr->ambient_boost != 0) {
+    if (info->attr->no_light != 0 || info->lighting_enabled == 0 || info->attr->ambient_boost != 0) {
         flags |= 0x20;
     }
     if (info->attr->unk_84 == 1) {
