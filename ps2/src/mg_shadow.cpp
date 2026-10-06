@@ -57,6 +57,7 @@ int mgCShadowMDT::CreateFacePacket(u_int *packet, mgCFace *face) {
     }
 
     u_int *start = packet;
+    u_int prim = (u_short)face->type & MG_FACE_PRIM_MASK;
     int remain = face->vertex_num;
     int *index = face->index;
 
@@ -64,7 +65,7 @@ int mgCShadowMDT::CreateFacePacket(u_int *packet, mgCFace *face) {
     *(u_long128 *)&tag = 0;
     tag.EOP = 1;
     tag.PRE = 1;
-    if ((face->type & MG_FACE_PRIM_MASK) != MG_PRIM_TRIANGLE) {
+    if (prim != MG_PRIM_TRIANGLE) {
         return 0;
     }
     tag.PRIM = SCE_GS_SET_PRIM(MG_PRIM_TRIANGLE_FAN, 1, 1, 0, 1, 0, 0, 0, 0);
