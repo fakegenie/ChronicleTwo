@@ -2053,7 +2053,7 @@ int DngMainKey() {
                 }
             }
         }
-        MainCamera.rot_reverse = !DngSaveData->GetConfig()->unk_37;
+        MainCamera.rot_reverse = !DngSaveData->GetConfig()->rot_normal;
         static int camera_default_dist = 1;
         float      dist_table[3] = {100.0f, 160.0f, 500.0f};
 

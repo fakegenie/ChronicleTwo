@@ -490,7 +490,7 @@ void EditCameraControl(CScene *scene, CPadControl *pad, float (*look_at)[4]) {
         }
     }
     SV_CONFIG_OPTION &config = GetSaveData()->config;
-    camera->rot_reverse = !(bool)config.unk_37;
+    camera->rot_reverse = !(bool)config.rot_normal;
     FixCameraFlag = fixed;
     if (!debug_camera && ViewMode == EDIT_VIEW_MODE_WALK) {
         if (strcmp(scene->GetMapName(scene->active_map), "s07") == 0 ||
