@@ -1936,11 +1936,7 @@ void DrawEditSystem(int block, CScene *scene, float *pos, int edit) {
                     for (int i = 0; i < 4; i++) {
                         float *color = colors[balance * 2];
                         prim.Color(color);
-                        int hit = 0;
-                        if (!focused) {
-                            hit = CheckFocusBalanceParts(map, i, cursor);
-                        }
-                        if (hit) {
+                        if (!focused && CheckFocusBalanceParts(map, i, cursor)) {
                             prim.Color(color + 4);
                             focused = 1;
                         }
