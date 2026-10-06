@@ -873,9 +873,9 @@ void BattleAreaBGMCtrl(void) {
         distance = ActiveMonster->IsBattleStyleDist();
     }
     if (distance <= 340.0f) {
-        *(s16 *)((u8 *)player + 0x75E) = 1;
+        ((CActionChara *)player)->unk_75e = 1;
     } else {
-        *(s16 *)((u8 *)player + 0x75E) = 0;
+        ((CActionChara *)player)->unk_75e = 0;
     }
     if (!(state->pause_flag & 0x4000) && state->boss_map == 0) {
         phase = state->battle_bgm_state;
