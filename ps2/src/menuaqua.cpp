@@ -4374,25 +4374,25 @@ void CAquarium::Draw() {
         food->DrawDirect();
     }
     textures->ReloadTexture(menu_tex_block, (sceVif1Packet *)NULL);
-    for (i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++) {
         if (AquaBubble[i] != NULL) {
             AquaBubble[i]->SetTexture(Tex_Aqualium, 0xF8, 0x64);
             AquaBubble[i]->Draw();
         }
     }
-    for (i = 0; i < 6; i++) {
+    for (int i = 0; i < 6; i++) {
         if (AquaFishBubble[i] != NULL) {
             AquaFishBubble[i]->SetTexture(Tex_Aqualium, 0xF8, 0x64);
             AquaFishBubble[i]->Draw();
         }
     }
     if (AquaBattleBubble != NULL) {
-        for (i = 0; i < 0x30; i++) {
+        for (int i = 0; i < 0x30; i++) {
             AquaBattleBubble[i].SetTexture(Tex_Aqualium, 0xF8, 0x64);
             AquaBattleBubble[i].Draw();
         }
     }
-    for (i = 0; i < 6; i++) {
+    for (int i = 0; i < 6; i++) {
         AquaFishEff[i]->Draw();
     }
     if (suimen_frame != NULL) {
@@ -4412,15 +4412,6 @@ void CAquarium::Draw() {
     if (water != NULL) {
         float camera_pos[4];
         float matrix[4][4];
-        mgRect<int> screen_rect;
-        float dir[4];
-        float flat_dir[4];
-        aqua_vector axis_x;
-        aqua_vector axis_z;
-        aqua_wall_quad walls[4];
-        float offset[4];
-        int prim_pos[4][4];
-        int screen_pos[4][4];
         mgCTexture *screen;
         mgCTexture *reflect;
         int wall;
@@ -4436,6 +4427,7 @@ void CAquarium::Draw() {
         mgCTexture frame_buffer;
         mgGetFrameBuffer(&frame_buffer);
         screen = textures->GetTexture(at_3162__2, -1);
+        mgRect<int> screen_rect;
         screen_rect.Set(0, 0, (mgScreenWidth - 1) * 16, (mgScreenHeight - 1) * 16);
         mgSetPkMoveImage(&frame_buffer, screen_rect, screen, 0, 0, 0);
         mgCDrawPrim prim;
@@ -4445,12 +4437,14 @@ void CAquarium::Draw() {
         prim.TextureMapEnable(1);
         prim.AlphaBlendEnable(0);
         prim.AlphaTestEnable(0);
+        float dir[4];
+        float flat_dir[4];
         Camera__2->GetDir(dir);
         sceVu0Normalize(flat_dir, dir);
         dir[1] = 0.0f;
         sceVu0Normalize(dir, dir);
-        axis_x = at_4363__2;
-        axis_z = at_4364__2;
+        aqua_vector axis_x = at_4363__2;
+        aqua_vector axis_z = at_4364__2;
         sceVu0InnerProduct(axis_x.v, dir);
         sceVu0InnerProduct(axis_z.v, flat_dir);
         water->CreatePacket();
@@ -4460,34 +4454,33 @@ void CAquarium::Draw() {
         }
         int row = fptosi(24.0f * GetRandF(1.0f));
         water->Shake(row, fptosi(16.0f * GetRandF(1.0f)), ripple);
-        water->SetParam(0.15f, 0.0045f, 0.0f, 10.0f);
+        float speed = 0.0045f;
+        water->SetParam(0.15f, speed, 0.0f, 10.0f);
         water->Step();
         water->SetColor(0x80, 0x80, 0x80, 0x80);
         mgDrawDirect(water);
         reflect = textures->GetTexture(at_4519, -1);
         mgSetPkFrameBuffer(screen);
         if (reflect != NULL) {
-            mgRect<int> put_rect;
-            mgRect<int> tex_rect;
-
             prim.Begin(6);
             prim.Texture(reflect);
             prim.Color(0x80, 0x80, 0x80, 0x80);
-            tex_rect.Set(0, 0, 0x80, 0x80);
-            put_rect.Set(0, 0, mgScreenWidth, mgScreenHeight);
-            PrimQuad(&prim, put_rect, tex_rect);
+            PrimQuad(&prim, mgRect<int>(0, 0, mgScreenWidth, mgScreenHeight), mgRect<int>(0, 0, 0x80, 0x80));
             prim.End();
         }
         mgSetPkFrameBuffer(-1, -1, -1, -1);
         water->SetColor(0x80, 0x80, 0x80, 0x30);
-        water->SetParam(0.15f, 0.0045f, 0.0f, 100.0f);
+        water->SetParam(0.15f, speed, 0.0f, 100.0f);
         mgDrawDirect(water);
         mgGetFrameBuffer(&frame_buffer);
         mgSetPkMoveImage(&frame_buffer, screen_rect, screen, 0, 0, 0);
-        walls[0] = at_4369__2;
-        walls[1] = at_4370__2;
-        walls[2] = at_4371__2;
-        walls[3] = at_4372__2;
+        sceVu0FVECTOR wall0[4] = {{-33.0f, 47.0f, 21.0f, 1.0f}, {33.0f, 47.0f, 21.0f, 1.0f}, {-33.0f, 15.0f, 21.0f, 1.0f}, {33.0f, 15.0f, 21.0f, 1.0f}};
+        sceVu0FVECTOR wall1[4] = {{-33.0f, 47.0f, -21.0f, 1.0f}, {33.0f, 47.0f, -21.0f, 1.0f}, {-33.0f, 15.0f, -21.0f, 1.0f}, {33.0f, 15.0f, -21.0f, 1.0f}};
+        sceVu0FVECTOR wall2[4] = {{33.2f, 47.0f, 21.0f, 1.0f}, {33.2f, 47.0f, -21.0f, 1.0f}, {33.2f, 15.0f, 21.0f, 1.0f}, {33.2f, 15.0f, -21.0f, 1.0f}};
+        sceVu0FVECTOR wall3[4] = {{-33.2f, 47.0f, 21.0f, 1.0f}, {-33.2f, 47.0f, -21.0f, 1.0f}, {-33.2f, 15.0f, 21.0f, 1.0f}, {-33.2f, 15.0f, -21.0f, 1.0f}};
+        float offset[4];
+        int prim_pos[4][4];
+        int screen_pos[4][4];
         for (wall = 0; wall < 4; wall++) {
             float (*quad)[4];
             int visible;
@@ -4498,28 +4491,28 @@ void CAquarium::Draw() {
                     if (camera_pos[2] < 21.0f) {
                         continue;
                     }
-                    quad = walls[0].v;
+                    quad = wall0;
                     sceVu0SubVector(offset, v1orig_4373, camera_pos);
                     break;
                 case 1:
                     if (!(camera_pos[2] <= -21.0f)) {
                         continue;
                     }
-                    quad = walls[1].v;
+                    quad = wall1;
                     sceVu0SubVector(offset, v2orig_4374, camera_pos);
                     break;
                 case 2:
                     if (camera_pos[0] < 34.0f) {
                         continue;
                     }
-                    quad = walls[2].v;
+                    quad = wall2;
                     sceVu0SubVector(offset, v3orig_4375, camera_pos);
                     break;
                 case 3:
                     if (!(camera_pos[0] <= -34.0f)) {
                         continue;
                     }
-                    quad = walls[3].v;
+                    quad = wall3;
                     sceVu0SubVector(offset, v4orig_4376, camera_pos);
                     break;
             }
@@ -4578,22 +4571,17 @@ void CAquarium::Draw() {
         title_prim.Begin(6);
         title_prim.Texture(Tex_Aqualium);
         title_prim.Color(0x80, 0x80, 0x80, 0x80);
-        {
-            mgRect<int> title_rect;
-
-            title_rect.Set(AQUA_TITLE_X, AQUA_TITLE_Y, AQUA_TITLE_W, AQUA_TITLE_H);
-            Menu3DivideTextureDraw(&title_prim, title_rect, t_4408, 1);
-        }
+        Menu3DivideTextureDraw(&title_prim, mgRect<int>(AQUA_TITLE_X, AQUA_TITLE_Y, AQUA_TITLE_W, AQUA_TITLE_H), t_4408, 1);
         title_prim.End();
     }
     mes.DrawTitleMes();
     textures->ReloadTexture(menu_tex_block, (sceVif1Packet *)NULL);
-    if (fish_info_draw != 0 && sel_fish >= 0 && fish[sel_fish] != NULL) {
+    if (fish_info_draw != 0 && 0 <= sel_fish && fish[sel_fish] != NULL) {
         DrawFishParam(mgScreenWidth - 0x152, 2, Tex_Aqualium, fish[sel_fish]->data);
     }
-    if (love_phase > 0 && love_chara != NULL) {
+    if (0 < love_phase && love_chara != NULL) {
         textures->ReloadTexture(love_tex_block, (sceVif1Packet *)NULL);
-        love_chara->Draw();
+        love_chara->DrawDirect();
     }
     textures->ReloadTexture(MenuArg.mes_tex_block, (sceVif1Packet *)NULL);
     mes.Draw();
@@ -4603,11 +4591,12 @@ void CAquarium::Draw() {
 
         if (selected != NULL) {
             BREEDFISH_USED *breed = selected->data == NULL ? NULL : &selected->data->data.fish;
+            float h = 242.0f;
             int x = mgScreenWidth - 0x78;
+            float w = 120.0f;
+            float top = 80.0f;
             int y = 0x50;
-            char line[0x100];
-
-            DrawMenuFillBox(x, 80.0f, 120.0f, 242.0f, 0x40, 0, 0, 0);
+            DrawMenuFillBox(x, top, w, h, 0x40, 0, 0, 0);
             char *formats[12] = {
                 "  Battle:%d", "  Stamina:%d", "  Boost:%d", "  Endur:%d", "  Tenacity:%d", "  Color:%d",
                 "  SIZE:%d", "  WEIGHT:%d", "  HUNGRY:%d", "  ESA:%d", "  MIX:%d", "  LIFE:%d",
@@ -4617,7 +4606,8 @@ void CAquarium::Draw() {
                 breed->color, breed->size, breed->weight, breed->timer, breed->life, breed->unk_35,
                 breed->hp,
             };
-            for (i = 0; i < 12; i++, y += 0x14) {
+            char line[0x100];
+            for (int i = 0; i < 12; y += 0x14, i++) {
                 sprintf(line, formats[i], values[i]);
                 if (i == menu_debug_select) {
                     line[0] = '>';
