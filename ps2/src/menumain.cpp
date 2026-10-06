@@ -1191,7 +1191,6 @@ void DrawMenuTopic(void) {
         prim->End();
     }
 }
-#ifdef NONMATCHING
 int MenuInternInit(mgCMemory *stack, int open_type, int capture) {
     MenuArg.end_code = 0;
     if (capture != 0) {
@@ -1260,7 +1259,7 @@ int MenuInternInit(mgCMemory *stack, int open_type, int capture) {
         MenuCommonReadData(stack, fname_1858, 0);
         MenuMainFrameModeSet(0, 1);
         int icon_count = 0;
-        while (0 <= CMenuInterPt->mode_list[icon_count]) {
+        for (int k = 0; 0 <= CMenuInterPt->mode_list[k]; k++) {
             icon_count++;
         }
         MovePoint origin = at_1865;
@@ -1336,9 +1335,6 @@ int MenuInternInit(mgCMemory *stack, int open_type, int capture) {
     MenuCommonInfo->SetWakuType(-1);
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menumain", MenuInternInit__FP9mgCMemoryii);
-#endif
 void CMenuInter::Initialize(int unused) {
     step = 1;
     select_no = 0;
