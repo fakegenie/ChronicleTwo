@@ -755,42 +755,55 @@ int viBufStopDMA(ViBuf *buf) {
 #pragma divbyzerocheck on
 #ifdef NONMATCHING
 int viBufRestartDMA(ViBuf *buf) {
-    u32 ipubp = buf->env.ipubp;
-    int fifo_bits = ipubp & 0x7F;
-    u32 tag_addr = buf->env.d4tadr;
-    int fifo_quads = ((ipubp >> 16) & 3) + ((ipubp >> 8) & 0xF);
-    u32 madr = buf->env.d4madr - fifo_quads * 0x10;
-    u32 qwc = buf->env.d4qwc + fifo_quads;
-    u32 chcr = buf->env.d4chcr | 0x100;
+    int fifo_bits;
+    volatile int *ipu_ctrl;
+    u32 tag_addr;
+    u32 madr;
+    int mode;
+    u32 qwc;
+    u32 ipubp;
+    int fifo_index;
+    int size;
+    int pos;
+    u32 chcr;
+    int fifo_quads;
+    int index;
+
+    ipubp = buf->env.ipubp;
+    fifo_bits = ipubp & 0x7F;
+    fifo_quads = ((ipubp >> 16) & 3) + ((ipubp >> 8) & 0xF);
+    madr = buf->env.d4madr - fifo_quads * 0x10;
+    qwc = buf->env.d4qwc + fifo_quads;
+    tag_addr = buf->env.d4tadr;
+    chcr = buf->env.d4chcr | 0x100;
 
     WaitSema(buf->sema);
     if (madr < (u32)buf->data) {
-        int size = buf->n << 11;
-        int mode = 0;
+        size = buf->n << 11;
         qwc = (u32)((u8 *)buf->data - madr) >> 4;
-        tag_addr = (u32)buf->tag & MOVIE_ADDR_MASK;
+        tag_addr = (u32)DmaAddr(buf->tag);
         madr += size;
-        if (buf->env.d4madr != (u32)buf->data && buf->env.d4madr != (u32)buf->data + size) {
-            mode = 3;
-        }
-        chcr = (((u_long)buf->env.d4chcr << 36) >> 36) | (mode << 28) | 0x100;
-        if ((buf->n - buf->dma_start) % buf->n < 0 || (buf->n - buf->dma_start) % buf->n >= buf->dma_n) {
+        mode = (buf->env.d4madr == (u32)buf->data || buf->env.d4madr == (u32)buf->data + size) ? 0 : 3;
+        chcr = (buf->env.d4chcr & MOVIE_ADDR_MASK) | (mode << 28) | 0x100;
+        pos = (buf->n - buf->dma_start) % buf->n;
+        if (0 > pos || pos >= buf->dma_n) {
             buf->dma_start = buf->n - 1;
             buf->dma_n++;
         }
     } else {
-        int index = getFIFOindex(buf, (void *)buf->env.d4madr);
-        int fifo_index = getFIFOindex(buf, (void *)madr);
+        index = getFIFOindex(buf, (void *)buf->env.d4madr);
+        fifo_index = getFIFOindex(buf, (void *)madr);
         if (index != fifo_index) {
-            int mode = 0;
-                qwc = (u32)(((u8 *)buf->data + (fifo_index << 11)) - madr) >> 4;
-            tag_addr = (u32)(buf->tag + fifo_index) & MOVIE_ADDR_MASK;
+            qwc = (u32)(((u8 *)buf->data + (index << 11)) - madr) >> 4;
+            tag_addr = (u32)(buf->tag + index) & MOVIE_ADDR_MASK;
+            mode = 0;
             if ((u32)buf->data + ((buf->dma_start + buf->dma_n) % buf->n << 11) !=
                 (u32)buf->data + (buf->env.d4madr - (u32)buf->data) % (buf->n << 11)) {
                 mode = 3;
             }
-            chcr = (((u_long)buf->env.d4chcr << 36) >> 36) | (mode << 28) | 0x100;
-            if ((fifo_index + buf->n - buf->dma_start) % buf->n < 0 || (fifo_index + buf->n - buf->dma_start) % buf->n >= buf->dma_n) {
+            chcr = (buf->env.d4chcr & MOVIE_ADDR_MASK) | (mode << 28) | 0x100;
+            pos = (fifo_index + buf->n - buf->dma_start) % buf->n;
+            if (0 > pos || pos >= buf->dma_n) {
                 buf->dma_start = fifo_index;
                 buf->dma_n++;
             }
@@ -802,7 +815,8 @@ int viBufRestartDMA(ViBuf *buf) {
         setD3_CHCR(buf->env.d3chcr | 0x100);
     }
     if (buf->dma_n != 0) {
-        while (*(volatile int *)0x10002010 < 0) {
+        ipu_ctrl = (volatile int *)0x10002010;
+        while (*ipu_ctrl < 0) {
         }
         *(int *)0x10002000 = fifo_bits;
         while (*(volatile int *)0x10002010 < 0) {
