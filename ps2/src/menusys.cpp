@@ -8176,21 +8176,18 @@ void MenuWeaponBuildUpDraw(int &tex_block) {
     for (i = 0; i < BuildUpWeaponInfo.select_num; i++) {
         int line_y = list_y[i] + 12;
         PrimQuad(prim, 258.0f, line_y, line_left_rect);
-        mgRect<int> line_rect(0x106, line_y, list_x - 0x104, 6);
-        PrimQuad(prim, line_rect, line_middle_rect);
+        PrimQuad(prim, mgRect<int>(0x106, line_y, list_x - 0x104, 6), line_middle_rect);
         PrimQuad(prim, list_x, line_y, line_right_rect);
     }
     if (0 < BuildUpWeaponInfo.select_num) {
         PrimQuad(prim, 256.0f, bar_y, bar_top_rect);
-        mgRect<int> bar_rect(0x100, bar_y + 4, 6, bar_h - 4);
-        PrimQuad(prim, bar_rect, bar_middle_rect);
+        PrimQuad(prim, mgRect<int>(0x100, bar_y + 4, 6, bar_h - 4), bar_middle_rect);
         PrimQuad(prim, 256.0f, bar_y + bar_h, bar_bottom_rect);
     }
     int line_y = name_y + 12;
     int line_x = name_x + name_w;
     PrimQuad(prim, line_x, line_y, line_left_rect);
-    mgRect<int> line_rect(line_x + 4, line_y, 0x100 - line_x, 6);
-    PrimQuad(prim, line_rect, line_middle_rect);
+    PrimQuad(prim, mgRect<int>(line_x + 4, line_y, 0x100 - line_x, 6), line_middle_rect);
     PrimQuad(prim, 256.0f, line_y, line_right_rect);
     prim->End();
     if (BuildUpWeaponInfo.unk_0 == 0) {
@@ -8238,8 +8235,7 @@ void MenuWeaponBuildUpDraw(int &tex_block) {
                     if (0 < KillMonsterCount(data->buildup_monster[i], 0)) {
                         mark_u = 0x16A;
                     }
-                    mgRect<int> mark_rect(mark_u, 0xD0, 16, 16);
-                    PrimQuad(prim, mark_x, mark_y + 7, mark_rect);
+                    PrimQuad(prim, mark_x, mark_y + 7, mgRect<int>(mark_u, 0xD0, 16, 16));
                 }
                 mark_y += 32;
             }
@@ -8264,8 +8260,8 @@ void MenuWeaponBuildUpDraw(int &tex_block) {
                 note_x += 0x12;
             } else if (CheckNowEurope()) {
                 font.SetStr(strtbl_7727[LanguageCode]);
-                int w;
                 int h;
+                int w;
                 font.CalcDrawWH(font.str, &w, &h);
                 note_x = 0x167 - w / 2;
             }
