@@ -278,7 +278,7 @@ public:
 
     void SetPartDrawFlag(char *part_name, bool draw);
 
-    void SetActionCharaPtr(CActionChara *new_chara, int tex_block, int unk);
+    void SetActionCharaPtr(CActionChara *character, int texture_block, int secondary_block);
 
     void SetRGBACalcParam(int channel, int add, int target);
 
@@ -464,7 +464,7 @@ public:
 
     void SetRepairData(mgCMemory *stack, int new_tex_block, u32 *new_data);
 
-    void GeneratePoly(float *pos, int unk);
+    void GeneratePoly(float *pos, int block);
 
     void Generate(int x, int y);
 
@@ -551,7 +551,7 @@ public:
     float angle;
     float angle_add;
 
-    void Generate(float *center, float range, float unk);
+    void Generate(float *center, float range, float height);
 
     void Step();
 
@@ -630,9 +630,9 @@ void DrawOneItem(mgCDrawPrim *prim, mgRect<float> rect, int item, int mode, MENU
 
 void MenuPresentBoxView(int x, int y, int &tex_block, mgCTexture *tex, mgCTexture *cursor_tex);
 
-void PrimDrawNumber(mgCDrawPrim *prim, int number, int keta, int x, int y, mgRect<int> tex_rect, int space, int unk);
+void PrimDrawNumber(mgCDrawPrim *prim, int number, int keta, int x, int y, mgRect<int> tex_rect, int space, int mode);
 
-void PrimDrawNumber2(mgCDrawPrim *prim, int number, int keta, int x, int y, mgRect<int> tex_rect, int space, int unk);
+void PrimDrawNumber2(mgCDrawPrim *prim, int number, int keta, int x, int y, mgRect<int> tex_rect, int space, int mode);
 
 void PrimFillRect4(mgCDrawPrim *prim, mgRect<float> rect, float *rgba0, float *rgba1, float *rgba2, float *rgba3);
 
@@ -666,13 +666,13 @@ void MenuCursorDraw(mgCTexture *tex, float *pos, float rot, int reverse, int alp
 
 void MenuCursorDraw(mgCTexture *tex, float *pos, float rot, int alpha);
 
-void DrawMenuTilePattern(mgCDrawPrim *prim, mgCTexture *tex, float x, float y, mgRect<int> tex_rect, int unk, u8 *rgba);
+void DrawMenuTilePattern(mgCDrawPrim *prim, mgCTexture *tex, float x, float y, mgRect<int> tex_rect, int unused, u8 *rgba);
 
-void DrawMenuMainFrmImg(int &tex_block, mgRect<int> put_rect, mgRect<int> tex_rect, int unk, int r, int g, int b, int a);
+void DrawMenuMainFrmImg(int &tex_block, mgRect<int> put_rect, mgRect<int> tex_rect, int unused, int r, int g, int b, int a);
 
 int GetMenuMainFrameEndFlag();
 
-float *GetMenuMainFrameLeftTopPos(int unk);
+float *GetMenuMainFrameLeftTopPos(int frame);
 
 float GetMenuMainFrameCount();
 
@@ -698,15 +698,15 @@ void Func_MallocPartEffectInfo(MENUFORMPARTS_TYPE *part, mgCMemory *stack, int n
 
 void Func_SetPartEffectInfo(MENU_PARTS_EFFECT_STRUCT1 *effect, unsigned int type, short *param);
 
-void MenuItemBrdSetInfo(int unk, int top_line, int max_line, int view_line);
+void MenuItemBrdSetInfo(int unused, int top_line, int max_line, int view_line);
 
 void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int b);
 
 void MenuItemBrdDraw(float *pos, mgRect<int> clip_rect, int &tex_block, int a, int r, int g, int b);
 
-void MenuItemModeItemDraw(int &tex_block, mgRect<int> clip_rect, float *pos, MENUFORMPARTS_TYPE *parts, mgCTexture *cursor_tex, mgRect<int> cursor_rect, int unk);
+void MenuItemModeItemDraw(int &tex_block, mgRect<int> clip_rect, float *pos, MENUFORMPARTS_TYPE *parts, mgCTexture *cursor_tex, mgRect<int> cursor_rect, int unused);
 
-void Menu3DivideTextureDraw(mgCDrawPrim *prim, mgRect<int> rect, short *tex_tbl, int unk);
+void Menu3DivideTextureDraw(mgCDrawPrim *prim, mgRect<int> rect, short *tex_tbl, int vertical);
 
 void *GetMenuMainIconChar(int no);
 
@@ -720,7 +720,7 @@ void Func_MenuItemBrdPrepare2(MENUFORMPARTS_TYPE *parts, CGameDataUsed *items, C
 
 int NowUseNeedItemCheck(CUserDataManager *user);
 
-void Func_MenuIconDrawPrepare(MENUFORMPARTS_TYPE *part, CGameDataUsed *item, int unk);
+void Func_MenuIconDrawPrepare(MENUFORMPARTS_TYPE *part, CGameDataUsed *item, int need_item);
 
 void CheckItemBoardFunc_MenuIconDrawPrepare(CUserDataManager *user, MENUFORMPARTS_TYPE *parts);
 
@@ -732,7 +732,7 @@ void Func_MenuItemIconSetEffectOne(MENUFORMPARTS_TYPE *part);
 
 void MenuItemBrdItemIconEffectMalloc(mgCMemory *stack, MENUFORMPARTS_TYPE *parts, int num);
 
-int MenuCapture(int tex_block, mgCMemory *stack, int unk);
+int MenuCapture(int tex_block, mgCMemory *stack, int draw);
 
 void SetBGFrameForMenu(int tex_block, char *tex_name);
 
@@ -756,7 +756,7 @@ void DrawFishBoiledEffect();
 
 void SetEffectSpectolBreak(mgCMemory *stack, CMenuEffect *effect, int item);
 
-void SetEffectSpectolFusion(mgCMemory *stack, CMenuEffect **effect, CGameDataUsed *item, int unk);
+void SetEffectSpectolFusion(mgCMemory *stack, CMenuEffect **effect, CGameDataUsed *item, int is_fusion);
 
 template <class T>
 void PrimQuad(mgCDrawPrim *prim, mgRect<T> put_rect, mgRect<int> tex_rect);

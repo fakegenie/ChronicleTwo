@@ -322,7 +322,7 @@ public:
 
     virtual int ItemCmdAfter(int command, ITEMCMD_RET_PARA *result);
 
-    virtual int IsCreateObject(int mode, int arg);
+    virtual int IsCreateObject(int select_key, int push_button);
 
     void CalcMakeBrd(int message);
 
@@ -330,13 +330,13 @@ public:
 
     void CalcCursorPosition();
 
-    virtual int IsMakeObject(int mode, int arg);
+    virtual int IsMakeObject(int select_key, int push_button);
 
     void CalcTex();
 
     void BootExtendCommand();
 
-    virtual int IsAskExtend(int mode, int arg);
+    virtual int IsAskExtend(int select_key, int push_button);
 
     void PhotoNetaEnter(int index, int mode);
 
@@ -348,7 +348,7 @@ public:
 
     void UpdataNetaMemoStr();
 
-    void NextDifferentMode(int mode, int arg);
+    void NextDifferentMode(int next, int arg);
 };
 STATIC_ASSERT(sizeof(CMenuInvent) == 0xF30);
 
