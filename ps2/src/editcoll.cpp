@@ -3,6 +3,7 @@
 #include "mg_math.hpp"
 #include "mg_memory.hpp"
 #include "editcoll.hpp"
+#include "mapload.hpp"
 
 
 struct CollisionRow {
@@ -330,7 +331,6 @@ float CEditCollision::OverlapXZ(CEditCollision &other, float (*matrix)[4], mgVu0
     return total;
 }
 
-#ifdef NONMATCHING
 int CEditCollision::OverlapPoly3XZ(float (*triangle)[4], float (*matrix)[4], float *area) {
     float tri_max[4];
     float tri_min[4];
@@ -348,35 +348,14 @@ int CEditCollision::OverlapPoly3XZ(float (*triangle)[4], float (*matrix)[4], flo
     total = 0.0f;
     for (index = 0; index < poly_count; index++, source++) {
         mgApplyMatrixN(transformed, matrix, source->vertex, 3);
-        unsigned int check = (transformed[0][1] <= 0.1f ? 0u : 1u);
-        float first = check;
-        first = first < 0.0f ? -first : first;
-        float first_zero = 0.0f;
-        if (first == first_zero) {
-            unsigned int check = (transformed[1][1] <= 0.1f ? 0u : 1u);
-            float second = check;
-            second = second < 0.0f ? -second : second;
-            float second_zero = 0.0f;
-            if (second == second_zero) {
-                unsigned int check = (transformed[2][1] <= 0.1f ? 0u : 1u);
-                float third = check;
-                third = third < 0.0f ? -third : third;
-                float third_zero = 0.0f;
-                if (third == third_zero) {
-                    float overlap = OverlapPoly3AreaXZ(triangle, transformed, NULL);
-                    overlap = overlap < 0.0f ? -overlap : overlap;
-                    total += overlap;
-                }
-            }
+        if (!mgAbs(transformed[0][1] > 0.1f) && !mgAbs(transformed[1][1] > 0.1f) && !mgAbs(transformed[2][1] > 0.1f)) {
+            total += mgAbs(OverlapPoly3AreaXZ(triangle, transformed, NULL));
         }
     }
     if (area != NULL) *area = total;
     if (!(total <= 0.0f)) return 1;
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editcoll", OverlapPoly3XZ__14CEditCollisionFPA4_fPA4_fPf);
-#endif
 
 void CEditCollision::ApplyMatrix(float (*matrix)[4]) {
     CCPoly *p;
