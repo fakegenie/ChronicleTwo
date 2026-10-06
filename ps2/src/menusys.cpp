@@ -3337,24 +3337,24 @@ CGameDataUsed *GetGameDataUsedForSWAPINFO(MENU_SWAPITEM_INFO *info) {
     CGameDataUsed *item = NULL;
     short owner = info->chara;
     if (0 <= owner) {
-        u8 *base = (u8 *)MenuUserParam.chara[owner];
-        u8 *robo = (u8 *)MenuUserParam.robo;
+        CHARA_DATA *chara = MenuUserParam.chara[owner];
+        ROBO_DATA *robo = MenuUserParam.robo;
         short kind = info->type;
         if (kind == 0) {
-            item = (CGameDataUsed *)(base + info->no * 0x6C + 0x2C);
+            item = &chara->active_item[info->no];
         }
         if (kind == 1) {
-            item = (CGameDataUsed *)(base + info->no * 0x6C + 0x170);
+            item = &chara->equip[info->no];
         }
         if (kind == 2) {
-            item = (CGameDataUsed *)(robo + info->no * 0x6C + 0x30);
+            item = &robo->parts[info->no];
         }
         if (kind == 10) {
             return MenuUserDataManPtr->GetActiveEsa();
         }
         return item;
     }
-    return (CGameDataUsed *)((u8 *)MenuUserParam.used_data + info->no * 0x6C);
+    return &MenuUserParam.used_data[info->no];
 }
 int CMenuKeyFunc::ReturnItemMenu(int hide) {
     if (have_item.item_no <= 0) {
@@ -3671,12 +3671,12 @@ void MenuEquipCameraSetEnv(CActionChara *chara, mgCCamera *camera, int type, int
     sprintf(name, at_3774__2, type, index);
     MenuPosData->GetEtcTbl2Value(name, table, 3);
     sceVu0AddVector(position, position, table);
-    *(u_long128 *)((u8 *)MenuDrawEnv + 0x80) = *(u_long128 *)position;
+    *(u_long128 *)MenuDrawEnv->ref = *(u_long128 *)position;
     sprintf(name, at_3775__2, type, index);
     MenuPosData->GetEtcTbl2Value(name, table, 3);
     sceVu0AddVector(position, position, table);
-    *(u_long128 *)((u8 *)MenuDrawEnv + 0x90) = *(u_long128 *)position;
-    *(float *)((u8 *)MenuDrawEnv + 0xA0) = 7.0f;
+    *(u_long128 *)MenuDrawEnv->pos = *(u_long128 *)position;
+    MenuDrawEnv->speed = 7.0f;
 }
 extern char at_3825[];
 extern char at_3826[];
