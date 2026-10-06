@@ -298,6 +298,15 @@ int PauseEnable(int enable) {
     return previous;
 }
 
+enum {
+    PAUSE_SE_CORE = 1,
+    PAUSE_SE_ID = 0x19,
+    PAUSE_FADE_FRAMES = 15,
+    PAUSE_INIT_FRAME_MAX = 1000,
+    PAUSE_QUIT_ENABLE_FRAME = 17,
+    PAUSE_CANCEL_FRAMES = 10,
+};
+
 int GetPauseFlag() {
     return PauseFlag__2;
 }
@@ -312,7 +321,7 @@ int PauseStart(PAUSE_INFO *info) {
     }
     InitFlag = 0;
     PauseFlag__2 = result;
-    PauseCancelCnt = 10;
+    PauseCancelCnt = PAUSE_CANCEL_FRAMES;
     static_cast<PAUSE_INFO &>(PauseInfo) = *info;
     SeCoreVol = -1.0f;
     return result;
@@ -332,13 +341,13 @@ void PauseEnd() {
     if ((wave_status & SND_STREAM_STATE_PLAYING) != 0) {
         sndStreamRePlay();
     }
-    sndPortSqReplay(4);
-    sndPortSqReplay(0);
+    sndPortSqReplay(SND_PORT_EVENT);
+    sndPortSqReplay(SND_PORT_BGM);
     PlayTimeCount(play_time_count);
     if (SeCoreVol >= 0.0f) {
-        sndMasterVolFadeInOut(1, 15, SeCoreVol, 0.0f);
+        sndMasterVolFadeInOut(PAUSE_SE_CORE, PAUSE_FADE_FRAMES, SeCoreVol, 0.0f);
     }
-    sndSePlay(GetSystemSndID(), 0x19, 0);
+    sndSePlay(GetSystemSndID(), PAUSE_SE_ID, 0);
 }
 int PauseLoop() {
     if (!PauseFlag__2) return 0;
@@ -347,13 +356,13 @@ int PauseLoop() {
     tex->ReloadTexture(PauseTexb, (sceVif1Packet *)NULL);
     mgCTexture *backdrop = tex->GetTexture(at_920__7, -1);
     if (InitFlag == 0) {
-        sndSePlay(GetSystemSndID(), 25, 0);
-        SeCoreVol = sndGetMasterVol(1);
+        sndSePlay(GetSystemSndID(), PAUSE_SE_ID, 0);
+        SeCoreVol = sndGetMasterVol(PAUSE_SE_CORE);
         float zero_local = 0.0f;
         const float &zero_value = zero_local;
-        sndMasterVolFadeInOut(1, 15, zero_value, -1.0f);
-        sndPortSqPause(4);
-        sndPortSqPause(0);
+        sndMasterVolFadeInOut(PAUSE_SE_CORE, PAUSE_FADE_FRAMES, zero_value, -1.0f);
+        sndPortSqPause(SND_PORT_EVENT);
+        sndPortSqPause(SND_PORT_BGM);
         mgCTexture back_buffer;
         mgGetFrameBackBuffer(&back_buffer);
         mgRect<int> source(0, 0, (mgScreenWidth - 1) * 16, (mgScreenHeight - 1) * 16);
@@ -362,13 +371,13 @@ int PauseLoop() {
         PlayTimeCount(0);
         wave_status = 0;
     }
-    if (InitFlag == 15) {
+    if (InitFlag == PAUSE_FADE_FRAMES) {
         wave_status = sndStreamGetState();
-        if (wave_status & SND_STREAM_STATE_PLAYING) { sndStreamPause(); sndSetMasterVol(1, 0.0f); }
+        if (wave_status & SND_STREAM_STATE_PLAYING) { sndStreamPause(); sndSetMasterVol(PAUSE_SE_CORE, 0.0f); }
     }
-    if (InitFlag <= 15) sndStep(2.0f);
+    if (InitFlag <= PAUSE_FADE_FRAMES) sndStep(2.0f);
     ++InitFlag;
-    if (InitFlag > 1000) InitFlag = 1000;
+    if (InitFlag > PAUSE_INIT_FRAME_MAX) InitFlag = PAUSE_INIT_FRAME_MAX;
     SV_CONFIG_OPTION *config = &GetSaveData()->config;
     mgCDrawPrim prim;
     prim.Initialize(NULL, NULL);
@@ -411,7 +420,7 @@ int PauseLoop() {
     GamePad__2.UpDate();
     PadCtrl.Update(&GamePad__2);
     int quit = 0;
-    if (InitFlag > 17 && PadCtrl.Btn(21)) quit = 1;
+    if (InitFlag > PAUSE_QUIT_ENABLE_FRAME && PadCtrl.Btn(21)) quit = 1;
     if (PauseInfo.event_skip == 1 && PadCtrl.Btn(22)) { SkipEventStart(); quit = 1; }
     if (quit) { PauseEnd(); return 0; }
     return 1;
