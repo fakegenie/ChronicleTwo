@@ -434,22 +434,32 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgApplyMatrixN_MaxMin__FPA4_fPA4
 #endif
 #pragma global_optimizer reset
 #pragma global_optimizer off
-#ifdef NONMATCHING
-void mgVectorMinMaxN(float *max, float *min, float (*vectors)[4], int count) {
-    for (int axis = 0; axis < 4; ++axis) {
-        max[axis] = vectors[0][axis];
-        min[axis] = vectors[0][axis];
-    }
-    for (int i = 1; i < count; ++i) {
-        for (int axis = 0; axis < 4; ++axis) {
-            if (max[axis] < vectors[i][axis]) max[axis] = vectors[i][axis];
-            if (min[axis] > vectors[i][axis]) min[axis] = vectors[i][axis];
-        }
-    }
+asm void mgVectorMinMaxN(float *max, float *min, float (*vectors)[4], int count) {
+    .set noreorder
+    addi a3, a3, -1
+    lqc2 vf10, 0(a2)
+    vmove.xyzw vf11, vf10
+    lqc2 vf16, 0x10(a2)
+    vnop
+    vnop
+    vnop
+loop:
+    vmax.xyzw vf10, vf10, vf16
+    vmini.xyzw vf11, vf11, vf16
+    addi a3, a3, -1
+    addi a2, a2, 0x10
+    lqc2 vf16, 0(a2)
+    vnop
+    bgez a3, loop
+    nop
+    nop
+    vnop
+    vnop
+    vnop
+    sqc2 vf10, 0(a0)
+    jr ra
+    sqc2 vf11, 0(a1)
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgVectorMinMaxN__FPfPfPA4_fi);
-#endif
 #pragma global_optimizer reset
 void mgApplyMatrix(float *max, float *min, float (*matrix)[4], float *box_max, float *box_min) {
     sceVu0FVECTOR corners[8];
