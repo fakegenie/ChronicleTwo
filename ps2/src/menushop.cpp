@@ -1044,8 +1044,8 @@ extern char at_1825__3[];
 extern char at_1826__4[];
 void CShopMenu::CalcTex() {
     int num_pos[2];
-    int up_pos[2];
     int down_pos[2];
+    int up_pos[2];
     int name_pos[2];
     float bar_pos[2];
     if (shop_name_brd != NULL && MenuMesForm[1] != NULL) {
@@ -1094,12 +1094,22 @@ void CShopMenu::CalcTex() {
         message_form->draw_flag = 0;
         message->MakeMsg(0);
         if (NowSellMode == SHOP_SELL_MODE_MONEY && (key_arg_no == SHOP_MENU_MODE_BAG || key_arg_no == SHOP_MENU_MODE_SELL_NUM)) {
-            s16 *mes_width = &price_mes_width;
-            CGameDataUsed *item = SearchNowPosItemExist();
-            message->point_y = 0;
-            int gift_box = 0;
-            int mes_no = -1;
+            CGameDataUsed *item;
+            int win_y;
+            int px;
+            int koma[2];
+            int py;
+            int gift_box;
+            int mes_no;
+            int line;
+            int win_x;
+            s16 *mes_width;
             int sell;
+            mes_width = &price_mes_width;
+            item = SearchNowPosItemExist();
+            message->point_y = 0;
+            gift_box = 0;
+            mes_no = -1;
             if (item->item_no > 0) {
                 message_form->draw_flag = 1;
                 sell = 0;
@@ -1125,10 +1135,7 @@ void CShopMenu::CalcTex() {
                 message->MakeMsg(mes_no);
             }
             message->StepMsg();
-            int line = bag_pos / 6 - bag_top;
-            int koma[2];
-            int win_x;
-            int win_y;
+            line = bag_pos / 6 - bag_top;
             MenuPosData->GetPosMenuItemBrdKoma(koma, bag_pos, 1);
             if (gift_box == 1) {
                 koma[0] += 0x2C;
@@ -1136,10 +1143,12 @@ void CShopMenu::CalcTex() {
                 if (mgScreenWidth - *mes_width - 0x1E < win_x) {
                     win_x -= *mes_width + 0x6D;
                 }
-                koma[1] += 0xC;
+                koma[1] = koma[1] + 0xC;
                 win_y = koma[1] - 0x1A;
-                message->point_x = koma[0] - win_x;
-                message->point_y = koma[1] - win_y;
+                px = koma[0] - win_x;
+                py = koma[1] - win_y;
+                message->point_x = px;
+                message->point_y = py;
             } else {
                 koma[0] += 0x14;
                 win_x = koma[0] - *mes_width / 2;
@@ -1155,8 +1164,10 @@ void CShopMenu::CalcTex() {
                         win_y = koma[1] - 0x32;
                     }
                 }
-                message->point_x = koma[0] - win_x;
-                message->point_y = koma[1] - win_y;
+                px = koma[0] - win_x;
+                py = koma[1] - win_y;
+                message->point_x = px;
+                message->point_y = py;
             }
             message_form->x = win_x;
             message_form->y = win_y;
