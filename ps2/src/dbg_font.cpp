@@ -205,7 +205,6 @@ void dbgCJISFont::InitTexture(int full0_id, char *full0_name, int full1_id, char
 void dbgCJISFont::Clear(void) {
     buffer[0] = 0;
 }
-#ifdef NONMATCHING
 void dbgCJISFont::__putc(unsigned long serno) {
     mgCTextureManager *textures = &mgTexManager;
     int glyph_width = 16;
@@ -254,9 +253,7 @@ void dbgCJISFont::__putc(unsigned long serno) {
             long column = serno & 0x3F;
             long tex_y;
             long tex_x = column * 16;
-            unsigned long row = (serno - column) >> 6;
-            tex_y = row * 16;
-            prim.TextureCrd(tex_x + 1, tex_y + 1);
+            prim.TextureCrd(tex_x + 1, (tex_y = ((serno - column) >> 6) * 16) + 1);
             prim.Vertex(x - 1, y - 1, 0);
             prim.TextureCrd(glyph_width - 1 + tex_x, tex_y + 15);
             prim.Vertex(x + (char_width - (15 - (glyph_width - 1))), y + char_height + 1, 0);
@@ -290,9 +287,6 @@ void dbgCJISFont::__putc(unsigned long serno) {
         x += 2;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dbg_font", __putc__11dbgCJISFontFUl);
-#endif
 #ifdef NONMATCHING
 void dbgCJISFont::PrintDirect(int start_x, int start_y, char *format, ...) {
     char text[0x408];
