@@ -266,6 +266,9 @@ void CMonsterMan::Initialize(CScene *scene) {
     int i;
     DNG_BATTLE_AREA *area = &scene->battle_area;
     int texb;
+    int j;
+    int k;
+    int m;
 
     SetMonsterExtendTable();
     textures = &mgTexManager;
@@ -276,12 +279,12 @@ void CMonsterMan::Initialize(CScene *scene) {
         active[i] = (CActiveMonster *)scene->GetCharacter(i + MONSTER_ACTIVE_MAX);
         active[i]->Initialize();
     }
-    for (i = 0; i < MONSTER_REFER_MAX; i++) {
-        textures->DeleteBlock(i + 0x28);
-        refer[i].id = -1;
+    for (j = 0; j < MONSTER_REFER_MAX; j++) {
+        textures->DeleteBlock(j + 0x28);
+        refer[j].id = -1;
     }
-    for (i = 0; i < MONSTER_SHARE_MAX; i++) {
-        share_var[i].i = 0;
+    for (k = 0; k < MONSTER_SHARE_MAX; k++) {
+        share_var[k].i = 0;
     }
     FxScriptMan->ClearBaseFromLevel(3, NULL, -1);
     for (texb = area->free_texb; texb < 0xAA; texb++) {
@@ -289,12 +292,13 @@ void CMonsterMan::Initialize(CScene *scene) {
     }
     boss_life_gage.Initialize(0);
     boss_max_life = 0;
-    locate.num = 0;
-    locate.put_num = 0;
-    locate.put_flag = 0;
-    for (i = 0; i < MONSTER_LOCATE_MAX; i++) {
-        locate.param[i] = -1;
-        locate.monster_id[i] = -1;
+    CMonsterLocateInfo *loc = &locate;
+    loc->num = 0;
+    loc->put_num = 0;
+    loc->put_flag = 0;
+    for (m = 0; m < MONSTER_LOCATE_MAX; m++) {
+        loc->param[m] = -1;
+        loc->monster_id[m] = -1;
     }
 }
 #else
@@ -345,10 +349,12 @@ float CMonsterMan::IsBattleStyleDist() {
 
 #ifdef NONMATCHING
 int CMonsterMan::CheckMonsterTolk(float *pos) {
+    int found2;
     CActiveMonster *monster;
-    int found;
-    int i;
     float nearest;
+    int found;
+    int mons_base;
+    int i;
 
     if (dbinfo.monster_talk != 0) {
         found = -1;
@@ -370,12 +376,12 @@ int CMonsterMan::CheckMonsterTolk(float *pos) {
     if (DngUserData->active_chr_no != USER_CHARA_MONSTER) {
         return -1;
     }
-    int mons_base = GetBattleCharaInfo()->unk_2;
+    mons_base = GetBattleCharaInfo()->unk_2;
     if (mons_base == -1) {
         return -1;
     }
-    found = -1;
     i = 0;
+    found2 = -1;
     nearest = 90.0f;
     do {
         monster = active[i];
@@ -384,12 +390,12 @@ int CMonsterMan::CheckMonsterTolk(float *pos) {
             if (monster->tbl->user_mons_id == mons_base && monster->tbl->boss == 0 &&
                 monster->locate_param != -1 && monster->gekirin > 0.0f && nearest > monster->target_dist) {
                 nearest = monster->target_dist;
-                found = i;
+                found2 = i;
             }
         }
         i++;
     } while (i < MONSTER_ACTIVE_MAX);
-    return found;
+    return found2;
 }
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/monster", CheckMonsterTolk__11CMonsterManFPf);
