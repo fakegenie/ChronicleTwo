@@ -2457,7 +2457,6 @@ void CWeaponElement::Draw(void) {
         }
     }
 }
-#ifdef STATEMATCHING
 void CWeaponElement::Init_Cold(float *center) {
     int j;
     int i;
@@ -2488,9 +2487,6 @@ void CWeaponElement::Init_Cold(float *center) {
         frame[j] = fptosi((5.0f * (float)rand()) / 2.1474836e9f) * 0x30;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dng_effect", Init_Cold__14CWeaponElementFPf);
-#endif
 void CWeaponElement::Step_Cold(void) {
     int dead;
     int i;
