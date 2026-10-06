@@ -22,7 +22,6 @@ extern char at_1325__2[];
 extern char at_1326[];
 extern char at_1438__4[];
 
-// Code (.text)
 void CalcReflectionVector(float *incoming, float *surface, float *reflected) {
     float normal[4];
     float dx;
@@ -492,12 +491,10 @@ void CPot::Init(int keep_velocity) {
     fly_time = 0;
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/pot", box_offset__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/pot", iwa0_offset__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/pot", iwa1_offset__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/pot", at_1196__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/pot", at_1323__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/pot", at_1324__DATA);

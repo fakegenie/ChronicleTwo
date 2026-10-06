@@ -25,7 +25,6 @@ extern int ItemOver;
 static SubGameInfo GameInfo;
 extern char at_985__3[];
 
-// Code (.text)
 void InitSubGame(CScene *scene) {
     SubGame = SUBGAME_NONE;
     MenuOpenFlag = 0;
@@ -331,10 +330,8 @@ void sgCPlayVoice::Close(void) {
     }
 }
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/subgame", at_985__3__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(SubGame, 0x4);
 INCLUDE_BSS(MenuOpenFlag, 0x4);
 INCLUDE_BSS(ItemOver, 0x4);

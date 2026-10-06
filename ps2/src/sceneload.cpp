@@ -26,7 +26,6 @@ extern char at_1118__2[];
 static const u_int timer0_count = 0x10000000;
 extern char at_959__2[];
 
-// Code (.text)
 static int LoadMapData(SCN_LOADMAP_INFO2 &info, int deferred) {
     char path[0x80];
     mgCMemory *stack = info.stack;
@@ -505,9 +504,6 @@ int CScene::DeleteMap(int map_index, int clear_stack) {
     return 1;
 }
 
-// Initialised data (.data)
-
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sceneload", at_885__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sceneload", at_886__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sceneload", at_887__2__DATA);

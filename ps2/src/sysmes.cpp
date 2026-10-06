@@ -25,7 +25,6 @@
 
 extern "C" int CreateSystemMes__Fii(int, int);
 
-// Code (.text)
 ClsMes *GetSystemMessage() {
     return GetSystemMessage(0);
 }
@@ -95,7 +94,6 @@ void CreateSystemMes(int index, int unused) {
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/sysmes", CreateSystemMes__Fii);
 #endif
 
-// Static initialiser (.init)
 extern "C" void *__ct__6ClsMesFv(void *);
 
 extern "C" void __sinit_sysmes_cpp() {
@@ -105,7 +103,6 @@ extern "C" void __sinit_sysmes_cpp() {
     __ct__6ClsMesFv(&SystemMessage3);
 }
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sysmes", at_482__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sysmes", at_483__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sysmes", at_484__DATA);
@@ -120,10 +117,8 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sysmes", at_492__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sysmes", at_493__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sysmes", at_494__DATA);
 
-// Static initialiser table (.ctor)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sysmes", D_0037B000__DATA);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(SystemMesStack, 0x30);
 INCLUDE_BSS(SystemMesBuffer, 0xD000);
 INCLUDE_BSS(SysMesBuffer, 0x13880);

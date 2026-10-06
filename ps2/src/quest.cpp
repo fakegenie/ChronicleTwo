@@ -15,10 +15,9 @@ extern mgCMemory *spi_queststack;
 extern QUEST_INFO *spi_quest_info;
 extern SPI_TAG_PARAM quest_cmd_tag[];
 #ifdef NONMATCHING
-static CQuestManager *spi_questman; /**< Request list currently being read from a script. */
-static mgCMemory *spi_queststack; /**< Heap used for the request list. */
-static QUEST_INFO *spi_quest_info; /**< Request currently being filled. */
-
+static CQuestManager *spi_questman;
+static mgCMemory *spi_queststack;
+static QUEST_INFO *spi_quest_info;
 
 static SPI_TAG_PARAM quest_cmd_tag[] = {
     {"NUM", quest_NUM},
@@ -29,7 +28,6 @@ static SPI_TAG_PARAM quest_cmd_tag[] = {
 };
 #endif
 
-// Code (.text)
 static CQuestData *GetQuestData() {
     CSaveData *save_data = GetSaveData();
     return save_data != NULL ? &save_data->quest_data : NULL;
@@ -149,16 +147,13 @@ int CMonsterBook::CountKill(int monster, int amount) {
     return entry[monster].kill_count;
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/quest", quest_cmd_tag__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/quest", at_878__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/quest", at_879__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/quest", at_880__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/quest", at_881__4__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(spi_questman, 0x4);
 INCLUDE_BSS(spi_queststack, 0x4);
 INCLUDE_BSS(spi_quest_info, 0x4);

@@ -12,7 +12,6 @@ extern signed char init_303;
 #include "mg_texture.hpp"
 #include "mglib.hpp"
 
-// Code (.text)
 CWaveTable::CWaveTable() {
     int row;
     int col;
@@ -120,7 +119,6 @@ void CWaveTable::GetEffect() {
     int        col;
     int        row;
 
-    // Every fifth step drops four random disturbances onto the surface.
     if (cnt == 0) {
         for (i = 0; i < 4; i++) {
             col = rand() % 22 + 1;
@@ -160,11 +158,9 @@ void CWaveTable::Effect() {
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/wavetable", Effect__10CWaveTableFv);
 #endif
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/wavetable", at_251__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/wavetable", at_256__DATA);
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/wavetable", __vt__10CWaveTable__DATA);
 
 INCLUDE_BSS(cnt_302, 0x4);

@@ -22,7 +22,6 @@ extern sceCslBuffCtx msinBfCtx[MIDI_MSIN_PORT_COUNT];
 extern MSIN_BUFFER msinBf[MIDI_MSIN_PORT_COUNT];
 extern MIDI_BANK gBank;
 
-// Code (.text)
 void CSound::StopVoice(int core) {
     sceSdRemote(1, rSdSetSwitch, core | SD_S_KOFF, 0xFFFFFF);
     printf("voice completed Core=%d\n", core);
@@ -849,8 +848,6 @@ int CSound::TransBdState(int channel) {
     return sceSdRemote(1, rSdVoiceTransStatus, channel, SD_TRANS_STATUS_CHECK);
 }
 
-
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sound", at_218__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sound", at_278__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sound", at_279__DATA);
@@ -881,7 +878,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sound", at_908__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sound", at_929__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sound", at_930__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(iopMSINBuffAddr, 0x8);
 INCLUDE_BSS(bgm_info, 0x8);
 INCLUDE_BSS(iop_bd_addr, 0x4);
@@ -889,7 +885,6 @@ INCLUDE_BSS(bd_size_total, 0x4);
 INCLUDE_BSS(load_m_flg_351, 0x4);
 INCLUDE_BSS(init_352, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(msinCtx, 0x1C);
 INCLUDE_BSS(D_003F3F6C, 0x4);
 INCLUDE_BSS(msinBfGrp, 0x10);

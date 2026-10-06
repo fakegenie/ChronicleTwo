@@ -12,19 +12,15 @@
 
 #define SCE_FS_EXECUTING 0x1
 
-/**
- * Describes a file's attributes, size and
- * time stamps as reported by sceGetstat.
- */
 struct sce_stat {
-    unsigned int  st_mode;       /**< File type and access mode. */
-    unsigned int  st_attr;       /**< Device-specific attributes. */
-    unsigned int  st_size;       /**< Low 32 bits of the file size in bytes. */
-    unsigned char st_ctime[8];   /**< Creation time. */
-    unsigned char st_atime[8];   /**< Last access time. */
-    unsigned char st_mtime[8];   /**< Last modification time. */
-    unsigned int  st_hisize;     /**< High 32 bits of the file size in bytes. */
-    unsigned int  st_private[6]; /**< Device-specific data. */
+    unsigned int  st_mode;
+    unsigned int  st_attr;
+    unsigned int  st_size;
+    unsigned char st_ctime[8];
+    unsigned char st_atime[8];
+    unsigned char st_mtime[8];
+    unsigned int  st_hisize;
+    unsigned int  st_private[6];
 };
 
 extern "C" {

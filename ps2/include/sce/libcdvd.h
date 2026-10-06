@@ -2,24 +2,18 @@
 
 #include "types.h"
 
-/**
- * Describes a file located through the CD/DVD library.
- */
 struct sceCdlFILE {
-    u_int lsn;      /**< Starting logical sector number. */
-    u_int size;     /**< File size in bytes. */
-    char name[16];  /**< ISO 9660 file name. */
-    u_char date[8]; /**< ISO 9660 recording date. */
+    u_int lsn;
+    u_int size;
+    char name[16];
+    u_char date[8];
 };
 
-/**
- * Configures a CD/DVD read request.
- */
 struct sceCdRMode {
-    u_char trycount;    /**< Number of retry attempts. */
-    u_char spindlctrl;  /**< Spindle control mode. */
-    u_char datapattern; /**< Requested sector data pattern. */
-    u_char pad;         /**< Structure padding. */
+    u_char trycount;
+    u_char spindlctrl;
+    u_char datapattern;
+    u_char pad;
 };
 
 extern "C" {

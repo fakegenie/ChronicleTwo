@@ -7,7 +7,6 @@
 #include "mglib.hpp"
 #include <cmath>
 
-// Code (.text)
 #ifdef NONMATCHING
 void DepthOfField(int levels, float *depths, mgCTexture *work_texture, float strength) {
     if (work_texture == NULL) {
@@ -254,7 +253,6 @@ void LensFlare(int *screen, float *color, int bank, char *texture_a, char *textu
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/screeneffect", LensFlare__FPiPfiPcPc);
 #endif
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(at_205, 0x8);
 INCLUDE_BSS(at_206, 0x8);
 INCLUDE_BSS(at_283__2, 0x8);

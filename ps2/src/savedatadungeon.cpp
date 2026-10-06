@@ -4,7 +4,6 @@
 #include <cstring>
 
 extern short limmit_table[];
-// Code (.text)
 extern const char at_79[];
 
 DNG_FLOOR_SAVE *CSaveDataDungeon::GetFloorInfoPtr(int dungeon, int floor) {
@@ -51,8 +50,6 @@ void CSaveDataDungeon::SetFloorID(int floor) {
     printf(at_79, stage_id, prev_floor_id[stage_id], floor);
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/savedatadungeon", limmit_table__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/savedatadungeon", at_79__DATA);

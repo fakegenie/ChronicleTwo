@@ -31,7 +31,6 @@ extern char at_852__6[];
 extern mgCTexture *WorkTex;
 extern char at_1055[];
 
-// Code (.text)
 char *GetMesTxt(int message_id) {
     if (message_id < 0 || message_id >= 4) {
         return null_txt;
@@ -445,11 +444,9 @@ void DrawTakePhotoSystem(int texture, CInventUserData *user_data) {
     Font__3.DrawDirect(Font__3.str, Font__3.pos_x, Font__3.pos_y);
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/photo", mes_txt__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/photo", at_936__6__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/photo", at_793__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/photo", at_794__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/photo", at_795__4__DATA);
@@ -479,10 +476,8 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/photo", at_852__6__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/photo", at_997__5__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/photo", at_1055__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/photo", null_txt__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(TakePhotoMode, 0x4);
 INCLUDE_BSS(AddProj__2, 0x4);
 INCLUDE_BSS(CameraTexb, 0x4);
@@ -493,5 +488,4 @@ INCLUDE_BSS(OpenMenu, 0x4);
 INCLUDE_BSS(ShowTitleCnt, 0x4);
 INCLUDE_BSS(ShowLevelUpCnt, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(PhotoTitle, 0x80);

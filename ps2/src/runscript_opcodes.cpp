@@ -45,14 +45,9 @@
 extern CScene *nowScene;
 extern ACTION_DAMAGE *LastCInfo2;
 extern int (*ext_func[256])(RS_STACKDATA *, int);
-/**
- *
- * Script vector viewed as four floats or a quadword.
- *
- */
 union ScriptVector {
-    float f[4]; /**< Floating point components. */
-    u_long128 qw; /**< The same components as one quadword. */
+    float f[4];
+    u_long128 qw;
 };
 extern ScriptVector at_1480__2;
 extern ScriptVector at_1481__2;
@@ -68,17 +63,11 @@ extern char at_2580[17];
 extern char at_2787[13];
 extern char at_3078[];
 extern char at_3079[];
-/**
- *
- * Distance and identifier of a script range entry.
- *
- */
 struct RangeEntry {
-    float distance; /**< Range distance. */
-    int id; /**< Entry identifier. */
+    float distance;
+    int id;
 };
 
-// Code (.text)
 void CMonsterMan::RunScript(int index) {
     int script;
 
@@ -3088,14 +3077,12 @@ void SetMonsterExtendTable() {
     }
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/runscript_opcodes", at_1480__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/runscript_opcodes", at_1481__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/runscript_opcodes", at_1864__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/runscript_opcodes", at_2160__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/runscript_opcodes", ext_func_info__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/runscript_opcodes", at_1728__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/runscript_opcodes", at_1733__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/runscript_opcodes", at_1784__DATA);
@@ -3106,10 +3093,8 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/runscript_opcodes", at_2787__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/runscript_opcodes", at_3078__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/runscript_opcodes", at_3079__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(nowScene, 0x4);
 INCLUDE_BSS(nowMonster, 0x4);
 INCLUDE_BSS(LastCInfo2, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(ext_func, 0x400);

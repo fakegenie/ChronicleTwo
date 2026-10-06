@@ -14,30 +14,15 @@
 #include <cstdio>
 #include <cstring>
 
-/**
- *
- * Scene event vector viewed as floats or a quadword.
- *
- */
 union CopyVector {
-    float f[4]; /**< Floating point components. */
-    u_long128 word; /**< The same components as one quadword. */
+    float f[4];
+    u_long128 word;
 };
-/**
- *
- * Name copied into a scene event record.
- *
- */
 struct CopyEventName {
-    char text[16]; /**< Event name. */
+    char text[16];
 };
-/**
- *
- * Integer words copied into a scene event record.
- *
- */
 struct CopyEventWords {
-    int value[16]; /**< Event data words. */
+    int value[16];
 };
 extern float col_1003[4][4];
 extern float at_1013__4[4];
@@ -57,7 +42,6 @@ extern char at_1093[];
 
 #include <cstdio>
 
-// Code (.text)
 void CScene::UpDateMapInfo() {
     CMap *active_maps[4];
     CMapLightingInfo *lighting;
@@ -376,11 +360,9 @@ void CScene::DrawEffect(int tex_block) {
     }
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sceneevent", col_1003__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sceneevent", at_1013__4__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sceneevent", at_858__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sceneevent", at_958__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sceneevent", at_959__3__DATA);

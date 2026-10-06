@@ -7,7 +7,6 @@
 #include "mg_math.hpp"
 #include "mglib.hpp"
 
-// Code (.text)
 void CObject::GetMatrix(float (*out_matrix)[4]) {
     mgUnitMatrix(out_matrix);
     out_matrix[0][0] = scale[0];
@@ -43,7 +42,6 @@ int CObject::FarClip(float dist, float *out_alpha) {
         in_range = 0;
     }
 
-    // Leaving through the near distance fades twice as fast.
     if (near_dist > 0.0f && dist < near_dist) {
         in_range = 0;
         speed *= 2.0f;
@@ -66,7 +64,6 @@ int CObject::FarClip(float dist, float *out_alpha) {
                 fade_alpha = 1.0f;
             }
         } else {
-            // Still drawn while it fades out.
             fade_alpha -= speed;
             if (fade_alpha <= 0.0f) {
                 fade_alpha = 0.0f;
@@ -208,7 +205,6 @@ int CObjectFrame::DrawDirect() {
 void CObjectFrame::Copy(CObjectFrame &dest, mgCMemory *memory) {
     (CObject &)dest = *this;
 
-    // The frame is shared whether or not the copy has memory to duplicate it into.
     if (memory == NULL) {
         dest.frame = frame;
     } else {
@@ -225,6 +221,5 @@ void CObjectFrame::Initialize() {
     CObject::Initialize();
 }
 
-// Virtual tables (.vtables)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/object", __vt__12CObjectFrame__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/object", __vt__7CObject__DATA);

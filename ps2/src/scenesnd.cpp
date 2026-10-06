@@ -20,17 +20,11 @@ extern char at_1132__4[];
 extern char at_1194[];
 extern char at_1195[];
 extern char at_1766__2[];
-/**
- *
- * Pair of characters used to break a line of scene text.
- *
- */
 struct LineBreakPair {
-    s8 chars[2]; /**< Line break characters. */
+    s8 chars[2];
 };
 extern LineBreakPair at_1615__2;
 
-// Code (.text)
 void CScene::BGM_INFO::Init() {
     snd_id = -1;
     load_no = -1;
@@ -992,7 +986,6 @@ void CScene::LoadSndFileInfo(char *src, int size) {
     }
 }
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/scenesnd", at_1011__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/scenesnd", at_1012__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/scenesnd", at_1013__3__DATA);
@@ -1006,5 +999,4 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/scenesnd", at_1194__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/scenesnd", at_1195__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/scenesnd", at_1766__2__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/scenesnd", at_1615__2__DATA);

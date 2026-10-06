@@ -2,7 +2,6 @@
 #include "padcontrol.hpp"
 #include "gamepad.hpp"
 
-// Code (.text)
 void CPadControl::Initialize() {
     for (int i = 0; i < PAD_CTRL_BTN_MAX; i++) {
         btn[i].config = 0;

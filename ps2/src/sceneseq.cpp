@@ -28,7 +28,6 @@ extern char at_2863[];
         }                                                                                          \
     }
 
-// Code (.text)
 static void InitSplineKey(SPLINE_KEY *key) {
     key->frame = 0;
     key->length = 0;
@@ -3254,10 +3253,8 @@ void CSceneObjSeq::ResetDAPosition(void) {
     }
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sceneseq", ScsCmrSeqCallTbl__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sceneseq", ScsObjSeqCallTbl__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sceneseq", at_1527__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/sceneseq", at_2863__DATA);

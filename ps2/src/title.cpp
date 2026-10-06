@@ -198,7 +198,6 @@ static inline u_int Align16Blocks(u_int size) {
     return size >> 4;
 }
 
-// Code (.text)
 void title_init_rand() {
     srand(mgGetVSyncCount());
 }
@@ -2484,7 +2483,6 @@ void TitleLangSelDraw(void) {
     }
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/title", MC_ICON_Data__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/title", at_1594__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/title", at_1595__4__DATA);
@@ -2494,7 +2492,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/title", at_1924__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/title", table_2611__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/title", infomsg_2664__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/title", at_991__3__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/title", at_1221__4__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/title", at_1222__4__DATA);
@@ -2542,7 +2539,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/title", at_2667__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/title", at_2723__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/title", at_2724__DATA);
 
-// Small initialised data (.sdata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/title", TitleRushWaitCount__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/title", TitleProjection__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/title", TitleHDDCheckFlag__DATA);
@@ -2551,7 +2547,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/title", TitleMCCheckInport__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/title", cnttbl_2026__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/title", at_2646__2__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(TitleRushWaitCountBoot, 0x4);
 INCLUDE_BSS(TitleSelectInit, 0x4);
 INCLUDE_BSS(TitleMap, 0x4);
@@ -2626,7 +2621,6 @@ INCLUDE_BSS(title_lang_fadealpha, 0x4);
 INCLUDE_BSS(title_lang_cursor_cnt, 0x4);
 INCLUDE_BSS(lang_tex, 0x4);
 
-// Uninitialised data (.bss)
 mgCMemory DataBuffer;
 mgCMemory TitleMapBuffer;
 mgCMemory TitleWorkBuffer;

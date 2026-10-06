@@ -1,17 +1,12 @@
 #include "common.h"
 #include "snd_seseq.hpp"
 
-
 #include <cstdio>
 #include <cstring>
 
 #include "mg_memory.hpp"
 #include "snd_mngr.hpp"
 
-// Code (.text)
-/**
- * Copies a big-endian field into little-endian byte order.
- */
 static void BigToLittle(void *dst, void *src, int size) {
     u8  *output;
     u8  *input;
@@ -24,9 +19,6 @@ static void BigToLittle(void *dst, void *src, int size) {
     }
 }
 
-/**
- * Reads a MIDI variable-length delta and returns the following byte.
- */
 static char *GetDeltaTime(char *p, int *delta) {
     int value;
     u8  byte;
@@ -454,7 +446,6 @@ int sndTrack::PitchBend(int msb, int lsb) {
     return 1;
 }
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/snd_seseq", at_295__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/snd_seseq", at_296__2__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/snd_seseq", at_297__2__DATA);

@@ -1,7 +1,5 @@
 #pragma once
 
-/* Declarations only; the implementations are in src/lib/libm. */
-
 extern "C" {
 
 float sinf(float x);

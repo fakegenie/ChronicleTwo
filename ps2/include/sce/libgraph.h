@@ -1,8 +1,5 @@
 #pragma once
 
-/* Vendor SDK declarations. The reconstruction is given no system include path at all — only the
-   game's own headers — which is why this is reached with quotes rather than as <libgraph.h>. */
-
 #include "common.h"
 
 #define SCE_GS_INTERLACE 1
@@ -67,10 +64,6 @@
 #define SCE_GS_ALPHA_FIX 2
 
 #define SCE_GS_LOCAL_LOCAL 2
-
-/* Each register the display setup writes is a field layout rather than a number, so the setup
-   reads as the hardware state it is: a field the game changes is one assignment and the rest of
-   the register keeps whatever the SDK's defaults put there. */
 
 typedef struct {
     u_long NLOOP : 15;
@@ -283,32 +276,16 @@ typedef struct sceGsTex0 {
     sceGsTex0 &operator=(const sceGsTex0 &source);
 } sceGsTex0;
 
-/* The register built as one 64-bit word rather than field by field, which is how the SDK spells a
-   value nothing keeps a structure of. The width the block address is shifted by is the argument's
-   own — an int, so a 32-bit shift — and every other term is widened before it moves; that is what
-   puts a single `sll` among the `dsll`s. The two leading terms are in the order the game's code
-   evidences rather than the order the SDK is assumed to have written them: the buffer width first
-   is what matches and the block address first is not. Which one the *compiler* computes first says
-   nothing about it, and the block below is where that was measured. */
 #define SCE_GS_SET_TEX0(tbp0, tbw, psm, tw, th, tcc, tfx, cbp, cpsm, csm, csa, cld) \
     (((u_long) (tbw) << 14) | (u_long) (tbp0) | ((u_long) (psm) << 20) |            \
      ((u_long) (tw) << 26) | ((u_long) (th) << 30) | ((u_long) (tcc) << 34) |       \
      ((u_long) (tfx) << 35) | ((u_long) (cbp) << 37) | ((u_long) (cpsm) << 51) |    \
      ((u_long) (csm) << 55) | ((u_long) (csa) << 56) | ((u_long) (cld) << 61))
 
-/* The mip-map register beside it, in field order: every term but the level bias and the fixed
-   filter settings is a constant at every call site, so what the term order decides here is which
-   of them the compiler can fold into one immediate. */
 #define SCE_GS_SET_TEX1(lcm, mxl, mmag, mmin, mtba, l, k)                                       \
     ((u_long) (lcm) | ((u_long) (mxl) << 2) | ((u_long) (mmag) << 5) | ((u_long) (mmin) << 6) | \
      ((u_long) (mtba) << 9) | ((u_long) (l) << 19) | ((u_long) (k) << 32))
 
-/* The registers a transfer or a sprite is built out of, which are one 64-bit word each and have
-   no structure in the SDK. Term order is the game's own evidence rather than an assumption, and it
-   is *not* readable off which term the compiler computes first: `TRXPOS` proves both halves at
-   once. Written in field order it matches and written with the shifted term first it does not —
-   yet either way the shift is emitted ahead of the plain load. What a source order settles is the
-   operand order of the `|`, and reading it off the evaluation order is what gets it backwards. */
 #define SCE_GS_SET_BITBLTBUF(sbp, sbw, spsm, dbp, dbw, dpsm)             \
     ((u_long) (sbp) | ((u_long) (sbw) << 16) | ((u_long) (spsm) << 24) | \
      ((u_long) (dbp) << 32) | ((u_long) (dbw) << 48) | ((u_long) (dpsm) << 56))
@@ -361,8 +338,6 @@ typedef struct {
     u_long pad44 : 20;
 } sceGsTex1;
 
-/* The texture wrap register. Tagged as well as typedef'd so that headers which only pass it by
-   value can forward-declare it as a struct. */
 typedef struct sceGsClamp {
     u_long WMS : 2;
     u_long WMT : 2;
@@ -407,11 +382,11 @@ typedef struct {
         } bits;
 
         struct {
-            u_char red;   /**< Red colour channel. */
-            u_char green; /**< Green colour channel. */
-            u_char blue;  /**< Blue colour channel. */
-            u_char alpha; /**< Alpha channel. */
-            u_int q;      /**< Packed Q value. */
+            u_char red;
+            u_char green;
+            u_char blue;
+            u_char alpha;
+            u_int q;
         } bytes;
     };
 } sceGsRgbaq;
@@ -422,96 +397,88 @@ typedef struct {
     u_long Z : 32;
 } sceGsXyz;
 
-/* Five registers rather than a layout the code states: nothing reconstructed reaches inside one,
-   and 40 bytes each is what the double buffer's own size leaves room for. */
-/**
- * Fields of a GS display register.
- */
 typedef struct sceGsDisplay {
-    u_int DX : 12;  /**< Horizontal display offset. */
-    u_int DY : 11;  /**< Vertical display offset. */
-    u_int MAGH : 4; /**< Horizontal magnification. */
-    u_int MAGV : 2; /**< Vertical magnification. */
-    u_int p0 : 3;   /**< Reserved bits. */
-    u_int DW : 12;  /**< Display width. */
-    u_int DH : 11;  /**< Display height. */
-    u_int p1 : 9;   /**< Reserved bits. */
+    u_int DX : 12;
+    u_int DY : 11;
+    u_int MAGH : 4;
+    u_int MAGV : 2;
+    u_int p0 : 3;
+    u_int DW : 12;
+    u_int DH : 11;
+    u_int p1 : 9;
 } sceGsDisplay;
 
-/**
- * GS dither matrix register.
- */
 typedef struct {
     union {
         u_long value;
 
         struct {
-            u_long DM00 : 3; /**< Dither adjustment for row 0, column 0. */
+            u_long DM00 : 3;
             u_long pad00 : 1;
-            u_long DM01 : 3; /**< Dither adjustment for row 0, column 1. */
+            u_long DM01 : 3;
             u_long pad01 : 1;
-            u_long DM02 : 3; /**< Dither adjustment for row 0, column 2. */
+            u_long DM02 : 3;
             u_long pad02 : 1;
-            u_long DM03 : 3; /**< Dither adjustment for row 0, column 3. */
+            u_long DM03 : 3;
             u_long pad03 : 1;
-            u_long DM10 : 3; /**< Dither adjustment for row 1, column 0. */
+            u_long DM10 : 3;
             u_long pad10 : 1;
-            u_long DM11 : 3; /**< Dither adjustment for row 1, column 1. */
+            u_long DM11 : 3;
             u_long pad11 : 1;
-            u_long DM12 : 3; /**< Dither adjustment for row 1, column 2. */
+            u_long DM12 : 3;
             u_long pad12 : 1;
-            u_long DM13 : 3; /**< Dither adjustment for row 1, column 3. */
+            u_long DM13 : 3;
             u_long pad13 : 1;
-            u_long DM20 : 3; /**< Dither adjustment for row 2, column 0. */
+            u_long DM20 : 3;
             u_long pad20 : 1;
-            u_long DM21 : 3; /**< Dither adjustment for row 2, column 1. */
+            u_long DM21 : 3;
             u_long pad21 : 1;
-            u_long DM22 : 3; /**< Dither adjustment for row 2, column 2. */
+            u_long DM22 : 3;
             u_long pad22 : 1;
-            u_long DM23 : 3; /**< Dither adjustment for row 2, column 3. */
+            u_long DM23 : 3;
             u_long pad23 : 1;
-            u_long DM30 : 3; /**< Dither adjustment for row 3, column 0. */
+            u_long DM30 : 3;
             u_long pad30 : 1;
-            u_long DM31 : 3; /**< Dither adjustment for row 3, column 1. */
+            u_long DM31 : 3;
             u_long pad31 : 1;
-            u_long DM32 : 3; /**< Dither adjustment for row 3, column 2. */
+            u_long DM32 : 3;
             u_long pad32 : 1;
-            u_long DM33 : 3; /**< Dither adjustment for row 3, column 3. */
+            u_long DM33 : 3;
             u_long pad33 : 1;
         };
 
         struct {
-            u_long dm00 : 3; /**< Dither adjustment for row 0, column 0. */
+            u_long dm00 : 3;
             u_long pad00_ : 1;
-            u_long dm01 : 3; /**< Dither adjustment for row 0, column 1. */
+            u_long dm01 : 3;
             u_long pad01_ : 1;
-            u_long dm02 : 3; /**< Dither adjustment for row 0, column 2. */
+            u_long dm02 : 3;
             u_long pad02_ : 1;
-            u_long dm03 : 3; /**< Dither adjustment for row 0, column 3. */
+            u_long dm03 : 3;
             u_long pad03_ : 1;
-            u_long dm10 : 3; /**< Dither adjustment for row 1, column 0. */
+            u_long dm10 : 3;
             u_long pad10_ : 1;
-            u_long dm11 : 3; /**< Dither adjustment for row 1, column 1. */
+            u_long dm11 : 3;
             u_long pad11_ : 1;
-            u_long dm12 : 3; /**< Dither adjustment for row 1, column 2. */
+            u_long dm12 : 3;
             u_long pad12_ : 1;
-            u_long dm13 : 3; /**< Dither adjustment for row 1, column 3. */
+            u_long dm13 : 3;
             u_long pad13_ : 1;
-            u_long dm20 : 3; /**< Dither adjustment for row 2, column 0. */
+            u_long dm20 : 3;
             u_long pad20_ : 1;
-            u_long dm21 : 3; /**< Dither adjustment for row 2, column 1. */
+            u_long dm21 : 3;
             u_long pad21_ : 1;
-            u_long dm22 : 3; /**< Dither adjustment for row 2, column 2. */
+            u_long dm22 : 3;
             u_long pad22_ : 1;
-            u_long dm23 : 3; /**< Dither adjustment for row 2, column 3. */
+            u_long dm23 : 3;
             u_long pad23_ : 1;
-            u_long dm30 : 3; /**< Dither adjustment for row 3, column 0. */
+            u_long dm30 : 3;
             u_long pad30_ : 1;
-            u_long dm31 : 3; /**< Dither adjustment for row 3, column 1. */
+            u_long dm31 : 3;
             u_long pad31_ : 1;
-            u_long dm32 : 3; /**< Dither adjustment for row 3, column 2. */
+            u_long dm32 : 3;
             u_long pad32_ : 1;
-            u_long dm33 : 3; /**< Dither adjustment for row 3, column 3. */
+            u_long dm33 : 3;
             u_long pad33_ : 1;
         } bits;
     };
@@ -525,9 +492,6 @@ typedef struct {
     u_long bgcolor;
 } sceGsDispEnv;
 
-/* The eight register pairs sceGsSetDefDrawEnv fills, without the GIF tag that carries them: the
-   tag covers the clear beside them as well, so it belongs to the pair of them rather than to
-   either, which is also why sceGsSetHalfOffset is handed this and not the tag. */
 typedef struct {
     sceGsFrame frame1;
     u_long frame1addr;
@@ -573,15 +537,10 @@ typedef struct {
     sceGsClear clear1;
 } sceGsDBuff;
 
-/* The read-back packet the SDK builds and the game only ever passes by address. Its extent is the
-   one thing about it the image states, and it is what the executable gives gs_simage. */
 typedef struct {
     u_long chain[7][2];
 } sceGsStoreImage;
 
-/**
- * Packet used by the SDK to transfer one image into GS memory.
- */
 typedef struct {
     u_long chain[6][2];
 } sceGsLoadImage;
@@ -590,9 +549,6 @@ extern "C" {
 
 void sceGsResetGraph(short mode, short inter, short omode, short ffmd);
 
-/**
- * Resets the GIF paths used to submit graphics commands.
- */
 void sceGsResetPath();
 
 int sceGsSyncV(int mode);

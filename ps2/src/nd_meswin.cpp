@@ -24,28 +24,17 @@
 #include <cmath>
 #include <cstring>
 
-/**
- *
- * Screen positions used to anchor message elements.
- *
- */
 struct message_anchor_table {
-    float point[19][2]; /**< Anchor coordinates. */
+    float point[19][2];
 };
 
-/**
- *
- * Message draw primitive and its backing storage.
- *
- */
 union message_draw_prim {
-    mgCDrawPrim prim; /**< Draw primitive over the storage. */
-    u8 storage[0x120]; /**< Backing storage. */
+    mgCDrawPrim prim;
+    u8 storage[0x120];
 };
 
 extern "C" void
 __ct__11mgCDrawPrimFv(void *self);
-
 
 extern "C" u8 at_4574[];
 
@@ -133,7 +122,6 @@ extern char at_2396[];
 extern char at_2397[];
 extern char at_2398[];
 
-
 const int mes_newline = 0xFF00;
 
 const int mes_end = 0xFF01;
@@ -182,7 +170,6 @@ char *GetTopAddress(char *text, int size, int id);
 
 #include "common.h"
 
-// Code (.text)
 void MySetPrim(mgCDrawPrim *prim, int mode, int bilinear) {
     prim->Initialize(NULL, NULL);
     switch (mode) {
@@ -4193,7 +4180,6 @@ void MovieCCInit(char *text, int size, int id) {
     }
 }
 
-// Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nd_meswin", p__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nd_meswin", at_3748__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nd_meswin", at_4057__DATA);
@@ -4203,7 +4189,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nd_meswin", at_4185__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nd_meswin", data_4206__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nd_meswin", waku_data__DATA);
 
-// Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nd_meswin", at_1124__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nd_meswin", at_1317__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nd_meswin", at_1724__DATA);
@@ -4268,13 +4253,11 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nd_meswin", at_4635__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nd_meswin", at_4636__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/nd_meswin", at_4637__DATA);
 
-// Small uninitialised data (.sbss)
 INCLUDE_BSS(MesAbsDrawOff, 0x4);
 INCLUDE_BSS(MovieCCCnt, 0x4);
 INCLUDE_BSS(MovieCCW, 0x4);
 INCLUDE_BSS(MovieCCH, 0x4);
 
-// Uninitialised data (.bss)
 INCLUDE_BSS(NameRegistTbl, 0xB0);
 CFont MovieCCFont;
 INCLUDE_BSS(MovieCCStart, 0x50);

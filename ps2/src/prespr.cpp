@@ -1,16 +1,12 @@
 #include "common.h"
 #include "prespr.hpp"
 
-/**
- * One GIF address and data entry in a sprite's direct packet.
- */
 struct SpriteGsPacket {
-    u_long data; /**< GS register value. */
-    u_long reg;  /**< GS register address. */
+    u_long data;
+    u_long reg;
 };
 STATIC_ASSERT(sizeof(SpriteGsPacket) == 0x10);
 
-// Code (.text)
 void CPreSprite::Preset2D() {
     AlphaBlendEnable(1);
     AlphaBlend(MG_ALPHA_BLEND_NORMAL);
