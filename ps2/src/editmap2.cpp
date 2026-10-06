@@ -49,29 +49,36 @@ static void PlaneNormalXZ(float *normal, float *p0, float *p1, float *p2) {
 }
 #ifdef NONMATCHING
 float CEditMap::GetEditPartsAlt(CEditPartsInfo *info, float *pos, float rot_y, CEditParts **parts, int num) {
-    sceVu0FVECTOR parts_pos;
     sceVu0FMATRIX parts_matrix;
     sceVu0FMATRIX invers_matrix;
     sceVu0FMATRIX matrix;
-    mgVu0FBOX box;
+    sceVu0FVECTOR parts_pos;
+    sceVu0FVECTOR offset;
     sceVu0FVECTOR parts_rot;
     sceVu0FVECTOR triangle[3];
-    sceVu0FVECTOR offset;
+    mgVu0FBOX box;
     sceVu0FVECTOR normal;
+    CEditPartsInfo *parts_info;
+    int i;
     float area;
+    CCPoly *poly;
+    int j;
+    CEditParts *edit_parts;
+    float alt;
+    int poly_count;
 
     if (info == NULL) {
         return pos[1];
     }
     GetMatrix(matrix, pos, ConvEditAngle(rot_y));
-    float alt = pos[1];
-    for (int i = 0; i < num; i++) {
-        CEditParts *edit_parts = parts[i];
+    alt = pos[1];
+    for (i = 0; i < num; i++) {
+        edit_parts = parts[i];
         int empty = edit_parts->name[0] == 0;
         if (empty) {
             continue;
         }
-        CEditPartsInfo *parts_info = edit_parts->info;
+        parts_info = edit_parts->info;
         if (parts_info == NULL) {
             continue;
         }
@@ -81,9 +88,9 @@ float CEditMap::GetEditPartsAlt(CEditPartsInfo *info, float *pos, float rot_y, C
         GetInversMatrix(invers_matrix, parts_matrix);
         sceVu0SubVector(offset, pos, parts_pos);
         mgAngleLimit(rot_y - parts_rot[1]);
-        int poly_count = info->col_area1.poly_count;
-        CCPoly *poly = info->col_area1.poly;
-        for (int j = 0; j < poly_count; j++, poly++) {
+        poly_count = info->col_area1.poly_count;
+        poly = info->col_area1.poly;
+        for (j = 0; j < poly_count; j++, poly++) {
             mgApplyMatrixN(triangle, matrix, poly->vertex, 3);
             mgApplyMatrixN(triangle, invers_matrix, triangle, 3);
             PlaneNormalXZ(normal, triangle[0], triangle[1], triangle[2]);
