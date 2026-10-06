@@ -16,7 +16,32 @@ asm void mgFotI4(int *out, float *in) {
     jr ra
     sqc2 vf1, 0x0(a0)
 }
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgCreateBox8__FPA4_fPfPf);
+asm void mgCreateBox8(float (*corners)[4], float *max, float *min) {
+    .set noreorder
+    lqc2 vf1, 0x0(a1)
+    lqc2 vf2, 0x0(a2)
+    vaddx.xyzw vf3, vf2, vf0x
+    vaddx.xyzw vf4, vf2, vf0x
+    vaddx.xyzw vf5, vf2, vf0x
+    vaddx.xyzw vf6, vf1, vf0x
+    vaddx.xyzw vf7, vf1, vf0x
+    vaddx.xyzw vf8, vf1, vf0x
+    sqc2 vf2, 0x0(a0)
+    sqc2 vf1, 0x70(a0)
+    vaddx.x vf3, vf1, vf0x
+    vaddx.y vf4, vf1, vf0x
+    vaddx.z vf5, vf1, vf0x
+    vaddx.x vf6, vf2, vf0x
+    vaddx.y vf7, vf2, vf0x
+    vaddx.z vf8, vf2, vf0x
+    sqc2 vf3, 0x10(a0)
+    sqc2 vf4, 0x20(a0)
+    sqc2 vf5, 0x40(a0)
+    sqc2 vf6, 0x60(a0)
+    sqc2 vf7, 0x50(a0)
+    jr ra
+    sqc2 vf8, 0x30(a0)
+}
 void mgZeroVector(float *vector) {
     *(u_long128 *)vector = 0;
 }
