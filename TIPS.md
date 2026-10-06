@@ -78,8 +78,9 @@ A function is in one of four states:
   `main.symbols.txt`, are `static` in the `.cpp`. A global definition fails
   at link. The reverse also happens: `gameutil`'s `def_vrtx` is referenced by
   `libdev` assembly, so it has to be a plain global.
-- Functions whose bodies are only `asm { ... }` blocks (VU0 vector and matrix
-  code) are kept as `INCLUDE_ASM` here. Most have no C form. `mgZeroVector` does:
+- Functions whose bodies are only VU0 vector and matrix code have no C form
+  in most cases. The `mg_math` ones are written as `asm void f(...) { .set noreorder
+  ... jr ra; <delay slot> }` and match at 100%. `mgZeroVector` does have a C form:
   `*(u_long128 *)vector = 0;` compiles to the retail `sq $0, 0($4)`.
 
 ## Compiler state and `state.py`
@@ -327,3 +328,51 @@ only functions present in both objects can be replaced, the plain build keeps th
 - Compiling a function that does `new T[n]` emits T's weak inline constructor. Remove that constructor's `INCLUDE_ASM` stub, or `check_objects` reports an unexpected piece while the image check still passes.
 - A local declared directly in an unbraced `case` gives a different constant-load order than the same code in a braced case (`FishModifyParam` case 5).
 - Bash in the worktrees refuses a python heredoc followed by `./dev.sh` in one command. Put generator scripts in files and run them separately.
+- An increment written inside a call argument (`PrintDirect(x, y += 0x12, ...)`) stops MWCC constant-propagating the counter. Retail's `addiu s0,s0,N` before each call comes from this (`DrawEventEdit`).
+- A redundant `if` that assigns a variable the value it already holds (`int step = 100; if (select == 1) { step = 100; }`) switches on retail's unfilled delay-slot style. It also leaves a dead `lw`/`li` compare pair and keeps the constant in a saved register (`MenuLoop`). Look for an orphan compare in retail to find where it goes.
+- Reusing named float locals, declared once at function top and reassigned before each use, changed float constant load order where per-block locals, literals or declaration order did not (`DrawMenuTopic`).
+- Declaring a loop temporary outside the loop (`int glyph_x;` before a `do` loop, assigned inside) fixes callee-saved register colouring when strength-reduced induction pointers take the wrong registers (`DrawActiveFont`).
+- A call evaluated once before an if/else that uses it in both branches is a named local before the `if`.
+- Retail's `x - (x / 5) * 5` (a subtract instead of a second divide) comes from a named quotient (`int part = rest / 5; ... rest - part * 5`).
+- For a jump-table function use perm's word count or an aligned diff, not the objdiff percent: `MenuMainInit` was 13 words off while objdiff reported 44.9%.
+- In perm.py templates `[[[[` (an array subscript followed by a choice) mis-parses. Put a space after the bracket.
+- Two perm.py runs on the same unit collide on `work/<unit>_N.cpp`. Give each run its own work directory. Removing `ps2/asm` during a rebuild breaks any perm run still going.
+- A choice followed directly by `]`, as in `x[ [[[a|||b]]]]`, matches wrongly: only the last option keeps the bracket, so the base and every other option fail to compile. Write `]]] ]`. A "base 1000000" result is the symptom.
+- When a function's arrays are not in declaration-order stack slots, the original declared locals at first use. Arrays are laid out in order of appearance, block-scoped ones included.
+- Two adjacent `sceVu0FVECTOR` locals that retail addresses through a saved register (`addiu sN,sp,K` then `move a0,sN`) are one `sceVu0FVECTOR v[2]`, and `&v[1]` is the address kept.
+- Hoisting all scalar declarations to the top and permuting their order fixed most register and spill-slot differences in `MagnetParts` and `SaveData`.
+- Whether loops share a counter variable or use block-scoped ones swaps counter and induction registers. If both are tried, one usually matches.
+- A temporary register mismatch on a single expression (`subu v0,v1,v0` against `subu v1,v1,v0`) can come from a small static inline function in the original. `EditHouseIndex` fixed `SaveData`.
+- A retail `if` whose test sits at the bottom, reached by a forward `b` with the body laid out before it, is `while (cond) { ...; break; }`.
+- After a noreturn call such as `exit(0)`, retail's `b` past the loop increment is a `break`.
+- A ternary instead of if/else changes which branch's first instruction fills the delay slot (`MagnetParts`).
+- Initialise two float locals with `float a; float b; b = a = 0.0f;` instead of `float a = 0.0f; float b = 0.0f;`. This swapped which register gets the `mtc1 zero` versus the `mov.s`, and no declaration-order change did the same (`_RESET_CAMERA`).
+- In a branch that reads the same `float[]` locals twice, copying the elements into named locals before an earlier member call (`float fx = charaPos[0];` before `camera->FollowOn()`) reproduces retail loading them into callee-saved float registers before the call.
+- For a compute-then-store statement (`x * 50 / 60`), assigning back into the local and storing afterwards gave a different schedule from storing directly. Try both (`_SET_MOVIE_CC`).
+- Reading two fields into locals before a branch, in source order, matched `_GET_DEF_BGM_NO`.
+- The container mounts only the worktree, so helper templates and scripts must live under `ps2/re/`, not in the scratchpad.
+- A literal written as `float(x)` (a converted double) and one written as `xf` can give different register choices for constants. The effect can also reach later functions in a state compile (`CharacterBonus` broke after `FishModifyParam` changed). Run a perm over `xf|||float(x)` for every literal in the function.
+- Unused local declarations change register allocation. Removing an unused `int turn;` from `LaneBattleStep` made it worse.
+- When retail leaves a0 and a1 free in a `primer=u64div` unit, check whether the draft uses `fptosi(...)` where retail used `(int)` casts. Under that primer only casts respond (`GetUkiWaitTime`).
+- Function-scope declarations in a searched order, and a fresh variable instead of reusing an earlier loop counter, fixed saved-register swaps (`sgInitGyoRace`, `InitUkiObj`). They did not fix caller-saved swaps between a loop index and its offset.
+- To promote a draft that only compiles with a unit's `#ifdef NONMATCHING` globals block, make the needed includes unconditional and add externs to the `#ifndef NONMATCHING` block.
+- `VAR=1 ./dev.sh ...` has no effect inside the container. Toggle tools with files instead.
+- An `asm` function defined earlier in the file and made `static` lets MWCC keep a caller-saved register live across calls to it (a loop index stays in v1 across `trance_normal`). This extends the static-callee tip to `asm` functions. A global `asm` function does not do it.
+- To stop MWCC reusing a float it already loaded for a compare, read the source through a cast address, as in `box_max[0] = ((float *)&box)[0];`. Retail reloaded the value after the guard branches.
+- Retail's `lq`/`sq` CCPoly copy, with `normal` copied last, is an explicit member-by-member copy using `*(u_long128 *)` for the vectors. `*out = *poly` copies each float with `lwc1`/`swc1`.
+- Two adjacent 16-byte locals copied with `lq`/`sq` through address registers (`addiu tN,sp,K; sq x,0(tN)`) were two separate `sceVu0FVECTOR` locals in retail, not a `[2]` array or an `mgVu0FBOX`. The array form made MWCC reuse the address register for later loads.
+- A nop at a loop's continue label came out of `for (...) { if (call()) { ...; if (max <= 0) break; } }` with no extra work.
+- objdump collapses runs of zero words to `...`, so `draft_check.show_diff` and perm's `-1` listing hide `nop` runs and appear to drop instructions. Pass `-z`.
+- A `bc0f` wait loop in retail, which the split marks "Handwritten function", can be an inline `asm { loop: nop ... bc0f loop; nop }` block inside a normal C function. The compiler adds one `nop` after the delay slot (`SendDMA`).
+- A meaningless `switch` on a value the function already tests, with `case 0: break;` and a `default:` holding the real code, turns on the "no fall-through delay-slot fill" style. It also gives retail's extra label `nop`s and a dead `move` after a `b`. In `mgCVisualMDT::CreateFace` redundant if/else stores did nothing and the switch matched outright.
+- When retail reuses a parameter's register for a derived pointer and returns it, advance the parameter itself (`faces = (FACES_ID *)faces->index;`) and drop the separate local.
+- When a pointer offset that should fold comes out as two `addiu`s, write it with one constant offset (`(u_long128 *)environment + 5`). When a copy such as `start = write` is coalesced into a saved register too early, reusing `write` for a later unrelated value keeps the first value in v0.
+- A dead `if` written as a `switch` (`switch (x) { case 0: break; default: ...; }`) turns on retail's style of unfilled fall-through delay slots plus copying the branch target's first instruction into the slot. With `global_optimizer off` this needs no dummy branch, and it finished `GetLWMatrix`.
+- A store through an address register (`addiu aN,sp,K; sw x,0(aN)`) where retail stores directly means the source reads that element back later (`powers[0] = t * powers[1]`). Write the value again instead (`t * (t * t)`). The reverse also holds: retail's address register on `basis[0][3]` points to a read-back in the original source.
+- Variadic functions: retail's `li v1,4; slti; branch; (8 - v1) * 8` before `vsprintf` is `(char *)__builtin_next_arg(fmt) - (__builtin_args_info(2) >= 8 ? 0 : (8 - __builtin_args_info(2)) * 8)`. MWCC does not fold `__builtin_args_info`; arguments 0 and 1 crash the compiler.
+- Under `primer=u64div`, `(int)` casts respond to the state and `fptosi()` does not. Switching to casts fixed `LocalTransWorldPrimPos`.
+- A scheduling difference where retail computes one call argument before another statement's value can be fixed by an assignment inside the argument list: `f(a + 1, (b = expr) + 1)`.
+- Defining the final value as a fresh local (`float last = g(angle);`) instead of reassigning the variable fixed register colouring at the last of several repeated inline expansions.
+- In movie.cpp the `and` mask followed by the dsll32/dsrl32 pair appears with the global optimizer on, and both calls become shifts under `global_optimizer off`.
+- MWCC `asm void` bodies accept `vsqrt Q, vfNx`, `ctc2.ni zero, vi16`, `cfc2.ni v0, vi22` and `qmfc2.ni`. Keep the explicit `nop` after `jr ra` where retail leaves the slot empty. A parameter named `v0` or `v1` collides with the register names inside `asm {}`.
+- The worktree bash sandbox refuses compound commands with loops or globs that call `./dev.sh`. Put loops in a Python file and call that.

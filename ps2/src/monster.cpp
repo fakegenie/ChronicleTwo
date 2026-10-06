@@ -1768,7 +1768,6 @@ void CMonsterMan::MoveUnit(CActiveMonster *monster, CCPoly *poly, int poly_num) 
         monster->link_parts->SetRotation(rotation);
     }
 }
-#ifdef NONMATCHING
 extern EffectVector at_2699;
 void CMonsterMan::ThinkHost() {
     sceVu0FVECTOR monster_pos;
@@ -1854,14 +1853,14 @@ void CMonsterMan::ThinkHost() {
                 continue;
             }
         }
-        box.max[3] = 1.0f;
-        box.min[3] = 1.0f;
         box.max[0] = monster_pos[0] + 40.0f;
         box.min[0] = monster_pos[0] - 40.0f;
         box.max[2] = monster_pos[2] + 40.0f;
         box.min[2] = monster_pos[2] - 40.0f;
         box.max[1] = monster_pos[1] + 200.0f;
         box.min[1] = monster_pos[1] - 200.0f;
+        box.max[3] = 1.0f;
+        box.min[3] = 1.0f;
         int poly_num = map->GetColPoly(polys, box, 0x80);
         CTreasureBoxManager *treasure = battle->treasure_box;
         if (treasure != NULL) {
@@ -1899,7 +1898,7 @@ void CMonsterMan::ThinkHost() {
                     if (damage->prim != NULL) {
                         damage->prim->SetDamage(damage->damage, monster->chara_type);
                         damage->prim->SetCoord(damage->frame0, damage->frame1, damage->radius);
-                        damage->prim->unk_8c = monster->attack;
+                        damage->prim->damage = monster->attack;
                     }
                 }
             } else if (frame < damage->start_frame || !(frame <= damage->end_frame)) {
@@ -1992,9 +1991,6 @@ void CMonsterMan::ThinkHost() {
     }
     PriorityLevelCheck();
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/monster", ThinkHost__11CMonsterManFv);
-#endif
 int _MONSTER_NAME(SPI_STACK *stack, int argument_count) {
     char name[0x80];
     int monster_id;

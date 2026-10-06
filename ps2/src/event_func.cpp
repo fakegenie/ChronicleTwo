@@ -3934,7 +3934,6 @@ int _TRG_PAKU_ANIM(RS_STACKDATA *stack, int argc) {
     }
     return 1;
 }
-#ifdef NONMATCHING
 int _RESET_CAMERA(RS_STACKDATA *stack, int argc) {
     int mode;
     float follow[4];
@@ -3953,8 +3952,9 @@ int _RESET_CAMERA(RS_STACKDATA *stack, int argc) {
     float dz;
     float distance;
     mode = GetStackInt(stack++);
-    float height = 0.0f;
-    float angle = 0.0f;
+    float angle;
+float height;
+height = angle = 0.0f;
     if (argc > 1) {
         angle = GetStackFloat(stack++);
     }
@@ -3995,8 +3995,11 @@ int _RESET_CAMERA(RS_STACKDATA *stack, int argc) {
         if (argc < 2) {
             angle = atan2f(dx, dz);
         }
+        float fx = charaPos[0];
+        float fy = charaPos[1];
+        float fz = charaPos[2];
         camera->FollowOn();
-        camera->SetFollow(charaPos[0], charaPos[1], charaPos[2]);
+        camera->SetFollow(fx, fy, fz);
         camera->SetFollowOffset(followOffset[0], followOffset[1], followOffset[2]);
         camera->SetDistance(distance);
         camera->SetHeight(height);
@@ -4041,9 +4044,6 @@ int _RESET_CAMERA(RS_STACKDATA *stack, int argc) {
     }
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/event_func", _RESET_CAMERA__FP12RS_STACKDATAi);
-#endif
 int _GET_ACTIVE_CHR_NO(RS_STACKDATA *stack, int argc) {
     CUserDataManager *userData = NULL;
     CSaveData *save = GetSaveData();
@@ -9982,17 +9982,12 @@ int _BGM_PLAY_ENABLE(RS_STACKDATA *stack, int argc) {
     (&EventScene->skip_load_sound)[1] = 0;
     return 1;
 }
-#ifdef NONMATCHING
 int _GET_DEF_BGM_NO(RS_STACKDATA *stack, int argc) {
     int sndId;
     int bgmNo;
     if (argc == 1) {
-        CScene *scene = EventScene;
-        if (0 < scene->now_sub_map_no) {
-            sndId = GetMapSndDataID(scene->now_sub_map_no);
-        } else {
-            sndId = GetMapSndDataID(scene->now_map_no);
-        }
+        CScene *scene = EventScene; int map = scene->now_map_no; int sub = scene->now_sub_map_no;
+if (0 < sub) { sndId = GetMapSndDataID(sub); } else { sndId = GetMapSndDataID(map); }
         bgmNo = EventScene->GetDefBgmNo(sndId);
         SetStack(stack, bgmNo);
         return 1;
@@ -10005,10 +10000,6 @@ int _GET_DEF_BGM_NO(RS_STACKDATA *stack, int argc) {
     }
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/event_func", _GET_DEF_BGM_NO__FP12RS_STACKDATAi);
-#endif
-#ifdef NONMATCHING
 int _SET_MOVIE_CC(RS_STACKDATA *stack, int argc) {
     int i;
     int no;
@@ -10038,8 +10029,9 @@ int _SET_MOVIE_CC(RS_STACKDATA *stack, int argc) {
             if (no >= 18) {
                 return 0;
             }
+            start = start * 50 / 60;
             frames = frames * 50 / 60;
-            EdEventInfo.caption_start[no] = start * 50 / 60;
+            EdEventInfo.caption_start[no] = start;
             strcpy(EdEventInfo.caption_text[no], text);
             EdEventInfo.caption_frames[no] = frames;
             break;
@@ -10048,9 +10040,6 @@ int _SET_MOVIE_CC(RS_STACKDATA *stack, int argc) {
     }
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/event_func", _SET_MOVIE_CC__FP12RS_STACKDATAi);
-#endif
 int _REGISTER_VILLAGER2(RS_STACKDATA *stack, int argc) {
     int villagerNo;
     int mode;
@@ -13810,7 +13799,7 @@ int _GET_FLOOR_STATUS(RS_STACKDATA *stack, int argc) {
     if (info == NULL) {
         return 0;
     }
-    SetStack(stack, (int)(u_int) info->floor_status);
+    SetStack(stack, (int)(u_long) info->floor_status);
     return 1;
 }
 #else

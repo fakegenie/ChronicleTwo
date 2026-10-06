@@ -232,9 +232,9 @@ void CDynamicAnime::FramePose(mgCFrame *frame, DA_FRAME_POSE *pose) {
         v3 = now_vertex[pose->vertex_id[3]];
         sceVu0AddVector(origin, v0, v1);
         sceVu0ScaleVector(origin, origin, 0.5f);
-        sceVu0AddVector(end, vertex_c, vertex_d);
+        sceVu0AddVector(end, v2, v3);
         sceVu0ScaleVector(end, end, 0.5f);
-        sceVu0SubVector(along, vertex_b, vertex_a);
+        sceVu0SubVector(along, v1, v0);
         sceVu0Normalize(matrix[along_axis], along);
         matrix[along_axis][3] = 0.0f;
         sceVu0SubVector(across, end, origin);
@@ -267,12 +267,12 @@ void CDynamicAnime::FramePose(mgCFrame *frame, DA_FRAME_POSE *pose) {
         sceVu0SubVector(matrix[0], v1, v0);
         matrix[0][3] = 0.0f;
         sceVu0Normalize(matrix[0], matrix[0]);
-        sceVu0SubVector(along, vertex_c, vertex_d);
+        sceVu0SubVector(along, v2, v3);
         along[3] = 0.0f;
         sceVu0Normalize(matrix[2], along);
         sceVu0OuterProduct(matrix[1], matrix[2], matrix[0]);
         matrix[1][3] = 0.0f;
-        sceVu0CopyVector(matrix[3], vertex_a);
+        sceVu0CopyVector(matrix[3], v0);
         matrix[3][3] = 1.0f;
         if (pose->local != 0 && frame->parent != NULL) {
             sceVu0FMATRIX parent_matrix;

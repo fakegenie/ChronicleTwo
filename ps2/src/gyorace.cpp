@@ -57,6 +57,11 @@ extern CHitEffectImage *battle_effect;
 extern "C" void __ct__11mgCDrawPrimFv(void *);
 extern "C" void __ct__10mgCTextureFv(void *);
 extern mgCMemory BuffTextureData;
+#include "character.hpp"
+#include "dng_effect.hpp"
+#include "menuaqua.hpp"
+#include "userdata.hpp"
+#include <cstring>
 #ifndef NONMATCHING
 extern unsigned int gyore_snd_id;
 extern int hero_no;
@@ -68,15 +73,18 @@ extern int mes_count;
 extern int jyunkai_flg;
 extern int fish_rank[6];
 extern int old_fish_rank[6];
+extern int hantei_flg;
+extern int goal_cnt;
+extern BattleEffectPrim (*battle_EffectPara)[32];
+extern float old_ambient[4];
+extern CGameDataUsed *game_data[8];
+extern int CharaTexb;
+extern int WindowTexb;
+extern mgCTexture *EffectTex;
+extern mgCTexture *EffectTex2;
 #endif
 
 #ifdef NONMATCHING
-#include "character.hpp"
-#include "dng_effect.hpp"
-#include "menuaqua.hpp"
-#include "userdata.hpp"
-#include <cstring>
-
 static unsigned int gyore_snd_id;
 float race_cnt;
 int race_proc_cnt;
@@ -114,7 +122,6 @@ GYORACE_FISH_INF fish_inf[6];
 static int old_cam_no = -1;
 #endif
 
-#ifdef NONMATCHING
 int sgInitGyoRace(SubGameInfo *info) {
     extern short *GetSystemMesBuffer();
     extern mgCTexture *TEX_SystemEffect1;
@@ -318,21 +325,22 @@ int sgInitGyoRace(SubGameInfo *info) {
         grGetFishProgress(&RaceInfo, racer_no, race_cnt, &old_prog[racer_no]);
     }
     CharaTexb = info->texb;
-    fish = 0;
+    CGameDataUsed **item;
+    int fish_index = 0;
     int old_prog_offset = 0;
     int game_offset = 0;
     info_offset = 0;
     do {
         grRACE_PROGRESS *progress = (grRACE_PROGRESS *)((unsigned char *)old_prog + old_prog_offset);
-        grGetFishProgress(&RaceInfo, fish, 0.0f, progress);
+        grGetFishProgress(&RaceInfo, fish_index, 0.0f, progress);
         textures = &mgTexManager;
         textures->DeleteBlock(CharaTexb);
-        CGameDataUsed **item = (CGameDataUsed **)((unsigned char *)game_data + game_offset);
+        item = (CGameDataUsed **)((unsigned char *)game_data + game_offset);
         int kind = (*item)->item_no - 0x140;
         if (kind < 0) kind = 17;
         if (LoadFile2(fish_name[kind], buffer, NULL, 0) == 0) return 0;
         GYORACE_FISH_INF *state = (GYORACE_FISH_INF *)((unsigned char *)fish_inf + info_offset);
-        state->chara_no = fish + 0x40;
+        state->chara_no = fish_index + 0x40;
         state->lap = 0;
         state->unk_14 = 0;
         state->lap_start = 0.0f;
@@ -359,12 +367,12 @@ int sgInitGyoRace(SubGameInfo *info) {
         character->SetMotion(at_1380__2__DATA, 0);
         character->SetStep(0.3f);
         FishIMGReplace(buffer, character, (*item)->item_no, &(*item)->data.fish);
-        fish++;
+        fish_index++;
         old_prog_offset += sizeof(grRACE_PROGRESS);
         game_offset += sizeof(CGameDataUsed *);
         info_offset += sizeof(GYORACE_FISH_INF);
         CharaTexb++;
-    } while (fish < 6);
+    } while (fish_index < 6);
     if (texture_buffer != NULL) {
             WindowTexb = CharaTexb;
             char image_path[0x20];
@@ -394,9 +402,6 @@ int sgInitGyoRace(SubGameInfo *info) {
     scene->fade.FadeIn(30);
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/gyorace", sgInitGyoRace__FP11SubGameInfo);
-#endif
 #ifdef NONMATCHING
 int sgLoopGyoRace(SubGameInfo *info) {
     extern const unsigned char at_1380__2__DATA[];

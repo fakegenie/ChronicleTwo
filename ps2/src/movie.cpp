@@ -437,7 +437,6 @@ int mpegTS(sceMpeg *mpeg, sceMpegCbDataTimeStamp *data, void *user) {
     data->dts = ts.dts;
     return 1;
 }
-#pragma global_optimizer off
 #ifdef NONMATCHING
 int videoCallback(sceMpeg *mpeg, sceMpegCbDataStr *str, void *user) {
     u8 *area1;
@@ -458,8 +457,10 @@ int videoCallback(sceMpeg *mpeg, sceMpegCbDataStr *str, void *user) {
     src = str->data;
     total = str->len;
     first = end - src;
-    first = (first > total) ? total : first;
-    second = total - first;
+    if (first > total) {
+        first = total;
+    }
+    second = str->len - first;
     videoDecBeginPut(&videoDec, &area1, &size1, &area2, &size2);
     uncached1 = (u8 *)UncAddr(area1);
     uncached2 = (u8 *)UncAddr(area2);
@@ -477,7 +478,6 @@ int videoCallback(sceMpeg *mpeg, sceMpegCbDataStr *str, void *user) {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/movie", videoCallback__FP7sceMpegP16sceMpegCbDataStrPv);
 #endif
-#pragma global_optimizer reset
 int pcmCallback(sceMpeg *mpeg, sceMpegCbDataStr *str, void *user) {
     u8 *area1;
     u8 *area2;
@@ -794,13 +794,10 @@ int viBufRestartDMA(ViBuf *buf) {
         index = getFIFOindex(buf, (void *)buf->env.d4madr);
         fifo_index = getFIFOindex(buf, (void *)madr);
         if (index != fifo_index) {
-            qwc = (u32)(((u8 *)buf->data + (index << 11)) - madr) >> 4;
             tag_addr = (u32)(buf->tag + index) & MOVIE_ADDR_MASK;
-            mode = 0;
-            if ((u32)buf->data + ((buf->dma_start + buf->dma_n) % buf->n << 11) !=
-                (u32)buf->data + (buf->env.d4madr - (u32)buf->data) % (buf->n << 11)) {
-                mode = 3;
-            }
+            qwc = (u32)(((u8 *)buf->data + (index << 11)) - madr) >> 4;
+            mode = ((u32)buf->data + (buf->env.d4madr - (u32)buf->data) % (buf->n << 11) ==
+                (u32)buf->data + ((buf->dma_start + buf->dma_n) % buf->n << 11)) ? 0 : 3;
             chcr = (buf->env.d4chcr & MOVIE_ADDR_MASK) | (mode << 28) | 0x100;
             pos = (fifo_index + buf->n - buf->dma_start) % buf->n;
             if (0 > pos || pos >= buf->dma_n) {
@@ -810,7 +807,7 @@ int viBufRestartDMA(ViBuf *buf) {
         }
     }
     if (buf->env.d3madr != 0 && buf->env.d3qwc != 0) {
-        *(u32 *)0x1000B010 = buf->env.d3madr;
+        *(u32 *)0x1000B010 = ((volatile ViBuf *)buf)->env.d3madr;
         *(u32 *)0x1000B020 = buf->env.d3qwc;
         setD3_CHCR(buf->env.d3chcr | 0x100);
     }

@@ -2779,7 +2779,7 @@ int GetUkiWaitTime(FISH_DATA *fish, CScene *scene, float *position, int rod_no, 
             weight = width_rate * (size * param->weight_rate);
             vigour_recovery = 0.01f;
             pull_strength = param->pull_rate * (size / 80.0f * width_rate);
-            fishing_point = fptosi(width_rate * (param->fishing_point_rate * size));
+            fishing_point = (int)(width_rate * (param->fishing_point_rate * size));
             if (GetFishingMode() == 2) {
                 fishing_point *= 2;
             }
@@ -2789,13 +2789,13 @@ int GetUkiWaitTime(FISH_DATA *fish, CScene *scene, float *position, int rod_no, 
             wait_extra /= 2;
         }
         if (!(wait_bias < 0.0f)) {
-            wait_time = fptosi(wait_base / (1.0f + wait_bias));
-            wait_extra = fptosi(wait_extra / (1.0f + wait_bias));
+            wait_time = (int)(wait_base / (1.0f + wait_bias));
+            wait_extra = (int)(wait_extra / (1.0f + wait_bias));
         } else {
-            wait_time = fptosi(wait_base * (1.0f - wait_bias));
-            wait_extra = fptosi(wait_extra / (1.0f - wait_bias));
+            wait_time = (int)(wait_base * (1.0f - wait_bias));
+            wait_extra = (int)(wait_extra / (1.0f - wait_bias));
         }
-        wait_time += fptosi(wait_extra * mgRnd());
+        wait_time += (int)(wait_extra * mgRnd());
     }
     int rod_power = RodData.status[2] - 10;
     if (rod_power < 0) {

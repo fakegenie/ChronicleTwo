@@ -1677,62 +1677,52 @@ int EditDraw() {
     static int                 flag;
     static char                init;
     CMap                      *maps[8];
-    CMap                      *map;
-    CEditMap                  *edit_map;
+    mgCTextureManager        *tex_manager;
+    CInventUserData           *invent;
+    int                       map_index;
+    USER_PICTURE_INFO         *picture;
+    int                       chara_no;
+    mgCTexture                *overlay;
+    mgCTexture                *water;
+    int                       ghost_visible;
+    int                       dof_off;
+    int                       block;
     CPartsGroup               *ghost_group;
     CList<PartsGroupData>     *group_entry;
-    CMapParts                 *parts;
-    CList<CMapPiece>          *piece;
-    CCharacter2               *chara;
-    mgCCamera                 *camera;
-    mgCTexture                *water;
-    mgCTexture                *screen;
-    mgCTexture                *overlay;
-    CInventUserData           *invent;
-    USER_PICTURE_INFO         *picture;
-    CFuncPoint                *subject;
-    CScene::InScreenCharaInfo  screen_chara;
-    InScreenFuncInfo           screen_func;
-    sceVu0FMATRIX             view_matrix;
-    sceVu0FVECTOR             camera_pos = { 0.0f, 0.0f, 100.0f, 0.0f };
-    sceVu0FVECTOR             camera_dir;
-    sceVu0FVECTOR             walk_pos;
-    sceVu0FVECTOR             player_pos;
-    sceVu0FVECTOR             system_pos;
-    sceVu0FVECTOR             screen_range;
-    sceVu0FVECTOR             lighting;
-    float                     blur_range[2];
-    float                     photo_dist;
-    int                       texture_order[65];
-    int                       texture_blocks[128];
-    int                       later_texture_blocks[128];
-    int                       map_count;
-    int                       map_draw;
-    int                       ghost_visible;
     int                       water_block;
-    int                       block_count;
-    int                       map_index;
-    int                       texture_group;
-    int                       block_index;
-    int                       block;
-    int                       dof_off;
-    int                       chara_no;
-    int                       idea_no;
+    int                       map_count;
+    mgCCamera                 *camera;
+    CMapParts                 *parts;
     int                       show_system;
     int                       main_map_no;
+    CList<CMapPiece>          *piece;
+    CFuncPoint                *subject;
+    CCharacter2               *chara;
+    CMap                      *map;
+    mgCTexture                *screen;
+    int                       texture_group;
+    int                       block_count;
+    int                       block_index;
+    int                       idea_no;
     int                       exit_flag;
+    CEditMap                  *edit_map;
+    int                       map_draw;
+    sceVu0FMATRIX             view_matrix;
 
     if (EditDrawCancelFlag != 0) {
         EditDrawCancelFlag = 0;
         return 0;
     }
 
+    tex_manager = &mgTexManager;
     map_draw = EdEventInfo.map_draw;
     map_count = MainScene__2->GetActiveMap(maps, 8);
     mgSetPkTextureRepeat(0);
     MainScene__2->GetCamera(MainScene__2->active_camera);
     camera = MainScene__2->GetCamera(MainScene__2->active_camera);
     if (camera != NULL) {
+        sceVu0FVECTOR camera_pos = { 0.0f, 0.0f, 100.0f, 0.0f };
+        sceVu0FVECTOR camera_dir;
         camera->GetCameraMatrix(view_matrix);
         camera->GetPos(camera_pos);
         camera->GetDir(camera_dir);
@@ -1781,6 +1771,7 @@ int EditDraw() {
 
     WorkBuffer.stack_used = 0;
     WorkBuffer.lock = 0;
+    int texture_order[65];
     for (block_index = 0; block_index < 64; block_index++) {
         texture_order[block_index] = block_index;
     }
@@ -1793,6 +1784,7 @@ int EditDraw() {
         }
         EditPlaceAnime();
         for (map_index = 0; map_index < map_count; map_index++) {
+            sceVu0FVECTOR walk_pos;
             if (WalkChara != NULL) {
                 WalkChara->GetPosition(walk_pos);
             }
@@ -1805,13 +1797,14 @@ int EditDraw() {
             EditPlaceAnimeDraw();
         }
         EditPlaceAnime2();
-        water = mgTexManager.GetTexture("water", -1);
+        water = tex_manager->GetTexture("water", -1);
         water_block = -1;
         if (water != NULL) {
             water_block = water->block;
             WaveTable.GetEffect();
         }
         mgPreEndDraw(NULL);
+        int texture_blocks[128];
         for (texture_group = 0; texture_group < 6; texture_group++) {
             block_count = MainScene__2->mds_list_set.GetTextureBlockNo(texture_group, texture_blocks, 128);
             for (block_index = 0; block_index < block_count; block_index++) {
@@ -1833,20 +1826,19 @@ int EditDraw() {
             dof_off = GetSaveData()->config.dof_off;
         }
         if (dof_off != 0 && IsEditMode() == 0) {
-            blur_range[0] = 1000.0f;
-            blur_range[1] = 2000.0f;
-            screen = mgTexManager.GetTexture("work", 0x9C);
-            mgTexManager.ReloadTexture(0x9C, (sceVif1Packet *)NULL);
+            float blur_range[2] = {1000.0f, 2000.0f};
+            screen = tex_manager->GetTexture("work", 0x9C);
+            tex_manager->ReloadTexture(0x9C, (sceVif1Packet *)NULL);
             DepthOfField(2, blur_range, screen, 1.0f);
         } else {
             map = MainScene__2->GetMap(MainScene__2->active_map);
             if (map != NULL) {
+                sceVu0FVECTOR lighting;
                 map->GetLightingRatio(lighting);
             }
-            blur_range[0] = 3000.0f;
-            blur_range[1] = 4000.0f;
-            screen = mgTexManager.GetTexture("work", 0x9C);
-            mgTexManager.ReloadTexture(0x9C, (sceVif1Packet *)NULL);
+            float blur_range[2] = {3000.0f, 4000.0f};
+            screen = tex_manager->GetTexture("work", 0x9C);
+            tex_manager->ReloadTexture(0x9C, (sceVif1Packet *)NULL);
             DepthOfField(1, blur_range, screen, 1.0f);
         }
     }
@@ -1859,8 +1851,8 @@ int EditDraw() {
         }
     }
     if (LoopMode == EDIT_LOOP_WALK) {
-        mgTexManager.ReloadTexture(0x9F, (sceVif1Packet *)NULL);
-        screen = mgTexManager.GetTexture("shadow_work", 0x9F);
+        tex_manager->ReloadTexture(0x9F, (sceVif1Packet *)NULL);
+        screen = tex_manager->GetTexture("shadow_work", 0x9F);
         mgBeginDrawShadow(screen, NULL);
         EditDrawShadowChara(MainScene__2);
         sgDrawSubGameCharaShadow();
@@ -1875,6 +1867,7 @@ int EditDraw() {
     sgDrawSubGameChara();
     mgSetPkTextureRepeat(1);
     if (map_draw != 0) {
+        int later_texture_blocks[128];
         for (texture_group = 6; texture_group < 16; texture_group++) {
             block_count = MainScene__2->mds_list_set.GetTextureBlockNo(texture_group, later_texture_blocks, 128);
             for (block_index = 0; block_index < block_count; block_index++) {
@@ -1892,6 +1885,7 @@ int EditDraw() {
     MainScene__2->DrawExclamationMark(RedBicMark);
     chara = MainScene__2->GetCharacter(MainScene__2->player_chara);
     if (chara != NULL) {
+        sceVu0FVECTOR player_pos;
         chara->GetPosition(player_pos);
         if (BlueBicMark != NULL) {
             BlueBicMark->SetPosition(player_pos);
@@ -1911,22 +1905,22 @@ int EditDraw() {
     }
     EditDrawEffectChara(MainScene__2);
     if (map_draw != 0) {
-        screen = mgTexManager.GetTexture("water_work", 0x9E);
-        overlay = mgTexManager.GetTexture("ref", 0x9E);
+        screen = tex_manager->GetTexture("water_work", 0x9E);
+        overlay = tex_manager->GetTexture("ref", 0x9E);
         camera = MainScene__2->GetCamera(MainScene__2->active_camera);
         for (map_index = 0; map_index < map_count; map_index++) {
             maps[map_index]->DrawWater(camera, screen, overlay);
         }
     }
     if (IsEditMode() != 0 && edit_map != NULL) {
-        mgTexManager.ReloadTexture(0xA3, (sceVif1Packet *)NULL);
+        tex_manager->ReloadTexture(0xA3, (sceVif1Packet *)NULL);
         DrawEditCursor(MainScene__2);
         EditPEffectStep();
         EditPEffectDraw(0xA3);
     }
     if (map_draw != 0) {
         MainScene__2->DrawEffect(0x42);
-        mgTexManager.ReloadTexture(0xA4, (sceVif1Packet *)NULL);
+        tex_manager->ReloadTexture(0xA4, (sceVif1Packet *)NULL);
         MainScene__2->DrawGameObject(MapNo);
     }
     sgDrawSubGameEffect();
@@ -1943,8 +1937,8 @@ int EditDraw() {
     if (NowTakePhoto() == 0) {
         InitNpcCameraReaction();
     } else {
-        mgTexManager.ReloadTexture(0xA2, (sceVif1Packet *)NULL);
-        mgTexManager.GetTexture("fix_work", -1);
+        tex_manager->ReloadTexture(0xA2, (sceVif1Packet *)NULL);
+        tex_manager->GetTexture("fix_work", -1);
         invent = NULL;
         if (GetUserData() != NULL) {
             invent = &GetUserData()->invent_data;
@@ -1953,6 +1947,9 @@ int EditDraw() {
             flag = 0;
             init = 1;
         }
+        sceVu0FVECTOR screen_range;
+        CScene::InScreenCharaInfo screen_chara;
+        float photo_dist;
         screen_chara.chara_no = -1;
         screen_chara.dist = 0.0f;
         screen_chara.in_center = 0;
@@ -1963,6 +1960,7 @@ int EditDraw() {
         }
         picture = invent->IsPhotoSpace(NULL);
         if (DrawTakePhoto(picture, &photo_dist) != 0 && picture != NULL) {
+            InScreenFuncInfo screen_func;
             screen_func.range = -1.0f;
             screen_func.unk_04 = 0;
             screen_func.dist = -1.0f;
@@ -2018,13 +2016,14 @@ int EditDraw() {
         show_system = 0;
     }
     if (show_system != 0) {
+        sceVu0FVECTOR system_pos;
         chara = MainScene__2->GetCharacter(MainScene__2->player_chara);
         if (chara != NULL) {
             chara->GetPosition(system_pos);
         }
         DrawEditSystem(0xA3, MainScene__2, system_pos, LoopMode == EDIT_LOOP_EDIT);
     }
-    mgTexManager.ReloadTexture(0x9A, (sceVif1Packet *)NULL);
+    tex_manager->ReloadTexture(0x9A, (sceVif1Packet *)NULL);
     EventMes1.DrawMesWin();
     GetSystemMessage()->DrawMesWin();
     GetSystemMessage(1)->DrawMesWin();
