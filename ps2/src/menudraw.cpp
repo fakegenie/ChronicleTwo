@@ -2657,7 +2657,7 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
         int i;
         int j;
         int put_top;
-        for (i = 0; i < 5; i++) {
+        for (int i = 0; i < 5; i++) {
             int edge_left = (int)put_x;
             put_top = (int)put_y;
             PrimQuad(prim, mgRect<int>(edge_left, put_top, 40, 32), *parts[frmtbl0_2922[part++]]);
@@ -2705,7 +2705,7 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
         scroll_bar_parts bars = at_2951__2;
         prim->Begin(6);
         prim->Texture(tex);
-        for (i = 0; i < 2; i++) {
+        for (int i = 0; i < 2; i++) {
             int *layer = layers[i];
             prim->Color(layer[1], layer[2], layer[3], layer[4]);
             float bar_y = y + 9;
