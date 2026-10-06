@@ -5855,10 +5855,10 @@ void CMenuEffect::PresetInfo(MENU_EFFECT_INFO *particle, int no, int mode) {
 void CMenuEffect::Step() {
     end = 0;
     if (run != 0) {
-        if (info != NULL) {
-            MENU_EFFECT_INFO *particle = info;
+        MENU_EFFECT_INFO *particle = info;
+        if (particle != NULL) {
+            int prev_type = type;
             int i;
-            s8 prev_type = type;
             int done = 1;
             switch (prev_type) {
                 case 0:
@@ -5898,7 +5898,7 @@ void CMenuEffect::Step() {
                             done = 0;
                             drop->x = base_info[0] + drop->unk_14 * drop->unk_0;
                             drop->y = base_info[1] + drop->unk_18 * drop->unk_0 + 0.25f * (drop->unk_1c * drop->unk_0);
-                            drop->unk_0 += 1.0f;
+                            drop->unk_0++;
                         }
                     }
                     if (done != 0) {
@@ -5945,17 +5945,17 @@ void CMenuEffect::Step() {
                     particle->y = base_info[1] - particle->unk_20;
                     particle->unk_14 = 2.0f * particle->unk_1c;
                     particle->unk_18 = 2.0f * particle->unk_20;
-                    particle->unk_0 += 1.0f;
+                    particle->unk_0++;
                     if (particle->unk_0 < 70.0f && (int)particle->unk_0 % 2 != 0) {
                         particle->unk_1c += 1.0f;
                         particle->unk_20 += 1.0f;
                         particle->unk_28 += 1.0f;
-                    } else if (particle->unk_0 >= 70.0f && particle->unk_0 < 112.0f &&
+                    } else if (70.0f <= particle->unk_0 && particle->unk_0 < 112.0f &&
                                (int)particle->unk_0 % 4 == 0) {
                         particle->unk_1c += 2.0f;
                         particle->unk_20 += 2.0f;
                         particle->unk_28 += 5.0f;
-                    } else if (particle->unk_0 >= 112.0f) {
+                    } else if (112.0f <= particle->unk_0) {
                         particle->unk_1c -= 6.0f;
                         particle->unk_20 -= 6.0f;
                         particle->unk_28 -= 13.0f;
@@ -5986,12 +5986,14 @@ void CMenuEffect::Step() {
                             particle->unk_28 = 0.0f;
                         }
                         if (particle->unk_24 > 0.0f) {
-                            float radius = particle->unk_1c;
                             float angle = 3.1415927f / particle->unk_18 * particle->unk_0;
+                            float radius = particle->unk_1c;
                             particle->x = base_info[0] + radius * cosf(angle);
                             particle->y = base_info[1] + radius * sinf(angle);
-                            particle->x += (int)(particle->unk_30 * sinf(3.1415927f * particle->unk_0 / particle->unk_38));
-                            particle->y += (int)(particle->unk_34 * sinf(3.1415927f * particle->unk_0 / particle->unk_38));
+                            int dx = particle->unk_30 * sinf(3.1415927f * particle->unk_0 / particle->unk_38);
+                            particle->x += dx;
+                            int dy = particle->unk_34 * sinf(3.1415927f * particle->unk_0 / particle->unk_38);
+                            particle->y += dy;
                             particle->unk_1c += particle->unk_20;
                             particle->unk_0 += 1.0f;
                             if (particle->unk_24 > 1.0f && particle->unk_1c < 3.0f) {
@@ -6025,7 +6027,7 @@ void CMenuEffect::Step() {
                     break;
                 case 15:
                     for (i = 0; i < info_num; i++, particle++) {
-                        particle->unk_0 += 1.0f;
+                        particle->unk_0++;
                         if ((int)particle->unk_0 % 2 != 0) {
                             particle->unk_28 += particle->unk_2c;
                         }
@@ -6062,7 +6064,7 @@ void CMenuEffect::Step() {
                         if (particle->unk_24 > 0.0f) {
                             particle->x += particle->unk_14;
                             particle->y += particle->unk_18;
-                            particle->unk_0 += 1.0f;
+                            particle->unk_0++;
                             done = 0;
                             if (particle->unk_24 > 1.0f && particle->unk_28 < 10.0f) {
                                 particle->unk_24 -= 1.0f;
@@ -6095,7 +6097,7 @@ void CMenuEffect::Step() {
                 case 18: {
                     int ended = 0;
                     for (i = 0; i < info_num; i++, particle++) {
-                        particle->unk_0 += 1.0f;
+                        particle->unk_0++;
                         if (particle->unk_0 > 26.0f) {
                             particle->unk_30 -= 2.0f;
                         }
@@ -6158,8 +6160,8 @@ void CMenuEffect::Step() {
                         if (abs((int)(particle->x - base_info[4])) < 9 && abs((int)(particle->y - base_info[5])) < 9) {
                             particle->x = base_info[4] + particle->unk_14 * sinf(0.07853982f * particle->unk_0);
                             particle->y = base_info[5] + particle->unk_14 * cosf(0.07853982f * particle->unk_0);
-                            gathered++;
                             fade = -5;
+                            gathered++;
                         } else {
                             fade = 3;
                             done = 0;
@@ -6172,7 +6174,7 @@ void CMenuEffect::Step() {
                             particle->unk_30 = 128.0f;
                         }
                     }
-                    particle->unk_0 += 1.0f;
+                    particle->unk_0++;
                     particle->x = base_info[4] - particle->unk_18;
                     particle->y = base_info[5] - particle->unk_18;
                     if (gathered < info_num * 14 / 15) {
