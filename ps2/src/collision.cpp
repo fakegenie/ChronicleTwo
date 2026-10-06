@@ -234,15 +234,49 @@ int CColFrame::InsidePoint(float *point) {
 }
 
 #pragma force_active on
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/collision", pre_trance_normal__FPA4_f);
+#pragma global_optimizer off
+asm void pre_trance_normal(float (*matrix)[4]) {
+    .set noreorder
+    lqc2 vf10, 0(a0)
+    lqc2 vf11, 0x10(a0)
+    lqc2 vf12, 0x20(a0)
+    jr ra
+    lqc2 vf13, 0x30(a0)
+}
+#pragma global_optimizer reset
 
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/collision", trance_normal__FPfPfPfPf);
-
+#pragma global_optimizer off
+asm void trance_normal(float *v0, float *v1, float *v2, float *normal) {
+    .set noreorder
+    lqc2 vf16, 0(a0)
+    lqc2 vf17, 0x10(a0)
+    lqc2 vf18, 0x20(a0)
+    vmulax.xyzw ACC, vf10, vf16x
+    vmadday.xyzw ACC, vf11, vf16y
+    vmaddaz.xyzw ACC, vf12, vf16z
+    vmaddw.xyzw vf16, vf13, vf16w
+    vmulax.xyzw ACC, vf10, vf17x
+    vmadday.xyzw ACC, vf11, vf17y
+    vmaddaz.xyzw ACC, vf12, vf17z
+    vmaddw.xyzw vf17, vf13, vf17w
+    vmulax.xyzw ACC, vf10, vf18x
+    vmadday.xyzw ACC, vf11, vf18y
+    vmaddaz.xyzw ACC, vf12, vf18z
+    vmaddw.xyzw vf18, vf13, vf18w
+    vsub.xyzw vf20, vf17, vf16
+    vsub.xyzw vf21, vf18, vf16
+    sqc2 vf16, 0(a0)
+    sqc2 vf17, 0(a1)
+    sqc2 vf18, 0(a2)
+    vnop
+    vopmula.xyz ACC, vf20, vf21
+    vopmsub.xyz vf22, vf21, vf20
+    jr ra
+    sqc2 vf22, 0(a3)
+}
+#pragma global_optimizer reset
 #pragma force_active reset
 #ifdef NONMATCHING
-void pre_trance_normal(float (*matrix)[4]);
-void trance_normal(float *v0, float *v1, float *v2, float *normal);
-
 int CColFrame::PickUpNearPoly(CCPoly *out, const mgVu0FBOX &box, int max) {
     if (flags == COL_FRAME_FLAG_NO_CHILDREN) {
         return 0;
