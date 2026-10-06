@@ -2367,10 +2367,10 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
             this->poly_chr_form[1]->SetActionCharaPtr(this->create_chara, this->tex_block[2], -1);
             this->GradationSet(3);
             MenuCommonInfo->MenuPosPlay();
-            this->unk_5e4 = 0.0f;
-            this->unk_5f0 = 0.0f;
-            this->unk_5f4 = 0;
-            this->unk_5f8 = 0.0f;
+            this->create_spin_angle = 0.0f;
+            this->create_wobble_phase = 0.0f;
+            this->create_show_phase = 0;
+            this->create_scale_in = 0.0f;
             if (this->create_step != 0) {
                 this->ExeScript(at_3117);
                 if (this->create_chara != NULL) {
@@ -2436,7 +2436,7 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
             } else {
                 this->ExeScript(at_3120);
             }
-            MenuSePlay(0, this->unk_394, &MenuSoundBuffer);
+            MenuSePlay(0, this->create_sound_buffer, &MenuSoundBuffer);
         }
         break;
     case kCreateShow: {
@@ -2444,20 +2444,20 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
             if (this->create_chara != NULL) {
                 float scale[4];
                 this->create_chara->GetScale(scale);
-                switch (this->unk_5f4) {
+                switch (this->create_show_phase) {
                 case 0:
-                    if (CalcMenuAdd(&this->unk_5f8, 0.4f, this->unk_5f8) != 0) {
-                        this->unk_5f4 = 1;
-                        this->unk_5e4 = 0.0f;
-                        this->unk_5ec = 0.4f * this->create_scale;
+                    if (CalcMenuAdd(&this->create_scale_in, 0.4f, this->create_scale_in) != 0) {
+                        this->create_show_phase = 1;
+                        this->create_spin_angle = 0.0f;
+                        this->create_wobble_amp = 0.4f * this->create_scale;
                     }
-                    scale[0] = this->unk_5f8;
+                    scale[0] = this->create_scale_in;
                     break;
                 case 1:
-                    scale[0] = this->create_scale + this->unk_5ec * sinf(0.10471976f * this->unk_5f0);
-                    CalcMenuAdd(&this->unk_5ec, -0.02f, 0.0f);
-                    CalcMenuAdd(&this->unk_5e4, 0.15707964f, 15.707964f);
-                    CalcMenuAdd(&this->unk_5f0, 1.0f, 600.0f);
+                    scale[0] = this->create_scale + this->create_wobble_amp * sinf(0.10471976f * this->create_wobble_phase);
+                    CalcMenuAdd(&this->create_wobble_amp, -0.02f, 0.0f);
+                    CalcMenuAdd(&this->create_spin_angle, 0.15707964f, 15.707964f);
+                    CalcMenuAdd(&this->create_wobble_phase, 1.0f, 600.0f);
                     if (menu_debug_flag != 0) {
                         float move[4];
                         float scale_step = -GamePad__2.GetRYf() / 8.0f;
@@ -2715,8 +2715,8 @@ int CMenuInvent::IsCreateObject(int mode, int keys) {
         s32 sound_size;
         load_stack->Align64();
         StartReadBG();
-        this->unk_394 = (u32 *)load_stack->stGetTop();
-        LoadFileBG(sndfileName_2951[this->create_step], (u_long128 *)this->unk_394, &sound_size);
+        this->create_sound_buffer = (u32 *)load_stack->stGetTop();
+        LoadFileBG(sndfileName_2951[this->create_step], (u_long128 *)this->create_sound_buffer, &sound_size);
         load_stack->Alloc((sound_size & 15) != 0 ? ((unsigned int)sound_size >> 4) + 1 :
                                                 (unsigned int)sound_size >> 4);
         this->create_load_state++;
@@ -2944,10 +2944,10 @@ int CMenuInvent::IsMakeObject(int keys, int button) {
                     MenuCharaLoadStack.stack_used = 0;
                     MenuCharaLoadStack.lock = 0;
                     MenuCharaLoadStack.Alloc(0xC0);
-                    unk_578 = MenuCharaLoadStack.stack + MenuCharaLoadStack.stack_used;
+                    load_sound_buffer = MenuCharaLoadStack.stack + MenuCharaLoadStack.stack_used;
                     StartReadBG();
                     int size;
-                    LoadFileBG(at_3350__2, (u_long128 *)unk_578, &size);
+                    LoadFileBG(at_3350__2, (u_long128 *)load_sound_buffer, &size);
                     u_int bytes = size + 16;
                     MenuCharaLoadStack.Alloc((bytes & 0xF) ? (bytes >> 4) + 1 : bytes >> 4);
                 }
@@ -2978,7 +2978,7 @@ int CMenuInvent::IsMakeObject(int keys, int button) {
                 MenuCommonInfo->cursor_form->draw_flag = 0;
             }
             ExeScript(at_3351);
-            MenuSePlay(0, (u_int *)unk_578, &MenuSoundBuffer);
+            MenuSePlay(0, (u_int *)load_sound_buffer, &MenuSoundBuffer);
             CreateModeSwapForm(1);
             step = 1;
         }
@@ -3716,7 +3716,7 @@ void CMenuInvent::PhotoNetaEnter(int index, int button) {
         case 1:
         case 4:
             if (answer == 0) {
-                unk_390 = 0;
+                neta_effect_time = 0;
                 InventInNetaEffectFlag = 1;
                 ExeScript(at_3932);
                 MenuSePlay(0x20);
@@ -3737,14 +3737,14 @@ void CMenuInvent::PhotoNetaEnter(int index, int button) {
         break;
     }
     case 1:
-        if (unk_390 == 0) {
+        if (neta_effect_time == 0) {
             if (CheckRunStarDust(InventInNetaEffect, InventInNetaEffectNum4) == 0) {
-                unk_390++;
+                neta_effect_time++;
             }
         } else {
-            unk_390++;
+            neta_effect_time++;
         }
-        if (unk_390 > 50) {
+        if (neta_effect_time > 50) {
             CheckPhotoFlag();
             InventUserDataPtr->PhotoCheckEnd();
             if (photo_only == 1 && unk_112 == 0) {
@@ -4937,7 +4937,7 @@ inline CMenuInvent::CMenuInvent() {
     album_cursor = album_top = 0;
     memo_cursor = 0;
     memo_top = 0;
-    unk_24c = 0;
+    card_scroll_dir = 0;
     unk_112 = 0;
     for (i = 0; i < 3; i++) {
         neta_select_index[i] = -1;
@@ -4957,7 +4957,7 @@ inline CMenuInvent::CMenuInvent() {
     blink_time = 0;
     neta_circle_snap = 0;
     neta_flash_angle = 0.0f;
-    unk_390 = 0;
+    neta_effect_time = 0;
     album_scroll_reset = 0;
     album_scroll_x = album_scroll_y = 0.0f;
     for (i = 0; i < 30; i++) {
@@ -4969,11 +4969,11 @@ inline CMenuInvent::CMenuInvent() {
         album_tex[i] = NULL;
     }
     InitPhotoNetaBoardToAlbum(0);
-    unk_394 = NULL;
+    create_sound_buffer = NULL;
     photo_scroll = 0.0f;
     photo_bar = 0.0f;
-    unk_5f8 = 0.0f;
-    unk_5f4 = 0;
+    create_scale_in = 0.0f;
+    create_show_phase = 0;
     blink_count = 0;
     chara_read_info = NULL;
     chara_load_step = 0;
@@ -5398,9 +5398,9 @@ int MenuInventPushKey(int pad, int pushed) {
                 int new_row = CMenuInventPt->card_top;
                 if (old_row != new_row) {
                     if (old_row < new_row) {
-                        CMenuInventPt->unk_24c = 1;
+                        CMenuInventPt->card_scroll_dir = 1;
                     } else {
-                        CMenuInventPt->unk_24c = 0;
+                        CMenuInventPt->card_scroll_dir = 0;
                     }
                 }
                 if (menu_debug_flag != 0) {
@@ -6133,7 +6133,7 @@ int MenuInventKey() {
         int line = 0;
         tops.top[0] = CMenuInventPt->card_top;
         tops.top[1] = CMenuInventPt->card_top - 1;
-        int top = tops.top[CMenuInventPt->unk_24c];
+        int top = tops.top[CMenuInventPt->card_scroll_dir];
         InventUserDataPtr->GetHatsumeiNum();
         CMenuPosDataForm *list_form = CMenuInventPt->card_list_form;
         float list_x = list_form->x;

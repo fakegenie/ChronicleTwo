@@ -153,7 +153,7 @@ public:
     MENUFORM_MAKEBRD_INFO make_board;
     CGameDataUsed         create_item;
     MC_ICON_DATA          icon_data[3];
-    u8                    unk_24c;
+    u8                    card_scroll_dir;
     u8                    album_scroll_reset;
     u8                    unk_24e[2];
     float                 album_scroll_x;
@@ -171,9 +171,9 @@ public:
     u8                    unk_364[0xC];
     float                 neta_color[4];
     float                 scoop_color[4];
-    short                 unk_390;
+    short                 neta_effect_time;
     short                 unk_392;
-    u_int                *unk_394;
+    u_int                *create_sound_buffer;
     mgCMemory             data_stack;
     mgCTexture           *photo_tex[30];
     mgCTexture           *album_tex[50];
@@ -183,7 +183,7 @@ public:
     u8                   *create_model_file;
     u8                   *create_motion_file;
     CActionChara         *create_chara;
-    void                 *unk_578;
+    void                 *load_sound_buffer;
     INVENT_MATERIAL_LIST *make_material;
     short                 create_step;
     short                 create_item_id;
@@ -196,13 +196,13 @@ public:
     int                   neta_circle_snap;
     float                 neta_flash_angle;
     u8                    new_neta_photo[0x20];
-    float                 unk_5e4;
+    float                 create_spin_angle;
     float                 create_scale;
-    float                 unk_5ec;
-    float                 unk_5f0;
-    u8                    unk_5f4;
+    float                 create_wobble_amp;
+    float                 create_wobble_phase;
+    u8                    create_show_phase;
     u8                    unk_5f5[3];
-    float                 unk_5f8;
+    float                 create_scale_in;
     s8                    create_load_state;
     u8                    unk_5fd[3];
     int                   create_timer;
