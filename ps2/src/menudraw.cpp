@@ -278,7 +278,7 @@ extern board_button_color at_1814;
 
 extern s16 get_onoffbrdtbl_1789[2][3][4];
 
-extern u8 get_btntbl_1810[2][2];
+extern s8 get_btntbl_1810[2][2];
 
 extern float menu_cursor_rotation_angle;
 
@@ -1544,7 +1544,7 @@ void CommonBoardDraw(float *pos, int &tex_block) {
             prim->Color(0x80, 0x80, 0x80, 0x80);
         }
         if (line->kind != 0) {
-            u8 *button = get_btntbl_1810[line->button];
+            s8 *button = get_btntbl_1810[line->button];
             PrimQuad(prim, mgRect<int>((int)(line_x - 3.0f), top, 16, 16), mgRect<int>(button[0], button[1], 16, 16));
         }
     }
