@@ -606,12 +606,12 @@ void SetMenuLoadItemNo(int who) {
             break;
         }
         case 2: {
-            u8 *robo = (u8 *)userData;
-            MenuLoadItemNo[0] = *(short *)(robo + 0x47D6);
-            MenuLoadItemNo[1] = *(short *)(robo + 0x4692);
-            MenuLoadItemNo[2] = *(short *)(robo + 0x46FE);
+            ROBO_DATA *robo = &userData->robo_data;
+            MenuLoadItemNo[0] = robo->parts[3].item_no;
+            MenuLoadItemNo[1] = robo->parts[0].item_no;
+            MenuLoadItemNo[2] = robo->parts[1].item_no;
             MenuLoadItemNo[3] = 0;
-            MenuLoadItemNo[4] = *(short *)(robo + 0x476A);
+            MenuLoadItemNo[4] = robo->parts[2].item_no;
             count = 5;
             break;
         }
@@ -4514,20 +4514,20 @@ unsigned int MenuItemChrLoad(mgCMemory *stack, int itemNo, int variant, MENU_BGR
 int MenuItemChrLoadEndCheck(MENU_BGREAD_INFO2 *info, CActionChara *chara, mgCMemory *memory,
                             int texBlock) {
     if (info->reading != 0) {
-        u8 *loaded = GetReadBGInfo__FPc((char *)&info->path);
-        u8 *texManager = (u8 *)&mgTexManager;
+        BG_READ_INFO *loaded = (BG_READ_INFO *)GetReadBGInfo__FPc((char *)&info->path);
+        mgCTextureManager *texManager = &mgTexManager;
         int modelBuffer;
         DeleteBlock__17mgCTextureManagerFi(texManager, texBlock);
-        modelBuffer = *(int *)(loaded + 0x110);
+        modelBuffer = (int)loaded->buffer;
         memory->stack_used = 0;
         memory->lock = 0;
         info->chara = chara;
         if (chara != NULL) {
-            strcpy((char *)(texManager + 0x1D8), at_4123);
+            strcpy(texManager->name_suffix, at_4123);
             chara->Initialize(NULL);
             chara->LoadPack((u_int *)modelBuffer, menu_infocfgname, memory, memory, memory, texBlock,
                              0);
-            texManager[0x1D8] = 0;
+            texManager->name_suffix[0] = 0;
         }
         info->reading = 0;
         return 1;
