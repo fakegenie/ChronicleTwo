@@ -517,7 +517,6 @@ void CSound::SE_Stop(int port, int bank, int program, int key, int id) {
     }
 }
 
-#ifdef STATEMATCHING
 void CSound::Step() {
     int port;
 
@@ -552,9 +551,6 @@ void CSound::Step() {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/sound", Step__6CSoundFv);
-#endif
 
 void CSound::Stop(int port) {
     ezMidi(port + 0x20, 0);
