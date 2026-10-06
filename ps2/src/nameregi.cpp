@@ -1367,14 +1367,12 @@ void CNameRegiMenu::GetSelectedActiveFont(char *dst) {
     char *table = first_table;
     s16 cell = select.pos;
     if (font_mode == NAMEREGI_FONT_MODE_HIRA || font_mode == NAMEREGI_FONT_MODE_KATA) {
-        u32 rest = cell % 15;
-        char *kana_tables[3] = { NULL, NULL, NULL };
-        kana_tables[0] = first_table;
-        unsigned short column = cell / 15;
-        kana_tables[1] = second_table;
-        kana_tables[2] = third_table;
-        table = kana_tables[rest / 5];
-        char *glyph = column + (2 * (rest % 5 + column * 5)) + table;
+        int rest = cell % 15;
+        int column = cell / 15;
+        int part = rest / 5;
+        char *kana_tables[3] = { first_table, second_table, third_table };
+        table = kana_tables[part];
+        char *glyph = table + (column + 2 * (rest - part * 5 + column * 5));
         dst[0] = glyph[0];
         dst[1] = glyph[1];
     }
