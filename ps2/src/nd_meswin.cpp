@@ -2135,16 +2135,18 @@ int ClsMes::SetMesWinTbl(int code, short x, short y) {
     }
     return 1;
 }
-#ifdef NONMATCHING
+#pragma divbyzerocheck on
 int ClsMes::CalcSpaceW(int width, int char_width, unsigned short *text) {
-    int            spaces;
-    int            used_width;
-    unsigned short code;
+    unsigned short *p;
+    int code;
+    int used_width;
+    int spaces;
 
-    spaces = 0;
     used_width = 0;
+    spaces = 0;
+    p = text;
     while (1) {
-        code = *text++;
+        code = *p++;
         switch (code) {
         case MES_CODE_NEWLINE:
         case MES_CODE_PAGE:
@@ -2179,7 +2181,7 @@ int ClsMes::CalcSpaceW(int width, int char_width, unsigned short *text) {
             continue;
         } else if (code >= MES_CODE_COLOR_A && code <= 0xF2FF) {
             continue;
-        } else if (code == MES_CODE_VOICE_1 || code == MES_CODE_VOICE_0) {
+        } else if ((unsigned)(code - MES_CODE_VOICE_1) <= 1) {
             continue;
         } else if (code == MES_CODE_VOICE_2) {
             continue;
@@ -2194,9 +2196,7 @@ int ClsMes::CalcSpaceW(int width, int char_width, unsigned short *text) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/nd_meswin", CalcSpaceW__6ClsMesFiiPUs);
-#endif
+#pragma divbyzerocheck reset
 int ClsMes::MakeMesWinTbl(int mes_no) {
     unsigned short *text;
     short          *registered_name;
