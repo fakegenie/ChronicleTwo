@@ -3329,7 +3329,6 @@ int _SCN_GET_ENTRY_OBJ_POS(RS_STACKDATA *stack, int argc) {
     SetStackFloat(stack, pos[2]);
     return 1;
 }
-#ifdef NONMATCHING
 int _INTERSECTION_POINT(RS_STACKDATA *stack, int argc) {
     sceVu0FVECTOR start;
     sceVu0FVECTOR end;
@@ -3338,8 +3337,6 @@ int _INTERSECTION_POINT(RS_STACKDATA *stack, int argc) {
     mgVu0FBOX box;
     CCPoly poly[0x80];
     sceVu0FVECTOR normal;
-    int foot_sound;
-    int area_kind;
 
     if (argc != 8 && argc != 9 && argc != 10 && argc != 11 && argc != 12 && argc != 13 && argc != 14 && argc != 15 && argc != 16) {
         return 0;
@@ -3349,14 +3346,14 @@ int _INTERSECTION_POINT(RS_STACKDATA *stack, int argc) {
     GetStackVector(end, stack + 3);
     stack += 6;
     float range = 10.0f + mgDistVector(start, end);
-    box.max[3] = 1.0f;
-    box.min[3] = 1.0f;
     box.max[0] = range + start[0];
     box.min[0] = start[0] - range;
     box.max[1] = range + start[1];
     box.min[1] = start[1] - range;
     box.max[2] = range + start[2];
     box.min[2] = start[2] - range;
+    box.max[3] = 1.0f;
+    box.min[3] = 1.0f;
     int poly_num = now_scene->GetColPoly(poly, box, 0x80);
     if (poly_num >= 0x80) {
         printf(at_3303__2, poly_num);
@@ -3364,6 +3361,8 @@ int _INTERSECTION_POINT(RS_STACKDATA *stack, int argc) {
     }
     CCPoly *hit_poly = poly;
     int hit_no = CheckHit(hit_poly, poly_num, start, end, hit, 1, ignore_mask);
+    int foot_sound;
+    int area_kind;
     if (hit_no >= 0) {
         hit_poly += hit_no;
         sceVu0Normalize(normal, hit_poly->normal);
@@ -3426,9 +3425,6 @@ int _INTERSECTION_POINT(RS_STACKDATA *stack, int argc) {
     }
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/effscript", _INTERSECTION_POINT__FP12RS_STACKDATAi);
-#endif
 int _MON_SE_PLAY(RS_STACKDATA *stack, int argc) {
     float position[4];
     float pad[2];
@@ -3453,8 +3449,8 @@ int _MON_SE_PLAY(RS_STACKDATA *stack, int argc) {
             break;
         case 4:
             GetStackVector(position, stack);
-            float near_distance = 160.0f;
             float far_distance = 1200.0f;
+            float near_distance = 160.0f;
             sndGetVolPan(&volume, &pan, position, near_distance, far_distance);
             sndSePlayVPf(se_handle, se_id, volume, pan, 0);
             break;
