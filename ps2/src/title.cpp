@@ -1587,7 +1587,6 @@ void TitleMCCheckInit(int boot_mode) {
         TitleMCCheckMes->MakeMesWin(0x66);
     }
 }
-#ifdef NONMATCHING
 int TitleMCCheckKey() {
     MC_CARD_INFO *cards[2];
     u8 inserted[2];
@@ -1677,8 +1676,6 @@ int TitleMCCheckKey() {
             break;
     }
     switch (result) {
-        default:
-            return 0;
         case 0:
             TitleMCCheckPort = 0;
             TitleMCCheck->port = 0;
@@ -1723,9 +1720,6 @@ int TitleMCCheckKey() {
     }
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/title", TitleMCCheckKey__Fv);
-#endif
 void TitleMCCheckDraw(void) {
     if (TitleMCCheckMes != NULL) {
         mgTexManager.ReloadTexture(0x46, (sceVif1Packet *)NULL);
