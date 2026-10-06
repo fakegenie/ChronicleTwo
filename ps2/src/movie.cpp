@@ -35,6 +35,13 @@ int sceCdStStop();
 int sceCdStRead(unsigned int sectors, void *buffer, unsigned int mode, unsigned int *error);
 }
 
+enum {
+    MOVIE_ADDR_MASK = 0xFFFFFFF,
+    MOVIE_UNCACHED_BIT = 0x20000000,
+    MOVIE_SECTOR_SIZE = 0x800,
+    MOVIE_FRAME_STRIDE = 0xE0000,
+};
+
 extern u8 isStarted;
 extern int writerest;
 extern u8 isFrameEnd;
@@ -94,10 +101,10 @@ extern char at_1110__2[];
 extern char at_1270__3[];
 
 static inline void *DmaAddr(void *addr) {
-    return (void *)((u32)addr & 0xFFFFFFF);
+    return (void *)((u32)addr & MOVIE_ADDR_MASK);
 }
 static inline void *UncAddr(void *addr) {
-    return (void *)(((u32)addr & 0xFFFFFFF) | 0x20000000);
+    return (void *)(((u32)addr & MOVIE_ADDR_MASK) | MOVIE_UNCACHED_BIT);
 }
 #ifdef NONMATCHING
 void CMovie::Load(char *name, mgCMemory **memory, int width, int height, bool with_audio, bool loop,
@@ -443,8 +450,8 @@ int videoCallback(sceMpeg *mpeg, sceMpegCbDataStr *str, void *user) {
         first = total;
     }
     videoDecBeginPut(&videoDec, &area1, &size1, &area2, &size2);
-    int copied = cpy2area((u8 *)(((u32)area1 & 0xFFFFFFF) | 0x20000000), size1,
-                          (u8 *)(((u32)area2 & 0xFFFFFFF) | 0x20000000), size2, src, first,
+    int copied = cpy2area((u8 *)(((u32)area1 & MOVIE_ADDR_MASK) | MOVIE_UNCACHED_BIT), size1,
+                          (u8 *)(((u32)area2 & MOVIE_ADDR_MASK) | MOVIE_UNCACHED_BIT), size2, src, first,
                           (u8 *)user, total - first);
     if (copied > 0 && videoDecPutTs(&videoDec, str->pts, str->dts, area1, copied) == 0) {
         printf(at_584__2);
@@ -556,7 +563,7 @@ u8 *voBufGetData(VoBuf *buf) {
     if (voBufIsFull(buf)) {
         return 0;
     }
-    return (u8 *)buf->data + buf->write * 0xE0000;
+    return (u8 *)buf->data + buf->write * MOVIE_FRAME_STRIDE;
 }
 static s32 voBufIsEmpty(VoBuf *buffer) {
     return buffer->count == 0;
@@ -574,7 +581,7 @@ void voBufDecCount(VoBuf *buf) {
         buf->count = buf->count - 1;
 }
 static u32 getFIFOindex(ViBuf *buf, void *addr) {
-    if (addr == (void *)(((u32)buf->tag + (buf->n + 1) * 0x10) & 0xFFFFFFF)) {
+    if (addr == (void *)(((u32)buf->tag + (buf->n + 1) * 0x10) & MOVIE_ADDR_MASK)) {
         return 0;
     }
     return ((u32)addr - (u32)buf->data) >> 11;
@@ -600,7 +607,7 @@ static void scTag2(QWORD *tag, void *addr, u32 id, u32 count) {
 }
 int viBufCreate(ViBuf *buf, u_long128 *data, u_long128 *tags, int sectors, TimeStamp *ts, int ts_count) {
     buf->data = data;
-    buf->tag = (u_long128 *)(((u32)tags & 0xFFFFFFF) | 0x20000000);
+    buf->tag = (u_long128 *)(((u32)tags & MOVIE_ADDR_MASK) | MOVIE_UNCACHED_BIT);
     buf->n = sectors;
     buf->buff_size = sectors << 11;
     buf->ts = ts;
@@ -629,12 +636,12 @@ int viBufReset(ViBuf *buf) {
         buf->ts[i].len = 0;
     }
     for (i = 0; i < buf->n; i++) {
-        scTag2((QWORD *)(buf->tag + i), DmaAddr((u8 *)buf->data + i * 0x800), 3, 0x80);
+        scTag2((QWORD *)(buf->tag + i), DmaAddr((u8 *)buf->data + i * MOVIE_SECTOR_SIZE), 3, 0x80);
     }
     scTag2((QWORD *)(buf->tag + i), DmaAddr(buf->tag), 2, 0);
     *(int *)0x1000B420 = 0;
-    *(int *)0x1000B410 = (u32)buf->data & 0xFFFFFFF;
-    *(int *)0x1000B430 = (u32)buf->tag & 0xFFFFFFF;
+    *(int *)0x1000B410 = (u32)buf->data & MOVIE_ADDR_MASK;
+    *(int *)0x1000B430 = (u32)buf->tag & MOVIE_ADDR_MASK;
     setD4_CHCR(5U);
     return 1;
 }
@@ -685,23 +692,23 @@ int viBufAddDMA(ViBuf *buf) {
     buf->dma_n -= consumed;
     int ready;
     int tail = (buf->dma_start + buf->dma_n) % buf->n;
-    ready = buf->read_bytes / 0x800;
-    buf->read_bytes %= 0x800;
+    ready = buf->read_bytes / MOVIE_SECTOR_SIZE;
+    buf->read_bytes %= MOVIE_SECTOR_SIZE;
     if (ready > 0) {
         int last = (buf->dma_start + buf->dma_n - 1 + buf->n) % buf->n;
-        scTag2((QWORD *)(buf->tag + last), (void *)((u8 *)buf->data + last * 0x800), 3,
+        scTag2((QWORD *)(buf->tag + last), (void *)((u8 *)buf->data + last * MOVIE_SECTOR_SIZE), 3,
                0x80);
         chained = 1;
     }
     for (int i = 0; i < ready; i++) {
-        scTag2((QWORD *)(buf->tag + tail), (void *)((u8 *)buf->data + tail * 0x800),
+        scTag2((QWORD *)(buf->tag + tail), (void *)((u8 *)buf->data + tail * MOVIE_SECTOR_SIZE),
                i == ready - 1 ? 0 : 3, 0x80);
         tail = (tail + 1) % buf->n;
     }
     buf->dma_n += ready;
     if (buf->dma_n != 0) {
         if (chained) {
-            chcr = (chcr & 0xFFFFFFF) | 0x30000000;
+            chcr = (chcr & MOVIE_ADDR_MASK) | 0x30000000;
         }
         setD4_CHCR(chcr | 0x100);
     }
@@ -746,7 +753,7 @@ int viBufRestartDMA(ViBuf *buf) {
         int size = buf->n << 11;
         int mode = 0;
         qwc = (u32)((u8 *)buf->data - madr) >> 4;
-        tag_addr = (u32)buf->tag & 0xFFFFFFF;
+        tag_addr = (u32)buf->tag & MOVIE_ADDR_MASK;
         madr += size;
         if (buf->env.d4madr != (u32)buf->data && buf->env.d4madr != (u32)buf->data + size) {
             mode = 3;
@@ -762,7 +769,7 @@ int viBufRestartDMA(ViBuf *buf) {
         if (index != fifo_index) {
             int mode = 0;
                 qwc = (u32)(((u8 *)buf->data + (fifo_index << 11)) - madr) >> 4;
-            tag_addr = (u32)(buf->tag + fifo_index) & 0xFFFFFFF;
+            tag_addr = (u32)(buf->tag + fifo_index) & MOVIE_ADDR_MASK;
             if ((u32)buf->data + ((buf->dma_start + buf->dma_n) % buf->n << 11) !=
                 (u32)buf->data + (buf->env.d4madr - (u32)buf->data) % (buf->n << 11)) {
                 mode = 3;
@@ -812,7 +819,7 @@ int viBufDelete(ViBuf *buf) {
 }
 void viBufFlush(ViBuf *buf) {
     WaitSema(buf->sema);
-    buf->read_bytes = (buf->read_bytes + 0x7FF) / 0x800 * 0x800;
+    buf->read_bytes = (buf->read_bytes + (MOVIE_SECTOR_SIZE - 1)) / MOVIE_SECTOR_SIZE * MOVIE_SECTOR_SIZE;
     SignalSema(buf->sema);
 }
 #pragma divbyzerocheck on
@@ -1274,7 +1281,7 @@ int decBs0(VideoDec *dec) {
                     setImageTag(((VoTag *)((u8 *)voBuf.ring_tag + tag_offset))->v[1],
                                 (u8 *)voBuf.data + data_offset, 0, dec->mpeg.width, dec->mpeg.height);
                     tag_offset += 0x48;
-                    data_offset += 0xE0000;
+                    data_offset += MOVIE_FRAME_STRIDE;
                 }
             }
             voBufIncCount(&voBuf);
@@ -1298,7 +1305,7 @@ void setImageTag(u32 *tag, void *data, int a, int width, int height) {
     unsigned int tile_x;
     unsigned int tile_y;
 
-    sceGifPkInit(&packet, (u_long128 *)(((u32)tag & 0xFFFFFFF) | 0x20000000));
+    sceGifPkInit(&packet, (u_long128 *)(((u32)tag & MOVIE_ADDR_MASK) | MOVIE_UNCACHED_BIT));
     sceGifPkReset(&packet);
     sceGsTex0 tex0 = mgTexManager.GetTexture(TexName, -1)->tex0;
     sceGifPkCnt(&packet, 0, 0, 0);
