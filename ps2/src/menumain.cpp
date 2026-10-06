@@ -1551,7 +1551,6 @@ int CMenuInter::ReadBGTexture(int bgNo, int restart) {
     }
     return bg_read_step == 2;
 }
-#ifdef STATEMATCHING
 int MenuInternSelectKey(void) {
     int result = 0;
     int select_key = MenuCommonInfo->CheckSelectKey();
@@ -1703,9 +1702,6 @@ int MenuInternSelectKey(void) {
     MenuPosData->FormStep();
     return result;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menumain", MenuInternSelectKey__Fv);
-#endif
 void MenuInternSelectDraw(void) {
     MenuPosData->FormDraw();
     if (MenuInterMesDrawFlag != 0 && MenuInterMes != NULL) {
