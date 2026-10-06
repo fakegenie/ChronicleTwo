@@ -514,7 +514,7 @@ void FishModifyParam(grFISH_PARAM *source, float *output, float average) {
         break;
     }
     case 1: {
-        float factor = GetRandomNumber(1.0f, 0.2f);
+        float factor = GetRandomNumber(float(1.0), float(0.2));
         for (i = 1; i <= 3; ++i) output[i] *= factor;
         break;
     }
@@ -528,7 +528,7 @@ void FishModifyParam(grFISH_PARAM *source, float *output, float average) {
         output[5] += 0.2f;
         output[1] *= 0.8f;
         output[2] *= 0.8f;
-        output[3] *= GetRandomNumber(1.8f, float(0.4));
+        output[3] *= GetRandomNumber(float(1.8), float(0.4));
         break;
     case 4: {
         float factor = GetRandomNumber(float(1.0), float(0.2));
@@ -539,7 +539,7 @@ void FishModifyParam(grFISH_PARAM *source, float *output, float average) {
     case 5:
         output[5] += 0.1f;
         output[1] *= 0.8f;
-        float factor = GetRandomNumber(float(1.3), float(0.3));
+        float factor = GetRandomNumber(1.3f, 0.3f);
         output[2] *= factor;
         output[3] *= 0.8f;
         break;
