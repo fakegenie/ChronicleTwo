@@ -1728,11 +1728,15 @@ int CFishAquarium::CheckHaigouTankSex(CGameDataUsed *fish) {
 #ifdef NONMATCHING
 void CFishAquarium::RefreshParam() {
     int i;
+    bool crowded;
+    float hour;
+    int in_tank;
+    int tired;
     int now = GetSaveData()->play_time;
     s64 elapsed = now - last_time;
     last_time = now;
     int day = GetMainScene()->day;
-    float hour = GetMainScene()->time;
+    hour = GetMainScene()->time;
     float hours = hour - last_hour;
     int days = day - last_day;
     if (hours < 0.0f && 0 < days) {
@@ -1743,21 +1747,22 @@ void CFishAquarium::RefreshParam() {
         }
     }
     int fatigue_step = 0;
-    if (6.0f <= (float)fptosi(hours + 24.0f * (float)days)) {
+    hours += 24.0f * (float)days;
+    if (6.0f <= (float)fptosi(hours)) {
         fatigue_step = 1;
     }
     for (i = 0; i < 6; i++) {
         fish_tank[i].TimeCheck(elapsed);
     }
-    int crowded = false;
+    crowded = false;
     if (GetAquariumFishNum(1) > 1) {
         crowded = true;
     }
     for (i = 0; i < 4; i++) {
         if (sub_tank[i].item_no > 0) {
             sub_tank[i].TimeCheck(elapsed);
-            float tank_hours = hour - sub_tank[i].data.fish.tank_hour;
             int tank_days = day - sub_tank[i].data.fish.tank_day;
+            float tank_hours = hour - sub_tank[i].data.fish.tank_hour;
             if (tank_hours < 0.0f && 0 < tank_days) {
                 tank_days--;
                 tank_hours += 24.0f;
@@ -1765,10 +1770,10 @@ void CFishAquarium::RefreshParam() {
                     tank_days = 0;
                 }
             }
-            int in_tank = fptosi(tank_hours + 24.0f * (float)tank_days);
+            in_tank = fptosi(tank_hours + 24.0f * (float)tank_days);
             int tired = 0;
             while (crowded && in_tank - 6 >= 0) {
-                if ((u32)sub_tank[i].data.fish.hp >= 16) {
+                if ((u32)sub_tank[i].data.fish.hp > 15) {
                     sub_tank[i].data.fish.param[4]++;
                     sub_tank[i].AddFishHp(-5);
                     sub_tank[i].CheckParamLimmit();
@@ -1786,7 +1791,7 @@ void CFishAquarium::RefreshParam() {
             }
         }
     }
-    for (int i = 0; i < 2; i++) {
+    for (i = 0; i < 2; i++) {
         breed_tank[i].TimeCheck(elapsed);
     }
     if (fatigue_step) {
