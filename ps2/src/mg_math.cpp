@@ -45,7 +45,11 @@ asm void mgCreateBox8(float (*corners)[4], float *max, float *min) {
 void mgZeroVector(float *vector) {
     *(u_long128 *)vector = 0;
 }
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgZeroVectorW__FPf);
+asm void mgZeroVectorW(float *vector) {
+    .set noreorder
+    jr ra
+    sqc2 vf0, 0x0(a0)
+}
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgClipBoxVertex__FPfPfPf);
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgClipBox__FPfPfPfPf);
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_math", mgClipBoxW__FPfPfPfPf);
