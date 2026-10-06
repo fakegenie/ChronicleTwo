@@ -724,7 +724,6 @@ void CMenuChrCngMenu::AttachForm() {
         cmd_part[j] = form->GetPartInfo(name);
     }
 }
-#ifdef STATEMATCHING
 void CMenuChrCngMenu::EnterDataMenu(u8 *pack) {
     char name[0x20];
     int size;
@@ -838,9 +837,6 @@ void CMenuChrCngMenu::EnterDataMenu(u8 *pack) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuchr", EnterDataMenu__15CMenuChrCngMenuFPUc);
-#endif
 void CMenuChrCngMenu::LoadNPCFaceData(mgCMemory *memory, int mode) {
     char path[0x40];
     unsigned int size;
