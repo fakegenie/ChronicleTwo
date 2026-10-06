@@ -314,3 +314,13 @@ extern float iwa0_offset[10][4];
  * the smash.
  */
 extern float iwa1_offset[9][4];
+
+/**
+ * Pot that the player carries.
+ */
+extern CPot BTsubo;
+
+/**
+ * Breakable pot.
+ */
+extern CBPot BTsubo2;
