@@ -73,6 +73,15 @@ enum sndSQ_STATE {
 
 /**
  *
+ * Bits of the value sndStreamGetState returns.
+ *
+ */
+enum sndSTREAM_STATE {
+    SND_STREAM_STATE_PLAYING = 0x1000, /**< The stream is playing. */
+};
+
+/**
+ *
  * Reverb types, as named in a bank's sound effect and volume tables.
  *
  */

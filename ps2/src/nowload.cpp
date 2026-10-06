@@ -329,7 +329,7 @@ void PauseEnd() {
     if (bgm_status[0] == 1) {
         PauseInfo.scene->RePlayBGM();
     }
-    if ((wave_status & 0x1000) != 0) {
+    if ((wave_status & SND_STREAM_STATE_PLAYING) != 0) {
         sndStreamRePlay();
     }
     sndPortSqReplay(4);
@@ -364,7 +364,7 @@ int PauseLoop() {
     }
     if (InitFlag == 15) {
         wave_status = sndStreamGetState();
-        if (wave_status & 0x1000) { sndStreamPause(); sndSetMasterVol(1, 0.0f); }
+        if (wave_status & SND_STREAM_STATE_PLAYING) { sndStreamPause(); sndSetMasterVol(1, 0.0f); }
     }
     if (InitFlag <= 15) sndStep(2.0f);
     ++InitFlag;
