@@ -909,8 +909,10 @@ void ResetMenuScissor() {
     prim->End();
 }
 #ifdef NONMATCHING
-// 99.5% match, 21 words off
+// 99.9% match, 6 words off
 int SetModeMenuDrawItemBoard(int mode) {
+    int k;
+    CGameDataUsed *item;
     int party;
     int i;
     CGameDataUsed *used;
@@ -949,10 +951,10 @@ int SetModeMenuDrawItemBoard(int mode) {
             MenuDrawItemInfo[MenuDrawItemInfoNum] = &MenuUserParam.robo->parts[0];
             MenuDrawItemInfoNum++;
         }
-        used = MenuUserParam.used_data;
-        for (i = 0; i < 150; i++, used++) {
-            if (used->item_type == ITEM_DATA_ROBO_PART_D) {
-                MenuDrawItemInfo[MenuDrawItemInfoNum] = used;
+        item = MenuUserParam.used_data;
+        for (k = 0; k < 150; k++, item++) {
+            if (item->item_type == ITEM_DATA_ROBO_PART_D) {
+                MenuDrawItemInfo[MenuDrawItemInfoNum] = item;
                 MenuDrawItemInfoNum++;
             }
         }
@@ -962,10 +964,10 @@ int SetModeMenuDrawItemBoard(int mode) {
             MenuDrawItemInfo[MenuDrawItemInfoNum] = &MenuUserParam.robo->parts[2];
             MenuDrawItemInfoNum++;
         }
-        used = MenuUserParam.used_data;
-        for (i = 0; i < 150; i++, used++) {
-            if (used->item_type == ITEM_DATA_ROBO_WEAPON) {
-                MenuDrawItemInfo[MenuDrawItemInfoNum] = used;
+        item = MenuUserParam.used_data;
+        for (k = 0; k < 150; k++, item++) {
+            if (item->item_type == ITEM_DATA_ROBO_WEAPON) {
+                MenuDrawItemInfo[MenuDrawItemInfoNum] = item;
                 MenuDrawItemInfoNum++;
             }
         }
@@ -983,10 +985,10 @@ int SetModeMenuDrawItemBoard(int mode) {
                 }
             }
         }
-        used = MenuUserParam.used_data;
-        for (i = 0; i < 150; i++, used++) {
-            if (used->used_type == USED_ITEM_TYPE_FISH) {
-                MenuDrawItemInfo[MenuDrawItemInfoNum] = used;
+        item = MenuUserParam.used_data;
+        for (k = 0; k < 150; k++, item++) {
+            if (item->used_type == USED_ITEM_TYPE_FISH) {
+                MenuDrawItemInfo[MenuDrawItemInfoNum] = item;
                 MenuDrawItemInfoNum++;
             }
         }
