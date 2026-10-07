@@ -6609,15 +6609,14 @@ void CMenuEffect::PresetInfo(MENU_EFFECT_INFO *particle, int no, int mode) {
             break;
     }
 }
-#ifdef NONMATCHING
-// 99.7% match, 83 words off
+static inline int EffectType(CMenuEffect *e) { return e->type; }
 #pragma divbyzerocheck on
 void CMenuEffect::Step() {
     end = 0;
     if (run != 0) {
-        MENU_EFFECT_INFO *particle = info;
-        if (particle != NULL) {
-            int prev_type = type;
+        if (info != NULL) {
+            MENU_EFFECT_INFO *particle = info;
+            int prev_type = EffectType(this);
             int i;
             int done = 1;
             switch (prev_type) {
@@ -6964,9 +6963,6 @@ void CMenuEffect::Step() {
     }
 }
 #pragma divbyzerocheck reset
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", Step__11CMenuEffectFv);
-#endif
 void CMenuEffect::Draw() {
     if (run != 0 && info != NULL && tex != NULL) {
         mgTexManager.ReloadTexture(tex_block, (sceVif1Packet *) NULL);
