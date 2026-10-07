@@ -2488,25 +2488,28 @@ int FishIMGReplace(u_long128 *data, CCharacter2 *character, int item_no, BREEDFI
     return 0;
 }
 #ifdef NONMATCHING
-// 78.9% match, 307 words off
+// 258 words off in an aligned diff
 void DrawFishParam(int x, int y, mgCTexture *tex, CGameDataUsed *data) {
-    float fx;
-    float fy;
     int pass;
     int row;
-    int col;
-    int cx;
+    int by;
     int cy;
     int i;
+    float label_y;
     int lang;
-    int bx;
-    int by;
+    int col;
+    int wy;
+    BREEDFISH_USED *breed;
+    int cx;
+    int size;
+    int name_y;
+    float fx;
     int name_x;
-
+    float fy;
+    int bx;
     if (data == NULL || tex == NULL) {
         return;
     }
-    BREEDFISH_USED *breed;
     breed = &data->data.fish;
     fx = x;
     int w[5] = {wtbl_2470[0], (0x14A - wtbl_2470[0] - wtbl_2470[2] - wtbl_2470[4]) >> 1, wtbl_2470[2],
@@ -2515,7 +2518,7 @@ void DrawFishParam(int x, int y, mgCTexture *tex, CGameDataUsed *data) {
                 (0x8C - htbl_2471[0] - htbl_2471[2] - htbl_2471[4]) >> 1, htbl_2471[4]};
     int params[6] = {0};
     fy = y;
-    if (data->item_no >= 2) {
+    if (data->item_no > 1) {
         params[1] = breed->param[4];
         params[2] = breed->param[3];
         params[3] = breed->param[0];
@@ -2531,12 +2534,8 @@ void DrawFishParam(int x, int y, mgCTexture *tex, CGameDataUsed *data) {
         pen->Color(coltbl_2472[pass][0], coltbl_2472[pass][1], coltbl_2472[pass][2], coltbl_2472[pass][3]);
         for (row = 0, cy = 0; row < 5; cy += h[row], row++) {
             for (col = 0, cx = 0; col < 5; cx += w[col], col++) {
-                mgRect<int> src;
-                mgRect<int> dst;
-
-                src.Set(xtbl_2468[col], ytbl_2469[row], wtbl_2470[col], htbl_2471[row]);
-                dst.Set(fptosi(fx + cx), fptosi(fy + cy), w[col], h[row]);
-                PrimQuad(pen, dst, src);
+                PrimQuad(pen, mgRect<int>((int)(fx + cx), (int)(fy + cy), w[col], h[row]),
+                         mgRect<int>(xtbl_2468[col], ytbl_2469[row], wtbl_2470[col], htbl_2471[row]));
             }
         }
         fx -= 4.0f;
@@ -2546,50 +2545,30 @@ void DrawFishParam(int x, int y, mgCTexture *tex, CGameDataUsed *data) {
     lang = LanguageCode;
     fx = x;
     fy = y;
-    mgRect<int> label_rect;
-    mgRect<int> digit_rect;
-    label_rect.Set(0, 0xA6, 0x3A, 0x12);
-    digit_rect.Set(0, 0xEE, 0xC, 0x12);
+    mgRect<int> label_rect(0, 0xA6, 0x3A, 0x12);
+    mgRect<int> digit_rect(0, 0xEE, 0xC, 0x12);
     pen->Begin(6);
     pen->Texture(tex);
     pen->Color(0x80, 0x80, 0x80, 0x80);
-    float label_y = 24.0f + fy;
+    label_y = 24.0f + fy;
     PrimQuad(pen, fx + ptbl_2495[lang][5], label_y, label_rect);
     bx = fptosi(fx + ptbl_2495[lang][0]);
-    int name_y;
     name_y = fptosi(22.0f + fy);
-    {
-        mgRect<int> board;
-        board.Set(bx, name_y, ptbl_2495[lang][1], u_brdtbl_2493[3]);
-        Menu3DivideTextureDraw(pen, board, u_brdtbl_2493, 1);
-    }
-    {
-        mgRect<int> sex_rect;
-        s8 sex = breed->sex;
-        sex_rect.Set(0, offtbl_2496[sex] + 0xCA, ptbl_2495[lang][3 + sex], 0x12);
-        PrimQuad(pen, fx + ptbl_2495[lang][2], label_y, sex_rect);
-    }
+    Menu3DivideTextureDraw(pen, mgRect<int>(bx, name_y, ptbl_2495[lang][1], u_brdtbl_2493[3]), u_brdtbl_2493, 1);
+    PrimQuad(pen, fx + ptbl_2495[lang][2], label_y,
+             mgRect<int>(0, offtbl_2496[(s8)breed->sex] + 0xCA, ptbl_2495[lang][3 + (s8)breed->sex], 0x12));
     cx = 0x16;
     cy = 0x2C;
     for (i = 0; i < 6; i++) {
-        mgRect<int> board;
-
         bx = fptosi(fx + cx);
         by = fptosi(fy + cy);
-        board.Set(bx, by, 0x5C, u_brdtbl_2493[3]);
-        Menu3DivideTextureDraw(pen, board, u_brdtbl_2493, 1);
+        Menu3DivideTextureDraw(pen, mgRect<int>(bx, by, 0x5C, u_brdtbl_2493[3]), u_brdtbl_2493, 1);
         if (i == 0) {
-            mgRect<int> kind_rect;
             u8 *kind = chrtbl_2503[lang][breed->kind];
-
-            kind_rect.Set(kind[0], kind[1], 0x4C, 0x12);
-            PrimQuad(pen, bx + 8, by + 2, kind_rect);
+            PrimQuad(pen, bx + 8, by + 2, mgRect<int>(kind[0], kind[1], 0x4C, 0x12));
         } else {
-            mgRect<int> icon_rect;
             aqua_param_icon *icon = &get_paraxtbl_2494[lang][i];
-
-            icon_rect.Set(icon->x, icon->y, icon->w, 0x12);
-            PrimQuad(pen, bx + 2, by + 2, icon_rect);
+            PrimQuad(pen, bx + 2, by + 2, mgRect<int>(icon->x, icon->y, icon->w, 0x12));
             PrimDrawNumber(pen, params[i], 0, bx + 0x56, by + 3, digit_rect, -2, 0);
         }
         cx += 0x5C;
@@ -2600,45 +2579,29 @@ void DrawFishParam(int x, int y, mgCTexture *tex, CGameDataUsed *data) {
     }
     bx = fptosi(fx + 22.0f);
     by = fptosi(fy + (cy + 0x16));
-    {
-        mgRect<int> board;
-        mgRect<int> size_rect;
+    wy = by;
+    Menu3DivideTextureDraw(pen, mgRect<int>(bx, by, 0x8A, u_brdtbl_2493[3]), u_brdtbl_2493, 1);
+    PrimQuad(pen, bx + 2, by + 2, mgRect<int>(0x78, 0xEE, 0x82, 0x12));
+    size = breed->size;
+    PrimDrawNumber(pen, size / 10, 0, bx + 0x5A, by + 2, digit_rect, -1, 0);
+    PrimDrawNumber(pen, size % 10, 0, bx + 0x6A, by + 2, digit_rect, 0, 0);
 
-        board.Set(bx, by, 0x8A, u_brdtbl_2493[3]);
-        Menu3DivideTextureDraw(pen, board, u_brdtbl_2493, 1);
-        size_rect.Set(0x78, 0xEE, 0x82, 0x12);
-        PrimQuad(pen, bx + 2, by + 2, size_rect);
-        PrimDrawNumber(pen, breed->size / 10, 0, bx + 0x5A, by + 2, digit_rect, -1, 0);
-        PrimDrawNumber(pen, breed->size % 10, 0, bx + 0x6A, by + 2, digit_rect, 0, 0);
-    }
-    {
-        mgRect<int> board;
-        mgRect<int> unit_rect;
-        mgRect<int> weight_rect;
-        int wx = fptosi(fx + 160.0f);
-        int wy = by + 2;
-        aqua_param_icon *icon = get_paraxtbl_2494[lang];
-
-        board.Set(wx, by, 0x8A, u_brdtbl_2493[3]);
-        Menu3DivideTextureDraw(pen, board, u_brdtbl_2493, 1);
-        unit_rect.Set(icon[8].x, icon[8].y, icon[8].w, 0x12);
-        PrimQuad(pen, wx + 0x78, wy, unit_rect);
-        weight_rect.Set(icon[7].x, icon[7].y, icon[7].w, 0x12);
-        PrimQuad(pen, fptosi(2.0f + (fx + 160.0f)), wy, weight_rect);
-        if (breed->flags & 1) {
-            PrimDrawNumber(pen, breed->weight, 0, fptosi(138.0f + (fx + 160.0f) - 18.0f - 2.0f), wy, digit_rect, -1, 0);
-        } else {
-            aqua_param_icon *unknown = &icon[9];
-            int qx = fptosi(69.0f + (fx + 160.0f) - 2.0f);
-            mgRect<int> mark;
-
-            mark.Set(unknown->x, unknown->y, unknown->w, 0x12);
-            PrimQuad(pen, qx, wy, mark);
-            mark.Set(unknown->x, unknown->y, unknown->w, 0x12);
-            PrimQuad(pen, qx + 0xE, wy, mark);
-            mark.Set(unknown->x, unknown->y, unknown->w, 0x12);
-            PrimQuad(pen, qx + 0x1C, wy, mark);
-        }
+    bx = fptosi(fx + 160.0f);
+    by = wy + 2;
+    Menu3DivideTextureDraw(pen, mgRect<int>(bx, wy, 0x8A, u_brdtbl_2493[3]), u_brdtbl_2493, 1);
+    PrimQuad(pen, bx + 0x78, by,
+             mgRect<int>(get_paraxtbl_2494[lang][8].x, get_paraxtbl_2494[lang][8].y, get_paraxtbl_2494[lang][8].w, 0x12));
+    bx = fptosi(2.0f + (fx + 160.0f));
+    PrimQuad(pen, bx, by,
+             mgRect<int>(get_paraxtbl_2494[lang][7].x, get_paraxtbl_2494[lang][7].y, get_paraxtbl_2494[lang][7].w, 0x12));
+    if (data->data.fish.flags & 1) {
+        PrimDrawNumber(pen, breed->weight, 0, fptosi(138.0f + (fx + 160.0f) - 18.0f - 2.0f), by, digit_rect, -1, 0);
+    } else {
+        aqua_param_icon *unknown = &get_paraxtbl_2494[lang][9];
+        bx = fptosi(69.0f + (fx + 160.0f) - 2.0f);
+        PrimQuad(pen, bx, by, mgRect<int>(unknown->x, unknown->y, unknown->w, 0x12));
+        PrimQuad(pen, bx + 0xE, by, mgRect<int>(unknown->x, unknown->y, unknown->w, 0x12));
+        PrimQuad(pen, bx + 0x1C, by, mgRect<int>(unknown->x, unknown->y, unknown->w, 0x12));
     }
     pen->End();
     mgTexManager.ReloadTexture(MenuArg.mes_tex_block, (sceVif1Packet *)NULL);
