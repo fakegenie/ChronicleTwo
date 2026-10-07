@@ -420,7 +420,7 @@ int sgInitGyoRace(SubGameInfo *info) {
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/gyorace", sgInitGyoRace__FP11SubGameInfo);
 #endif
 #ifdef NONMATCHING
-// ~1.5% match, 1639 rows off, 361 aligned words off
+// 299 aligned words off (objdiff splits this jump-table function)
 int sgLoopGyoRace(SubGameInfo *info) {
     extern const unsigned char at_1380__2__DATA[];
     extern const unsigned char at_1696__2__DATA[];
@@ -503,9 +503,9 @@ int sgLoopGyoRace(SubGameInfo *info) {
         case 2:
         case 3: {
             int fish;
-            for (fish = 0; fish < 6; fish++) {
-                scene->GetCharacter(fish_inf[fish].chara_no);
-                grGetFishProgress(&RaceInfo, fish, race_cnt, &old_prog[fish]);
+            for (int i = 0; i < 6; i++) {
+                scene->GetCharacter(fish_inf[i].chara_no);
+                grGetFishProgress(&RaceInfo, i, race_cnt, &old_prog[i]);
             }
             race_cnt += 0.1f;
             for (fish = 0; fish < 6; fish++) {
@@ -546,7 +546,7 @@ int sgLoopGyoRace(SubGameInfo *info) {
                     unsigned int lap = (unsigned int) (progress.pos / 8.0f);
                     if (state->lap < lap) {
                         state->lap = lap;
-                        if ((int) state->lap >= 2) {
+                        if ((int) state->lap > 1) {
                             state->lap = 1;
                         } else {
                             state->unk_14 = 1;
@@ -610,6 +610,8 @@ int sgLoopGyoRace(SubGameInfo *info) {
                     position[2] += 345.0f;
                 }
                 position[1] = -15.0f;
+                float delta[4];
+                float forward[4];
                 float rotation[4];
                 float previous[4];
                 float hit_dir[4];
@@ -648,8 +650,6 @@ int sgLoopGyoRace(SubGameInfo *info) {
                 CMap *map = scene->GetMap(scene->active_map);
                 map->water->frame->Shake(position[0], position[2], 0.05f * (4.0f * mgRnd() - 2.0f));
                 character->SetPosition(position);
-                float delta[4];
-                float forward[4];
                 sceVu0SubVector(delta, position, previous);
                 sceVu0Normalize(forward, delta);
                 rotation[1] = mgAngleInterpolate(rotation[1], atan2f(forward[0], forward[2]), 0.034906585f, 0);

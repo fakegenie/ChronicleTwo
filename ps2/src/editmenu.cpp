@@ -1548,13 +1548,25 @@ void DrawDownLoadAnaunce() {
     }
 }
 #ifdef NONMATCHING
-// 94.5% match, 182 words off
+// 181 aligned words off
 #pragma divbyzerocheck on
 int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_sub_num, int *out_height) {
     int geo_floor;
     char *dst_char;
     char *word;
     int valid;
+    int size;
+    int no;
+    CSaveDataDungeon *dungeon;
+    int floor_num;
+    int map_no;
+    CEditInfoMngr *info;
+    int request_num;
+    int font_no;
+    int condition_num;
+    int total;
+    int *ok_table;
+    int height;
     short floors[0x180][2];
     char *names[0x180];
     signed char extras[0x180];
@@ -1563,9 +1575,7 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
     char text[0x80];
     char conv_text[0x80];
     valid = 1;
-    int map_no = town_no;
-    int size;
-    int no;
+    map_no = town_no;
     if (town_no < 0 || town_no > 4) {
         map_no = 0;
         valid = 0;
@@ -1589,16 +1599,16 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
     analyze_percent = edit->GetAnalyzePercent(map_no);
     MenuAnalyzeData = &edit->analyze;
     MenuGeoStoneDownLoad_PartsNum = 0;
-    CSaveDataDungeon *dungeon = &save->save_dungeon;
-    int floor_num = 0;
+    dungeon = &save->save_dungeon;
+    floor_num = 0;
     MenuGeoStoneDownLoad_Request = 0;
     memset(floors, 0, sizeof(floors));
     PartsMakeOkTableNum = 0;
-    int *ok_table = PartsMakeOkTable;
+    ok_table = PartsMakeOkTable;
     char *hatena = GetHatena();
     CScene *scene = GetMainScene();
     CEditMap *map = (CEditMap *)scene->GetMap(scene->active_map);
-    CEditInfoMngr *info = &map->info_mngr;
+    info = &map->info_mngr;
     if (map == NULL) {
         return 0;
     }
@@ -1634,12 +1644,12 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
                     ok_table[PartsMakeOkTableNum] = parts->id;
                     PartsMakeOkTableNum++;
                 } else if (!(floor->flag & DNG_FLOOR_FLAG_GEOSTONE_READ)) {
-                    floor_num++;
                     extras[MenuGeoStoneDownLoad_PartsNum] = 0;
                     names[MenuGeoStoneDownLoad_PartsNum] = parts->edit_name;
                     MenuGeoStoneDownLoad_PartsNum++;
-                    floors[floor_num - 1][0] = dungeon_no;
-                    floors[floor_num - 1][1] = floor_no;
+                    floors[floor_num][0] = dungeon_no;
+                    floors[floor_num][1] = floor_no;
+                    floor_num++;
                 }
             }
         }
@@ -1650,10 +1660,10 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
         GeoramaReqMsgTexH[no] = 0;
         GeoramaReqMsgFontDrawFlag[no] = 1;
     }
-    int request_num = 0;
-    int font_no = 0;
-    int condition_num = 0;
-    int height = 0;
+    request_num = 0;
+    font_no = 0;
+    condition_num = 0;
+    height = 0;
     for (no = 0; no < 32; no++) {
         EditAnalyzeDataSrc *src = MenuEditAnalyzeDataSrc[no];
         if (src == NULL) {
@@ -1675,7 +1685,7 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
                 int dungeon_no = geo_floor / 100;
                 int floor_no = geo_floor % 100;
                 DNG_FLOOR_SAVE *floor = dungeon->GetFloorInfoPtr(dungeon_no, floor_no);
-                int was_open = MenuAnalyzeData->data_open[no];
+                int was_open = (signed char)MenuAnalyzeData->data_open[no];
                 if (floor != NULL && (floor->flag & DNG_FLOOR_FLAG_GEOSTONE_FOUND)) {
                     known = 1;
                     MenuAnalyzeData->data_open[no] = 1;
@@ -1684,8 +1694,9 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
                     floor_num++;
                 }
                 if (was_open != (signed char)MenuAnalyzeData->data_open[no]) {
+                    char *message = src->message;
                     extras[MenuGeoStoneDownLoad_PartsNum + MenuGeoStoneDownLoad_Request] = 0;
-                    names[MenuGeoStoneDownLoad_PartsNum + MenuGeoStoneDownLoad_Request] = src->message;
+                    names[MenuGeoStoneDownLoad_PartsNum + MenuGeoStoneDownLoad_Request] = message;
                     MenuGeoStoneDownLoad_Request++;
                 }
             }
@@ -1752,12 +1763,17 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
                     if (count >= 21 && *src_char == ' ') {
                         word = src_char + 1;
                         int word_len = 0;
-                        while (word != NULL && *word != ' ' && *word != '\0') {
-                            word_len++;
-                            word++;
+                        if (word != NULL) {
+                            while (*word != ' ' && *word != '\0') {
+                                word_len++;
+                                word++;
+                                if (word == NULL) {
+                                    break;
+                                }
+                            }
                         }
-                        *dst_char = '\n';
                         if (word_len >= limit) {
+                            *dst_char = '\n';
                             src_char++;
                             (*lines)++;
                             dst_char++;
@@ -1789,7 +1805,7 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
             floor->flag |= DNG_FLOOR_FLAG_GEOSTONE_READ;
         }
     }
-    int total = MenuGeoStoneDownLoad_Request + MenuGeoStoneDownLoad_PartsNum;
+    total = MenuGeoStoneDownLoad_Request + MenuGeoStoneDownLoad_PartsNum;
     DownLoadInfo = NULL;
     DownLoadInfoNext = NULL;
     MenuGeoStoneDmyCnt_Now = NULL;
@@ -2156,12 +2172,10 @@ void MenuMapPartsDraw(int &draw_wait) {
         draw_wait = -1;
     }
 }
-#ifdef NONMATCHING
-// 99.9% match, 13 words off
 void MenuGeoramaMessageMake(int mode) {
     int first_line;
     int force_pos = GeoramaMesPosForceSetFlag;
-    char *name;
+    int k;
     GeoramaMesPosForceSetFlag = 0;
     for (int list_no = 0; list_no < GEORAMA_VIEW_MODE_NUM; list_no++) {
         int data_no = ConvGeoramaDataNo(list_no);
@@ -2232,27 +2246,26 @@ void MenuGeoramaMessageMake(int mode) {
             y += 24.0f;
         }
         CDC2Mes *mes = GeoramaMes[data_no];
-        for (i = 0; i < 10; i++) {
+        for (k = 0; k < 10; k++) {
             if (list_no == GEORAMA_VIEW_PAINT) {
-                line_pos[i][0] += 40;
-                if (mes->item_mes[i] != item_mes[i]) {
+                line_pos[k][0] += 40;
+                if (mes->item_mes[k] != item_mes[k]) {
                     mes->ClsMes::mes_no = - 1;
                 }
-                mes->SetItemMes(i, item_mes[i]);
+                mes->SetItemMes(k, item_mes[k]);
             }
             if (list_no != GEORAMA_VIEW_PAINT) {
-                name = names[i];
-                if (name != NULL && strcmp(mes->name[i], name) != 0) {
+                if (names[k] != NULL && strcmp(mes->name[k], names[k]) != 0) {
                     mes->ClsMes::mes_no = - 1;
                 }
-                if (name != NULL) {
-                    strcpy(mes->name[i], name);
+                if (names[k] != NULL) {
+                    strcpy(mes->name[k], names[k]);
                 }
-                if (name == NULL) {
-                    strcpy(mes->name[i], at_2370__2);
+                if (names[k] == NULL) {
+                    strcpy(mes->name[k], at_2370__2);
                 }
             }
-            mes->SetMovePosGyou(i, line_pos[i][0], line_pos[i][1]);
+            mes->SetMovePosGyou(k, line_pos[k][0], line_pos[k][1]);
         }
         if (GeoramaMesForceMakeFlag != 0) {
             mes->ClsMes::mes_no = - 1;
@@ -2277,9 +2290,6 @@ void MenuGeoramaMessageMake(int mode) {
         GeoramaMesForceMakeFlag = (signed char)GeoramaMesForceMakeFlag ^ 1;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editmenu", MenuGeoramaMessageMake__Fi);
-#endif
 int CheckGekkaViewMode(int view_mode) {
     if (view_mode == kTabHouse && CheckBitFlagMenu(kBitFlagGekkaView) != 0) {
         return 1;
@@ -2776,24 +2786,22 @@ int CMenuGeorama::GetNowModeLoadPartsID() {
 
     return id;
 }
-#ifdef NONMATCHING
-// 98.6% match, 2 words off
 CEditPartsInfo *CMenuGeorama::GetNowSelectEditPartsInfo(int mode, int line) {
+    CEditPartsInfo *info;
     if (MenuMainMapInfo == NULL) {
         return NULL;
     }
     if (mode == GEORAMA_VIEW_STOCK) {
-        return MenuMainMapInfo->GetePartsInfo(stock_list[line].name);
+        info = MenuMainMapInfo->GetePartsInfo(stock_list[line].name);
     } else if (mode == GEORAMA_VIEW_MAKE) {
-        return MenuMainMapInfo->GetePartsInfo(make_list[line].name);
+        info = MenuMainMapInfo->GetePartsInfo(make_list[line].name);
     } else if (mode == GEORAMA_VIEW_CHECK_POINT) {
-        return MenuMainMapInfo->GetePartsInfo(house_list[line].name);
+        info = MenuMainMapInfo->GetePartsInfo(house_list[line].name);
+    } else {
+        info = NULL;
     }
-    return NULL;
+    return info;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editmenu", GetNowSelectEditPartsInfo__12CMenuGeoramaFii);
-#endif
 void CMenuGeorama::LoadGeoramaPart(int no, int kind) {
     int       id;
     mgVu0FBOX box;

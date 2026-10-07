@@ -1078,7 +1078,7 @@ static inline CMap *ActiveSceneMap(CScene *scene) {
 static inline mgCCameraFollow *ActiveSceneCamera(CScene *scene) {
     return (mgCCameraFollow *)scene->GetCamera(scene->active_camera);
 }
-// 99.0% match, 64 rows off, 72 aligned words off
+// 52 aligned words off
 void EditMode(CScene *scene) {
     CCPoly *next_poly;
     int i;
@@ -1156,6 +1156,8 @@ void EditMode(CScene *scene) {
             }
             if (key_up || key_down || key_left || key_right) {
                 map->GetEditPos(eCurPos, eCurPos);
+                float unused_a;
+                float unused_b;
                 float axis_cos;
                 float axis_sin;
                 float key_z;
@@ -1188,6 +1190,7 @@ void EditMode(CScene *scene) {
                     axis_sin = -1.0f;
                     axis_cos = 0.0f;
                 }
+                float unused_e;
                 move_x = key_x * axis_cos + key_z * axis_sin;
                 move_z = -key_x * axis_sin + key_z * axis_cos;
             }
@@ -1266,6 +1269,7 @@ void EditMode(CScene *scene) {
             eCurPos[1] = 0.0f;
             sceVu0FVECTOR box_max;
             sceVu0FVECTOR box_min;
+            float *box_low;
             float new_pos[4];
             float ground[4];
             float start_pos[4];
@@ -1273,7 +1277,7 @@ void EditMode(CScene *scene) {
             CCPoly polys[0x800];
             MoveCheckInfo move_info;
             *(u_long128 *)box_max = *(u_long128 *)eCurPos;
-            *(u_long128 *)box_min = *(u_long128 *)eCurPos;
+            *(u_long128 *)(box_low = box_min) = *(u_long128 *)eCurPos;
             *(u_long128 *)new_pos = *(u_long128 *)eCurPos;
             *(u_long128 *)start_pos = *(u_long128 *)old_pos;
             new_pos[1] = 20.0f;
@@ -1283,7 +1287,7 @@ void EditMode(CScene *scene) {
             box_max[0] += 100.0f;
             box_max[1] = 100.0f;
             box_max[2] += 100.0f;
-            box_min[0] -= 100.0f;
+            box_low[0] -= 100.0f;
             box_min[1] = -100.0f;
             box_min[2] -= 100.0f;
             int poly_rest = 0x800;
@@ -1344,11 +1348,11 @@ void EditMode(CScene *scene) {
             sceVu0Normalize(camera_dir, camera_dir);
             sceVu0ScaleVector(camera_dir, camera_dir, 20.0f);
             mgAddVector(camera_pos, camera_dir);
-            mgVectorMaxMin(box_max, box_min, camera_pos, camera_ref);
+            mgVectorMaxMin(box_max, box_low, camera_pos, camera_ref);
             box_max[0] += 10.0f;
             box_max[1] = 100.0f;
             box_max[2] += 10.0f;
-            box_min[0] -= 10.0f;
+            box_low[0] -= 10.0f;
             box_min[1] = -100.0f;
             box_min[2] -= 10.0f;
             if (CheckHit(polys, GetGeoCheckCamCol(map, *(mgVu0FBOX *)box_max, polys, 0x800), camera_ref, camera_pos, camera_hit, 1, 0) >= 0) {

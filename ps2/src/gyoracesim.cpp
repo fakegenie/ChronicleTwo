@@ -250,9 +250,7 @@ int StepFish(int index, RACE_FISH_PARAM *fish) {
 
     return 0;
 }
-#ifdef NONMATCHING
 #pragma divbyzerocheck on
-// 99.9% match, 6 words off
 void LaneBattleStep(RACE_FISH_PARAM *fish, int count) {
     int order[6];
     int lane_fish[6][6];
@@ -333,8 +331,8 @@ void LaneBattleStep(RACE_FISH_PARAM *fish, int count) {
             if (chance > 100) chance = 100;
             if (rand_prob(chance)) ++current->battle_hits;
             if (current->battle_time < 0.0f) {
-                RACE_FISH_PARAM *loser;
                 RACE_FISH_PARAM *winner;
+                RACE_FISH_PARAM *loser;
                 if (rand_prob(chance)) {
                     winner = current;
                     loser = opponent;
@@ -342,9 +340,10 @@ void LaneBattleStep(RACE_FISH_PARAM *fish, int count) {
                     winner = opponent;
                     loser = current;
                 }
-                side = winner->battle_hits;
-                j = side + loser->battle_hits;
-                winner->boost = 0.5f + 0.0f / (float)j;
+                chance = winner->battle_hits;
+                j = loser->battle_hits;
+                adjacent_lane = chance + j;
+                winner->boost = 0.5f + 0.0f / (float)adjacent_lane;
                 loser->boost = 0.5f * -winner->boost;
                 current->battle_time = 0.0f;
                 current->state = GR_RACE_STATE_SWIM;
@@ -415,9 +414,6 @@ void LaneBattleStep(RACE_FISH_PARAM *fish, int count) {
     }
 }
 #pragma divbyzerocheck reset
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/gyoracesim", LaneBattleStep__FP15RACE_FISH_PARAMi);
-#endif
 #ifdef NONMATCHING
 // 99.8% match, 8 words off
 static void CollisionFish(RACE_FISH_PARAM *fish, int count) {
