@@ -330,15 +330,16 @@ void EndLightingEdit() {
 int IsLightingEditMode() { return LEditFlag; }
 #ifdef NONMATCHING
 int mgTransWorldScreen(int *out, float *position);
-// 135 aligned words off (objdiff splits this jump-table function)
+// 117 aligned words off (objdiff splits this jump-table function)
 void LightingEdit(CScene *scene) {
     int row;
     float *selected;
     int selected_index;
+    int edit;
     char *end;
-    int light_no;
     CMapLightingInfo *light;
     CMap *map;
+    int light_no;
     float angle;
     int previous;
     if (!LEditFlag) {
@@ -376,7 +377,7 @@ void LightingEdit(CScene *scene) {
     if (LightType != 1) end += sprintf(end, "%s%s\n", cursor[row == 1], pages[LightType]);
     else end += sprintf(end, "%s%s%d->\n", cursor[row == 1], pages[LightType], DirLightNo);
     if (LightType == LIGHTING_EDIT_PAGE_BG_AMBIENT) {
-        int edit = row - 2;
+        edit = row - 2;
         float *colors[3] __attribute__((aligned(16))) = {light->bg_color, light->bg_color2, light->ambient};
         if (row > 10) row = 10;
         selected = colors[edit / 3];
