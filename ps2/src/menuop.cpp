@@ -1729,8 +1729,6 @@ static inline MC_CARD_INFO *GetSaveMenuCard(int port) {
     }
     return NULL;
 }
-#ifdef NONMATCHING
-// ~98.6% match, 24 words off
 int CSaveMenuClass::KeyStep(void) {
     int finished;
     CDC2Mes *fileMes;
@@ -1757,7 +1755,7 @@ int CSaveMenuClass::KeyStep(void) {
     int chapter;
     SAVEDATA_INFO *rowInfo[13];
     CDC2Mes *rowMes;
-    int formPos[2];
+    int formPos[18];
     CMemoryCardManager *manager;
 
     finished = 0;
@@ -2493,9 +2491,6 @@ int CSaveMenuClass::KeyStep(void) {
     }
     return finished;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuop", KeyStep__14CSaveMenuClassFv);
-#endif
 void SaveFileListDraw(int &tex_block, float *pos, int alpha) {
     ScreenPos linePos[13];
     SAVEDATA_INFO *info[13];
