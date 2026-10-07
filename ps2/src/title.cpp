@@ -378,17 +378,17 @@ void TitleInit(INIT_LOOP_ARG arg) {
 
     TitleBootInit();
 }
-#ifdef NONMATCHING
-// 99.7% match, 6 words off
 #pragma inline_depth(8)
 void TitleBootInit() {
+    float angle;
+    angle = 0.0f;
     RushMovie = new ((u_long128 *)DataBuffer.Alloc(0x2396)) CMovie;
     TitleMCFuncFlag = 1;
     TitleMCCheckNow = 0;
     TitleMainMCCheckPhase = 0;
     TitleMCCheck = new ((u_long128 *)DataBuffer.Alloc(0x112)) CMemoryCardManager;
     TitleMCCheck->Initialize(&DataBuffer);
-    TitleCamera = new ((u_long128 *)DataBuffer.Alloc(0xE)) mgCCameraFollow(40.0f, 30.0f, 0.0f, 8.0f);
+    TitleCamera = new ((u_long128 *)DataBuffer.Alloc(0xE)) mgCCameraFollow(40.0f, 30.0f, angle, 8.0f);
     TitleCamera2 = new ((u_long128 *)DataBuffer.Alloc(9)) mgCCamera(8.0f);
     WaveTable__3 = new ((u_long128 *)DataBuffer.Alloc(0x123)) CWaveTable;
     mgCTextureManager *textures = &mgTexManager;
@@ -541,9 +541,6 @@ void TitleBootInit() {
     }
 }
 #pragma inline_depth reset
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/title", TitleBootInit__Fv);
-#endif
 void TitleExit() {
     if (CheckOmakeFlag() != 0) {
         OmakeFlag = 1;
@@ -1442,7 +1439,9 @@ int TitleModeKey() {
     case TITLE_PHASE_OMAKE_MENU: {
         TitlePushStart_AlphaPlus = 0;
         CalcMenuAdd(&TitleInfo->menu_alpha, -8.0f);
-        CalcMenuAdd(&TitleInfo->cursor_alpha, 3, 128);
+        float limit = 128.0f;
+        float rate = 3.0f;
+        CalcMenuAdd(&TitleInfo->cursor_alpha, rate, limit);
         int old_select = TitleInfo->omake_select;
         if (GamePad__2.Down(PAD_UP) != 0) {
             TitleInfo->omake_select--;
