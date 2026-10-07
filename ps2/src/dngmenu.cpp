@@ -590,8 +590,6 @@ unsigned int CDngFreeMap::DrawGlidCheck(GLID_INFO *glid) {
     }
     return mask;
 }
-#ifdef NONMATCHING
-// 38 words off in an aligned diff
 void CDngFreeMap::DrawRoomOne(mgRect<float> rect, DNGMAP_ROOM_INFO *room, unsigned int glid_check, int alpha, float bright) {
     if (room == NULL || !(rect.left <= (float)(mgScreenWidth + 20)) || !(rect.top <= (float)(mgScreenHeight + 30))) {
         return;
@@ -670,10 +668,10 @@ void CDngFreeMap::DrawRoomOne(mgRect<float> rect, DNGMAP_ROOM_INFO *room, unsign
             phase += 6.2831855f;
         }
         if (!(phase <= 0.0f)) {
-            red = green = blue = (int)(7.0f * (float)level / 8.0f);
+            blue = green = red = (int)(7.0f * (float)level / 8.0f);
         }
     } else {
-        red = green = blue = level;
+        blue = green = red = level;
     }
     prim->Bilinear(0);
     prim->Begin(6);
@@ -707,17 +705,17 @@ void CDngFreeMap::DrawRoomOne(mgRect<float> rect, DNGMAP_ROOM_INFO *room, unsign
     shade = 128.0f * shade;
     if (name_tex != NULL && room->visited == 1) {
         for (int i = 0; i < 3; i++) {
+            int k = i * 4;
             if (room->flag & (1 << (i + 1))) {
-                s16 *letter = get_moji_tbl_1524[i];
-                if (letter[0] >= 0) {
-                    mgRect<float> letter_put(put.left + (float)put_moji_tbl_1525[i][0], put.top + (float)put_moji_tbl_1525[(int)i][1],
-                                             (float)letter[2], (float)letter[3]);
+                if (get_moji_tbl_1524[0][k] >= 0) {
+                    mgRect<float> letter_put(put.left + (float)put_moji_tbl_1525[i][0], put.top + (float)put_moji_tbl_1525[i][1],
+                                             (float)get_moji_tbl_1524[0][k + 2], (float)get_moji_tbl_1524[0][k + 3]);
                     prim->TextureMapEnable(1);
                     prim->Begin(6);
                     prim->Texture(name_tex);
                     int letter_level = fptosi(shade);
                     prim->Color(letter_level, letter_level, letter_level, alpha);
-                    mgRect<int> letter_uv(letter[0], letter[1], letter[2], letter[3]);
+                    mgRect<int> letter_uv(get_moji_tbl_1524[0][k], get_moji_tbl_1524[0][k + 1], get_moji_tbl_1524[0][k + 2], get_moji_tbl_1524[0][k + 3]);
                     PrimQuad(prim, letter_put.left, letter_put.top, letter_uv);
                     prim->End();
                 }
@@ -725,9 +723,6 @@ void CDngFreeMap::DrawRoomOne(mgRect<float> rect, DNGMAP_ROOM_INFO *room, unsign
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dngmenu", DrawRoomOne__11CDngFreeMapF9mgRect_f_P16DNGMAP_ROOM_INFOUiif);
-#endif
 void CDngFreeMap::DrawGlid(mgRect<float> rect) {
     mgCDrawPrim prim;
     SetSpriteEnv(&prim, 1);
@@ -789,8 +784,6 @@ int CheckGeoramaMateria(TRESURE_BOX_FLOOR_INFO *tresure, int floor, int *materia
     }
     return materia_num;
 }
-#ifdef NONMATCHING
-// 27 words off in an aligned diff
 static void DrawDngRoomInfo(DNGMAP_ROOM_INFO *room) {
     if (room != NULL && Floor_InfoTex != NULL) {
         if (dngfloor_infoview != 0) {
@@ -836,8 +829,8 @@ static void DrawDngRoomInfo(DNGMAP_ROOM_INFO *room) {
         prim->Texture(Floor_InfoTex);
         prim->Color(0x80, 0x80, 0x80, alpha);
         int left = fptosi(board_x);
-        int top = fptosi(board_y);
-        Menu3DivideTextureDraw(prim, mgRect<int>(left, top, board_w, 0x46), dngboardbrdtbl[0], 1);
+        int top;
+        Menu3DivideTextureDraw(prim, mgRect<int>(left, top = fptosi(board_y), board_w, 0x46), dngboardbrdtbl[0], 1);
         Menu3DivideTextureDraw(prim, mgRect<int>(left, top + 0x46, board_w, board_h - 0x46 - dngboardbrdtbl[1][3]), dngboardbrdtbl[1], 1);
         Menu3DivideTextureDraw(prim, mgRect<int>(left, top + board_h - bottom_tbl[3], board_w, bottom_tbl[3]), bottom_tbl, 1);
         prim->End();
@@ -895,7 +888,7 @@ static void DrawDngRoomInfo(DNGMAP_ROOM_INFO *room) {
         }
         int mark_x = (int)(20.0f + board_x);
         int row_y;
-        board_h = row_y = fptosi(2.0f + (68.0f + (float)top));
+        row_y = board_h = fptosi(2.0f + (68.0f + (float)top));
         int text_x = mark_x + 0x1C;
         PrimQuad(prim, (float)mark_x, mark_y, mark_uv);
         if (DngInfoFloorInfo != NULL && (DngInfoFloorInfo->flag & DNG_FLOOR_FLAG_FAST_DESTROY_CLEAR)) {
@@ -986,9 +979,6 @@ static void DrawDngRoomInfo(DNGMAP_ROOM_INFO *room) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dngmenu", DrawDngRoomInfo__FP16DNGMAP_ROOM_INFO);
-#endif
 #ifdef NONMATCHING
 // 99.8% match, 6 words off
 static void DrawGeoramaMateria(int y, char *title, int materia_num, int *materia, int tex_block) {
@@ -1327,7 +1317,7 @@ void CDngFreeMap::SetKomaMove(int moving) {
     }
 }
 #ifdef NONMATCHING
-// 10 words off in an aligned diff
+// 6 words off in an aligned diff
 int CDngFreeMap::LoadDngInfo(mgCMemory *stack, int tex_block, int dng_no, int user_room_no, int next_room_no) {
     int i;
     if (stack == NULL || stack->stGetRest() <= 0) {
@@ -1652,6 +1642,7 @@ int CDngFreeMap::LoadDngInfo(mgCMemory *stack, int tex_block, int dng_no, int us
             CalcGlidPutPos(glid, glid_x, glid_y, 0);
             glid->blink = 1;
             s16(*points)[2];
+            s16(*room_hokan)[2];
             s8 reverse;
             if (glid->type == 0) {
                 points = RootHokanTablePtrTable_2240[glid->root.shape];
@@ -1660,39 +1651,39 @@ int CDngFreeMap::LoadDngInfo(mgCMemory *stack, int tex_block, int dng_no, int us
                     break;
                 }
                 if (reverse == 0) {
-                    for (i = 0; i < 20; i++) {
+                    for (tex_block = 0; tex_block < 20; tex_block++) {
                         DNGMAP_KOMA_POS *pos = (DNGMAP_KOMA_POS *)work.Alloc(1);
-                        pos->x = glid_x + (float)points[i][0];
-                        pos->y = glid_y + (float)points[i][1];
+                        pos->x = glid_x + (float)points[tex_block][0];
+                        pos->y = glid_y + (float)points[tex_block][1];
                         tail->next = pos;
                         tail = tail->next;
                     }
                 } else if (reverse == 1) {
-                    for (i = 19; i >= 0; i--) {
+                    for (tex_block = 19; tex_block >= 0; tex_block--) {
                         DNGMAP_KOMA_POS *pos = (DNGMAP_KOMA_POS *)work.Alloc(1);
-                        pos->x = glid_x + (float)points[i][0];
-                        pos->y = glid_y + (float)points[i][1];
+                        pos->x = glid_x + (float)points[tex_block][0];
+                        pos->y = glid_y + (float)points[tex_block][1];
                         tail->next = pos;
                         tail = pos;
                     }
                 }
             } else if (glid->type == 1) {
                 int table = old_hokantbl_useno_2247[1][direction];
-                points = RoomHokanTablePtrTable_2245[table];
+                room_hokan = RoomHokanTablePtrTable_2245[table];
                 reverse = is_reverse_tbl_room_2248[1][table];
                 if (reverse == 0) {
                     for (i = 0; i < 10; i++) {
                         DNGMAP_KOMA_POS *pos = (DNGMAP_KOMA_POS *)work.Alloc(1);
-                        pos->x = glid_x + (float)points[i][0];
-                        pos->y = glid_y + (float)points[i][1];
+                        pos->x = glid_x + (float)room_hokan[i][0];
+                        pos->y = glid_y + (float)room_hokan[i][1];
                         tail->next = pos;
                         tail = pos;
                     }
                 } else if (reverse == 1) {
                     for (i = 9; i >= 0; i--) {
                         DNGMAP_KOMA_POS *pos = (DNGMAP_KOMA_POS *)work.Alloc(1);
-                        pos->x = glid_x + (float)points[i][0];
-                        pos->y = glid_y + (float)points[i][1];
+                        pos->x = glid_x + (float)room_hokan[i][0];
+                        pos->y = glid_y + (float)room_hokan[i][1];
                         tail->next = pos;
                         tail = pos;
                     }

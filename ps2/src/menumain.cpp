@@ -388,7 +388,6 @@ void DisablePadReset(int disable) {
         }
     }
 }
-#ifdef NONMATCHING
 void MakeMenuTopic();
 int MenuInternInit(mgCMemory *, int, int);
 extern float light_1062[4][4];
@@ -396,7 +395,6 @@ extern float lightcolor_1063[4][4];
 extern "C" mgCCamera *__ct__9mgCCameraFf(mgCCamera *, float);
 extern "C" CGameDataUsed *__ct__13CGameDataUsedFv(CGameDataUsed *);
 
-// 44.9% match, 346 words off
 int MenuMainInit(MENU_INIT_ARG *arg) {
     MENU_INIT_ARG *init_arg = arg;
     if (arg == NULL) {
@@ -463,14 +461,19 @@ int MenuMainInit(MENU_INIT_ARG *arg) {
     MenuSystemDataPtr = NULL;
     MenuSaveDataDungeonPtr = NULL;
     MenuFishAquarium = NULL;
-    if (MenuActiveSaveData != NULL) {
-        user = MenuActiveSaveData->GetUserDataManager();
+    common = (CMenuKeyFunc *)MenuActiveSaveData;
+    if (common != NULL) {
+        user = ((CSaveData *)common)->GetUserDataManager();
         MenuUserDataManPtr = user;
-        MenuConfigPtr = MenuActiveSaveData->GetConfig();
-        MenuSystemDataPtr = &MenuActiveSaveData->menu_system_data;
-        MenuSaveDataDungeonPtr = &MenuActiveSaveData->save_dungeon;
-        MenuFishAquarium = &user->aquarium;
+        draw_env = (MENU_DRAW_ENV *)((CSaveData *)common)->GetConfig();
+        MenuConfigPtr = (SV_CONFIG_OPTION *)draw_env;
+        draw_env = (MENU_DRAW_ENV *)&((CSaveData *)common)->menu_system_data;
+        MenuSystemDataPtr = (CMenuSystemData *)draw_env;
+        draw_env = (MENU_DRAW_ENV *)&((CSaveData *)common)->save_dungeon;
+        MenuSaveDataDungeonPtr = (CSaveDataDungeon *)draw_env;
+        draw_env = (MENU_DRAW_ENV *)&user->aquarium;
         int active_chara_no = user->active_chr_no;
+        MenuFishAquarium = (CFishAquarium *)draw_env;
         MenuArg.active_chara_no = active_chara_no;
     }
     MenuCommonInfo->user_data = MenuUserDataManPtr;
@@ -709,9 +712,6 @@ int MenuMainInit(MENU_INIT_ARG *arg) {
     MenuSePlay(sound);
     return MenuCommonInfo->open_type;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menumain", MenuMainInit__FP13MENU_INIT_ARG);
-#endif
 int MenuMainExit() {
     CCharacter2 *chara;
     int          i;
@@ -1038,9 +1038,7 @@ void MenuWorldTrans() {
     camera = &MenuDrawEnv->camera;
     MenuDrawEnv->camera.GetCameraMatrix(view_matrix);
     camera->GetPos(pos);
-    MENU_DRAW_ENV *env = MenuDrawEnv;
-    float          speed = env->speed;
-    camera->SetSpeed(speed, -1.0f);
+    camera->SetSpeed(MenuDrawEnv->speed, -1.0f);
     camera->SetNextRef(MenuDrawEnv->ref);
     camera->SetNextPos(MenuDrawEnv->pos);
     camera->Step(1);
@@ -1873,9 +1871,6 @@ int MenuInternSelectKey(void) {
     MenuPosData->FormStep();
     return result;
 }
-#ifdef NONMATCHING
-// 100.0% match, 0 words off, only with every NONMATCHING draft in the unit compiled
-// Matches 100% with compiler state: a u64 division compiled before the unit's first function and every NONMATCHING draft in the unit compiled (state.py: drafts primer=u64div)
 void MenuInternSelectDraw(void) {
     MenuPosData->FormDraw();
     if (MenuInterMesDrawFlag != 0 && MenuInterMes != NULL) {
@@ -1917,9 +1912,6 @@ void MenuInternSelectDraw(void) {
         font.DrawDirect(at_2335, 300, 350);
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menumain", MenuInternSelectDraw__Fv);
-#endif
 void CopyActiveItemAndWeapon(int slot, int weapon_slot) {
     mgCTexture *textures[2];
 
