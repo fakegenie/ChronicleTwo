@@ -7637,7 +7637,7 @@ static inline void DebugPrint(CMenuFont *font, char *text, int x, int y) {
     font->SetPos(x, y);
     font->DrawDirect(font->str, font->pos_x, font->pos_y);
 }
-// ~2.5% match, 1226 words off
+// ~97.9% match, 27 words off
 void MenuItemDebugDraw(void) {
     CMenuFont menu_font;
     mgCTextureManager *tex_manager = &mgTexManager;
@@ -7664,8 +7664,7 @@ void MenuItemDebugDraw(void) {
         for (int row = 0; row < 8; row++) {
             int col;
             for (col = 0; col < 8; col++) {
-                int row_first = row * 8;
-                int item_no = page * 64 + 1 + row_first + col;
+                int item_no = page * 64 + 1 + row * 8 + col;
                 if (item_no == CMenuItemInfoPt->debug_item_no) {
                     int x = col * 32 + 24;
                     int y = row * 32 + 60;
@@ -7688,7 +7687,7 @@ void MenuItemDebugDraw(void) {
                 info->debug_item_count);
         DebugPrint(font, title, 26, 40);
         if (MenuDebugModelDrawFlag == 1) {
-            DrawMenuFillBox(0.0f, 0.0f, mgScreenWidth, mgScreenHeight, 0x80, 0, 0, 0);
+            DrawMenuFillBox(0.0f, float(0.0), mgScreenWidth, mgScreenHeight, 0x80, 0, 0, 0);
         }
         DrawMenuFillBox(20.0f, 330.0f, 500.0f, 200.0f, 0x52, 0, 0, 0);
         if (MenuDebugModelDrawFlag == 0) {
@@ -7754,7 +7753,7 @@ void MenuItemDebugDraw(void) {
         break;
     }
     case 3: {
-        DrawMenuFillBox(236.0f, 60.0f, 230.0f, 200.0f, 0x80, 0, 0, 0);
+        DrawMenuFillBox(float(236.0), 60.0f, 230.0f, 200.0f, 0x80, 0, 0, 0);
         DebugPrint(font, at_6781, 236, 60);
         DebugPrint(font, at_6782, 236, 80);
         DebugPrint(font, at_6783, 236, 100);
@@ -7778,7 +7777,7 @@ void MenuItemDebugDraw(void) {
         break;
     }
     case 4: {
-        DrawMenuFillBox(236.0f, 60.0f, float(230.0), 300.0f, 0x80, 0, 0, 0);
+        DrawMenuFillBox(236.0f, 60.0f, 230.0f, 300.0f, 0x80, 0, 0, 0);
         DebugPrint(font, at_6789, 236, 60);
         DebugPrint(font, at_6790, 236, 80);
         DebugPrint(font, at_6791, 236, 100);
@@ -7790,7 +7789,8 @@ void MenuItemDebugDraw(void) {
             DebugPrint(font, text, 336, 120);
             CheckBuildUp(weapon, NULL, build_item, NULL);
             for (int i = 0; i < 3; i++) {
-                build_name[i] = GetItemMessage(build_item[i]);
+                int build = build_item[i];
+                build_name[i] = GetItemMessage(build);
             }
         }
         DebugPrint(font, at_6794, 236, 140);
@@ -7813,7 +7813,7 @@ void MenuItemDebugDraw(void) {
         if (weapon == NULL) {
             break;
         }
-        DrawMenuFillBox(float(236.0), 60.0f, 230.0f, 260.0f, 0x80, 0, 0, 0);
+        DrawMenuFillBox(236.0f, 60.0f, 230.0f, 260.0f, 0x80, 0, 0, 0);
         DebugPrint(font, at_6803, 236, 60);
         DebugPrint(font, at_6804, 236, 100);
         DebugPrint(font, at_6805, 236, 120);
@@ -7841,7 +7841,7 @@ void MenuItemDebugDraw(void) {
         DebugPrint(font, at_6810, 236, 140);
         break;
     case 7: {
-        DrawMenuFillBox(float(236.0), 60.0f, float(230.0), float(260.0), 0x80, 0, 0, 0);
+        DrawMenuFillBox(236.0f, float(60.0), float(230.0), float(260.0), 0x80, 0, 0, 0);
         int cursor = MenuCommonInfo->cursor;
         if (cursor == 0) {
             DebugPrint(font, at_6811, 236, 60);
