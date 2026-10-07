@@ -197,8 +197,6 @@ int COutLineDraw::Draw(float scale, float alpha) {
     return result;
 }
 
-#ifdef NONMATCHING
-// 99.9% match, 2 words off
 static void DrawDivSprite(mgCDrawPrim *prim, mgRect<int> rect, mgCTexture *texture,
                           int *color, int dx, int dy, int z, int unused) {
     int x;
@@ -207,7 +205,11 @@ static void DrawDivSprite(mgCDrawPrim *prim, mgRect<int> rect, mgCTexture *textu
     int offset_y;
     int y;
     int block_height;
-    mgRect<int> area = rect;
+    mgRect<int> area;
+    area.right = rect.right;
+    area.left = rect.left;
+    area.top = rect.top;
+    area.bottom = rect.bottom;
     sceVu0IVECTOR vertex_start;
     sceVu0IVECTOR vertex_end;
     sceVu0IVECTOR texcrd_start;
@@ -263,9 +265,6 @@ static void DrawDivSprite(mgCDrawPrim *prim, mgRect<int> rect, mgCTexture *textu
     prim->EndPrim2();
     prim->End2();
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/outline", DrawDivSprite__FP11mgCDrawPrim9mgRect_i_P10mgCTexturePiiiii);
-#endif
 
 static void DrawDivSprite4(mgCDrawPrim *prim, mgRect<int> rect, mgCTexture *texture,
                            int *color, int offset, int z) {
