@@ -15,14 +15,14 @@ __declspec(dead) static u_long PrimeLongDivision(u_long a, u_long b) {
 }
 
 // Code (.text)
-#ifdef NONMATCHING
-// 98.6% match, 15 words off
 struct DepthTextureName {
     char text[0x20];
 };
+
 struct DepthTextureImages {
     u_long128 *image[MG_TEXTURE_LEVEL_MAX];
 };
+
 void DepthOfField(int levels, float *depths, mgCTexture *work_texture, float strength) {
     if (work_texture == NULL) {
         return;
@@ -71,7 +71,7 @@ void DepthOfField(int levels, float *depths, mgCTexture *work_texture, float str
     sprite.attr.alpha_test = -1;
     blur_texture.Bilinear(1);
     blur_texture.tex0.bits.tcc = 0;
-    for (level = 0; level < levels; level++) {
+    for (level = 0; level < levels; level++, source_texture = &blur_texture) {
         destination.left -= 8;
         destination.right -= 8;
         destination.top -= 8;
@@ -82,14 +82,17 @@ void DepthOfField(int levels, float *depths, mgCTexture *work_texture, float str
         destination.top += 8;
         destination.bottom += 8;
         depth = &depths[level];
-        float  tenth = *depth / 10.0f;
-        int    dest_top = destination.top;
-        int    dest_right = destination.right;
-        int    dest_bottom = destination.bottom;
+        float tenth = *depth / 10.0f;
+        int next_u;
+        int depth_z;
+        int next_x;
+        int dest_top = destination.top;
+        int dest_right = destination.right;
+        int dest_bottom = destination.bottom;
         dest_left = destination.left;
         parity = level % 2;
-        int    z[2] = {mgTransZPrim(*depth), mgTransZPrim(tenth + *depth)};
-        int    alpha[2] = {(int)(128.0f * strength), (int)(32.0f * strength)};
+        int z[2] = {mgTransZPrim(*depth), mgTransZPrim(tenth + *depth)};
+        int alpha[2] = {(int)(128.0f * strength), (int)(32.0f * strength)};
         prim.Begin(MG_PRIM_TRIANGLE_STRIP);
         prim.Texture(&blur_texture);
         float step_x = (float)(screen_right - screen_left) / 16.0f;
@@ -107,15 +110,14 @@ void DepthOfField(int levels, float *depths, mgCTexture *work_texture, float str
         while (x < (float)screen_right) {
             parity = !parity;
             prim.Color(0x80, 0x80, 0x80, alpha[0]);
-            prim.TextureCrd4(texel_u = (int)(u + step_u), dest_top + 16);
-            prim.Vertex4(vertex_x = (int)(x + step_x), screen_top, z[parity]);
-            prim.TextureCrd4(texel_u, dest_bottom - 16);
-            prim.Vertex4(vertex_x, screen_bottom, z[parity]);
+            prim.TextureCrd4(next_u = (int)(u + step_u), dest_top + 16);
+            prim.Vertex4(next_x = (int)(x + step_x), screen_top, depth_z = z[parity]);
+            prim.TextureCrd4(next_u, dest_bottom - 16);
+            prim.Vertex4(next_x, screen_bottom, depth_z);
             x += step_x;
             u += step_u;
         }
         prim.End();
-        source_texture = &blur_texture;
         source = destination;
         int width = source.right - source.left;
         destination.left += width;
@@ -125,9 +127,6 @@ void DepthOfField(int levels, float *depths, mgCTexture *work_texture, float str
         destination.bottom = destination.top + height * 2 / 3;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/screeneffect", DepthOfField__FiPfP10mgCTexturef);
-#endif
 
 #ifdef NONMATCHING
 // 76.6% match, 394 words off
