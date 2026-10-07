@@ -1663,8 +1663,11 @@ void CAutoMapGen::CreatFixedMap(int preset_no) {
     room[0].h = preset_height;
 }
 #ifdef NONMATCHING
-// 98.5% match, 80 words off
+// 98.6% match, 74 words off
 void CAutoMapGen::RandomMapMainProc() {
+    int placed;
+    int extra_links;
+    int from;
     random_map = 1;
     int seed = iRand(0xFFFF);
     if (DebugFlag != 0) {
@@ -1679,7 +1682,6 @@ void CAutoMapGen::RandomMapMainProc() {
     for (int i = 0; i < 8; i++) {
         room[i].unk_0 = 0;
     }
-    int placed;
     do {
         if (gen_flag & AUTOMAP_GEN_FIXED_START) {
             CreatFixedMap(0);
@@ -1718,9 +1720,9 @@ void CAutoMapGen::RandomMapMainProc() {
     }
     room_num = rooms;
 
-    int extra_links = iRand(3) + 1;
+    extra_links = iRand(3) + 1;
     for (int linked = 0; linked < extra_links;) {
-        int from = iRand(rooms);
+        from = iRand(rooms);
         int to = iRand(rooms);
         if ((!(gen_flag & AUTOMAP_GEN_FIXED_START) || (from != 0 && to != 0)) && from != to) {
             RoomLink(from, to);
