@@ -13,6 +13,10 @@ __declspec(dead) static float PrimeDoubleToFloat(double a) {
     return a;
 }
 
+__declspec(dead) static u_long PrimeLongDivision(u_long a, u_long b) {
+    return a / b;
+}
+
 // Code (.text)
 void COutLineDraw::Initialize() {
     mgZeroVector(unk_10.max);
@@ -47,7 +51,7 @@ int COutLineDraw::Draw(float *pos, float scale, float alpha) {
 }
 
 #ifdef NONMATCHING
-// 99.0% match, 6 words off
+// 99.0% match, 4 words off
 int COutLineDraw::Draw(float scale, float alpha) {
     if (frame == NULL) {
         return 0;
