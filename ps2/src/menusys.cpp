@@ -4135,7 +4135,7 @@ short CMenuKeyFunc::StepMenuBGM() {
     return bgm_fading;
 }
 #ifdef NONMATCHING
-// 99.6% match, 13 words off
+// 99.8% match, 7 words off
 void CheckEnableHaveItemNum(void) {
     CGameData *item_data = &GameItemDataManage;
     int i;
@@ -4167,7 +4167,8 @@ void CheckEnableHaveItemNum(void) {
         chara = chara + i;
         for (int k = 0; k < 3; k++) {
             CGameDataUsed *active = &chara->active_item[k];
-            int item_no = active->item_no;            if (item_no > 0) {
+            int item_no = active->item_no;
+            if (item_no > 0) {
                 have_num[item_no] += (&chara->active_item[k])->GetNum();
                 if (0 < active->GetGiftBoxItemNum()) {
                     for (int j = 0; j < 3; j++) {
@@ -4194,17 +4195,12 @@ void CheckEnableHaveItemNum(void) {
         }
     }
     chara = user_data->GetCharaDataPtr(0);
-    {
-        i = 0;
-        if (i < 2) {
-            do {
-                for (j = 0; j < 3; j++) {
-                    menu_chara_activeItem_limmit_check[i * 3 + j] = 0;
-                    if (chara->active_item[j].item_no > 0 && full[chara->active_item[j].item_no] != 0) {
-                        menu_chara_activeItem_limmit_check[i * 3 + j] = 1;
-                    }
-                }
-                i++, chara++;            } while (i < 2);
+    for (i = 0; i < 2; i++, chara++) {
+        for (j = 0; j < 3; j++) {
+            menu_chara_activeItem_limmit_check[i * 3 + j] = 0;
+            if (chara->active_item[j].item_no > 0 && full[chara->active_item[j].item_no] != 0) {
+                menu_chara_activeItem_limmit_check[i * 3 + j] = 1;
+            }
         }
     }
 }
