@@ -1384,7 +1384,7 @@ extern char at_2485[];
 extern char at_2486[];
 extern char at_2487[];
 extern char at_2488[];
-// 91.4% match, 337 words off
+// 96.3% match, 220 words off
 #pragma divbyzerocheck on
 void CMonsterMan::CheckDamage() {
     BASE_MONSTER_TBL *tbl;
@@ -1458,13 +1458,12 @@ void CMonsterMan::CheckDamage() {
                 }
                 printf(at_2485, prim->status);
             }
-            float element_rate[8] = {0.6f, 1.2f, 1.4f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f};
-            element_damage = 0.0f;
             damage *= 0.01f * (float)tbl->ext_param[vs_attk_index[prim->param->kind]];
-            BASE_MONSTER_TBL *resist_tbl = monster->tbl;
+            element_damage = 0.0f;
+            float element_rate[8] = {0.6f, 1.2f, 1.4f, 0.8f, 1.0f, 1.0f, 1.0f, 1.0f};
             for (int e = 0; e < 8; e++) {
                 float power = 0.007843138f * (float)prim->element[e];
-                float resist = 0.01f * (float)resist_tbl->element_resist[e];
+                float resist = 0.01f * (float)monster->tbl->element_resist[e];
                 if (area->unk_8c != 2) {
                     element_damage += resist * (damage * power);
                 } else {
@@ -1480,7 +1479,7 @@ void CMonsterMan::CheckDamage() {
                     element = e;
                 }
             }
-            if (resist_tbl->user_mons_id == 4 && chara_info->GetNowNPC() == 3) {
+            if (monster->tbl->user_mons_id == 4 && chara_info->GetNowNPC() == 3) {
                 damage *= 1.2f;
             }
             if (monster->tbl->user_mons_id == 9 && chara_info->GetNowNPC() == 0x13) {
@@ -1522,23 +1521,23 @@ void CMonsterMan::CheckDamage() {
             int greyed = 0;
             BASE_MONSTER_TBL *status_tbl = monster->tbl;
             s16 status_rate = status_tbl->status_chance / prim->param->hit_count;
-            int hit_damage = (int)damage;
-            if (hit_damage > 0) {
+            int hit_damage;
+            if ((hit_damage = (int)damage) > 0) {
                 if ((prim->status & 0x4) && !(status_tbl->resist_attr & 0x4) && status_rate >= iRand(100)) {
                     monster->status.attr |= MONSTER_STATUS_POISON;
                     monster->status.poison_count = 0x78;
                 }
                 if ((prim->status & 0x8) && !(monster->status.attr & (MONSTER_STATUS_UNK_8 | MONSTER_STATUS_UNK_20)) &&
                     !(monster->tbl->resist_attr & 0x8) && status_rate >= iRand(100)) {
-                    greyed = 1;
                     monster->status.attr |= MONSTER_STATUS_UNK_8;
                     monster->status.grey_time = 300;
+                    greyed = 1;
                 }
                 if ((prim->status & 0x8000) && !(monster->status.attr & MONSTER_STATUS_UNK_20) &&
                     !(monster->tbl->resist_attr & 0x8000) && status_rate >= iRand(100)) {
-                    greyed = 1;
                     monster->status.attr |= MONSTER_STATUS_UNK_20;
                     monster->status.grey_time = 900;
+                    greyed = 1;
                 }
                 if ((prim->status & 0x10000) && !(monster->tbl->resist_attr & 0x10000) && status_rate >= iRand(100)) {
                     monster->status.attr |= MONSTER_STATUS_SLOW;
@@ -1554,13 +1553,12 @@ void CMonsterMan::CheckDamage() {
             if ((int)damage > 0 && (prim->status & 0x400) && iRand(10) == 0) {
                 damage *= 1.8f;
             }
-            final_damage = (int)damage;
-            if (final_damage > 0 && (prim->status & 0x80) && prim->attacker == chara_info->chr_no) {
+            if ((final_damage = (int)damage) > 0 && (prim->status & 0x80) && prim->attacker == chara_info->chr_no) {
                 drain_rate = 25 / prim->param->hit_count;
                 if (drain_rate <= 1) {
                     drain_rate = 1;
                 }
-                if (drain_rate >= iRand(100)) {
+                if (iRand(100) <= drain_rate) {
                     chara_info->AddHp_Point(0.02f * damage, 0.0f);
                 }
             }
@@ -1571,7 +1569,7 @@ void CMonsterMan::CheckDamage() {
                 }
                 int roll = (iRand(100) + iRand(100)) / 2;
                 printf(at_2488, steal_rate, roll);
-                if (steal_rate >= roll && (monster->tbl->drop_item[0] > 0 || monster->tbl->drop_item[1] > 0)) {
+                if (roll <= steal_rate && (monster->tbl->drop_item[0] > 0 || monster->tbl->drop_item[1] > 0)) {
                     int slot = 0;
                     if (iRand(100) < 20 && monster->tbl->drop_item[1] > 0) {
                         slot = 1;
@@ -1595,7 +1593,7 @@ void CMonsterMan::CheckDamage() {
                 }
             }
             guard = 0;
-            if (iRand(100) < tbl->guard_rate) {
+            if (tbl->guard_rate > iRand(100)) {
                 guard = 1;
             }
             if (monster->mask_flag & 1) {
@@ -1614,8 +1612,8 @@ void CMonsterMan::CheckDamage() {
                 damage *= 0.01f * (float)prim->param->critical_rate;
             }
             calcWeaponParamWhp(monster, prim);
-            int dealt = (int)damage;
-            monster->life -= dealt;
+            int dealt;
+            monster->life -= (dealt = (int)damage);
             if (monster->life <= 0) {
                 monster->life = 0;
             }
@@ -1706,11 +1704,16 @@ void CMonsterMan::CheckDamage() {
                     effect->Set(&monster->center_pos, monster->center_pos, power, element, 2.0f * monster->body_width);
                 }
                 int contact;
-                if (prim->param->kind != DAMAGE_KIND_RIDEPOD_SWORD && prim->param->kind != DAMAGE_KIND_RIDEPOD_PUNCH &&
-                    prim->param->kind != DAMAGE_KIND_MONICA_MELEE && prim->param->kind != DAMAGE_KIND_MAX_MELEE) {
-                    contact = 0;
-                } else {
+                switch (prim->param->kind) {
+                case DAMAGE_KIND_MAX_MELEE:
+                case DAMAGE_KIND_MONICA_MELEE:
+                case DAMAGE_KIND_RIDEPOD_PUNCH:
+                case DAMAGE_KIND_RIDEPOD_SWORD:
                     contact = 1;
+                    break;
+                default:
+                    contact = 0;
+                    break;
                 }
                 if (contact) {
                     switch (element) {
@@ -1788,12 +1791,14 @@ void CMonsterMan::CheckDamage() {
                 if (monster->tbl->stagger > 0) {
                     monster->stagger += prim->param->stagger;
                     monster->stagger_time = 60;
-                    if (monster->stagger < monster->tbl->stagger) {
-                        break;
+                    if (monster->stagger >= monster->tbl->stagger) {
+                        monster->req_prog = MONSTER_PROG_DAMAGE;
+                        sndSePlay(monster->sound_info.se_bank, 0xB, 0);
                     }
+                } else {
+                    monster->req_prog = MONSTER_PROG_DAMAGE;
+                    sndSePlay(monster->sound_info.se_bank, 0xB, 0);
                 }
-                monster->req_prog = MONSTER_PROG_DAMAGE;
-                sndSePlay(monster->sound_info.se_bank, 0xB, 0);
                 break;
             case 4:
                 if (tbl->flags & 4) {
