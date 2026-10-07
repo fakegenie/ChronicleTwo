@@ -420,7 +420,8 @@ int sgInitGyoRace(SubGameInfo *info) {
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/gyorace", sgInitGyoRace__FP11SubGameInfo);
 #endif
 #ifdef NONMATCHING
-// 251 aligned words off (objdiff splits this jump-table function)
+template <typename T> static inline T Ident(T v) { return v; }
+// 182 aligned words off (objdiff splits this jump-table function)
 int sgLoopGyoRace(SubGameInfo *info) {
     extern const unsigned char at_1380__2__DATA[];
     extern const unsigned char at_1696__2__DATA[];
@@ -580,8 +581,8 @@ int sgLoopGyoRace(SubGameInfo *info) {
                 float matrix[4][4];
                 position[1] = 0.0f;
                 if (distance >= 0.0 && distance < 1.0) {
-                    position[2] = -345.0f * distance;
                     position[0] = 190.0f + 15.0f * progress.lane_pos;
+                    position[2] = -345.0f * distance;
                 }
                 if (distance >= 3.0 && distance < 4.0) {
                     position[0] = -190.0f - 15.0f * progress.lane_pos;
@@ -635,16 +636,7 @@ int sgLoopGyoRace(SubGameInfo *info) {
                     character->SetMotion((char *) at_1380__2__DATA, 0);
                 }
                 image->kind = 0;
-                union {
-                    mgRect<int> rect;
-                };
-                rect.Set(425, 85, 42, 42);
-                RaceVector coords;
-                coords.q = *(u_long128 *) &rect;
-                image->tex_rect.left = coords.v[0];
-                image->tex_rect.top = coords.v[1];
-                image->tex_rect.right = coords.v[2];
-                image->tex_rect.bottom = coords.v[3];
+                image->tex_rect = Ident(mgRect<int>(425, 85, 42, 42));
                 effect_cnt++;
                 if (effect_cnt >= 96) {
                     effect_cnt = 0;
@@ -694,8 +686,8 @@ int sgLoopGyoRace(SubGameInfo *info) {
                 float matrix[4][4];
                 position[1] = 0.0f;
                 if (distance >= 0.0 && distance < 1.0) {
-                    position[2] = -345.0f * distance;
                     position[0] = 190.0f + 15.0f * progress.lane_pos;
+                    position[2] = -345.0f * distance;
                 }
                 if (distance >= 3.0 && distance < 4.0) {
                     position[0] = -190.0f - 15.0f * progress.lane_pos;
