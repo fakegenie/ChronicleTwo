@@ -146,7 +146,7 @@ void CWaveTable::GetEffect() {
 }
 
 #ifdef NONMATCHING
-// 99.0% match, 57 words off
+// 99.4% match, 27 words off
 void CWaveTable::Effect() {
     int row;
     int column;
@@ -166,11 +166,7 @@ void CWaveTable::Effect() {
     }
     for (row = 1; row < 23; row++) {
         float *line = &before[row * 24];
-        float seam = line[22];
-        seam += line[1];
-        seam *= 0.5f;
-        line[1] = seam;
-        line[22] = seam;
+        line[22] = line[1] = (line[22] + line[1]) * 0.5f;
     }
 }
 #else

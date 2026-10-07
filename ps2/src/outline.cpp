@@ -50,8 +50,6 @@ int COutLineDraw::Draw(float *pos, float scale, float alpha) {
     return Draw(scale, alpha);
 }
 
-#ifdef NONMATCHING
-// 99.0% match, 4 words off
 int COutLineDraw::Draw(float scale, float alpha) {
     if (frame == NULL) {
         return 0;
@@ -67,6 +65,7 @@ int COutLineDraw::Draw(float scale, float alpha) {
     int right;
     int top;
     int bottom;
+    int edge_offset;
     if (!(scale <= 1.0f)) {
         scale = 1.0f;
     }
@@ -77,14 +76,15 @@ int COutLineDraw::Draw(float scale, float alpha) {
     }
 
     float scaled_width = width * scale;
+    edge_offset = (int)scaled_width;
     float opacity = 1.0f;
-    if ((int)scaled_width <= 0) {
+    if (edge_offset <= 0) {
         opacity = scaled_width;
     }
     if (opacity < 0.01f) {
         opacity = 0.01f;
     }
-    int edge_offset = (int)(16.0f * scaled_width);
+    edge_offset = (int)(16.0f * scaled_width);
     mgVu0FBOX draw_box;
     if (mgGetDrawRect(frame, &draw_box) == 0) {
         return 0;
@@ -196,25 +196,25 @@ int COutLineDraw::Draw(float scale, float alpha) {
     composite.End();
     return result;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/outline", Draw__12COutLineDrawFff);
-#endif
 
 #ifdef NONMATCHING
-// 98.0% match, 18 words off
+// 99.9% match, 2 words off
 static void DrawDivSprite(mgCDrawPrim *prim, mgRect<int> rect, mgCTexture *texture,
                           int *color, int dx, int dy, int z, int unused) {
+    int x;
+    int x_end;
+    int y_end;
+    int offset_y;
+    int y;
+    int block_height;
     mgRect<int> area = rect;
     sceVu0IVECTOR vertex_start;
     sceVu0IVECTOR vertex_end;
     sceVu0IVECTOR texcrd_start;
     sceVu0IVECTOR texcrd_end;
-    int x;
     int offset_x = dx + mgScreenOffx * 16;
-    int y_end;
-    int offset_y = dy + mgScreenOffy * 16;
-    int y;
-    int block_height = mgScreenHeight * 16;
+    offset_y = dy + mgScreenOffy * 16;
+    block_height = mgScreenHeight * 16;
 
     prim->Begin2();
     prim->BeginPrim2(MG_PRIM_SPRITE);
@@ -229,7 +229,7 @@ static void DrawDivSprite(mgCDrawPrim *prim, mgRect<int> rect, mgCTexture *textu
     vertex_end[2] = z;
     vertex_start[2] = z;
     for (x = area.left; x < area.right;) {
-        int x_end = x + 0x200;
+        x_end = x + 0x200;
         if (area.right < x_end) {
             x_end = area.right;
         }
@@ -250,7 +250,7 @@ static void DrawDivSprite(mgCDrawPrim *prim, mgRect<int> rect, mgCTexture *textu
             texcrd_end[1] = y_end;
             vertex_end[0] += offset_x;
             vertex_end[1] += offset_y;
-                    u_long128 *packet = (u_long128 *)prim->DirectData(4);
+            u_long128 *packet = (u_long128 *)prim->DirectData(4);
             y = y_end;
             packet[0] = *(u_long128 *)texcrd_start;
             packet[1] = *(u_long128 *)vertex_start;
