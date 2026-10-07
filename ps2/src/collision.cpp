@@ -440,9 +440,8 @@ int CColFrame::GetWorldBBox(mgVu0FBOX *box) {
     return found;
 }
 
-#ifdef NONMATCHING
-// 98.1% match, 14 words off
 CColFrame *LoadCollisionFile(MDS_HEADER *header, mgCMemory *memory) {
+    u_char        *data = (u_char *)header;
     sceVu0FMATRIX  matrix;
     sceVu0FVECTOR  max;
     sceVu0FVECTOR  min;
@@ -464,7 +463,7 @@ CColFrame *LoadCollisionFile(MDS_HEADER *header, mgCMemory *memory) {
     frames = new ((u_long128 *)memory->Alloc(Align16Blocks(header->object_num * sizeof(CColFrame)) + 2)) CColFrame[header->object_num];
 
     i = 0;
-    for (offset = 0; i < header->object_num; offset += sizeof(CColFrame), i++) {
+    for (offset = 0; i < ((MDS_HEADER *)data)->object_num; offset += sizeof(CColFrame), i++) {
         object = (MDTOBJ_HEADER *)cursor;
         cursor += sizeof(MDTOBJ_HEADER);
         frame = (CColFrame *)((u_char *)frames + offset);
@@ -486,7 +485,7 @@ CColFrame *LoadCollisionFile(MDS_HEADER *header, mgCMemory *memory) {
         }
 
         if (object->mdt_ofs != 0) {
-            u_int *model = (u_int *)((u_char *)header + object->mdt_ofs);
+            u_int *model = (u_int *)(data + object->mdt_ofs);
             mgZeroVector(max);
             mgZeroVector(min);
 
@@ -503,9 +502,6 @@ CColFrame *LoadCollisionFile(MDS_HEADER *header, mgCMemory *memory) {
 
     return frames;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/collision", LoadCollisionFile__FP10MDS_HEADERP9mgCMemory);
-#endif
 
 void CColFrame::Initialize() {
     flags = COL_FRAME_FLAG_SELF;
