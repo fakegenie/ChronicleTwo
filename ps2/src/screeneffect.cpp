@@ -9,21 +9,55 @@
 #include "mglib.hpp"
 #include "screeneffect.hpp"
 
+#pragma define_section dead ".dead" ".dead"
+__declspec(dead) static u_long PrimeLongDivision(u_long a, u_long b) {
+    return a / b;
+}
+
 // Code (.text)
 #ifdef NONMATCHING
-// 67.6% match, 328 words off
+// 98.6% match, 15 words off
+struct DepthTextureName {
+    char text[0x20];
+};
+struct DepthTextureImages {
+    u_long128 *image[MG_TEXTURE_LEVEL_MAX];
+};
 void DepthOfField(int levels, float *depths, mgCTexture *work_texture, float strength) {
     if (work_texture == NULL) {
         return;
     }
-
+    int level;
+    int screen_top;
+    int dest_left;
+    float *depth;
+    int parity;
+    mgCTexture *source_texture;
     mgCTexture frame_buffer;
     mgCTexture blur_texture;
     mgGetFrameBuffer(&frame_buffer);
-    blur_texture = *work_texture;
-
+    blur_texture.block = work_texture->block;
+    blur_texture.width = work_texture->width;
+    blur_texture.height = work_texture->height;
+    blur_texture.bpp = work_texture->bpp;
+    *(DepthTextureName *)blur_texture.name = *(DepthTextureName *)work_texture->name;
+    blur_texture.vram_size = work_texture->vram_size;
+    blur_texture.image_blocks = work_texture->image_blocks;
+    blur_texture.clut_size = work_texture->clut_size;
+    blur_texture.tex0_bits = work_texture->tex0_bits;
+    blur_texture.tex1_bits = work_texture->tex1_bits;
+    blur_texture.clamp_bits = work_texture->clamp_bits;
+    *(DepthTextureImages *)blur_texture.image = *(DepthTextureImages *)work_texture->image;
+    blur_texture.clut = work_texture->clut;
+    blur_texture.swizzled = work_texture->swizzled;
+    blur_texture.next = work_texture->next;
+    source_texture = &frame_buffer;
     mgRect<int> source(0, 0, mgScreenWidth * 16, mgScreenHeight * 16);
     mgRect<int> destination(0, 0, mgScreenWidth * 8, mgScreenHeight * 8);
+    screen_top = source.top;
+    int screen_left = source.left;
+    int screen_right = source.right;
+    int screen_bottom = source.bottom;
     mgCDrawPrim prim;
     prim.Initialize(NULL, NULL);
     prim.DepthTestEnable(1);
@@ -32,48 +66,51 @@ void DepthOfField(int levels, float *depths, mgCTexture *work_texture, float str
     prim.ZMask(MG_Z_MASK_MASKED);
     prim.TextureMapEnable(1);
     prim.AlphaBlendEnable(1);
-
     mgCSprite sprite;
-    sprite.attr.alpha_test = -1;
     sprite.attr.z_test = 1;
+    sprite.attr.alpha_test = -1;
     blur_texture.Bilinear(1);
     blur_texture.tex0.bits.tcc = 0;
-
-    mgCTexture *source_texture = &frame_buffer;
-    for (int level = 0; level < levels; level++) {
+    for (level = 0; level < levels; level++) {
         destination.left -= 8;
-        destination.top -= 8;
         destination.right -= 8;
+        destination.top -= 8;
         destination.bottom -= 8;
         mgSetPkMoveImage(source_texture, source, &blur_texture, destination, NULL);
         destination.left += 8;
-        destination.top += 8;
         destination.right += 8;
+        destination.top += 8;
         destination.bottom += 8;
-
-        int   z[2] = {mgTransZPrim(depths[level]), mgTransZPrim(depths[level] + depths[level] / 10.0f)};
-        int   alpha[2] = {(int) (128.0f * strength), (int) (32.0f * strength)};
-        int   parity = level & 1;
-        float step_x = (float) (source.right - source.left) / 16.0f;
-        float step_u = (float) (destination.right - destination.left) / 16.0f;
-        float x = (float) source.left;
-        float u = (float) destination.left;
-
+        depth = &depths[level];
+        float  tenth = *depth / 10.0f;
+        int    dest_top = destination.top;
+        int    dest_right = destination.right;
+        int    dest_bottom = destination.bottom;
+        dest_left = destination.left;
+        parity = level % 2;
+        int    z[2] = {mgTransZPrim(*depth), mgTransZPrim(tenth + *depth)};
+        int    alpha[2] = {(int)(128.0f * strength), (int)(32.0f * strength)};
         prim.Begin(MG_PRIM_TRIANGLE_STRIP);
         prim.Texture(&blur_texture);
+        float step_x = (float)(screen_right - screen_left) / 16.0f;
+        float step_u = (float)(dest_right - dest_left) / 16.0f;
+        float x = (float)screen_left;
+        float u = (float)dest_left;
         prim.Direct(0x3B, 0x8000000080ULL);
         prim.Color(0x80, 0x80, 0x80, alpha[0]);
-        prim.TextureCrd4((int) u, destination.top + 16);
-        prim.Vertex4((int) x, source.top, z[0]);
-        prim.TextureCrd4((int) u, destination.bottom - 16);
-        prim.Vertex4((int) x, source.bottom, z[0]);
-        while (x < (float) source.right) {
+        int texel_u;
+        prim.TextureCrd4(texel_u = (int)u, dest_top + 16);
+        int vertex_x;
+        prim.Vertex4(vertex_x = (int)x, screen_top, z[0]);
+        prim.TextureCrd4(texel_u, dest_bottom - 16);
+        prim.Vertex4(vertex_x, screen_bottom, z[0]);
+        while (x < (float)screen_right) {
             parity = !parity;
             prim.Color(0x80, 0x80, 0x80, alpha[0]);
-            prim.TextureCrd4((int) (u + step_u), destination.top + 16);
-            prim.Vertex4((int) (x + step_x), source.top, z[parity]);
-            prim.TextureCrd4((int) (u + step_u), destination.bottom - 16);
-            prim.Vertex4((int) (x + step_x), source.bottom, z[parity]);
+            prim.TextureCrd4(texel_u = (int)(u + step_u), dest_top + 16);
+            prim.Vertex4(vertex_x = (int)(x + step_x), screen_top, z[parity]);
+            prim.TextureCrd4(texel_u, dest_bottom - 16);
+            prim.Vertex4(vertex_x, screen_bottom, z[parity]);
             x += step_x;
             u += step_u;
         }
@@ -81,9 +118,9 @@ void DepthOfField(int levels, float *depths, mgCTexture *work_texture, float str
         source_texture = &blur_texture;
         source = destination;
         int width = source.right - source.left;
-        int height = source.bottom - source.top;
         destination.left += width;
         destination.right = destination.left + width * 2 / 3;
+        int height = source.bottom - source.top;
         destination.top += height;
         destination.bottom = destination.top + height * 2 / 3;
     }
@@ -93,7 +130,7 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/screeneffect", DepthOfField__FiPfP10mgCTex
 #endif
 
 #ifdef NONMATCHING
-// 76.6% match, 395 words off
+// 76.6% match, 394 words off
 void LensFlare(int *screen, float *color, int bank, char *texture_a, char *texture_b) {
     int width = mgScreenWidth;
     int height = mgScreenHeight;
