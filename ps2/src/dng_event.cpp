@@ -1229,10 +1229,9 @@ int SearchMapEventParts(int kind, CMapParts **parts, float *rotation, int unused
 static inline CMap *ActiveDngMap() {
     return DngMainScene->GetMap(DngMainScene->active_map);
 }
-// 98.1% match, 14 words off
+template <typename T> static inline T Ident(T v) { return v; }
+// 99.9% match, 7 words off
 int SearchMapFlatPosition(float *out_pos, CAutoMapGen *map_gen) {
-    int attempt;
-    CMapParts *place_parts;
     float center[4];
     float from[4];
     float to[4];
@@ -1241,14 +1240,18 @@ int SearchMapFlatPosition(float *out_pos, CAutoMapGen *map_gen) {
     int hit_polys[32];
     float hit_points[32][4];
     float found[4];
-    int axis;
+    CMapParts *parts;
     int place_num;
-    int poly_num;
-    int hit_num;
-    int tries_left;
-    CMap *map;
-
-    if ((map = ActiveDngMap()) == NULL) {
+    int poly_num __attribute__((aligned(16)));
+    CMapParts *place_parts;
+    int tries_left __attribute__((aligned(32)));
+    int attempt __attribute__((aligned(16)));
+    CMap *map __attribute__((aligned(32)));
+    int hit_num __attribute__((aligned(16)));
+    int attr __attribute__((aligned(32)));
+    int axis __attribute__((aligned(32)));
+    map = ActiveDngMap();
+    if (map == NULL) {
         return 0;
     }
     place_parts = map->GetPlacPartsTable(&place_num);
@@ -1267,8 +1270,8 @@ int SearchMapFlatPosition(float *out_pos, CAutoMapGen *map_gen) {
     tries_left = 999;
     box.min[3] = box.max[3] = center[3] = from[3] = to[3] = 1.0f;
     while (1) {
-        CMapParts *parts = &place_parts[iRand(place_num)];
-        int attr = 0;
+        parts = &place_parts[iRand(place_num)];
+        attr = 0;
         if (map_gen != NULL) {
             CAutoMapParts *cell = map_gen->grid;
             for (int i = 0; i < map_gen->grid_w * map_gen->grid_h; i++) {
@@ -1292,7 +1295,7 @@ int SearchMapFlatPosition(float *out_pos, CAutoMapGen *map_gen) {
                 box.min[axis] = center[axis] - 100.0f;
             }
         }
-        poly_num = map->GetColPoly(polys, box, 0x80);
+        poly_num = Ident(map)->GetColPoly(polys, box, 0x80);
         for (attempt = 0; attempt < 16; attempt++) {
             sceVu0CopyVector(from, center);
             from[0] += fRand(320.0f) - 160.0f;
