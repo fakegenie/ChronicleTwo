@@ -146,20 +146,29 @@ void CWaveTable::GetEffect() {
 }
 
 #ifdef NONMATCHING
-// 85.1% match, 208 words off
+// 99.0% match, 57 words off
 void CWaveTable::Effect() {
-    float *before = &height[1 - current][0][0];
+    int row;
+    int column;
+    float *old;
+    float *before = height[1 - current][0];
+    float *center;
     float *now = &height[current][0][0];
-    for (int row = 1; row < 23; row++) {
-        for (int column = 1; column < 23; column++) {
-            float *center = &now[row * 24 + column];
-            float *old = &before[row * 24 + column];
-            *old = (*center * 1.9216f - *old) - (*center - *old) * 0.0015f + (center[-24] + (center[-1] + center[1] + center[24])) * 0.0196f;
+    for (row = 1; row < 23; row++) {
+        for (column = 1; column < 23; column++) {
+            center = &now[row * 24 + column];
+            old = &before[row * 24 + column];
+            float sum = center[-24] + (center[24] + (center[-1] + center[1]));
+            sum *= 0.0196f;
+            sum += 1.9216f * *center - *old;
+            *old = sum - 0.0015f * (*center - *old);
         }
     }
-    for (int row = 1; row < 23; row++) {
+    for (row = 1; row < 23; row++) {
         float *line = &before[row * 24];
-        float seam = (line[22] + line[1]) * 0.5f;
+        float seam = line[22];
+        seam += line[1];
+        seam *= 0.5f;
         line[1] = seam;
         line[22] = seam;
     }
