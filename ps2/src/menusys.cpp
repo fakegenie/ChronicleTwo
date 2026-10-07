@@ -6262,10 +6262,10 @@ extern s8   checkmoveFlag_5411;
 extern u8   itemmenu_calcmode_tbl_5410[6];
 extern char at_5758[];
 extern char at_5759[];
-#ifdef NONMATCHING
-// ~31.3% match, 570 words off
 void CMenuItemInfo::CalcTex() {
-    int held_type;
+    int k;
+    int spare_a;
+    int spare_b;
     Func_MenuItemBrdPosStep(MenuItem_ItemBoardTopLine);
     int cursor = MenuCommonInfo->cursor;
     if (init_5412 == 0) {
@@ -6350,10 +6350,10 @@ void CMenuItemInfo::CalcTex() {
             reference_no = cursor;
         }
     } else {
-        held_type = GetItemDataType(held_item_no);
-        for (i = 0; i < 4; i++) {
-            if (held_type == SearchEquipType(reference_id, i)) {
-                reference_no = i;
+        int held_type = GetItemDataType(held_item_no);
+        for (k = 0; k < 4; k++) {
+            if (held_type == SearchEquipType(reference_id, k)) {
+                reference_no = k;
             }
         }
     }
@@ -6586,9 +6586,6 @@ void CMenuItemInfo::CalcTex() {
     checkmoveFlag_5411 = check_move;
     EffectDrawCheck(item_board_form);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menusys", CalcTex__13CMenuItemInfoFv);
-#endif
 extern char at_5879[];
 extern char at_5880[];
 extern char at_5881[];
