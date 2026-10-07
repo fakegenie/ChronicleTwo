@@ -2703,8 +2703,6 @@ MENUFORMPARTS_TYPE *CMenuPosDataForm::GetEnableEnterPart() {
 
     return NULL;
 }
-#ifdef NONMATCHING
-// 99.8% match, 11 words off
 int CMenuPosDataForm::GetNowPosRGBA(MENUFORMPARTS_TYPE *part, MENU_BASETEXINFO *tex_info, float *pos, u8 *rgba) {
     MENU_PARTS_EFFECT_STRUCT1 *effect;
     int i;
@@ -2718,7 +2716,6 @@ int CMenuPosDataForm::GetNowPosRGBA(MENUFORMPARTS_TYPE *part, MENU_BASETEXINFO *
     float sin_angle;
     float scale_x;
     float scale_y;
-    float grow;
     float shrink;
     int dx;
     int dy;
@@ -2780,11 +2777,11 @@ int CMenuPosDataForm::GetNowPosRGBA(MENUFORMPARTS_TYPE *part, MENU_BASETEXINFO *
                 pos[n + 1] = center_y + (dx * rot[k][2] + dy * rot[k][3]);
             }
         } else if (effect->type == MENU_PARTS_EFFECT_STRETCH || effect->type == MENU_PARTS_EFFECT_STRETCH_REP) {
-            grow = effect->param[0] / 3.0f;
-            scale_x = grow + effect->param[4];
-            scale_y = grow + effect->param[5];
-            if (effect->type == MENU_PARTS_EFFECT_STRETCH_REP && grow > effect->param[1] / 2.0f) {
-                shrink = effect->param[1] - grow;
+            phase = effect->param[0] / 3.0f;
+            scale_x = effect->param[4] + phase;
+            scale_y = effect->param[5] + phase;
+            if (effect->type == MENU_PARTS_EFFECT_STRETCH_REP && phase > effect->param[1] / 2.0f) {
+                shrink = effect->param[1] - phase;
                 scale_x = (effect->param[4] - shrink) / 100.0f;
                 scale_y = (effect->param[5] - shrink) / 100.0f;
             }
@@ -2814,9 +2811,6 @@ int CMenuPosDataForm::GetNowPosRGBA(MENUFORMPARTS_TYPE *part, MENU_BASETEXINFO *
     }
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", GetNowPosRGBA__16CMenuPosDataFormFP18MENUFORMPARTS_TYPEP16MENU_BASETEXINFOPfPUc);
-#endif
 void CMenuPosDataForm::MenuPartsStep() {
     int                        i;
     MENUFORMPARTS_TYPE        *part;
