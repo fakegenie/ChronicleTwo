@@ -420,7 +420,8 @@ int sgInitGyoRace(SubGameInfo *info) {
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/gyorace", sgInitGyoRace__FP11SubGameInfo);
 #endif
 #ifdef NONMATCHING
-// 299 aligned words off (objdiff splits this jump-table function)
+template <typename T> static inline T Ident(T v) { return v; }
+// 117 aligned words off (objdiff splits this jump-table function)
 int sgLoopGyoRace(SubGameInfo *info) {
     extern const unsigned char at_1380__2__DATA[];
     extern const unsigned char at_1696__2__DATA[];
@@ -544,10 +545,11 @@ int sgLoopGyoRace(SubGameInfo *info) {
                 }
                 if (!(progress.pos < 8.0f)) {
                     unsigned int lap = (unsigned int) (progress.pos / 8.0f);
-                    if (state->lap < lap) {
-                        state->lap = lap;
-                        if ((int) state->lap > 1) {
-                            state->lap = 1;
+                    unsigned int *lap_no = &state->lap;
+                    if (*lap_no < lap) {
+                        *lap_no = lap;
+                        if ((int) *lap_no > 1) {
+                            *lap_no = 1;
                         } else {
                             state->unk_14 = 1;
                             GetSaveData();
@@ -560,14 +562,15 @@ int sgLoopGyoRace(SubGameInfo *info) {
                 if (fish == hero) {
                     if ((unsigned char) progress.state != 3) {
                         state->time = 20.0f * race_cnt;
-                        state->lap_time[fish_inf[hero].lap] = state->time - 20.0f * state->lap_start;
+                        state->lap_time[fish_inf[hero].lap] = fish_inf[fish].time - 20.0f * state->lap_start;
                     } else if ((unsigned char) progress.state == 3) {
-                        state->time = 20.0f * RaceInfo.goal_time[fish];
+                        float *total;
+                        *(total = &state->time) = 20.0f * RaceInfo.goal_time[(int)fish] ;
                         float time = state->lap_time[0];
                         float minutes = 3600.0f * (float) (int) (time / 3600.0f);
                         time -= minutes;
                         float seconds = 60.0f * (float) (int) (time / 60.0f);
-                        state->lap_time[1] = state->time - ((60.0f * (float) (int) ((100.0f * (time - seconds)) / 60.0f)) / 100.0f + (minutes + seconds));
+                        state->lap_time[1] = *total - ((60.0f * (float) (int) ((100.0f * (time - seconds)) / 60.0f)) / 100.0f + (minutes + seconds));
                     }
                 }
                 float distance = progress.pos;
@@ -578,8 +581,8 @@ int sgLoopGyoRace(SubGameInfo *info) {
                 float matrix[4][4];
                 position[1] = 0.0f;
                 if (distance >= 0.0 && distance < 1.0) {
-                    position[2] = -345.0f * distance;
                     position[0] = 190.0f + 15.0f * progress.lane_pos;
+                    position[2] = -345.0f * distance;
                 }
                 if (distance >= 3.0 && distance < 4.0) {
                     position[0] = -190.0f - 15.0f * progress.lane_pos;
@@ -633,16 +636,7 @@ int sgLoopGyoRace(SubGameInfo *info) {
                     character->SetMotion((char *) at_1380__2__DATA, 0);
                 }
                 image->kind = 0;
-                union {
-                    mgRect<int> rect;
-                };
-                rect.Set(425, 85, 42, 42);
-                RaceVector coords;
-                coords.q = *(u_long128 *) &rect;
-                image->tex_rect.left = coords.v[0];
-                image->tex_rect.top = coords.v[1];
-                image->tex_rect.right = coords.v[2];
-                image->tex_rect.bottom = coords.v[3];
+                image->tex_rect = Ident(mgRect<int>(425, 85, 42, 42));
                 effect_cnt++;
                 if (effect_cnt >= 96) {
                     effect_cnt = 0;
@@ -692,8 +686,8 @@ int sgLoopGyoRace(SubGameInfo *info) {
                 float matrix[4][4];
                 position[1] = 0.0f;
                 if (distance >= 0.0 && distance < 1.0) {
-                    position[2] = -345.0f * distance;
                     position[0] = 190.0f + 15.0f * progress.lane_pos;
+                    position[2] = -345.0f * distance;
                 }
                 if (distance >= 3.0 && distance < 4.0) {
                     position[0] = -190.0f - 15.0f * progress.lane_pos;
@@ -742,17 +736,16 @@ int sgLoopGyoRace(SubGameInfo *info) {
             race_mode = 2;
             race_proc_cnt = 0;
             SetGyoRaceRanking(RaceInfo.rank[hero_no] - 1);
+            mgCTextureManager *textures = &mgTexManager;
             for (int fish = 0; fish < 6; fish++) {
-                GYORACE_FISH_INF *state = &fish_inf[fish];
-                CCharacter2      *character = scene->GetCharacter(state->chara_no);
-                mgTexManager.DeleteBlock(*(int *) ((unsigned char *) character + 0x2E4));
-                GYORACE_RESULT *result = &fish_game_data[RaceInfo.rank[fish] - 1];
-                strcpy(result->name, (char *) at_1701__DATA);
+                CCharacter2      *character = scene->GetCharacter(fish_inf[fish].chara_no);
+                textures->DeleteBlock(*(int *) ((unsigned char *) character + 0x2E4));
+                strcpy(fish_game_data[RaceInfo.rank[fish] - 1].name, (char *) at_1701__DATA);
                 char *name = game_data[fish]->data.fish.name;
-                strncpy(result->name, name, strlen(name));
-                result->time = 20.0f * RaceInfo.goal_time[fish];
-                result->fish_no = state->fish_no;
-                result->race_class = race_rank[0];
+                strncpy(fish_game_data[RaceInfo.rank[fish] - 1].name, name, strlen(name));
+                fish_game_data[RaceInfo.rank[fish] - 1].time = 20.0f * RaceInfo.goal_time[fish];
+                fish_game_data[RaceInfo.rank[fish] - 1].fish_no = fish_inf[fish].fish_no;
+                fish_game_data[RaceInfo.rank[fish] - 1].race_class = race_rank[0];
                 sndSeStop(gyore_snd_id, fish + 3, fish + 3);
                 sndSeStop(gyore_snd_id, fish + 9, fish + 9);
             }
@@ -760,8 +753,8 @@ int sgLoopGyoRace(SubGameInfo *info) {
                 printf((char *) at_1702__DATA, place + 1, fish_game_data[place].name);
             }
             sndSeStop(gyore_snd_id, 2, 0);
-            mgTexManager.DeleteBlock(WindowTexb);
-            mgTexManager.DeleteBlock(EffectTexb);
+            textures->DeleteBlock(WindowTexb);
+            textures->DeleteBlock(EffectTexb);
             mgSetAmbient(old_ambient);
             scene->SetActive(1, 0);
             scene->active_camera = scene->before_camera;
@@ -781,8 +774,8 @@ int sgLoopGyoRace(SubGameInfo *info) {
         scene->GetCharacter(fish_inf[fish].chara_no)->Step();
     }
     RaceVector ambient = at_1547;
-    RaceVector camera_pos = at_1548;
     float      camera_matrix[4][4];
+    RaceVector camera_pos = at_1548;
     camera0.Step(1);
     camera0.GetCameraMatrix(camera_matrix);
     camera0.GetPos(camera_pos.f);
@@ -796,9 +789,9 @@ int sgLoopGyoRace(SubGameInfo *info) {
     mgSetViewMatrix(camera_matrix, camera_pos.f);
     for (int fish = 0; fish < 6; fish++) {
         CCharacter2 *character = scene->GetCharacter(fish_inf[fish].chara_no);
+        float        position[4];
         float        camera_pos[4];
         float        camera_ref[4];
-        float        position[4];
         float        volume;
         float        pan;
         camera0.GetPos(camera_pos);
