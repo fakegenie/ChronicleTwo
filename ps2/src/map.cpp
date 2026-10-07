@@ -1828,13 +1828,13 @@ void CMap::CreateMap(CMdsListSet *mds_list_set, mgCMemory *stack) {
     char *script;
     int   size;
 
-    script = GetAddMapFile(&size);
+    script = map_info.GetAddMapFile(&size);
 
     if (script != NULL && size > 0) {
         LoadMapFile(script, size, stack, 1);
     }
 
-    script = GetMapFile(&size);
+    script = map_info.GetMapFile(&size);
     LoadMapFile(script, size, stack, 0);
 }
 
@@ -2042,7 +2042,7 @@ void CMap::LoadData(unsigned int *pcp_pack, unsigned int *img_pack, int *tex_blo
         mgCTextureManager *manager = &mgTexManager;
 
         for (index = 0;; index++) {
-            name = GetImgName(index);
+            name = map_info.GetImgName(index);
 
             if (name == NULL) {
                 break;
@@ -2064,7 +2064,7 @@ void CMap::LoadData(unsigned int *pcp_pack, unsigned int *img_pack, int *tex_blo
         int   pcp_index;
 
         for (pcp_index = 0;; pcp_index++) {
-            pcp_name = GetPCPName(pcp_index);
+            pcp_name = map_info.GetPCPName(pcp_index);
 
             if (pcp_name == NULL) {
                 break;
@@ -2073,7 +2073,7 @@ void CMap::LoadData(unsigned int *pcp_pack, unsigned int *img_pack, int *tex_blo
             file = GetPackFile(pcp_pack, pcp_name, NULL);
 
             if (file != NULL) {
-                mds_list_set->LoadPCPFile(pcp_name, file, stack, all_scissor);
+                mds_list_set->LoadPCPFile(pcp_name, file, stack, map_info.all_scissor);
             }
         }
 

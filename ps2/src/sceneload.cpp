@@ -373,9 +373,9 @@ int CScene::LoadMapFromMemory(int map_no, int step, SCN_LOADMAP_INFO2 *info) {
         if (info->files[1].enable != 0) {
             add_files = &info->files[1];
         }
-        map->LoadMapInfo(files->map_data, files->map_size, stack);
+        map->map_info.LoadMapInfo(files->map_data, files->map_size, stack);
         if (add_files != NULL) {
-            map->AddMapInfo(add_files->map_data, add_files->map_size, stack);
+            map->map_info.AddMapInfo(add_files->map_data, add_files->map_size, stack);
         }
         return SCN_LOADMAP_STEP_DATA;
     }
@@ -414,7 +414,7 @@ int CScene::LoadMapFromMemory(int map_no, int step, SCN_LOADMAP_INFO2 *info) {
             map->CreateEffect(efp_data, info->efp_tex_block, stack);
         }
         strcpy((tex_manager = &mgTexManager)->name_suffix, at_1116);
-        if (map->sky_info != 0 && files->sky_data != NULL && info->sky_tex_block > 0) {
+        if (map->map_info.sky_info != 0 && files->sky_data != NULL && info->sky_tex_block > 0) {
             CMapSky *sky;
             DeleteSky(0);
             if ((sky = (CMapSky *)operator new(sizeof(CMapSky), stack->Alloc(0x13))) != NULL) {
@@ -467,14 +467,9 @@ template <>
 void mgCObjectStack<CList<EMAP_MESSAGE> >::Initialize() {
     unk_8 = 0;
 }
-#ifdef NONMATCHING
-// 91.2% match, 7 words off
 CMap::CMap() {
     Initialize();
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/sceneload", __ct__4CMapFv);
-#endif
 int CScene::LoadMapBGStep(SCN_LOADMAP_INFO2 *info) {
     int step;
     int result;
@@ -571,7 +566,7 @@ int CScene::DeleteMap(int map_index, int clear_stack) {
     }
 
     for (index = 0;; index++) {
-        file_name = loaded_map->GetImgName(index);
+        file_name = loaded_map->map_info.GetImgName(index);
 
         if (file_name == NULL) {
             break;
@@ -583,7 +578,7 @@ int CScene::DeleteMap(int map_index, int clear_stack) {
     }
 
     for (index = 0;; index++) {
-        file_name = loaded_map->GetPCPName(index);
+        file_name = loaded_map->map_info.GetPCPName(index);
 
         if (file_name == NULL) {
             break;

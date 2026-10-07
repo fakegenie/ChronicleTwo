@@ -1903,7 +1903,7 @@ void CMonsterMan::MoveUnit(CActiveMonster *monster, CCPoly *poly, int poly_num) 
                         CMap *map = scene->GetMap(scene->active_map);
 
                         if (map != NULL) {
-                            ground = map->def_foot;
+                            ground = map->map_info.def_foot;
                         }
                     }
 
