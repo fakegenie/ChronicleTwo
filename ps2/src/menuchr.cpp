@@ -905,7 +905,7 @@ void SetMenuLoadItemNo(int who) {
  * Partitions character menu memory among its work buffers.
  *
  */
-// 90.5% match, 11 words off
+// 11 words off in an aligned diff
 static int MenuMemoryDivide(mgCMemory *memory, mgCMemory **list, int chara) {
     int total;
     memory->Align64();
@@ -2799,7 +2799,7 @@ void CMenuChrCngMenu::UpdataLife() {
 }
 #ifdef NONMATCHING
 extern "C" void Set__9mgRect_s_Fssss(mgRect<short> *rect, short x, short y, short w, short h);
-// 92.4% match, 156 words off
+// 154 words off in an aligned diff
 void MenuCharaChangeStarDraw() {
     mgCTextureManager *texManager = &mgTexManager;
 
@@ -2827,7 +2827,7 @@ void MenuCharaChangeStarDraw() {
     prim->Texture(MenuCharaChangeBase_Tex);
     prim->Color(0x80, 0x80, 0x80, (int)ChrChangMenuPt->star_alpha);
     for (int i = 0; i < 4; i++) {
-        prim->TextureCrd((int)crd.uv[i][0], (int)crd.uv[i][1]);
+        prim->TextureCrd((int)crd.uv[i][0], (int)crd.uv[(int)i][1]);
         float x = 1.0f + (center.x + size * cosf(angle));
         prim->Vertex(x, center.y + 1.1538461f * (size * sinf(angle)), 0.0f);
         angle += 1.5707964f;
@@ -4033,7 +4033,7 @@ void MenuMonsterBoxInit(mgCMemory *stack, int *tex_block, int mode) {
 
 #pragma inline_depth reset
 #ifdef NONMATCHING
-// 96.6% match, 167 words off
+// 161 words off in an aligned diff
 int CMenuMosSelect::KeyStep() {
     int size;
     int i;
@@ -4075,7 +4075,7 @@ int CMenuMosSelect::KeyStep() {
         case 0: {
             action = 0;
             if (menu_debug_flag) {
-                if (keys & 1) {
+                if ((int)keys & 1) {
                     menu_debug_select__2--;
                 }
                 if (keys & 2) {
@@ -4093,7 +4093,7 @@ int CMenuMosSelect::KeyStep() {
                     if (GamePad__2.On(PAD_SQUARE)) {
                         gauge = &debugBadge->abs;
                     }
-                    if (keys & 8) {
+                    if ((int)keys & 8) {
                         gauge->AddPoint(1.0f);
                     } else if (keys & 4) {
                         gauge->AddPoint(-1.0f);
@@ -4332,7 +4332,7 @@ int CMenuMosSelect::KeyStep() {
                                     for (i = 0; i < 10; i++) {
                                         param[i] = select_badge->class_level + 3;
                                     }
-                                    param[convert_table_3430[ sel ]] += select_badge->class_level * 2;
+                                    param[convert_table_3430[sel]] += select_badge->class_level * 2;
                                     place->CopyGameData(&reward);
                                     ExeScript(at_3695);
                                 } else {
@@ -4542,7 +4542,7 @@ int CMenuMosSelect::KeyStep() {
                     names.name[0] = at_3704;
                     names.name[1] = GetMonsterName(monsterNo);
                     for (i = 0; i < level_num; i++) {
-                        names.name[2 + i] = GetMonsterName(level_monster[i]);
+                        names.name[2 + i] = GetMonsterName(level_monster[(int)i]);
                     }
                     info->MakeMsg(level_num + 0x33);
                     info->SetMsgItemNo(names.name, level_num + 2);

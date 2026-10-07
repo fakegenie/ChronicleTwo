@@ -591,7 +591,7 @@ unsigned int CDngFreeMap::DrawGlidCheck(GLID_INFO *glid) {
     return mask;
 }
 #ifdef NONMATCHING
-// 93.5% match, 38 words off
+// 38 words off in an aligned diff
 void CDngFreeMap::DrawRoomOne(mgRect<float> rect, DNGMAP_ROOM_INFO *room, unsigned int glid_check, int alpha, float bright) {
     if (room == NULL || !(rect.left <= (float)(mgScreenWidth + 20)) || !(rect.top <= (float)(mgScreenHeight + 30))) {
         return;
@@ -790,7 +790,7 @@ int CheckGeoramaMateria(TRESURE_BOX_FLOOR_INFO *tresure, int floor, int *materia
     return materia_num;
 }
 #ifdef NONMATCHING
-// 96.2% match, 27 words off
+// 27 words off in an aligned diff
 static void DrawDngRoomInfo(DNGMAP_ROOM_INFO *room) {
     if (room != NULL && Floor_InfoTex != NULL) {
         if (dngfloor_infoview != 0) {
@@ -1327,7 +1327,7 @@ void CDngFreeMap::SetKomaMove(int moving) {
     }
 }
 #ifdef NONMATCHING
-// 99.9% match, 10 words off
+// 10 words off in an aligned diff
 int CDngFreeMap::LoadDngInfo(mgCMemory *stack, int tex_block, int dng_no, int user_room_no, int next_room_no) {
     int i;
     if (stack == NULL || stack->stGetRest() <= 0) {
