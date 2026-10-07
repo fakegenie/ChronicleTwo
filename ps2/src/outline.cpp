@@ -50,8 +50,6 @@ int COutLineDraw::Draw(float *pos, float scale, float alpha) {
     return Draw(scale, alpha);
 }
 
-#ifdef NONMATCHING
-// 99.0% match, 4 words off
 int COutLineDraw::Draw(float scale, float alpha) {
     if (frame == NULL) {
         return 0;
@@ -67,6 +65,7 @@ int COutLineDraw::Draw(float scale, float alpha) {
     int right;
     int top;
     int bottom;
+    int edge_offset;
     if (!(scale <= 1.0f)) {
         scale = 1.0f;
     }
@@ -77,14 +76,15 @@ int COutLineDraw::Draw(float scale, float alpha) {
     }
 
     float scaled_width = width * scale;
+    edge_offset = (int)scaled_width;
     float opacity = 1.0f;
-    if ((int)scaled_width <= 0) {
+    if (edge_offset <= 0) {
         opacity = scaled_width;
     }
     if (opacity < 0.01f) {
         opacity = 0.01f;
     }
-    int edge_offset = (int)(16.0f * scaled_width);
+    edge_offset = (int)(16.0f * scaled_width);
     mgVu0FBOX draw_box;
     if (mgGetDrawRect(frame, &draw_box) == 0) {
         return 0;
@@ -196,9 +196,6 @@ int COutLineDraw::Draw(float scale, float alpha) {
     composite.End();
     return result;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/outline", Draw__12COutLineDrawFff);
-#endif
 
 #ifdef NONMATCHING
 // 98.0% match, 18 words off
