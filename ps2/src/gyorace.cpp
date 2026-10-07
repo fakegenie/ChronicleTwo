@@ -421,7 +421,7 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/gyorace", sgInitGyoRace__FP11SubGameInfo);
 #endif
 #ifdef NONMATCHING
 template <typename T> static inline T Ident(T v) { return v; }
-// 132 aligned words off (objdiff splits this jump-table function)
+// 117 aligned words off (objdiff splits this jump-table function)
 int sgLoopGyoRace(SubGameInfo *info) {
     extern const unsigned char at_1380__2__DATA[];
     extern const unsigned char at_1696__2__DATA[];
@@ -774,8 +774,8 @@ int sgLoopGyoRace(SubGameInfo *info) {
         scene->GetCharacter(fish_inf[fish].chara_no)->Step();
     }
     RaceVector ambient = at_1547;
-    RaceVector camera_pos = at_1548;
     float      camera_matrix[4][4];
+    RaceVector camera_pos = at_1548;
     camera0.Step(1);
     camera0.GetCameraMatrix(camera_matrix);
     camera0.GetPos(camera_pos.f);
@@ -789,9 +789,9 @@ int sgLoopGyoRace(SubGameInfo *info) {
     mgSetViewMatrix(camera_matrix, camera_pos.f);
     for (int fish = 0; fish < 6; fish++) {
         CCharacter2 *character = scene->GetCharacter(fish_inf[fish].chara_no);
+        float        position[4];
         float        camera_pos[4];
         float        camera_ref[4];
-        float        position[4];
         float        volume;
         float        pan;
         camera0.GetPos(camera_pos);
