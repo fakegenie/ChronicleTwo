@@ -573,7 +573,7 @@ int CWater::Draw(u_int *tag, float (*matrix)[4], mgCDrawManager *draw_manager) {
     return 0;
 }
 #ifdef NONMATCHING
-// 98.8% match, 80 words off
+// 99.4% match, 66 words off
 struct WaterTextureName {
     char text[0x20];
 };
@@ -616,7 +616,6 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
     int                row;
     int                index;
     u_long128         *start;
-    int                vertex_count;
     u_long128         *end;
     float              row_position;
     int                column;
@@ -629,12 +628,13 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
     WaterFinishPacket *finish;
     u_int             *counts;
     float             *previous;
-    WaterStripPacket  *strip;
     u_long128         *positions;
     float             *current;
     sceVu0FVECTOR     *slope0;
     int                remaining;
     sceVu0FVECTOR     *slope1;
+    sceVu0FVECTOR     *slope2;
+    WaterStripPacket  *strip;
     memory = draw_manager->data_memory;
     mgZeroVector(row_step);
     mgZeroVector(column_step);
@@ -706,7 +706,7 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
         sceVu0FVECTOR row_offset;
         current = height + row * columns;
         slope1 = slope[row + 1];
-        slope0 = slope[row];
+        slope2 = slope[row];
         sceVu0ScaleVector(row_offset, row_step, row_position);
         sceVu0AddVector(position0, min, row_offset);
         position0[3] = 1.0f;
@@ -728,20 +728,20 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
             strip->giftag.REGS1 = 3;
             strip->giftag.REGS2 = 4;
             positions = (u_long128 *) (strip + 1);
-            vertex_count = point_count * 2;
-            end = positions + point_count * 2;
+            column = point_count * 2;
+            end = (u_long128 *) strip + 3 + point_count * 2;
             for (index = 0; index < point_count; index++) {
                 positions[0] = *(u_long128 *) position0;
                 positions[1] = *(u_long128 *) position1;
                 positions += 2;
-                end[0] = *(u_long128 *) slope0++;
+                end[0] = *(u_long128 *) slope2++;
                 end[1] = *(u_long128 *) slope1++;
                 end += 2;
                 mgAddVector(position0, column_step);
                 mgAddVector(position1, column_step);
             }
             current--;
-            slope0--;
+            slope2--;
             slope1--;
             mgSubVector(position0, column_step);
             mgSubVector(position1, column_step);
@@ -750,8 +750,8 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
             strip->dma[1] = 0;
             strip->dma[2] = 0;
             strip->dma[3] = MG_VIF_UNPACK_V4_32 | MG_VIF_UNPACK_FLG | (size << MG_VIF_NUM_SHIFT);
-            counts[0] = vertex_count;
-            counts[1] = vertex_count;
+            counts[0] = column;
+            counts[1] = column;
             counts[2] = 0;
             counts[3] = 0;
             if (point_count > 0) {
