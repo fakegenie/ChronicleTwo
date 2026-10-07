@@ -2045,8 +2045,7 @@ float CAutoMapGen::GetNaviDistance(float *pos) {
     distance *= (size_x + size_z) / 2.0f;
     return distance;
 }
-#ifdef NONMATCHING
-// 99.0% match, 2 words off
+
 void CAutoMapGen::UpdateNaviMap(float *pos, int depth) {
     int steps;
     int x;
@@ -2075,63 +2074,62 @@ void CAutoMapGen::UpdateNaviMap(float *pos, int depth) {
     if (x != cax || z != cay) {
         cax = x;
         cay = z;
-        cell = grid;
-        for (i = 0; i < grid_w * grid_h; i++) {
-            if (cell->parts_no != -1) {
-                cell->navi = 0;
-            } else {
-                cell->navi = -1;
-            }
-            cell++;
+    } else {
+        return;
+    }
+    cell = grid;
+    for (i = 0; i < grid_w * grid_h; i++) {
+        if (cell->parts_no != -1) {
+            cell->navi = 0;
+        } else {
+            cell->navi = -1;
         }
-        (grid + z * grid_w)[x].navi = depth;
-        do {
-            cell = grid;
-            changed = 0;
-            for (row = 0; row < grid_h; row++) {
-                for (col = 0; col < grid_w; col++) {
-                    steps = cell->navi;
-                    wall = cell->wall;
-                    if (steps > 0) {
-                        if (row > 0 && !(wall & AUTOMAP_WALL_NEG_Z)) {
-                            int next = steps - 1;
-                            if ((cell - grid_w)->navi < next && !((cell - grid_w)->wall & AUTOMAP_WALL_POS_Z)) {
-                                (cell - grid_w)->navi = next;
-                                changed = 1;
-                            }
-                        }
-                        if (row < grid_h - 1 && !(wall & AUTOMAP_WALL_POS_Z)) {
-                            int next = steps - 1;
-                            if ((cell + grid_w)->navi < next && !((cell + grid_w)->wall & AUTOMAP_WALL_NEG_Z)) {
-                                (cell + grid_w)->navi = next;
-                                changed = 1;
-                            }
-                        }
-                        if (col > 0 && !(wall & AUTOMAP_WALL_NEG_X)) {
-                            int next = steps - 1;
-                            if (cell[-1].navi < next && !(cell[-1].wall & AUTOMAP_WALL_POS_X)) {
-                                cell[-1].navi = next;
-                                changed = 1;
-                            }
-                        }
-                        if (col < grid_w - 1 && !(wall & AUTOMAP_WALL_POS_X)) {
-                            int next = steps - 1;
-                            if (cell[1].navi < next && !(cell[1].wall & AUTOMAP_WALL_NEG_X)) {
-                                cell[1].navi = next;
-                                changed = 1;
-                            }
+        cell++;
+    }
+    (grid + z * grid_w)[x].navi = depth;
+    do {
+        cell = grid;
+        changed = 0;
+        for (row = 0; row < grid_h; row++) {
+            for (col = 0; col < grid_w; col++) {
+                steps = cell->navi;
+                wall = cell->wall;
+                if (steps > 0) {
+                    if (row > 0 && !(wall & AUTOMAP_WALL_NEG_Z)) {
+                        int next = steps - 1;
+                        if ((cell - grid_w)->navi < next && !((cell - grid_w)->wall & AUTOMAP_WALL_POS_Z)) {
+                            (cell - grid_w)->navi = next;
+                            changed = 1;
                         }
                     }
-                    cell++;
+                    if (row < grid_h - 1 && !(wall & AUTOMAP_WALL_POS_Z)) {
+                        int next = steps - 1;
+                        if ((cell + grid_w)->navi < next && !((cell + grid_w)->wall & AUTOMAP_WALL_NEG_Z)) {
+                            (cell + grid_w)->navi = next;
+                            changed = 1;
+                        }
+                    }
+                    if (col > 0 && !(wall & AUTOMAP_WALL_NEG_X)) {
+                        int next = steps - 1;
+                        if (cell[-1].navi < next && !(cell[-1].wall & AUTOMAP_WALL_POS_X)) {
+                            cell[-1].navi = next;
+                            changed = 1;
+                        }
+                    }
+                    if (col < grid_w - 1 && !(wall & AUTOMAP_WALL_POS_X)) {
+                        int next = steps - 1;
+                        if (cell[1].navi < next && !(cell[1].wall & AUTOMAP_WALL_NEG_X)) {
+                            cell[1].navi = next;
+                            changed = 1;
+                        }
+                    }
                 }
+                cell++;
             }
-        } while (changed != 0);
-        navi_valid = 1;
-    }
+        }
+    } while (changed != 0);
+    navi_valid = 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/automap", UpdateNaviMap__11CAutoMapGenFPfi);
-#endif
 
 // Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/automap", PartsInfoData__DATA);
