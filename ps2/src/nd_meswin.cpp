@@ -4162,7 +4162,6 @@ void CalcWindowInRectFromOutRect(int type, RECT outer, RECT *inner) {
     inner->width = outer.width - (waku_data[type][0] + waku_data[type][2]);
     inner->height = outer.height - (waku_data[type][1] + waku_data[type][3]);
 }
-#ifdef NONMATCHING
 static inline int BottomPos(float max, int size) {
     return (int)CalcAutoPosSet(0.0f, max, size, 0.95f);
 }
@@ -4172,7 +4171,6 @@ static inline int CentrePos(float max, int size) {
 static inline int CentrePosX(float max, int size) {
     return (int)CalcAutoPosSet(float(0.0), max, size, 0.5f);
 }
-// ~99.9% match, 1 word off
 void ClsMes::DrawMesWin() {
     RGBAQ_TYPE color;
     RGBAQ_TYPE shadow_color;
@@ -4276,8 +4274,10 @@ void ClsMes::DrawMesWin() {
         case MES_WIN_VERSATILE_3:
             CalcRectScale(shadow, fade, &versatile_3_scaled);
             select_y = inner.y + font_h * select_top + 7;
-            int diff = select_y - (versatile_3_scaled.y + versatile_3_scaled.height / 2);
-            select_y = (int)(diff * fade) + versatile_3_scaled.y + versatile_3_scaled.height / 2;
+            int half = versatile_3_scaled.height / 2;
+            int diff = select_y - ((int)versatile_3_scaled.y + (int)half);
+            select_y = (int)(diff * fade);
+            select_y = select_y + versatile_3_scaled.y + (int)half;
             versatile_3_scaled.x = (int)(versatile_3_scaled.x + draw_off_x);
             versatile_3_scaled.y = (int)(versatile_3_scaled.y + draw_off_y);
             DrawVersatileWin_3(&frame_prim, versatile_3_scaled, select_y, &shadow_color, alpha, bg_opaque);
@@ -4373,9 +4373,6 @@ void ClsMes::DrawMesWin() {
     DrawCross(&sprite_prim);
     DrawRightDelta(&sprite_prim);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/nd_meswin", DrawMesWin__6ClsMesFv);
-#endif
 void Parametric(float *a, float *b, float *out) {
     sceVu0SubVector(out, b, a);
     out[3] = 1.0f;
