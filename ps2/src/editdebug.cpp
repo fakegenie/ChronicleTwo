@@ -330,7 +330,7 @@ void EndLightingEdit() {
 int IsLightingEditMode() { return LEditFlag; }
 #ifdef NONMATCHING
 int mgTransWorldScreen(int *out, float *position);
-// 117 aligned words off (objdiff splits this jump-table function)
+// 90 aligned words off (objdiff splits this jump-table function)
 void LightingEdit(CScene *scene) {
     int row;
     float *selected;
@@ -371,8 +371,8 @@ void LightingEdit(CScene *scene) {
     const char *tail[2] = {"  ", "<<"};
     char text[4096];
     const char *pages[4] = {"<- BG & AMB ", "<-Dir Light ", "<-    Fog   ", "<-   File   "};
-    row = LightSel[LightType];
     end = text;
+    row = LightSel[LightType];
     end += sprintf(end, "%sLightSet [%d]\n", cursor[row == 0], light_no);
     if (LightType != 1) end += sprintf(end, "%s%s\n", cursor[row == 1], pages[LightType]);
     else end += sprintf(end, "%s%s%d->\n", cursor[row == 1], pages[LightType], DirLightNo);
@@ -507,8 +507,8 @@ void LightingEdit(CScene *scene) {
     if (GamePad__2.Down2(PAD_DOWN)) row += 1;
     if (row < 0) row = LightListNum[LightType] - 1;
     previous = LightType;
-    if (row >= LightListNum[previous]) row = 0;
-    LightSel[previous] = row;
+    if (row >= LightListNum[LightType]) row = 0;
+    LightSel[LightType] = row;
     if (row == 1) {
         if (previous == 1) {
             if (GamePad__2.Down2(PAD_RIGHT)) DirLightNo += 1;
