@@ -130,17 +130,9 @@ struct menu_tile_color {
     u8 rgba[4]; /**< Red, green, blue, and alpha channels. */
 };
 
-/**
- *
- * Stores the colour channels of a menu effect.
- *
- */
-struct effect_color {
-    int r; /**< Red channel. */
-    int g; /**< Green channel. */
-    int b; /**< Blue channel. */
-    int a; /**< Alpha channel. */
-} __attribute__((aligned(16)));
+struct ZeroedRect : mgRect<int> {
+    ZeroedRect() { Set(0, 0, 0, 0); }
+};
 
 /**
  *
@@ -377,8 +369,6 @@ extern menu_board_pos at_3651;
 extern menu_tile_color at_3658;
 
 extern "C" char at_3721[];
-
-extern effect_color at_5901;
 
 extern item_color at_5917;
 
@@ -6977,8 +6967,6 @@ void CMenuEffect::Step() {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", Step__11CMenuEffectFv);
 #endif
-#ifdef NONMATCHING
-// 98.1% match, 38 words off
 void CMenuEffect::Draw() {
     if (run != 0 && info != NULL && tex != NULL) {
         mgTexManager.ReloadTexture(tex_block, (sceVif1Packet *) NULL);
@@ -6994,15 +6982,10 @@ void CMenuEffect::Draw() {
         prim->TextureMapEnable(1);
         prim->Bilinear(1);
         MENU_EFFECT_INFO *particle = info;
-        effect_color      color = at_5901;
-        color.a = alpha;
+        int color[4] = {0x80, 0x80, 0x80, alpha};
         mgRect<float> rect(0.0f, 0.0f, 8.0f, 8.0f);
         mgRect<int>   uv(0, 32, 8, 8);
-        mgRect<int>   corner_uv[4];
-        corner_uv[0].Set(0, 0, 0, 0);
-        corner_uv[1].Set(0, 0, 0, 0);
-        corner_uv[2].Set(0, 0, 0, 0);
-        corner_uv[3].Set(0, 0, 0, 0);
+        ZeroedRect    corner_uv[4];
         corner_uv[3].Set(32, 32, 32, 32);
         int i;
         switch (type) {
@@ -7012,7 +6995,7 @@ void CMenuEffect::Draw() {
                 prim->Texture(tex);
                 for (i = 0; i < 48; i++, particle++) {
                     int piece = (int) particle->unk_4;
-                    prim->Color(color.r, color.g, color.b, (int) particle->unk_30);
+                    prim->Color(color[0], color[1], color[2], (int) particle->unk_30);
                     s16(*corner)[2] = spectol_break_pos[piece];
                     prim->TextureCrd(base_info[2] + corner[0][0], base_info[3] + corner[0][1]);
                     prim->Vertex(particle->x, particle->y, 0.0f);
@@ -7028,7 +7011,7 @@ void CMenuEffect::Draw() {
                 prim->Begin(6);
                 prim->Texture(MenuPosData->icon_effect_tex);
                 for (; i < info_num || i < 80; i++, particle++) {
-                    prim->Color(color.r, color.g, color.b, (int) particle->unk_30);
+                    prim->Color(color[0], color[1], color[2], (int) particle->unk_30);
                     prim->TextureCrd(0, 32);
                     prim->Vertex(particle->x, particle->y, 0.0f);
                     prim->TextureCrd(8, 40);
@@ -7074,9 +7057,8 @@ void CMenuEffect::Draw() {
                 break;
             case 15:
                 uv.Set(0, 0, 32, 32);
-                color.r = 0x20;
-                color.g = 0x20;
-                color.b = 0x60;
+                color[0] = color[1] = 0x20;
+                color[2] = 0x60;
                 break;
             case 16:
                 rect.Set(0.0f, 0.0f, 32.0f, 32.0f);
@@ -7087,9 +7069,9 @@ void CMenuEffect::Draw() {
         prim->Texture(tex);
         for (i = 0; i < info_num; i++, particle++) {
             if (type == 0) {
-                color.a = (int) particle->unk_28;
+                color[3] = (int) particle->unk_28;
             } else if (type == 2) {
-                color.a = (int) particle->unk_1c;
+                color[3] = (int) particle->unk_1c;
             } else if (type == 10) {
                 uv = corner_uv[(int) particle->unk_8];
                 float angle = 0.3926991f * particle->unk_0;
@@ -7097,13 +7079,13 @@ void CMenuEffect::Draw() {
                     angle -= 6.2831855f;
                 }
                 rect.right = rect.bottom = 32.0f + particle->unk_3c * sinf(angle);
-                color.a = (int) particle->unk_28;
+                color[3] = (int) particle->unk_28;
             } else if (type == 12) {
                 uv = corner_uv[3];
             } else if (type == 15) {
                 float size = 2.0f * particle->unk_14;
                 rect.Set(particle->x, particle->y, size, size);
-                color.a = (int) particle->unk_28;
+                color[3] = (int) particle->unk_28;
             } else if (type == 20) {
                 if (i == info_num - 1) {
                     float size = 2.0f * particle->unk_18;
@@ -7111,13 +7093,13 @@ void CMenuEffect::Draw() {
                     uv.Set(0x40, 0, 32, 32);
                 } else {
                     int *star_color = &star_color_table[(int) particle->unk_20 * 3];
-                    color.r = star_color[0];
-                    color.g = star_color[1];
-                    color.b = star_color[2];
+                    color[0] = star_color[0];
+                    color[1] = star_color[1];
+                    color[2] = star_color[2];
                 }
-                color.a = (int) particle->unk_30;
+                color[3] = (int) particle->unk_30;
             }
-            prim->Color(color.r, color.g, color.b, color.a);
+            prim->Color(color[0], color[1], color[2], color[3]);
             rect.left = particle->x;
             rect.top = particle->y;
             PrimQuad(prim, rect, uv);
@@ -7125,9 +7107,6 @@ void CMenuEffect::Draw() {
         prim->End();
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", Draw__11CMenuEffectFv);
-#endif
 void PrimQuad_f_(mgCDrawPrim *prim, mgRect_f_ rect, mgRect_i_ tex_rect) {
     if (prim != NULL) {
         prim->TextureCrd(tex_rect.left, tex_rect.top);
@@ -7178,7 +7157,6 @@ INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menudraw", at_4495__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menudraw", l_levelup_color__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menudraw", at_5441__DATA);
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menudraw", at_5450__DATA);
-INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menudraw", at_5901__DATA);
 
 // Constants (.rodata)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menudraw", at_873__4__DATA);
