@@ -5008,8 +5008,6 @@ void MenuItemBrdItemIconEffectMalloc(mgCMemory *memory, MENUFORMPARTS_TYPE *part
     parts->w = 32.0f;
     parts->h = 40.0f;
 }
-#ifdef NONMATCHING
-// 99.5% match, 19 words off
 void CMenuPosDataManage::MallocPallet(mgCMemory *stack) {
     int i;
     int k;
@@ -5039,12 +5037,16 @@ void CMenuPosDataManage::MallocPallet(mgCMemory *stack) {
         memcpy(item_icon_tex[1][i], icon_tex.tex[i], sizeof(mgCTexture));
         memcpy(item_icon_tex[2][i], icon_tex.tex[i], sizeof(mgCTexture));
         memcpy(item_icon_tex[3][i], icon_tex.tex[i], sizeof(mgCTexture));
-        color = (u8 *)pallet[0][i];
-        for (j = 0; j < 256; j++, color += 4) {
-            grey = color[0] + color[1] + color[2];
-            grey /= 3;
-            if (grey > 8 && color[2] != 0) {
-                color[2] = 0xFF;
+        {
+            int entry;
+            int sum;
+            u8 *pixel = (u8 *)pallet[0][i];
+            for (entry = 0; entry < 256; entry++, pixel += 4) {
+                sum = pixel[0] + pixel[1] + pixel[2];
+                sum /= 3;
+                if (sum > 8 && pixel[2] != 0) {
+                    pixel[2] = 0xFF;
+                }
             }
         }
         item_icon_tex[1][i]->clut = pallet[0][i];
@@ -5077,9 +5079,6 @@ void CMenuPosDataManage::MallocPallet(mgCMemory *stack) {
         item_icon_tex[3][i]->clut = pallet[2][i];
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", MallocPallet__18CMenuPosDataManageFP9mgCMemory);
-#endif
 void CMenuPosDataManage::SearchTransPalletNo() {
     u8 *colors;
     int i;
