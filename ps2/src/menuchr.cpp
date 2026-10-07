@@ -4058,7 +4058,7 @@ void MenuMonsterBoxInit(mgCMemory *stack, int *tex_block, int mode) {
 static inline s16 MosNowMonster() {
     return GetUserDataMan()->monster_id;
 }
-// 136 words off in an aligned diff
+// 109 words off in an aligned diff
 int CMenuMosSelect::KeyStep() {
     int size;
     int i;
@@ -4566,8 +4566,8 @@ int CMenuMosSelect::KeyStep() {
                     ExeScript(at_3703);
                     names.name[0] = at_3704;
                     names.name[1] = GetMonsterName(monsterNo);
-                    for (i = 0; i < level_num; i++) {
-                        names.name[2 + i] = GetMonsterName(level_monster[(int)i]);
+                    for (int k = 0; k < level_num; k++) {
+                        names.name[2 + k] = GetMonsterName(level_monster[k]);
                     }
                     info->MakeMsg(level_num + 0x33);
                     info->SetMsgItemNo(names.name, level_num + 2);
@@ -4606,10 +4606,10 @@ int CMenuMosSelect::KeyStep() {
         BadgeInfoValues values = at_3554;
         int base = view_monster * 10 + 10000;
         int degree = select_badge->GetDegreeLevel();
+        values.value[1] = select * 20 + (degree + 1);
         values.value[2] = base + 10;
         values.value[3] = base + 11;
         values.value[4] = -1;
-        values.value[1] = select * 20 + degree + 1;
         CDC2Mes *desc = MenuDCMsg[7];
         desc->ClsMes::mes_no = -1;
         desc->value_zero = 1;
