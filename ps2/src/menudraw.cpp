@@ -1332,14 +1332,12 @@ void MenuPresentBoxView(int x, int y, int &tex_block, mgCTexture *tex, mgCTextur
 static void SetMenuDrawNumberKeta(char value) {
     MenuDrawNumberKeta = value;
 }
-#ifdef NONMATCHING
 template <typename T> static inline T Ident(T v) { return v; }
 /**
  *
  * Draws a number with the selected alignment and optional digit padding.
  *
  */
-// 99.9% match, 2 words off
 int DrawMenuNumber(mgCDrawPrim *prim, int number, int align, mgRect<int> rect, mgRect<int> texture_rect, int step_x,
                    int step_y) {
     int digits = GetNumberKeta(number);
@@ -1377,16 +1375,15 @@ int DrawMenuNumber(mgCDrawPrim *prim, int number, int align, mgRect<int> rect, m
         int         put_y = y;
         x -= step_x;
         y -= step_y;
-        src.Set(texture_rect.left, Ident(texture_rect.top), digit_w, texture_rect.bottom);
+        int top = texture_rect.top;
+        int bottom = texture_rect.bottom;
+        src.Set(texture_rect.left, Ident(top), digit_w, Ident(bottom));
         dst.Set(x, put_y, rect.right, rect.bottom);
         PrimQuad(prim, dst, src);
         padding--;
     }
     return x;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", DrawMenuNumber__FP11mgCDrawPrimii9mgRect_i_9mgRect_i_ii);
-#endif
 void PrimDrawNumber(mgCDrawPrim *prim, int number, int digit_count, int x, int y,
                     mgRect<int> texture_rect, int spacing, int mode) {
     SetMenuDrawNumberKeta(-1);
