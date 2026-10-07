@@ -5009,7 +5009,7 @@ void MenuItemBrdItemIconEffectMalloc(mgCMemory *memory, MENUFORMPARTS_TYPE *part
     parts->h = 40.0f;
 }
 #ifdef NONMATCHING
-// 96.5% match, 37 words off
+// 99.5% match, 19 words off
 void CMenuPosDataManage::MallocPallet(mgCMemory *stack) {
     int i;
     int k;
@@ -5023,54 +5023,58 @@ void CMenuPosDataManage::MallocPallet(mgCMemory *stack) {
     mgTexManager.ReloadTexture(MenuItemIconTextureBlock, (sceVif1Packet *)NULL);
     icon_tex.tex[0] = item_icon_tex[0][0];
     icon_tex.tex[1] = item_icon_tex[0][1];
-    if (icon_tex.tex[0] != NULL) {
-        for (i = 0; i < 2; i++) {
-            pallet[0][i] = stack->Alloc(0x40);
-            pallet[1][i] = stack->Alloc(0x40);
-            pallet[2][i] = stack->Alloc(0x40);
-            memcpy(pallet[0][i], icon_tex.tex[i]->clut, 0x400);
-            memcpy(pallet[1][i], icon_tex.tex[i]->clut, 0x400);
-            memcpy(pallet[2][i], icon_tex.tex[i]->clut, 0x400);
-            item_icon_tex[1][i] = new (stack->Alloc(9)) mgCTexture;
-            item_icon_tex[2][i] = new (stack->Alloc(9)) mgCTexture;
-            item_icon_tex[3][i] = new (stack->Alloc(9)) mgCTexture;
-            memcpy(item_icon_tex[1][i], icon_tex.tex[i], sizeof(mgCTexture));
-            memcpy(item_icon_tex[2][i], icon_tex.tex[i], sizeof(mgCTexture));
-            memcpy(item_icon_tex[3][i], icon_tex.tex[i], sizeof(mgCTexture));
-            color = (u8 *)pallet[0][i];
-            for (j = 0; j < 256; j++, color += 4) {
-                if ((color[0] + color[1] + color[2]) / 3 >= 9 && color[2] != 0) {
-                    color[2] = 0xFF;
-                }
+    if (icon_tex.tex[0] == NULL) {
+        return;
+    }
+    for (i = 0; i < 2; i++) {
+        pallet[0][i] = stack->Alloc(0x40);
+        pallet[1][i] = stack->Alloc(0x40);
+        pallet[2][i] = stack->Alloc(0x40);
+        memcpy(pallet[0][i], icon_tex.tex[i]->clut, 0x400);
+        memcpy(pallet[1][i], icon_tex.tex[i]->clut, 0x400);
+        memcpy(pallet[2][i], icon_tex.tex[i]->clut, 0x400);
+        item_icon_tex[1][i] = new (stack->Alloc(9)) mgCTexture;
+        item_icon_tex[2][i] = new (stack->Alloc(9)) mgCTexture;
+        item_icon_tex[3][i] = new (stack->Alloc(9)) mgCTexture;
+        memcpy(item_icon_tex[1][i], icon_tex.tex[i], sizeof(mgCTexture));
+        memcpy(item_icon_tex[2][i], icon_tex.tex[i], sizeof(mgCTexture));
+        memcpy(item_icon_tex[3][i], icon_tex.tex[i], sizeof(mgCTexture));
+        color = (u8 *)pallet[0][i];
+        for (j = 0; j < 256; j++, color += 4) {
+            grey = color[0] + color[1] + color[2];
+            grey /= 3;
+            if (grey > 8 && color[2] != 0) {
+                color[2] = 0xFF;
             }
-            item_icon_tex[1][i]->clut = pallet[0][i];
-            color = (u8 *)pallet[1][i];
-            for (j = 0; j < 256; j++, color += 4) {
-                grey = (color[0] + color[1] + color[2]) / 3;
-                for (k = 1; k < 17; k++) {
-                    if (16 * (k - 1) <= grey && grey < k * 16) {
-                        color[0] = (k - 1) * 16;
-                        color[1] = (k - 1) * 16;
-                        color[2] = (k - 1) * 16;
-                        break;
-                    }
-                }
-            }
-            item_icon_tex[2][i]->clut = pallet[1][i];
-            color = (u8 *)pallet[2][i];
-            for (j = 0; j < 256; j++, color += 4) {
-                grey = (color[2] + color[0] + color[1]) / 3;
-                for (k = 1; k < 17; k++) {
-                    if (16 * (k - 1) <= grey && grey < k * 16) {
-                        color[0] = 30.0f + 12.2f * k;
-                        color[1] = 20.0f + 8.75f * k;
-                        color[2] = 20.0f + 6.75f * k;
-                        break;
-                    }
-                }
-            }
-            item_icon_tex[3][i]->clut = pallet[2][i];
         }
+        item_icon_tex[1][i]->clut = pallet[0][i];
+        color = (u8 *)pallet[1][i];
+        for (j = 0; j < 256; j++, color += 4) {
+            grey = (color[0] + color[1] + color[2]) / 3;
+            for (k = 1; k < 17; k++) {
+                if (16 * (k - 1) <= grey && grey < k * 16) {
+                    color[0] = (k - 1) * 16;
+                    color[1] = (k - 1) * 16;
+                    color[2] = (k - 1) * 16;
+                    break;
+                }
+            }
+        }
+        item_icon_tex[2][i]->clut = pallet[1][i];
+        color = (u8 *)pallet[2][i];
+        for (j = 0; j < 256; j++, color += 4) {
+            grey = color[0] + color[1] + color[2];
+            grey /= 3;
+            for (k = 1; k < 17; k++) {
+                if (16 * (k - 1) <= grey && grey < k * 16) {
+                    color[0] = 30.0f + 12.2f * k;
+                    color[1] = 20.0f + 8.75f * k;
+                    color[2] = 20.0f + 6.75f * k;
+                    break;
+                }
+            }
+        }
+        item_icon_tex[3][i]->clut = pallet[2][i];
     }
 }
 #else
