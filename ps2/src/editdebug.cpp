@@ -330,15 +330,16 @@ void EndLightingEdit() {
 int IsLightingEditMode() { return LEditFlag; }
 #ifdef NONMATCHING
 int mgTransWorldScreen(int *out, float *position);
-// 148 aligned words off (objdiff splits this jump-table function)
+// 87 aligned words off (objdiff splits this jump-table function)
 void LightingEdit(CScene *scene) {
     int row;
     float *selected;
     int selected_index;
+    int edit;
     char *end;
-    int light_no;
     CMapLightingInfo *light;
     CMap *map;
+    int light_no;
     float angle;
     int previous;
     if (!LEditFlag) {
@@ -370,13 +371,13 @@ void LightingEdit(CScene *scene) {
     const char *tail[2] = {"  ", "<<"};
     char text[4096];
     const char *pages[4] = {"<- BG & AMB ", "<-Dir Light ", "<-    Fog   ", "<-   File   "};
-    row = LightSel[LightType];
     end = text;
+    row = LightSel[LightType];
     end += sprintf(end, "%sLightSet [%d]\n", cursor[row == 0], light_no);
     if (LightType != 1) end += sprintf(end, "%s%s\n", cursor[row == 1], pages[LightType]);
     else end += sprintf(end, "%s%s%d->\n", cursor[row == 1], pages[LightType], DirLightNo);
     if (LightType == LIGHTING_EDIT_PAGE_BG_AMBIENT) {
-        int edit = row - 2;
+        edit = row - 2;
         float *colors[3] __attribute__((aligned(16))) = {light->bg_color, light->bg_color2, light->ambient};
         if (row > 10) row = 10;
         selected = colors[edit / 3];
@@ -493,20 +494,21 @@ void LightingEdit(CScene *scene) {
         }
     }
     if (selected != NULL) {
+        int value;
         float *target = selected + selected_index;
-        int value = (int)*target;
+        value = (int)*target;
         if (GamePad__2.Down2(PAD_RIGHT)) value += 1;
         if (GamePad__2.Down2(PAD_LEFT)) value -= 1;
         if (value < 0) value = 0;
-        if (value >= 256) value = 255;
+        if (value > 255) value = 255;
         *target = value;
     }
     if (GamePad__2.Down2(PAD_UP)) row -= 1;
     if (GamePad__2.Down2(PAD_DOWN)) row += 1;
     if (row < 0) row = LightListNum[LightType] - 1;
     previous = LightType;
-    if (row >= LightListNum[previous]) row = 0;
-    LightSel[previous] = row;
+    if (row >= LightListNum[LightType]) row = 0;
+    LightSel[LightType] = row;
     if (row == 1) {
         if (previous == 1) {
             if (GamePad__2.Down2(PAD_RIGHT)) DirLightNo += 1;
@@ -596,14 +598,8 @@ void LightingEdit(CScene *scene) {
         mgTransWorldScreen(screen[1], tip_x);
         mgTransWorldScreen(screen[2], tip_y);
         mgTransWorldScreen(screen[3], tip_z);
-        screen[0][0] -= origin[0];
-        screen[1][0] -= origin[0];
-        screen[2][0] -= origin[0];
-        screen[3][0] -= origin[0];
-        screen[0][1] -= origin[1];
-        screen[1][1] -= origin[1];
-        screen[2][1] -= origin[1];
-        screen[3][1] -= origin[1];
+        for (int i = 0; i < 4; i++) screen[i][0] = screen[i][0] - origin[0];
+        for (int i = 0; i < 4; i++) screen[i][1] -= origin[1];
         sceVu0ITOF4Vector(tip_light, screen[0]);
         sceVu0ITOF4Vector(tip_x, screen[1]);
         sceVu0ITOF4Vector(tip_y, screen[2]);
@@ -619,14 +615,8 @@ void LightingEdit(CScene *scene) {
         sceVu0FTOI4Vector(screen[1], tip_x);
         sceVu0FTOI4Vector(screen[2], tip_y);
         sceVu0FTOI4Vector(screen[3], tip_z);
-        screen[0][0] += anchor[0];
-        screen[1][0] += anchor[0];
-        screen[2][0] += anchor[0];
-        screen[3][0] += anchor[0];
-        screen[0][1] += anchor[1];
-        screen[1][1] += anchor[1];
-        screen[2][1] += anchor[1];
-        screen[3][1] += anchor[1];
+        for (int i = 0; i < 4; i++) screen[i][0] += anchor[0];
+        for (int i = 0; i < 4; i++) screen[i][1] += anchor[1];
         prim.AlphaBlendEnable(1);
         prim.AlphaTestEnable(0);
         prim.DepthTestEnable(0);
