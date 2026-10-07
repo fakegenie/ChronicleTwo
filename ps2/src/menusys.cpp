@@ -2589,8 +2589,6 @@ int MenuItemBrdKey(int keys, int *cursor, int *scroll, int board) {
 }
 
 extern s8 ret_tbl1_2511[2];
-#ifdef NONMATCHING
-// 97.0% match, 10 words off
 int MenuDataSwap(CGameDataUsed *destination, CGameDataUsed *source, int quantity) {
     int dst_type;
     int dst_no;
@@ -2650,6 +2648,7 @@ int MenuDataSwap(CGameDataUsed *destination, CGameDataUsed *source, int quantity
         int had_dst = 0;
         int had_src = 0;
         s8 *tbl;
+        s8 value;
         GameDataSwap(destination, source, 1);
         if (dst_no > 0) {
             had_dst = 1;
@@ -2658,16 +2657,14 @@ int MenuDataSwap(CGameDataUsed *destination, CGameDataUsed *source, int quantity
         if (src_no > 0) {
             had_src = 1;
         }
-        tbl += had_src;
-        s8 results[2] = {*tbl, 2};
+        tbl = ret_tbl1_2511 + had_src;
+        value = *tbl;
+        s8 results[2] = {Ident(value), 2};
         result = results[had_dst];
     }
     CheckEnableHaveItemNum();
     return result;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menusys", MenuDataSwap__FP13CGameDataUsedP13CGameDataUsedi);
-#endif
 void CMenuKeyFunc::Initialize() {
     int i;
 
