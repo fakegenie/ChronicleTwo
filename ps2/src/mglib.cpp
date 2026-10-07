@@ -112,11 +112,9 @@ extern int       over_vsync;
 extern int       frame_buf0;
 extern int       frame_buf1;
 extern sceGsDimx mgDIMX;
-#ifdef NONMATCHING
 extern int       old_vcount;
 extern int       capture_on;
 extern int       cap_ture_cnt;
-#endif
 
 // Code (.text)
 void mgPerformanceMeter(int enable) {
@@ -540,8 +538,6 @@ void mgEndDraw(int mode, mgCDrawManager *manager) {
 void mgStoreFrameImage() {
     StoreImage(0);
 }
-#ifdef NONMATCHING
-// 99.9% match, 3 words off
 #pragma divbyzerocheck on
 void mgEndFrame(mgCDrawManager *manager) {
     float            frame_ticks = (float)(mgFrameRate * 262);
@@ -552,7 +548,7 @@ void mgEndFrame(mgCDrawManager *manager) {
     float            packet_free;
     int              wait_start;
     float            data_free;
-    int              depth;
+    u_int            depth;
     sceGsFrame      *frame;
     int              sample;
     int              pixel;
@@ -616,9 +612,10 @@ void mgEndFrame(mgCDrawManager *manager) {
                 FlushCache(0);
                 sceGsExecStoreImage(&store_image, store_data);
                 sceGsSyncPath(0, 0);
-                depth = ((u_int *)store_data)[0] & 0xFFFFFF;
+                depth = ((u_int *)store_data)[0];
+                depth &= 0xFFFFFF;
                 for (pixel = 0; pixel < 64; pixel++) {
-                    if ((int)(((u_int *)store_data)[pixel] & 0xFFFFFF) < depth) {
+                    if ((int)(((u_int *)store_data)[pixel] & 0xFFFFFF) < (int)depth) {
                         depth = ((u_int *)store_data)[pixel] & 0xFFFFFF;
                     }
                 }
@@ -693,9 +690,6 @@ void mgEndFrame(mgCDrawManager *manager) {
     mgDBuffID = !mgDBuffID;
 }
 #pragma divbyzerocheck reset
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mglib", mgEndFrame__FP14mgCDrawManager);
-#endif
 void mgSendPacket(mgCDrawManager *manager) {
     DmaCH1 = sceDmaGetChan(1);
     DmaCH1->chcr.TTE = 1;
