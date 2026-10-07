@@ -6992,8 +6992,7 @@ extern u64           at_6234;
 extern u64           at_6256;
 extern u64           at_6265;
 #ifdef NONMATCHING
-// ~1.6% match, 1437 words off
-#pragma inline_depth(5)
+// ~99.2% match, 11 words off
 void MenuItemDebugKey(void) {
     float rotation[4];
     float health_input[2];
@@ -7104,11 +7103,10 @@ void MenuItemDebugKey(void) {
                 MenuDebugItemModel = NULL;
                 MenuDebugModelDrawFlag = 1;
 
-                camera = new ((u_long128 *)MenuDebugStack.Alloc(sizeof(mgCCameraFollow) / 16 + 2))
-                    mgCCameraFollow(40.0f, float(30.0), 0.0f, float(8.0));
-                MenuDebugCamera = camera;
+                MenuDebugCamera = new ((u_long128 *)MenuDebugStack.Alloc(sizeof(mgCCameraFollow) / 16 + 2))
+                    mgCCameraFollow(40.0f, 30.0f, 0.0f, 8.0f);
 
-                MenuDebugItemModel = model = new ((u_long128 *)MenuDebugStack.Alloc(sizeof(CActionChara) / 16 + 2)) CActionChara;
+                MenuDebugItemModel = model = NewMenuActionChara(&MenuDebugStack);
                 model->Initialize(NULL);
                 MenuDebugStack.Align64();
 
@@ -7133,8 +7131,7 @@ void MenuItemDebugKey(void) {
                     }
                 }
                 if (model_loaded == 0) {
-                    buffer = (u8 *)MenuDebugStack.stack +
-                             MenuDebugStack.stack_used * 0x10;
+                    buffer = MenuDebugStack.stack + MenuDebugStack.stack_used;
                     LoadFile2(dbox_path_6083, buffer, &file_size, 0);
                     MenuDebugStack.Alloc(file_size / 16 + 1);
                     stack_used_before_load = MenuDebugStack.stack_used;
@@ -7146,7 +7143,7 @@ void MenuItemDebugKey(void) {
                     MenuDebugItemModel->SetScale(1.0f, 1.0f, 1.0f);
                     MenuDebugItemModel->Step();
                     MenuDebugCamera->SetRef(0.0f, 0.0f, 0.0f);
-                    MenuDebugCamera->SetPos(0.0f, 0.0f, 100.0f);
+                    MenuDebugCamera->SetPos(0.0f, 0.0f, float(100.0));
                     MenuDebugSize = MenuDebugStack.stack_used - stack_used_before_load;
                     MenuDebugSize = MenuDebugSize * 16 / 1024;
                 }
@@ -7569,7 +7566,6 @@ void MenuItemDebugKey(void) {
         break;
     }
 }
-#pragma inline_depth reset
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/menusys", MenuItemDebugKey__Fv);
 #endif
