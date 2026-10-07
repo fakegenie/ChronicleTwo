@@ -160,12 +160,10 @@ void GetCharacterSnd(CUserDataManager *user_data, int unit, char *path) {
         }
     }
 }
-#ifdef NONMATCHING
-// 99.4% match, 83 words off
 int SetupMainUnit(u_long128 *read_buffer, mgCMemory *memory, mgCMemory *stacks, int image_block,
                   CScene *scene, CUserDataManager *user_data, int chara_type, int edit_mode) {
     CActionChara *parts[6];
-    int texture = (int)(u32)image_block;
+    int texture = image_block;
     for (int character_index = 0; character_index < 6; ++character_index) {
         parts[character_index] = (CActionChara *)scene->GetCharacter(character_index);
         if (parts[character_index] == NULL) return 0;
@@ -288,14 +286,13 @@ int SetupMainUnit(u_long128 *read_buffer, mgCMemory *memory, mgCMemory *stacks, 
         parts[0]->texture_block = texture;
         SetupPartStack part_stack = at_919__3;
         for (int i = 1; i < 5; ++i) {
-            CActionChara *part = parts[i];
-            part->Initialize(NULL);
+            parts[i]->Initialize(NULL);
             if (i != 3) sprintf(path, at_1013__2, robo_info->model_name[i]);
             else sprintf(path, at_1014__2, robo_info->model_name[i]);
             LoadFile(path, read_buffer, NULL);
-            mgCMemory *stack = &stacks[part_stack.stacks[i]];
-            part->LoadPack((unsigned int *)read_buffer, at_1002__3, stack, stack, stack, texture, parts[0]);
-            if (i == 1) SetSwordBlurEffect(parts[0], stack, chara_type);
+            parts[i]->LoadPack((unsigned int *)read_buffer, at_1002__3, &stacks[part_stack.stacks[i]],
+                               &stacks[part_stack.stacks[i]], &stacks[part_stack.stacks[i]], texture, parts[0]);
+            if (i == 1) SetSwordBlurEffect(parts[0], &stacks[part_stack.stacks[i]], chara_type);
         }
         CActionChara *part = parts[5];
         part->Initialize(NULL);
@@ -342,9 +339,6 @@ int SetupMainUnit(u_long128 *read_buffer, mgCMemory *memory, mgCMemory *stacks, 
     } while (i < 7);
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/charasetup", SetupMainUnit__FP1P9mgCMemoryP9mgCMemoryiP6CSceneP16CUserDataManagerii);
-#endif
 int GetCharaMemAllocSize() {
     int maximum = 0;
 
