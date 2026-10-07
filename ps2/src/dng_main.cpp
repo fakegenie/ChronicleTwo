@@ -1185,7 +1185,7 @@ void DngMainDraw() {
     CMapLightingInfo *info = &light;
 
     if (DngMainMap != NULL) {
-        DngMainMap->time_light_blend = 1;
+        DngMainMap->map_info.time_light_blend = 1;
         DngMainMap->now_time = DngMainScene->time;
         DngMainMap->GetLightInfo(info);
 
