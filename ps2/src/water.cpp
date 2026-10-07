@@ -46,7 +46,6 @@ struct WaterRenderPacket {
 
 STATIC_ASSERT(sizeof(WaterRenderPacket) == 0x260);
 
-#ifdef NONMATCHING
 /**
  *
  * Header of one grid strip, followed by its positions and slope vectors.
@@ -85,7 +84,6 @@ struct WaterFinishPacket {
 };
 
 STATIC_ASSERT(sizeof(WaterFinishPacket) == 0x30);
-#endif
 
 // Code (.text)
 void CFireRaster::Step(void) {
@@ -572,8 +570,6 @@ int CWater::Draw(u_int *tag, float (*matrix)[4], mgCDrawManager *draw_manager) {
 
     return 0;
 }
-#ifdef NONMATCHING
-// 99.9% match, 11 words off
 struct WaterTextureName {
     char text[0x20];
 };
@@ -621,10 +617,10 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
     int                column;
     int                size;
     WaterDmaTag       *tag;
-    u_long128         *base;
     int                point_count;
     int                started;
     mgCMemory         *memory;
+    u_int              base;
     WaterFinishPacket *finish;
     u_int             *counts;
     float             *previous;
@@ -637,7 +633,6 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
     u_long128         *out;
     sceVu0FVECTOR     *slope3;
     int                vertex_count;
-    int                strip_row;
     memory = draw_manager->data_memory;
     mgZeroVector(row_step);
     mgZeroVector(column_step);
@@ -678,8 +673,8 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
         slope[row_end - 2][c][3] = 0.3f;
         slope[2][c][3] = 0.3f;
     }
-    base = memory->stGetTop();
-    start = (u_long128 *) ((u_int) base | MG_UNCACHED);
+    base = (u_int) memory->stGetTop();
+    start = (u_long128 *) (base | MG_UNCACHED);
     end = start;
     if (texture != NULL) {
         mgCTexture *source = texture;
@@ -704,13 +699,13 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
     }
     out = end;
     started = 0;
-    for (strip_row = 0, row_position = 0.0f; strip_row < rows - 1; strip_row++, row_position += 1.0f) {
+    for (row = 0, row_position = 0.0f; row < rows - 1; row++, row_position += 1.0f) {
         sceVu0FVECTOR position0;
         sceVu0FVECTOR position1;
         sceVu0FVECTOR row_offset;
-        current = height + strip_row * columns;
-        slope2 = slope[strip_row + 1];
-        slope1 = slope[strip_row];
+        current = height + row * columns;
+        slope2 = slope[row + 1];
+        slope1 = slope[row];
         sceVu0ScaleVector(row_offset, row_step, row_position);
         sceVu0AddVector(position0, min, row_offset);
         position0[3] = 1.0f;
@@ -733,7 +728,8 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
             strip->giftag.REGS2 = 4;
             positions = (u_long128 *) (strip + 1);
             vertex_count = point_count * 2;
-            out = (u_long128 *) strip + 3 + point_count * 2;
+            int bytes = point_count * 32;
+            out = (u_long128 *) (bytes + (u_int) strip) + 3;
             for (index = 0; index < point_count; index++) {
                 positions[0] = *(u_long128 *) position0;
                 positions[1] = *(u_long128 *) position1;
@@ -791,12 +787,9 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
     finish->ret.vif[1] = 0;
     out += 3;
     memory->Alloc(out - start);
-    packet = (u_int) base;
-    return (u_int) base;
+    packet = base;
+    return base;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/water", CreatePacket__6CWaterFP14mgCDrawManager);
-#endif
 void CWaterFrame::SetTexture(mgCTexture *texture) {
     CWater *surface = GetWater();
 
