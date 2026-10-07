@@ -3169,11 +3169,13 @@ void MenuItemBrdDraw(float *pos, mgRect<int> clip_rect, int &tex_block, int a, i
         prim->End();
     }
 }
-#ifdef NONMATCHING
-// 99.5% match, 55 words off
+static inline int UsedItemNo(CGameDataUsed *u) { return u->item_no; }
 void MenuItemModeItemDraw(int &tex_block, mgRect<int> clip_rect, float *pos, MENUFORMPARTS_TYPE *parts,
                           mgCTexture *num_tex, mgRect<int> num_rect, int unk) {
+    float              height;
     mgCTextureManager *textures;
+    mgCDrawPrim       *prim;
+    int                icon_mode;
     mgCTexture        *effect_tex;
     int                left;
     int                y;
@@ -3187,8 +3189,7 @@ void MenuItemModeItemDraw(int &tex_block, mgRect<int> clip_rect, float *pos, MEN
     int                num_unk;
     int                num;
     int                x;
-    int                bottom;
-    mgCDrawPrim       *prim = GetMenuPrim();
+    prim = GetMenuPrim();
     textures = &mgTexManager;
     mgCTexture *icon_tex = MenuPosData->item_icon_tex[0][0];
     mgCTexture *icon_tex2 = MenuPosData->item_icon_tex[0][1];
@@ -3202,7 +3203,7 @@ void MenuItemModeItemDraw(int &tex_block, mgRect<int> clip_rect, float *pos, MEN
     scissor.left = clip_rect.left;
     scissor.top = clip_rect.top;
     scissor.right = clip_rect.right;
-    scissor.bottom = bottom = clip_rect.bottom;
+    scissor.bottom = clip_rect.bottom;
     MenuClipRectCheck(scissor);
     mgRect<float> item_rect(0.0f, 0.0f, 0.0f, 0.0f);
     item_rect.right = 32.0f;
@@ -3213,7 +3214,7 @@ void MenuItemModeItemDraw(int &tex_block, mgRect<int> clip_rect, float *pos, MEN
     bag_max = GetNowBagMax(0);
     int no = 0;
     for (row = 0; row < 25; row++, y += 50) {
-        if (y > bottom) {
+        if (y > clip_rect.bottom) {
             break;
         }
         for (col = 0, x = 0; col < 6; x += 40, col++, no++) {
@@ -3229,7 +3230,7 @@ void MenuItemModeItemDraw(int &tex_block, mgRect<int> clip_rect, float *pos, MEN
             item_rect.left = left + x;
             item_rect.top = y;
             CGameDataUsed *used = MenuDrawItemInfo[no];
-            int            item_no = used->item_no;
+            int            item_no = UsedItemNo(used);
             if (mgScreenWidth < item_rect.left || item_no <= 0) {
                 if (parts != NULL) {
                     parts++;
@@ -3251,7 +3252,7 @@ void MenuItemModeItemDraw(int &tex_block, mgRect<int> clip_rect, float *pos, MEN
                 num_space = (int) (parts->x);
                 num_unk = (int) (parts->y);
             }
-            int icon_mode = 0;
+            icon_mode = 0;
             if (item_no == 0xB9) {
                 item_no = used->GetSpectolNo();
                 icon_mode = 1;
@@ -3268,7 +3269,7 @@ void MenuItemModeItemDraw(int &tex_block, mgRect<int> clip_rect, float *pos, MEN
                         MenuPosData->fish_jump_count[no] = 2;
                     }
                 } else {
-                    float height = MenuPosData->fish_jump_height[no] *
+                    height = MenuPosData->fish_jump_height[no] *
                                    sinf(effect[1].param[0] * rottbl_3145[MenuPosData->fish_jump_count[no]]);
                     if (height > 0.0f) {
                         item_rect.top -= height;
@@ -3336,9 +3337,6 @@ void MenuItemModeItemDraw(int &tex_block, mgRect<int> clip_rect, float *pos, MEN
     }
     ResetMenuScissor();
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", MenuItemModeItemDraw__FRi9mgRect_i_PfP18MENUFORMPARTS_TYPEP10mgCTexture9mgRect_i_i);
-#endif
 int CMenuPosDataForm::MenuFormStep() {
     int ended = 0;
     int next[2];
