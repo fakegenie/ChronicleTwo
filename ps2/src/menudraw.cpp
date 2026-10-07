@@ -2959,13 +2959,12 @@ void MenuItemBrdSetInfo(int unused, int pos, int max_line, int view_line) {
     MenuItemBrdCalcManner = 1;
     Func_MenuItemBrdPosStep(pos);
 }
-#ifdef NONMATCHING
-// 99.9% match, 8 words off
 void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int b) {
     int edge;
     int clip_left;
-    int clip_top;
     int shadow_alpha;
+    int j;
+    int clip_top;
     int row_top;
     mgCDrawPrim *prim = GetMenuPrim();
     mgRect<int> put(0, 0, 0, 0);
@@ -3010,7 +3009,6 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
         prim->Color(0, 0, 0, shadow_alpha = (int)(2.0f * a / 3.0f));
         PrimQuad(prim, mgRect<float>(put_x, put_y, 40.0f, 32.0f), *parts[frmtbl0_2922[part++]]);
         put_x += 40.0f;
-        int j;
         int put_top;
         for (j = 0; j < 5; j++) {
             edge = (int)put_x;
@@ -3085,9 +3083,6 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
         prim->End();
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", MenuItemBrdFrameDraw__FiiRiiiii);
-#endif
 void MenuItemBrdDraw(float *pos, mgRect<int> clip_rect, int &tex_block, int a, int r, int g, int b) {
     mgCDrawPrim *prim;
     mgCTexture  *tex;
