@@ -141,10 +141,10 @@ union ScriptVector {
  */
 static int GetStackInt(RS_STACKDATA *slot) {
     if (slot->type == 1) {
-        return (int) slot->f;
+        return (int) slot->val.f;
     }
 
-    return slot->i;
+    return slot->val.i;
 }
 
 /**
@@ -154,10 +154,10 @@ static int GetStackInt(RS_STACKDATA *slot) {
  */
 static float GetStackFloat(RS_STACKDATA *slot) {
     if (slot->type == 0) {
-        return (float) slot->i;
+        return (float) slot->val.i;
     }
 
-    return *(float *) &slot->i;
+    return *(float *) &slot->val.i;
 }
 
 /**
@@ -166,7 +166,7 @@ static float GetStackFloat(RS_STACKDATA *slot) {
  *
  */
 static char *GetStackString(RS_STACKDATA *slot) {
-    return (char *) slot->i;
+    return (char *) slot->val.i;
 }
 
 /**
@@ -176,7 +176,7 @@ static char *GetStackString(RS_STACKDATA *slot) {
  */
 static void SetStack(RS_STACKDATA *slot, int value) {
     if (slot->type == 3) {
-        ((RS_STACKDATA *) slot->i)->i = value;
+        ((RS_STACKDATA *) slot->val.i)->val.i = value;
     }
 }
 
@@ -187,7 +187,7 @@ static void SetStack(RS_STACKDATA *slot, int value) {
  */
 static void SetStack(RS_STACKDATA *slot, float value) {
     if (slot->type == 3) {
-        *(float *) &((RS_STACKDATA *) slot->i)->i = value;
+        *(float *) &((RS_STACKDATA *) slot->val.i)->val.i = value;
     }
 }
 

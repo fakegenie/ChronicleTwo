@@ -1,10 +1,8 @@
 #include "common.h"
 
 #include "runscript.hpp"
-#ifdef NONMATCHING
-#include <cmath>
-#endif
 
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -64,7 +62,7 @@ void stkoverflow() {
  */
 int chk_int(RS_STACKDATA data, funcdata *func) {
     if (data.type == RS_INT) {
-        return data.i;
+        return data.val.i;
     }
 
     fprintf(stderr, at_183__2, func->name);
@@ -81,7 +79,7 @@ u8 is_true(RS_STACKDATA data) {
     int is_zero = data.type == RS_INT;
 
     if (is_zero) {
-        is_zero = data.i == 0;
+        is_zero = data.val.i == 0;
     }
 
     return is_zero ^ 1;
@@ -116,11 +114,11 @@ void print(RS_STACKDATA *slots, int count) {
     if (0 < count) {
         do {
             if (slots->type == RS_INT) {
-                printf(at_223, slots->i);
+                printf(at_223, slots->val.i);
             } else if (slots->type == RS_STR) {
-                printf(at_224, slots->i);
+                printf(at_224, slots->val.i);
             } else if (slots->type == RS_FLOAT) {
-                printf(at_225, slots->f);
+                printf(at_225, slots->val.f);
             }
 
             fflush(stdout);
@@ -161,7 +159,7 @@ void CRunScript::push(RS_STACKDATA data) {
     RS_STACKDATA *slot = sp;
     sp++;
     slot->type = data.type;
-    *(float *) &slot->i = *(float *) &data.i;
+    *(float *) &slot->val.i = *(float *) &data.val.i;
 }
 
 void CRunScript::push_int(int value) {
@@ -169,7 +167,7 @@ void CRunScript::push_int(int value) {
     sp->type = RS_INT;
     RS_STACKDATA *slot = sp;
     sp++;
-    slot->i = value;
+    slot->val.i = value;
 }
 
 void CRunScript::push_str(char *value) {
@@ -177,7 +175,7 @@ void CRunScript::push_str(char *value) {
     sp->type = RS_STR;
     RS_STACKDATA *slot = sp;
     sp++;
-    slot->s = value;
+    slot->val.s = value;
 }
 
 void CRunScript::push_ptr(RS_STACKDATA *value) {
@@ -185,7 +183,7 @@ void CRunScript::push_ptr(RS_STACKDATA *value) {
     sp->type = RS_PTR;
     RS_STACKDATA *slot = sp;
     sp++;
-    slot->p = value;
+    slot->val.p = value;
 }
 
 void CRunScript::push_float(float value) {
@@ -193,7 +191,7 @@ void CRunScript::push_float(float value) {
     sp->type = RS_FLOAT;
     RS_STACKDATA *slot = sp;
     sp++;
-    slot->f = value;
+    slot->val.f = value;
 }
 
 RS_STACKDATA CRunScript::pop() {
@@ -231,7 +229,7 @@ vmcode_t *CRunScript::ret_func() {
 }
 
 void CRunScript::ext(RS_STACKDATA *command, int arg_count) {
-    int index = command->i;
+    int index = command->val.i;
     int (*func)(RS_STACKDATA *, int);
 
     if (index < 0 || index >= ext_func_num) {
@@ -247,7 +245,7 @@ void CRunScript::ext(RS_STACKDATA *command, int arg_count) {
     }
 
     if (func(command + 1, arg_count - 1) == 0) {
-        printf(at_293__2, command->i);
+        printf(at_293__2, command->val.i);
     }
 }
 
@@ -354,8 +352,10 @@ void CRunScript::skip() {
     skip_wait = 1;
     resume();
 }
-#ifdef NONMATCHING
-// ~1.1% match, 1356 words off
+#pragma define_section dead ".dead" ".dead"
+__declspec(dead) static u_long PrimeLongDivision(u_long a, u_long b) {
+    return a / b;
+}
 void CRunScript::exe(vmcode_t *entry) {
     RS_STACKDATA  value;
     RS_STACKDATA  rhs;
@@ -364,7 +364,6 @@ void CRunScript::exe(vmcode_t *entry) {
     float         rhs_f;
     float         lhs_f;
     int           rhs_i;
-    int           lhs_i;
 
     pc = entry;
 
@@ -382,7 +381,7 @@ void CRunScript::exe(vmcode_t *entry) {
                         push(*(frame + pc->arg1 + chk_int(pop(), func)));
                         break;
                     case RS_ADDR_POINTER_INDEX:
-                        push(*(frame[pc->arg1].p + chk_int(pop(), func)));
+                        push(*(frame[pc->arg1].val.p + chk_int(pop(), func)));
                         break;
                     case RS_ADDR_LOCAL_FLOAT:
                         (frame + pc->arg1)->type = RS_FLOAT;
@@ -399,8 +398,8 @@ void CRunScript::exe(vmcode_t *entry) {
                         break;
                     case RS_ADDR_POINTER_INDEX_FLOAT:
                         rhs_i = chk_int(pop(), func);
-                        (frame[pc->arg1].p + rhs_i)->type = RS_FLOAT;
-                        push(*(frame[pc->arg1].p + rhs_i));
+                        (frame[pc->arg1].val.p + rhs_i)->type = RS_FLOAT;
+                        push(*(frame[pc->arg1].val.p + rhs_i));
                         break;
                 }
 
@@ -417,7 +416,7 @@ void CRunScript::exe(vmcode_t *entry) {
                         push_ptr(frame + pc->arg1 + chk_int(pop(), func));
                         break;
                     case RS_ADDR_POINTER_INDEX:
-                        push_ptr(frame[pc->arg1].p + chk_int(pop(), func));
+                        push_ptr(frame[pc->arg1].val.p + chk_int(pop(), func));
                         break;
                     case RS_ADDR_LOCAL_FLOAT:
                         push_ptr(frame + pc->arg1);
@@ -429,29 +428,25 @@ void CRunScript::exe(vmcode_t *entry) {
                         push_ptr(frame + pc->arg1 + chk_int(pop(), func));
                         break;
                     case RS_ADDR_POINTER_INDEX_FLOAT:
-                        push_ptr(frame[pc->arg1].p + chk_int(pop(), func));
+                        push_ptr(frame[pc->arg1].val.p + chk_int(pop(), func));
                         break;
                 }
 
                 break;
             case RS_OP_STORE:
                 value = pop();
-                target = pop().p;
+                target = pop().val.p;
                 target->type = value.type;
-                target->f = value.f;
+                target->val.f = value.val.f;
                 push(value);
                 break;
             case RS_OP_PUSH_CONST:
-                switch (pc->arg1) {
-                    case RS_CONST_INT:
-                        push_int(pc->arg2);
-                        break;
-                    case RS_CONST_STR:
-                        push_str(code + pc->arg2);
-                        break;
-                    case RS_CONST_FLOAT:
-                        push_float(*(float *)&pc->arg2);
-                        break;
+                if (pc->arg1 == RS_CONST_INT) {
+                    push_int(pc->arg2);
+                } else if (pc->arg1 == RS_CONST_STR) {
+                    push_str(code + pc->arg2);
+                } else if (pc->arg1 == RS_CONST_FLOAT) {
+                    push_float(*(float *)&pc->arg2);
                 }
 
                 break;
@@ -460,7 +455,7 @@ void CRunScript::exe(vmcode_t *entry) {
                 break;
             case RS_OP_JMP:
                 if (!skip_wait) {
-                    pc = (vmcode_t *) (code + (int) pc->arg1);
+                    pc = (vmcode_t *) (code + pc->arg1);
                     continue;
                 }
 
@@ -472,7 +467,7 @@ void CRunScript::exe(vmcode_t *entry) {
                             push_int(1);
                         }
 
-                        pc = (vmcode_t *) (code + (int) pc->arg1);
+                        pc = (vmcode_t *) (code + pc->arg1);
                         continue;
                     }
                 }
@@ -485,7 +480,7 @@ void CRunScript::exe(vmcode_t *entry) {
                             push_int(0);
                         }
 
-                        pc = (vmcode_t *) (code + (int) pc->arg1);
+                        pc = (vmcode_t *) (code + pc->arg1);
                         continue;
                     }
                 }
@@ -496,39 +491,39 @@ void CRunScript::exe(vmcode_t *entry) {
                 lhs = pop();
 
                 if (lhs.type == RS_INT && rhs.type == RS_INT) {
-                    rhs_i = rhs.i;
-                    lhs_i = lhs.i;
+                    int right = rhs.val.i;
+                    int left = lhs.val.i;
 
                     switch (pc->arg1) {
                         case RS_CMP_EQ:
-                            push_int(rhs_i == lhs_i);
+                            push_int(right == left);
                             break;
                         case RS_CMP_NE:
-                            push_int(rhs_i != lhs_i);
+                            push_int(right != left);
                             break;
                         case RS_CMP_LT:
-                            push_int(lhs_i < rhs_i);
+                            push_int(left < right);
                             break;
                         case RS_CMP_LE:
-                            push_int(lhs_i <= rhs_i);
+                            push_int(left <= right);
                             break;
                         case RS_CMP_GT:
-                            push_int(lhs_i > rhs_i);
+                            push_int(left > right);
                             break;
                         case RS_CMP_GE:
-                            push_int(lhs_i >= rhs_i);
+                            push_int(left >= right);
                             break;
                     }
                 } else {
                     if (lhs.type == RS_FLOAT && rhs.type == RS_FLOAT) {
-                        rhs_f = rhs.f;
-                        lhs_f = lhs.f;
+                        rhs_f = rhs.val.f;
+                        lhs_f = lhs.val.f;
                     } else if (lhs.type == RS_INT && rhs.type == RS_FLOAT) {
-                        rhs_f = rhs.f;
-                        lhs_f = lhs.i;
+                        rhs_f = rhs.val.f;
+                        lhs_f = lhs.val.i;
                     } else if (lhs.type == RS_FLOAT && rhs.type == RS_INT) {
-                        rhs_f = rhs.i;
-                        lhs_f = lhs.f;
+                        rhs_f = rhs.val.i;
+                        lhs_f = lhs.val.f;
                     } else {
                         fprintf(stderr, "RUNTIME ERROR at _CMP: %s: operand is not number\n", func->name);
                         exit(-1);
@@ -557,37 +552,36 @@ void CRunScript::exe(vmcode_t *entry) {
                 }
 
                 break;
-            case RS_OP_ADD: {
-                RS_STACKDATA rhs = pop();
-                RS_STACKDATA lhs = pop();
+            case RS_OP_ADD:
+                rhs = pop();
+                lhs = pop();
 
                 if (lhs.type == RS_INT && rhs.type == RS_INT) {
-                    push_int(lhs.i + rhs.i);
+                    push_int(lhs.val.i + rhs.val.i);
                 } else if (lhs.type == RS_FLOAT && rhs.type == RS_FLOAT) {
-                    push_float(lhs.f + rhs.f);
+                    push_float(lhs.val.f + rhs.val.f);
                 } else if (lhs.type == RS_INT && rhs.type == RS_FLOAT) {
-                    push_float(lhs.i + rhs.f);
+                    push_float(lhs.val.i + rhs.val.f);
                 } else if (lhs.type == RS_FLOAT && rhs.type == RS_INT) {
-                    push_float(lhs.f + rhs.i);
+                    push_float(lhs.val.f + rhs.val.i);
                 } else {
                     fprintf(stderr, "RUNTIME ERROR at _ADD: %s: operand is not number\n", func->name);
                     exit(-1);
                 }
 
                 break;
-            }
             case RS_OP_SUB:
                 rhs = pop();
                 lhs = pop();
 
                 if (lhs.type == RS_INT && rhs.type == RS_INT) {
-                    push_int(lhs.i - rhs.i);
+                    push_int(lhs.val.i - rhs.val.i);
                 } else if (lhs.type == RS_FLOAT && rhs.type == RS_FLOAT) {
-                    push_float(lhs.f - rhs.f);
+                    push_float(lhs.val.f - rhs.val.f);
                 } else if (lhs.type == RS_INT && rhs.type == RS_FLOAT) {
-                    push_float(lhs.i - rhs.f);
+                    push_float(lhs.val.i - rhs.val.f);
                 } else if (lhs.type == RS_FLOAT && rhs.type == RS_INT) {
-                    push_float(lhs.f - rhs.i);
+                    push_float(lhs.val.f - rhs.val.i);
                 } else {
                     fprintf(stderr, "RUNTIME ERROR at _SUB: %s: operand is not number\n", func->name);
                     exit(-1);
@@ -599,13 +593,13 @@ void CRunScript::exe(vmcode_t *entry) {
                 lhs = pop();
 
                 if (lhs.type == RS_INT && rhs.type == RS_INT) {
-                    push_int(lhs.i * rhs.i);
+                    push_int(lhs.val.i * rhs.val.i);
                 } else if (lhs.type == RS_FLOAT && rhs.type == RS_FLOAT) {
-                    push_float(lhs.f * rhs.f);
+                    push_float(lhs.val.f * rhs.val.f);
                 } else if (lhs.type == RS_INT && rhs.type == RS_FLOAT) {
-                    push_float(lhs.i * rhs.f);
+                    push_float(lhs.val.i * rhs.val.f);
                 } else if (lhs.type == RS_FLOAT && rhs.type == RS_INT) {
-                    push_float(lhs.f * rhs.i);
+                    push_float(lhs.val.f * rhs.val.i);
                 } else {
                     fprintf(stderr, "RUNTIME ERROR _MUL: %s: operand is not number\n", func->name);
                     exit(-1);
@@ -615,20 +609,20 @@ void CRunScript::exe(vmcode_t *entry) {
             case RS_OP_DIV:
                 rhs = pop();
 
-                if (rhs.i == 0) {
+                if (rhs.val.i == 0) {
                     divby0error();
                 }
 
                 lhs = pop();
 
                 if (lhs.type == RS_INT && rhs.type == RS_INT) {
-                    push_int(lhs.i / rhs.i);
+                    push_int(lhs.val.i / rhs.val.i);
                 } else if (lhs.type == RS_FLOAT && rhs.type == RS_FLOAT) {
-                    push_float(lhs.f / rhs.f);
+                    push_float(lhs.val.f / rhs.val.f);
                 } else if (lhs.type == RS_INT && rhs.type == RS_FLOAT) {
-                    push_float(lhs.i / rhs.f);
+                    push_float(lhs.val.i / rhs.val.f);
                 } else if (lhs.type == RS_FLOAT && rhs.type == RS_INT) {
-                    push_float(lhs.f / rhs.i);
+                    push_float(lhs.val.f / rhs.val.i);
                 } else {
                     fprintf(stderr, "RUNTIME ERROR at _DIV: %s: operand is not number\n", func->name);
                     exit(-1);
@@ -656,9 +650,9 @@ void CRunScript::exe(vmcode_t *entry) {
                 rhs = pop();
 
                 if (rhs.type == RS_INT) {
-                    push_int(-rhs.i);
+                    push_int(-rhs.val.i);
                 } else if (rhs.type == RS_FLOAT) {
-                    push_float(-rhs.f);
+                    push_float(-rhs.val.f);
                 } else {
                     fprintf(stderr, "RUNTIME ERROR at _INVT: %s: operand is not number\n", func->name);
                     exit(-1);
@@ -669,9 +663,9 @@ void CRunScript::exe(vmcode_t *entry) {
                 rhs = pop();
 
                 if (rhs.type == RS_INT) {
-                    push_float(sinf(rhs.i));
+                    push_float(sinf(rhs.val.i));
                 } else if (rhs.type == RS_FLOAT) {
-                    push_float(sinf(rhs.f));
+                    push_float(sinf(rhs.val.f));
                 } else {
                     fprintf(stderr, "RUNTIME ERROR at _SIN: %s: operand is not number\n", func->name);
                     exit(-1);
@@ -682,9 +676,9 @@ void CRunScript::exe(vmcode_t *entry) {
                 rhs = pop();
 
                 if (rhs.type == RS_INT) {
-                    push_float(cosf(rhs.i));
+                    push_float(cosf(rhs.val.i));
                 } else if (rhs.type == RS_FLOAT) {
-                    push_float(cosf(rhs.f));
+                    push_float(cosf(rhs.val.f));
                 } else {
                     fprintf(stderr, "RUNTIME ERROR at _COS: %s: operand is not number\n", func->name);
                     exit(-1);
@@ -695,7 +689,7 @@ void CRunScript::exe(vmcode_t *entry) {
                 rhs = pop();
 
                 if (rhs.type == RS_INT) {
-                    push_int(!rhs.i);
+                    push_int(!rhs.val.i);
                 } else {
                     fprintf(stderr, "RUNTIME ERROR: %s: \220\256\220\224\202\305\202\310\202\242\203\111"
                                     "\203\171\203\211\203\223\203\150\n",
@@ -708,9 +702,9 @@ void CRunScript::exe(vmcode_t *entry) {
                 rhs = pop();
 
                 if (rhs.type == RS_INT) {
-                    push_float(rhs.i);
+                    push_float(rhs.val.i);
                 } else if (rhs.type == RS_FLOAT) {
-                    push_float(rhs.f);
+                    push_float(rhs.val.f);
                 } else {
                     fprintf(stderr, "RUNTIME ERROR at _ITOF: %s: operand is not number\n", func->name);
                     exit(-1);
@@ -721,9 +715,9 @@ void CRunScript::exe(vmcode_t *entry) {
                 rhs = pop();
 
                 if (rhs.type == RS_INT) {
-                    push_int((int) rhs.i);
+                    push_int(rhs.val.i);
                 } else if (rhs.type == RS_FLOAT) {
-                    push_int((int) rhs.f);
+                    push_int((int) rhs.val.f);
                 } else {
                     fprintf(stderr, "RUNTIME ERROR at _FTOI: %s: operand is not number\n", func->name);
                     exit(-1);
@@ -747,7 +741,7 @@ void CRunScript::exe(vmcode_t *entry) {
                 pc = NULL;
                 return;
             case RS_OP_CALL:
-                pc = call_func((funcdata *) (code + (int) pc->arg2), pc);
+                pc = call_func((funcdata *) (code + pc->arg2), pc);
                 pc--;
                 break;
             case RS_OP_RET:
@@ -757,7 +751,7 @@ void CRunScript::exe(vmcode_t *entry) {
                     sp = frame;
                     pc = ret_func();
                 } else {
-                    result = value.i;
+                    result = value.val.i;
                     push(value);
                     pc = NULL;
                     end = 1;
@@ -787,20 +781,17 @@ void CRunScript::exe(vmcode_t *entry) {
         pc++;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/runscript", exe__10CRunScriptFP8vmcode_t);
-#endif
 int rsGetStackInt(RS_STACKDATA *data) {
     if (data->type == RS_FLOAT) {
-        return (int) data->f;
+        return (int) data->val.f;
     }
 
-    return data->i;
+    return data->val.i;
 }
 
 void rsSetStack(RS_STACKDATA *data, int value) {
     if (data->type == RS_PTR) {
-        data->p->i = value;
+        data->val.p->val.i = value;
     }
 }
 

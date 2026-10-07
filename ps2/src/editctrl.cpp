@@ -437,7 +437,7 @@ void EditMoveChara(CScene *scene, sceVu0FVECTOR velocity, EditMoveCharaInfo *inf
             foot_sound = MoveInfo.ground_poly.foot_sound;
 
             if (foot_sound == 0) {
-                foot_sound = map->def_foot;
+                foot_sound = map->map_info.def_foot;
             }
 
             character->sound_info.foot_sound_id = foot_sound;
