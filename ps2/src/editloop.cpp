@@ -1855,9 +1855,7 @@ int EditStep() {
     StepHelpMes();
     return 1;
 }
-#ifdef NONMATCHING
 template <typename T> static inline T Ident(T v) { return v; }
-// 99.7% match, 7 words off
 int EditDraw() {
     static int                 flag;
     static char                init;
@@ -1870,6 +1868,7 @@ int EditDraw() {
     mgCTexture                *water;
     int                       ghost_visible;
     int                       texture_group;
+    int                       tex_index;
     int                       block_count;
     int                       block;
     CPartsGroup               *ghost_group;
@@ -1892,6 +1891,7 @@ int EditDraw() {
     int                       idea_no;
     int                       exit_flag;
     int                       dof_off;
+    int                      *entry;
     sceVu0FMATRIX             view_matrix;
     if (EditDrawCancelFlag != 0) {
         EditDrawCancelFlag = 0;
@@ -1952,7 +1952,7 @@ int EditDraw() {
     WorkBuffer.stack_used = 0;
     WorkBuffer.lock = 0;
     int texture_order[65];
-    for (int block_index = 0; block_index < 64; block_index++) {
+    for (block_index = 0; block_index < 64; block_index++) {
         texture_order[block_index] = block_index;
     }
     texture_order[64] = -1;
@@ -1985,9 +1985,9 @@ int EditDraw() {
         mgPreEndDraw(NULL);
         int texture_blocks[128];
         for (texture_group = 0; texture_group < 6; texture_group++) {
-            block_count = MainScene__2->mds_list_set.GetTextureBlockNo(texture_group, texture_blocks, 128);
-            for (int block_index = 0; block_index < block_count; block_index++) {
-                int *entry = &texture_blocks[block_count - block_index - 1];
+            block_count = MainScene__2->GetTextureBlockNo(texture_group, texture_blocks, 128);
+            for (tex_index = 0; tex_index < block_count; tex_index++) {
+                entry = Ident(&texture_blocks[block_count - tex_index - 1]);
                 block = *entry;
                 if (mgEndDrawReloadTexture(block, NULL) != 0 && water_block == *entry) {
                     WaveTable.CreateTexture(water);
@@ -2211,9 +2211,6 @@ int EditDraw() {
     EventTimeDraw();
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editloop", EditDraw__Fv);
-#endif
 void UpdateTrBoxFlag(int map_no) {
     int           i;
     CMapFlagData *flag_data = GetSaveData()->GetMapFlag(map_no);
