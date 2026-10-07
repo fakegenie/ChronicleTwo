@@ -784,8 +784,6 @@ int CheckGeoramaMateria(TRESURE_BOX_FLOOR_INFO *tresure, int floor, int *materia
     }
     return materia_num;
 }
-#ifdef NONMATCHING
-// 27 words off in an aligned diff
 static void DrawDngRoomInfo(DNGMAP_ROOM_INFO *room) {
     if (room != NULL && Floor_InfoTex != NULL) {
         if (dngfloor_infoview != 0) {
@@ -831,8 +829,8 @@ static void DrawDngRoomInfo(DNGMAP_ROOM_INFO *room) {
         prim->Texture(Floor_InfoTex);
         prim->Color(0x80, 0x80, 0x80, alpha);
         int left = fptosi(board_x);
-        int top = fptosi(board_y);
-        Menu3DivideTextureDraw(prim, mgRect<int>(left, top, board_w, 0x46), dngboardbrdtbl[0], 1);
+        int top;
+        Menu3DivideTextureDraw(prim, mgRect<int>(left, top = fptosi(board_y), board_w, 0x46), dngboardbrdtbl[0], 1);
         Menu3DivideTextureDraw(prim, mgRect<int>(left, top + 0x46, board_w, board_h - 0x46 - dngboardbrdtbl[1][3]), dngboardbrdtbl[1], 1);
         Menu3DivideTextureDraw(prim, mgRect<int>(left, top + board_h - bottom_tbl[3], board_w, bottom_tbl[3]), bottom_tbl, 1);
         prim->End();
@@ -890,7 +888,7 @@ static void DrawDngRoomInfo(DNGMAP_ROOM_INFO *room) {
         }
         int mark_x = (int)(20.0f + board_x);
         int row_y;
-        board_h = row_y = fptosi(2.0f + (68.0f + (float)top));
+        row_y = board_h = fptosi(2.0f + (68.0f + (float)top));
         int text_x = mark_x + 0x1C;
         PrimQuad(prim, (float)mark_x, mark_y, mark_uv);
         if (DngInfoFloorInfo != NULL && (DngInfoFloorInfo->flag & DNG_FLOOR_FLAG_FAST_DESTROY_CLEAR)) {
@@ -981,9 +979,6 @@ static void DrawDngRoomInfo(DNGMAP_ROOM_INFO *room) {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dngmenu", DrawDngRoomInfo__FP16DNGMAP_ROOM_INFO);
-#endif
 #ifdef NONMATCHING
 // 99.8% match, 6 words off
 static void DrawGeoramaMateria(int y, char *title, int materia_num, int *materia, int tex_block) {
