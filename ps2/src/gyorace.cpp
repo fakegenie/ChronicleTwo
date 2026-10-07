@@ -421,7 +421,7 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/gyorace", sgInitGyoRace__FP11SubGameInfo);
 #endif
 #ifdef NONMATCHING
 template <typename T> static inline T Ident(T v) { return v; }
-// 182 aligned words off (objdiff splits this jump-table function)
+// 132 aligned words off (objdiff splits this jump-table function)
 int sgLoopGyoRace(SubGameInfo *info) {
     extern const unsigned char at_1380__2__DATA[];
     extern const unsigned char at_1696__2__DATA[];
@@ -736,17 +736,16 @@ int sgLoopGyoRace(SubGameInfo *info) {
             race_mode = 2;
             race_proc_cnt = 0;
             SetGyoRaceRanking(RaceInfo.rank[hero_no] - 1);
+            mgCTextureManager *textures = &mgTexManager;
             for (int fish = 0; fish < 6; fish++) {
-                GYORACE_FISH_INF *state = &fish_inf[fish];
-                CCharacter2      *character = scene->GetCharacter(state->chara_no);
-                mgTexManager.DeleteBlock(*(int *) ((unsigned char *) character + 0x2E4));
-                GYORACE_RESULT *result = &fish_game_data[RaceInfo.rank[fish] - 1];
-                strcpy(result->name, (char *) at_1701__DATA);
+                CCharacter2      *character = scene->GetCharacter(fish_inf[fish].chara_no);
+                textures->DeleteBlock(*(int *) ((unsigned char *) character + 0x2E4));
+                strcpy(fish_game_data[RaceInfo.rank[fish] - 1].name, (char *) at_1701__DATA);
                 char *name = game_data[fish]->data.fish.name;
-                strncpy(result->name, name, strlen(name));
-                result->time = 20.0f * RaceInfo.goal_time[fish];
-                result->fish_no = state->fish_no;
-                result->race_class = race_rank[0];
+                strncpy(fish_game_data[RaceInfo.rank[fish] - 1].name, name, strlen(name));
+                fish_game_data[RaceInfo.rank[fish] - 1].time = 20.0f * RaceInfo.goal_time[fish];
+                fish_game_data[RaceInfo.rank[fish] - 1].fish_no = fish_inf[fish].fish_no;
+                fish_game_data[RaceInfo.rank[fish] - 1].race_class = race_rank[0];
                 sndSeStop(gyore_snd_id, fish + 3, fish + 3);
                 sndSeStop(gyore_snd_id, fish + 9, fish + 9);
             }
@@ -754,8 +753,8 @@ int sgLoopGyoRace(SubGameInfo *info) {
                 printf((char *) at_1702__DATA, place + 1, fish_game_data[place].name);
             }
             sndSeStop(gyore_snd_id, 2, 0);
-            mgTexManager.DeleteBlock(WindowTexb);
-            mgTexManager.DeleteBlock(EffectTexb);
+            textures->DeleteBlock(WindowTexb);
+            textures->DeleteBlock(EffectTexb);
             mgSetAmbient(old_ambient);
             scene->SetActive(1, 0);
             scene->active_camera = scene->before_camera;
