@@ -151,10 +151,10 @@ void CScene::GetCharaLighting(float (*lights)[4], float *ambient) {
         float next;
         float third;
 
-        if (map->chara_light_adjust != 0) {
-            light_scale = map->chara_light_adjust_value[0];
-            ambient_scale = map->chara_light_adjust_value[1];
-            ambient_floor = 128.0f * map->chara_light_adjust_value[2];
+        if (map->map_info.chara_light_adjust != 0) {
+            light_scale = map->map_info.chara_light_adjust_value[0];
+            ambient_scale = map->map_info.chara_light_adjust_value[1];
+            ambient_floor = 128.0f * map->map_info.chara_light_adjust_value[2];
         }
 
         limit = *(typeof(limit) *) at_868__4;

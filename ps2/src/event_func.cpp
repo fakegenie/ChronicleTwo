@@ -4656,8 +4656,8 @@ int _SET_ACTIVE_LIGHT(RS_STACKDATA *stack, int argc) {
     }
 
     if (light_no >= 0) {
-        if (light_no < maps[0]->lighting_info_num) {
-            maps[0]->active_light_no = light_no;
+        if (light_no < maps[0]->map_info.lighting_info_num) {
+            maps[0]->map_info.active_light_no = light_no;
         }
     }
 

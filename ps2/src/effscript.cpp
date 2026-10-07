@@ -4670,7 +4670,7 @@ int _INTERSECTION_POINT(RS_STACKDATA *stack, int argc) {
         if (foot_sound == 0) {
             CMap *map = now_scene->GetMap(now_scene->active_map);
             if (map != NULL) {
-                foot_sound = map->def_foot;
+                foot_sound = map->map_info.def_foot;
             }
         }
     }
