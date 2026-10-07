@@ -420,7 +420,7 @@ int sgInitGyoRace(SubGameInfo *info) {
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/gyorace", sgInitGyoRace__FP11SubGameInfo);
 #endif
 #ifdef NONMATCHING
-// 299 aligned words off (objdiff splits this jump-table function)
+// 251 aligned words off (objdiff splits this jump-table function)
 int sgLoopGyoRace(SubGameInfo *info) {
     extern const unsigned char at_1380__2__DATA[];
     extern const unsigned char at_1696__2__DATA[];
@@ -544,10 +544,11 @@ int sgLoopGyoRace(SubGameInfo *info) {
                 }
                 if (!(progress.pos < 8.0f)) {
                     unsigned int lap = (unsigned int) (progress.pos / 8.0f);
-                    if (state->lap < lap) {
-                        state->lap = lap;
-                        if ((int) state->lap > 1) {
-                            state->lap = 1;
+                    unsigned int *lap_no = &state->lap;
+                    if (*lap_no < lap) {
+                        *lap_no = lap;
+                        if ((int) *lap_no > 1) {
+                            *lap_no = 1;
                         } else {
                             state->unk_14 = 1;
                             GetSaveData();
@@ -560,14 +561,15 @@ int sgLoopGyoRace(SubGameInfo *info) {
                 if (fish == hero) {
                     if ((unsigned char) progress.state != 3) {
                         state->time = 20.0f * race_cnt;
-                        state->lap_time[fish_inf[hero].lap] = state->time - 20.0f * state->lap_start;
+                        state->lap_time[fish_inf[hero].lap] = fish_inf[fish].time - 20.0f * state->lap_start;
                     } else if ((unsigned char) progress.state == 3) {
-                        state->time = 20.0f * RaceInfo.goal_time[fish];
+                        float *total;
+                        *(total = &state->time) = 20.0f * RaceInfo.goal_time[(int)fish] ;
                         float time = state->lap_time[0];
                         float minutes = 3600.0f * (float) (int) (time / 3600.0f);
                         time -= minutes;
                         float seconds = 60.0f * (float) (int) (time / 60.0f);
-                        state->lap_time[1] = state->time - ((60.0f * (float) (int) ((100.0f * (time - seconds)) / 60.0f)) / 100.0f + (minutes + seconds));
+                        state->lap_time[1] = *total - ((60.0f * (float) (int) ((100.0f * (time - seconds)) / 60.0f)) / 100.0f + (minutes + seconds));
                     }
                 }
                 float distance = progress.pos;
