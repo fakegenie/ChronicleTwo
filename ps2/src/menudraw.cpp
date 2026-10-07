@@ -1713,7 +1713,8 @@ void CalcCommonBrdDrawInfo(float *pos, MENUFORM_MAKEBRD_INFO *info, ClsMes *mes)
     memcpy(&CommonBoardDrawInfo, info, sizeof(MENUFORM_MAKEBRD_INFO));
 }
 #ifdef NONMATCHING
-// 99.6% match, 62 words off
+static inline MENUFORM_MAKEBRD_LINE *BoardLine(int i) { return &CommonBoardDrawInfo.line[i]; }
+// 99.7% match, 47 words off
 void CommonBoardDraw(float *pos, int &tex_block) {
     mgCTexture *board_tex = Tex_CommonBoard;
     if (board_tex == NULL) {
@@ -1793,7 +1794,7 @@ void CommonBoardDraw(float *pos, int &tex_block) {
     prim->Texture(Tex_CommonBoard);
     prim->Color(0x80, 0x80, 0x80, 0x80);
     for (int i = 0, line_y = 0; i < 4; i++, line_y += 34) {
-        MENUFORM_MAKEBRD_LINE *line = &CommonBoardDrawInfo.line[i];
+        MENUFORM_MAKEBRD_LINE *line = BoardLine(i);
         float line_x;
         float x = line_x = 20.0f + pos[0];
         float line_top = 88.0f + pos[1] + line_y;
