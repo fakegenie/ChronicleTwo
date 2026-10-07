@@ -5123,28 +5123,28 @@ void CMenuPosDataManage::InitializeCMenuPosDataManage() {
     memset(fish_jump_count, 2, sizeof(fish_jump_count));
 }
 #ifdef NONMATCHING
-// 98.0% match, 37 words off
+// 98.3% match, 30 words off
 int MenuCapture(int block, mgCMemory *stack, int draw) {
-    int x;
-    int b;
     int pad_w;
-    int g;
     int pad_h;
-    int tex_w;
-    u8 *below;
-    int y;
-    u8 *line;
-    int line_num;
-    int half_w;
-    int tex_h;
-    int half_h;
-    mgCTextureManager *tex_manager;
-    int screen_w;
-    u8 *dst;
-    mgCDrawPrim *prim;
     int r;
+    int b;
+    mgCTextureManager *tex_manager;
+    mgCDrawPrim *prim;
+    int x;
+    int y;
     int pixel_num;
+    int screen_w;
+    u8 *line;
+    int half_w;
+    int line_num;
+    int g;
+    int half_h;
+    int tex_w;
     u8 *src;
+    u8 *dst;
+    int tex_h;
+    u8 *below;
 
     stack->Align64();
     tex_manager = &mgTexManager;
@@ -5176,13 +5176,13 @@ int MenuCapture(int block, mgCMemory *stack, int draw) {
     stack->Align64();
     src = stack->stack_bytes + (stack->stack_used << 4);
     mgStoreImage(&frame, (u_long128 *)src);
-    line_num = mgScreenHeight >> 1;
     screen_w = mgScreenWidth;
-    pixel_num = screen_w >> 1;
+    line_num = mgScreenHeight >> 1;
+    pixel_num = mgScreenWidth >> 1;
     for (y = 0; y < line_num; y++) {
         line = src;
         for (x = 0; x < pixel_num; x++) {
-            below = line + screen_w * 4;
+            below = &line[screen_w * 4];
             r = 0;
             b = 0;
             g = 0;
@@ -5205,7 +5205,7 @@ int MenuCapture(int block, mgCMemory *stack, int draw) {
             dst[3] = 0x80;
             dst += 4;
         }
-        src += (screen_w << 3);
+        src += screen_w * 8;
     }
     if (draw != 0 && MenuFrameTex != NULL) {
         tex_manager->ReloadTexture(block, (sceVif1Packet *)NULL);
