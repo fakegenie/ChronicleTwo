@@ -1721,8 +1721,6 @@ s32 CNameRegiMenu::KeyStep() {
     return 0;
 }
 
-#ifdef NONMATCHING
-// 93.2% match, 23 words off
 void CNameRegiMenu::GetSelectedActiveFont(char *dst) {
     int font_mode = GetActiveFontMode();
     char *first_table = NameRegistFont_Table[font_mode].first;
@@ -1735,9 +1733,9 @@ void CNameRegiMenu::GetSelectedActiveFont(char *dst) {
         int column;
         int part;
         rest = cell % 15;
-        char *kana_tables[3] = { first_table, second_table, third_table };
         column = cell / 15;
         part = rest / 5;
+        char *kana_tables[3] = { first_table, second_table, third_table };
         table = kana_tables[part];
         rest -= part * 5;
         char *glyph = table + (column + 2 * (rest + column * 5));
@@ -1774,9 +1772,6 @@ void CNameRegiMenu::GetSelectedActiveFont(char *dst) {
         dst[0] = table[glyph_index];
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/nameregi", GetSelectedActiveFont__13CNameRegiMenuFPc);
-#endif
 void CNameRegiMenu::ChangeFontSelectMode(int mode) {
     if (mode < 0 || mode >= 5) {
         return;

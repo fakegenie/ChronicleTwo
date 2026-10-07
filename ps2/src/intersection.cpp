@@ -163,8 +163,6 @@ int IntersectionSpherePoly3(float *sphere, float (*tri)[4], float *normal, float
 
     return 0;
 }
-#ifdef NONMATCHING
-// 99.7% match, 14 words off
 int IntersectionBox(float *from, float *to, mgVu0FBOX *box, float (*hits)[4]) {
     sceVu0FVECTOR segment_max;
     sceVu0FVECTOR segment_min;
@@ -172,14 +170,16 @@ int IntersectionBox(float *from, float *to, mgVu0FBOX *box, float (*hits)[4]) {
     sceVu0FVECTOR point;
     sceVu0FVECTOR candidates[6];
     mgVu0FBOX bounds;
-    int i;
+    int count;
+    int axis;
     int j;
+
     sceVu0SubVector(direction, to, from);
     struct BoxCopy { u_long128 v[2]; };
     *(BoxCopy *)&bounds = *(BoxCopy *)box;
     mgVectorMaxMin(segment_max, segment_min, from, to);
-    int count = 0;
-    for (int axis = 0; axis < 3; axis++) {
+    count = 0;
+    for (axis = 0; axis < 3; axis++) {
         while (bounds.min[axis] < segment_max[axis] && bounds.min[axis] > segment_min[axis]) {
             sceVu0ScaleVector(point, direction, (bounds.min[axis] - from[axis]) / direction[axis]);
             sceVu0AddVector(point, point, from);
@@ -204,14 +204,12 @@ int IntersectionBox(float *from, float *to, mgVu0FBOX *box, float (*hits)[4]) {
         }
     }
     if (count > 1) {
-        for (j = 0; j < count - 1; j++) {
-            for (i = j + 1; i < count; i++) {
-                float *near = candidates[j];
-                float *far = candidates[i];
-                if (near[3] > far[3]) {
-                    *(u_long128 *)point = *(u_long128 *)far;
-                    *(u_long128 *)far = *(u_long128 *)near;
-                    *(u_long128 *)near = *(u_long128 *)point;
+        for (axis = 0; axis < count - 1; axis++) {
+            for (j = axis + 1; j < count; j++) {
+                if (candidates[axis][3] > candidates[j][3]) {
+                    *(u_long128 *)point = *(u_long128 *)candidates[j];
+                    *(u_long128 *)candidates[j] = *(u_long128 *)candidates[axis];
+                    *(u_long128 *)candidates[axis] = *(u_long128 *)point;
                 }
             }
         }
@@ -219,14 +217,11 @@ int IntersectionBox(float *from, float *to, mgVu0FBOX *box, float (*hits)[4]) {
     if (count > 2) {
         count = 2;
     }
-    for (i = 0; i < count; i++) {
-        *(u_long128 *)hits[i] = *(u_long128 *)candidates[i];
+    for (j = 0; j < count; j++) {
+        *(u_long128 *)hits[j] = *(u_long128 *)candidates[j];
     }
     return count;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/intersection", IntersectionBox__FPfPfP9mgVu0FBOXPA4_f);
-#endif
 int IntersectionBox(float *start, float *end, mgVu0FBOX *box, float (*matrix)[4], float (*hits_out)[4]) {
     float local_start[4];
     float local_end[4];
