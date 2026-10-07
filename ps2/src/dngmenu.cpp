@@ -790,7 +790,7 @@ int CheckGeoramaMateria(TRESURE_BOX_FLOOR_INFO *tresure, int floor, int *materia
     return materia_num;
 }
 #ifdef NONMATCHING
-// 98.0% match, 77 words off
+// 96.2% match, 27 words off
 static void DrawDngRoomInfo(DNGMAP_ROOM_INFO *room) {
     if (room != NULL && Floor_InfoTex != NULL) {
         if (dngfloor_infoview != 0) {
@@ -895,34 +895,34 @@ static void DrawDngRoomInfo(DNGMAP_ROOM_INFO *room) {
         }
         int mark_x = (int)(20.0f + board_x);
         int row_y;
-        int line_y = row_y = fptosi(2.0f + (68.0f + (float)top));
+        board_h = row_y = fptosi(2.0f + (68.0f + (float)top));
         int text_x = mark_x + 0x1C;
         PrimQuad(prim, (float)mark_x, mark_y, mark_uv);
         if (DngInfoFloorInfo != NULL && (DngInfoFloorInfo->flag & DNG_FLOOR_FLAG_FAST_DESTROY_CLEAR)) {
             medal_uv.left = medal_xytbl_1736[0];
             PrimQuad(prim, (float)mark_x, (float)row_y, medal_uv);
         }
-        MenuDngMes[1]->SetMovePosGyou(0, text_x, line_y);
+        MenuDngMes[1]->SetMovePosGyou(0, text_x, board_h);
         int time_x = left + board_w - MenuDngMes[1]->line_w[1] - 0xE;
         if (CheckNowEurope() != 0) {
             time_x -= 8;
         }
         row_y += 0x16;
-        MenuDngMes[1]->SetMovePosGyou(1, time_x, line_y);
-        line_y += 0x16;
+        MenuDngMes[1]->SetMovePosGyou(1, time_x, board_h);
+        board_h += 0x16;
         if (DngInfoRoomInfo != NULL && DngInfoRoomInfo->fishing != 0) {
             PrimQuad(prim, (float)mark_x, (float)row_y, mark_uv);
             if (DngInfoFloorInfo->flag & DNG_FLOOR_FLAG_FISHING_CLEAR) {
                 medal_uv.left = medal_xytbl_1736[2];
                 PrimQuad(prim, (float)mark_x, (float)row_y, medal_uv);
             }
-            MenuDngMes[3]->SetMovePosGyou(0, text_x, line_y);
-            MenuDngMes[3]->SetMovePosGyou(1, left + board_w - MenuDngMes[3]->line_w[1] - 0x10, line_y);
+            MenuDngMes[3]->SetMovePosGyou(0, text_x, board_h);
+            MenuDngMes[3]->SetMovePosGyou(1, left + board_w - MenuDngMes[3]->line_w[1] - 0x10, board_h);
             if (MenuDngMes[3]->ClsMes::mes_no == 2) {
-                MenuDngMes[3]->SetMovePosGyou(1, value_x, line_y);
+                MenuDngMes[3]->SetMovePosGyou(1, value_x, board_h);
             }
             row_y += 0x16;
-            line_y += 0x16;
+            board_h += 0x16;
         }
         if (DngInfoRoomInfo != NULL && DngInfoRoomInfo->spheda != 0) {
             PrimQuad(prim, (float)mark_x, (float)row_y, mark_uv);
@@ -945,9 +945,9 @@ static void DrawDngRoomInfo(DNGMAP_ROOM_INFO *room) {
                 }
             }
             row_y += 0x16;
-            MenuDngMes[4]->SetMovePosGyou(0, text_x, line_y);
-            MenuDngMes[4]->SetMovePosGyou(1, spheda_x, line_y);
-            line_y += 0x16;
+            MenuDngMes[4]->SetMovePosGyou(0, text_x, board_h);
+            MenuDngMes[4]->SetMovePosGyou(1, spheda_x, board_h);
+            board_h += 0x16;
         }
         PrimQuad(prim, (float)mark_x, (float)row_y, mark_uv);
         if (DngInfoFloorInfo != NULL && (DngInfoFloorInfo->flag & DNG_FLOOR_FLAG_PRACTICE_CLEAR)) {
@@ -955,25 +955,25 @@ static void DrawDngRoomInfo(DNGMAP_ROOM_INFO *room) {
             PrimQuad(prim, (float)mark_x, (float)row_y, medal_uv);
         }
         if (language == 0) {
-            MenuDngMes[5]->SetMovePosGyou(0, text_x, line_y);
-            MenuDngMes[5]->SetMovePosGyou(1, value_x, line_y);
-            line_y += 0x16;
+            MenuDngMes[5]->SetMovePosGyou(0, text_x, board_h);
+            MenuDngMes[5]->SetMovePosGyou(1, value_x, board_h);
+            board_h += 0x16;
         } else {
-            MenuDngMes[5]->SetMovePosGyou(0, text_x, line_y);
+            MenuDngMes[5]->SetMovePosGyou(0, text_x, board_h);
             if (MenuDngMes[5]->ClsMes::mes_no == 0x6C) {
-                MenuDngMes[5]->SetMovePosGyou(1, left + board_w - MenuDngMes[5]->line_w[1] - 0x10, line_y);
-                line_y += 0x16;
+                MenuDngMes[5]->SetMovePosGyou(1, left + board_w - MenuDngMes[5]->line_w[1] - 0x10, board_h);
+                board_h += 0x16;
             } else {
-                MenuDngMes[5]->SetMovePosGyou(1, text_x, line_y + 0x16);
-                MenuDngMes[5]->SetMovePosGyou(2, left + board_w - MenuDngMes[5]->line_w[2] - 0x10, line_y + 0x12);
-                line_y += 0x2C;
+                MenuDngMes[5]->SetMovePosGyou(1, text_x, board_h + 0x16);
+                MenuDngMes[5]->SetMovePosGyou(2, left + board_w - MenuDngMes[5]->line_w[2] - 0x10, board_h + 0x12);
+                board_h += 0x2C;
             }
         }
         prim->End();
-        MenuDngMes[6]->SetMovePosGyou(0, text_x, line_y);
-        MenuDngMes[6]->SetMovePosGyou(1, left + board_w - MenuDngMes[6]->line_w[1] - 0x1A, line_y);
+        MenuDngMes[6]->SetMovePosGyou(0, text_x, board_h);
+        MenuDngMes[6]->SetMovePosGyou(1, left + board_w - MenuDngMes[6]->line_w[1] - 0x1A, board_h);
         if (DngInfoRoomInfo != NULL && DngInfoRoomInfo->geostone != 0) {
-            MenuDngMes[7]->SetMovePosGyou(0, centre_x - (MenuDngMes[7]->line_w[0] >> 1), line_y + 0x24);
+            MenuDngMes[7]->SetMovePosGyou(0, centre_x - (MenuDngMes[7]->line_w[0] >> 1), board_h + 0x24);
         }
         for (int i = 0; i < DNG_TREE_MAP_MES_MAX; i++) {
             MenuDngMes[i]->SetMsgAlpha(alpha);
