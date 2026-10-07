@@ -6863,8 +6863,6 @@ int MenuInventPushKey(int pad, int pushed) {
 
     return 1;
 }
-#ifdef NONMATCHING
-// ~30.3% match, 363 words off
 int MenuInventKey() {
     int result = 0;
     int item_pos[16];
@@ -7015,7 +7013,7 @@ int MenuInventKey() {
         int name_x = 74.0f + list_x;
         int y = 13.0f + list_form->y + (float)(top * 46);
         int number_x = 11.0f + list_x;
-        for (int card = top; card < 0; card++) {
+        for (button = top; button < 0; button++) {
             names[line] = NULL;
             item_pos[line * 2] = name_x;
             item_pos[line * 2 + 1] = y;
@@ -7064,9 +7062,6 @@ int MenuInventKey() {
     }
     return result;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/inventmn", MenuInventKey__Fv);
-#endif
 void MenuInventDraw() {
     MenuPosData->FormDraw();
     MenuEffect[0]->Draw();
