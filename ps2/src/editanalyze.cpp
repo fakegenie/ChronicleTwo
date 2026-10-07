@@ -631,39 +631,39 @@ void AnalyzeHeim(CEditData *data, CEditMap *map) {
     target[12] = 6;
     data->Analize(3, condition, target);
 }
-#ifdef NONMATCHING
-// 99.9% match, 6 words off
 void AnalyzeMoonFlower(CEditData *data, CEditMap *map) {
     int   condition[analyze_slots];
     int   target[analyze_slots];
     float position[4];
     int   parts_nos[parts_list_max];
     int   i;
-
-    int count;
+    int   hits;
+    int   num;
+    int   count;
     for (count = 0; count < analyze_slots; count++) {
         condition[count] = 0;
         target[count] = -1;
     }
     float center[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-    if (map->GetePlacePartsAtInfoID(0x39, parts_nos, parts_list_max) > 0) {
+    num = map->GetePlacePartsAtInfoID(0x39, parts_nos, parts_list_max);
+    if (num > 0) {
         if (GetPartsPos(map, parts_nos[0], position) && mgDistVector(position, center) < 300.0f) {
             *(u_long128 *) center = *(u_long128 *) position;
             condition[0] = 1;
         }
     }
-    int num = map->GetePlacePartsAtInfoID(0x42, parts_nos, parts_list_max);
-    count = 0;
+    num = map->GetePlacePartsAtInfoID(0x42, parts_nos, parts_list_max);
+    hits = 0;
     for (i = 0; i < num; i++) {
         if (GetPartsPos(map, parts_nos[i], position)) {
             float distance = position[0] - center[0];
             distance = distance < 0.0f ? -distance : distance;
             if (distance < 50.0f) {
-                count++;
+                hits++;
             }
         }
     }
-    if (count >= 8) {
+    if (hits >= 8) {
         condition[1] = 1;
     }
     num = map->GetePlacePartsAtInfoID(0x40, parts_nos, parts_list_max);
@@ -713,13 +713,14 @@ void AnalyzeMoonFlower(CEditData *data, CEditMap *map) {
         }
     }
     condition[4] = east > 0 && west > 0;
-    count = 0;
+    hits = 0;
     for (i = 0; i < num; i++) {
-        if (map->GetRiverNum(parts_nos[i], 50.0f) > 0) {
-            count++;
+        int no = parts_nos[i];
+        if (map->GetRiverNum(no, 50.0f) > 0) {
+            hits++;
         }
     }
-    if (count >= 2) {
+    if (hits >= 2) {
         condition[5] = 1;
     }
     count = 0;
@@ -775,9 +776,6 @@ void AnalyzeMoonFlower(CEditData *data, CEditMap *map) {
     condition[11] = map->GetePlacePartsAtInfoID(0x44, parts_nos, parts_list_max) >= 2;
     data->Analize(4, condition, target);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editanalyze", AnalyzeMoonFlower__FP9CEditDataP8CEditMap);
-#endif
 int CheckLiveChara(int map_no, CEditMap *map, int no, int chara) {
     int         parts_nos[parts_list_max];
     float       position[4];
