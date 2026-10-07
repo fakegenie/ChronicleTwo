@@ -573,7 +573,7 @@ int CWater::Draw(u_int *tag, float (*matrix)[4], mgCDrawManager *draw_manager) {
     return 0;
 }
 #ifdef NONMATCHING
-// 99.9% match, 14 words off
+// 99.9% match, 12 words off
 struct WaterTextureName {
     char text[0x20];
 };
@@ -631,12 +631,12 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
     u_long128         *positions;
     float             *current;
     sceVu0FVECTOR     *slope0;
-    int                remaining;
     sceVu0FVECTOR     *slope1;
     sceVu0FVECTOR     *slope2;
     WaterStripPacket  *strip;
     u_long128         *out;
     sceVu0FVECTOR     *slope3;
+    int                vertex_count;
     memory = draw_manager->data_memory;
     mgZeroVector(row_step);
     mgZeroVector(column_step);
@@ -715,10 +715,10 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
         position0[3] = 1.0f;
         *(u_long128 *) position1 = *(u_long128 *) position0;
         mgAddVector(position1, row_step);
-        for (remaining = columns; remaining > 0; remaining -= 27) {
+        for (column = columns; column > 0; column -= 27) {
             point_count = 27;
-            if (remaining < 27) {
-                point_count = remaining;
+            if (column < 27) {
+                point_count = column;
             }
             strip = (WaterStripPacket *) out;
             counts = strip->counts;
@@ -731,7 +731,7 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
             strip->giftag.REGS1 = 3;
             strip->giftag.REGS2 = 4;
             positions = (u_long128 *) (strip + 1);
-            column = point_count * 2;
+            vertex_count = point_count * 2;
             out = (u_long128 *) strip + 3 + point_count * 2;
             for (index = 0; index < point_count; index++) {
                 positions[0] = *(u_long128 *) position0;
@@ -753,8 +753,8 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
             strip->dma[1] = 0;
             strip->dma[2] = 0;
             strip->dma[3] = MG_VIF_UNPACK_V4_32 | MG_VIF_UNPACK_FLG | (size << MG_VIF_NUM_SHIFT);
-            counts[0] = column;
-            counts[1] = column;
+            counts[0] = vertex_count;
+            counts[1] = vertex_count;
             counts[2] = 0;
             counts[3] = 0;
             if (point_count > 0) {
