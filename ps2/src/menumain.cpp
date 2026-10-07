@@ -1934,8 +1934,6 @@ void CopyActiveItemAndWeapon(int slot, int weapon_slot) {
     CopyActiveIconTexture(textures, slot, 0);
     manager->ReloadTexture(-1, (sceVif1Packet *) 0);
 }
-#ifdef NONMATCHING
-// 99.6% match, 15 words off
 int CopyActiveIconTexture(mgCTexture **textures, int chara_no, u_int *unused) {
     CUserDataManager *user = GetUserDataMan();
     int offset;
@@ -1973,16 +1971,17 @@ int CopyActiveIconTexture(mgCTexture **textures, int chara_no, u_int *unused) {
         }
         u8 transparent;
         u8 *dest;
-        int row;
-        u8 *source;
-        int slot;
         u8 *pixels;
+        u8 *source;
+        int x;
+        int i;
+        int slot;
         manager->ReloadCLUT(textures[sheet], (sceVif1Packet *)NULL);
         memcpy(textures[sheet]->clut, icon_clut[sheet], 0x400);
         transparent = 0;
-        for (int index = 0; index < 0x100; ++index) {
-            if (((u8 *)textures[sheet]->clut)[index * 4 + 3] == 0) {
-                transparent = index;
+        for (i = 0; i < 0x100; ++i) {
+            if (((u8 *)textures[sheet]->clut)[i * 4 + 3] == 0) {
+                transparent = i;
                 break;
             }
         }
@@ -1995,8 +1994,8 @@ int CopyActiveIconTexture(mgCTexture **textures, int chara_no, u_int *unused) {
             }
             int item_no = items[sheet * 4 + slot];
             if (item_no <= 0) {
-                for (row = 0; row < 0x20; ++row) {
-                    for (int x = 0; x < 0x20; x++) {
+                for (i = 0; i < 0x20; ++i) {
+                    for (x = 0; x < 0x20; ++x) {
                         dest[x] = transparent;
                     }
                     dest += 0x40;
@@ -2005,7 +2004,7 @@ int CopyActiveIconTexture(mgCTexture **textures, int chara_no, u_int *unused) {
                 int icon_no = GetItemIconNo(item_no);
                 source = (u8 *)icon_sheet[sheet]->image[0];
                 source += (icon_no % 8) * 0x20 + (icon_no / 8) * 0x2000;
-                for (row = 0; row < 0x20; ++row) {
+                for (i = 0; i < 0x20; ++i) {
                     memcpy(dest, source, 0x20);
                     dest += 0x40;
                     source += 0x100;
@@ -2015,9 +2014,6 @@ int CopyActiveIconTexture(mgCTexture **textures, int chara_no, u_int *unused) {
     }
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menumain", CopyActiveIconTexture__FPP10mgCTextureiPUi);
-#endif
 void MenuDebugModeDraw() {
 
     float margin = 6.0f, width = 110.0f, height = 24.0f;
