@@ -154,7 +154,7 @@ int TransHdBd(int hd, int hd_size, int bd, int bd_size) {
 }
 
 #ifdef NONMATCHING
-// 92.5% match, 161 words off
+// 93.2% match, 101 words off
 int CSound::Init(int mode0, int mode1, int depth0, int depth1) {
     static int load_m_flg = 0;
     int        port;
@@ -184,11 +184,11 @@ int CSound::Init(int mode0, int mode1, int depth0, int depth1) {
         msinBfGrp[0].buffCtx = NULL;
         msinBfGrp[1].buffNum = MIDI_MSIN_PORT_COUNT;
         msinBfGrp[1].buffCtx = msinBfCtx;
-        for (int port = 0; port < MIDI_MSIN_PORT_COUNT; port++) {
-            msinBfCtx[port].sema = 0;
-            msinBfCtx[port].buff = &msinBf[port];
-            msinBf[port].size = sizeof(MSIN_BUFFER);
-            msinBf[port].length = 0;
+        for (slot = 0; slot < MIDI_MSIN_PORT_COUNT; slot++) {
+            msinBfCtx[slot].sema = 0;
+            msinBfCtx[slot].buff = &msinBf[slot];
+            msinBf[slot].size = sizeof(MSIN_BUFFER);
+            msinBf[slot].length = 0;
         }
         if (sceMSIn_Init(&msinCtx) != 0) {
             printf("sceMSIn_Init Error\n");
