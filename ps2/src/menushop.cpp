@@ -525,7 +525,6 @@ void CShopMenu::InitEnd() {
     shop_name_ofs_x = message->GetMesWidth_system(shop_name_no) >> 1;
     shop_name_ofs_y = 2;
 }
-#ifdef NONMATCHING
 extern s16 shop_mode_prev_1326;
 extern s8 init_1327;
 extern char *exe_tbl_1509[];
@@ -548,12 +547,13 @@ extern char at_1663[];
 extern char at_1664__2[];
 extern char at_1665[];
 extern char at_1666[];
-// ~7.7% match, 1119 words off
 int CShopMenu::KeyStep() {
     int ret = 0;
     MenuCommonInfo->CheckSelectKey();
-    int push = MenuCommonInfo->CheckPushButton();
-    int lr = MenuCommonInfo->CheckLRKey();
+    int lr;
+    int push;
+    push = MenuCommonInfo->CheckPushButton();
+    lr = MenuCommonInfo->CheckLRKey();
     CUserDataManager *user = GetUserDataMan();
     int fade_end = FadeCheckMenu();
     switch (mode) {
@@ -605,7 +605,7 @@ int CShopMenu::KeyStep() {
             if (list_pos < 0) {
                 list_pos = 0;
             }
-            if (list_pos >= item_num) {
+            if (item_num <= list_pos) {
                 list_pos = item_num - 1;
             }
             while (list_pos < list_top) {
@@ -620,7 +620,7 @@ int CShopMenu::KeyStep() {
             if (lr & 8) {
                 key_arg_no = 1;
                 int line = list_pos - list_top + 1;
-                if (line >= 5) {
+                if (line > 4) {
                     line = 4;
                 }
                 bag_pos = (bag_top + line) * 6;
@@ -658,13 +658,17 @@ int CShopMenu::KeyStep() {
                 switch (push) {
                 case 1:
                     command = 0x14;
-                    if (MenuCommonInfo->have_item.item_no <= 0) {
-                        command = 5;
-                        if (NowSellMode != SHOP_SELL_MODE_ROBO_ABS && NowSellMode != SHOP_SELL_MODE_MEDAL) {
-                            command = 0x3F2;
-                            shop_mode_prev_1326 = key_arg_no;
-                        }
+                    if (MenuCommonInfo->have_item.item_no > 0) {
+                        command = 0x14;
+                        break;
                     }
+                    command = 5;
+                    if (NowSellMode == SHOP_SELL_MODE_ROBO_ABS || NowSellMode == SHOP_SELL_MODE_MEDAL) {
+                        command = 5;
+                        break;
+                    }
+                    command = 0x3F2;
+                    shop_mode_prev_1326 = key_arg_no;
                     break;
                 case 4:
                     command = 0x14;
@@ -680,8 +684,8 @@ int CShopMenu::KeyStep() {
             break;
         case 2:
         case 3: {
+            int old_cursor = num_cursor;
             int old_num = num;
-            s16 old_cursor = num_cursor;
             if (lr & 4) {
                 num_cursor = old_cursor - 1;
             }
@@ -691,7 +695,7 @@ int CShopMenu::KeyStep() {
             if (num_cursor < 0) {
                 num_cursor = 0;
             }
-            if (num_cursor >= 2) {
+            if (num_cursor > 1) {
                 num_cursor = 1;
             }
             int arrow = -1;
@@ -722,12 +726,12 @@ int CShopMenu::KeyStep() {
             if (num <= 0) {
                 num = 1;
             }
-            if (num_max < num) {
+            if (num > num_max) {
                 num = num_max;
             }
             if (old_cursor != num_cursor || old_num != num) {
                 MenuSePlay(SYSTEM_SE_CURSOR);
-                if (arrow >= 0) {
+                if (0 <= arrow) {
                     arrow_flash[arrow] = 8;
                     arrow_flash[arrow ^ 1] = 0;
                 }
@@ -747,13 +751,13 @@ int CShopMenu::KeyStep() {
             trade_brd->SetNumber(at_1651, total);
             trade_brd->SetPartRGBA(at_1651, 0x80, 0x80, 0x80, 0x80);
             trade_brd->SetPartRGBA(at_1652, 0x80, 0x80, 0x80, 0x80);
-            if (key_arg_no == 2 && CShopPtr->CheckMoney() < total) {
+            if (key_arg_no == 2 && total > CShopPtr->CheckMoney()) {
                 trade_brd->SetPartRGBA(at_1651, 0x80, 0x14, 0x14, 0x80);
                 trade_brd->SetPartRGBA(at_1652, 0x80, 0x14, 0x14, 0x80);
             }
             switch (push) {
-            case 4:
             case 1:
+            case 4:
                 if (num_cursor == 0) {
                     if (key_arg_no == 2) {
                         command = 0x3E9;
@@ -857,7 +861,7 @@ int CShopMenu::KeyStep() {
             }
             int room = 0;
             CGameDataUsed *bag = user->GetUsedDataPtr(0);
-            for (int slot = 0; slot < GetNowBagMax(0); slot++, bag++) {
+            for (int slot = 0; slot < GetNowBagMax(0); bag++, slot++) {
                 if (bag->item_no <= 0) {
                     room += common->stack_num;
                 }
@@ -1001,20 +1005,21 @@ int CShopMenu::KeyStep() {
             }
             break;
         }
-        case 0x3F3:
         case 0x3E9:
+        case 0x3F3:
             if (key_arg_no == 2) {
-                if (NowSellMode != SHOP_SELL_MODE_DONY && CShopPtr->CheckMoney() < total) {
+                if (NowSellMode != SHOP_SELL_MODE_DONY && total > CShopPtr->CheckMoney()) {
                     refuse = 1;
                     break;
                 }
                 ExeScript(extbl_1573[NowSellMode]);
                 key_arg_no = 4;
-            } else {
-                if (key_arg_no == 3) {
-                    ExeScript(at_1662);
-                    key_arg_no = 5;
-                }
+            }
+            if (key_arg_no == 3) {
+                ExeScript(at_1662);
+                key_arg_no = 5;
+            }
+            {
                 CGameDataUsed *trade_item = SearchNowPosItemExist();
                 char *name = NULL;
                 if (trade_item != NULL) {
@@ -1047,7 +1052,7 @@ int CShopMenu::KeyStep() {
         }
         if (refuse > 0) {
             error = refuse;
-            ask_mes->mes_no = -1;
+            ask_mes->ClsMes::mes_no = -1;
         }
         switch (refuse) {
         case 1:
@@ -1071,6 +1076,7 @@ int CShopMenu::KeyStep() {
             ExeScript(at_1666);
             break;
         }
+        break;
     }
     default:
         ExtendCommand(lr, push);
@@ -1087,9 +1093,6 @@ int CShopMenu::KeyStep() {
     }
     return ret;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menushop", KeyStep__9CShopMenuFv);
-#endif
 extern char at_1817[];
 extern char at_1818[];
 extern char at_1819[];
