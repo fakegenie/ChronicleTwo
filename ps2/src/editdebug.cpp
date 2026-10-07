@@ -329,8 +329,18 @@ void EndLightingEdit() {
 
 int IsLightingEditMode() { return LEditFlag; }
 #ifdef NONMATCHING
+#pragma define_section dead ".dead" ".dead"
+__declspec(dead) static u_long PrimeLongDivision(u_long a, u_long b) {
+    return a / b;
+}
+static inline float LightAbs(float value) {
+    if (value < 0.0f) {
+        return -value;
+    }
+    return value;
+}
 int mgTransWorldScreen(int *out, float *position);
-// 87 aligned words off (objdiff splits this jump-table function)
+// 65 aligned words off (objdiff splits this jump-table function)
 void LightingEdit(CScene *scene) {
     int row;
     float *selected;
@@ -450,7 +460,7 @@ void LightingEdit(CScene *scene) {
             case 2:
             case 3:
             case 4: {
-                u_char *component = (u_char *)fog + edit + 6;
+                u_char *component = edit + (u_char *)fog + 6;
                 int value = *component + direction;
                 if (value < 0) value = 0;
                 if (value > 255) value = 255;
@@ -573,7 +583,7 @@ void LightingEdit(CScene *scene) {
         float tip_y[4];
         float tip_z[4];
         int origin[4];
-        int screen[4][4];
+        union { int m[4][4]; struct { int v0[4]; int v1[4]; int v2[4]; int v3[4]; } v; } screen;
         int anchor[4] = {0x4B0, 0x1040, 0, 0};
         float x_axis[4] = {1.0f, 0.0f, 0.0f, 0.0f};
         float y_axis[4] = {0.0f, 1.0f, 0.0f, 0.0f};
@@ -594,46 +604,46 @@ void LightingEdit(CScene *scene) {
         sceVu0AddVector(tip_y, reference, y_axis);
         sceVu0AddVector(tip_z, reference, z_axis);
         mgTransWorldScreen(origin, reference);
-        mgTransWorldScreen(screen[0], tip_light);
-        mgTransWorldScreen(screen[1], tip_x);
-        mgTransWorldScreen(screen[2], tip_y);
-        mgTransWorldScreen(screen[3], tip_z);
-        for (int i = 0; i < 4; i++) screen[i][0] = screen[i][0] - origin[0];
-        for (int i = 0; i < 4; i++) screen[i][1] -= origin[1];
-        sceVu0ITOF4Vector(tip_light, screen[0]);
-        sceVu0ITOF4Vector(tip_x, screen[1]);
-        sceVu0ITOF4Vector(tip_y, screen[2]);
-        sceVu0ITOF4Vector(tip_z, screen[3]);
+        mgTransWorldScreen(screen.v.v0, tip_light);
+        mgTransWorldScreen(screen.v.v1, tip_x);
+        mgTransWorldScreen(screen.m[2], tip_y);
+        mgTransWorldScreen(screen.m[3], tip_z);
+        for (int i = 0; i < 4; i++) screen.m[i][0] = screen.m[i][0] - origin[0];
+        for (int i = 0; i < 4; i++) screen.m[i][1] -= origin[1];
+        sceVu0ITOF4Vector(tip_light, screen.v.v0);
+        sceVu0ITOF4Vector(tip_x, screen.m[1]);
+        sceVu0ITOF4Vector(tip_y, screen.m[2]);
+        sceVu0ITOF4Vector(tip_z, screen.m[3]);
         float unit = tip_y[1];
-        if (unit < 0.0f) unit = -unit;
+        unit = LightAbs(unit);
         float ratio = 30.0f / unit;
         sceVu0ScaleVector(tip_light, tip_light, ratio);
         sceVu0ScaleVector(tip_x, tip_x, ratio);
         sceVu0ScaleVector(tip_y, tip_y, ratio);
         sceVu0ScaleVector(tip_z, tip_z, ratio);
-        sceVu0FTOI4Vector(screen[0], tip_light);
-        sceVu0FTOI4Vector(screen[1], tip_x);
-        sceVu0FTOI4Vector(screen[2], tip_y);
-        sceVu0FTOI4Vector(screen[3], tip_z);
-        for (int i = 0; i < 4; i++) screen[i][0] += anchor[0];
-        for (int i = 0; i < 4; i++) screen[i][1] += anchor[1];
+        sceVu0FTOI4Vector(screen.m[0], tip_light);
+        sceVu0FTOI4Vector(screen.m[1], tip_x);
+        sceVu0FTOI4Vector(screen.m[2], tip_y);
+        sceVu0FTOI4Vector(screen.m[3], tip_z);
+        for (int i = 0; i < 4; i++) screen.m[i][0] += anchor[0];
+        for (int i = 0; i < 4; i++) screen.m[i][1] += anchor[1];
         prim.AlphaBlendEnable(1);
         prim.AlphaTestEnable(0);
         prim.DepthTestEnable(0);
         prim.Begin(1);
         prim.Color(0, 255, 0, 64);
         prim.Vertex4(anchor);
-        prim.Vertex4(screen[1]);
+        prim.Vertex4(screen.m[1]);
         prim.Color(0, 0, 255, 64);
         prim.Vertex4(anchor);
-        prim.Vertex4(screen[2]);
+        prim.Vertex4(screen.v.v2);
         prim.Color(255, 0, 0, 64);
         prim.Vertex4(anchor);
-        prim.Vertex4(screen[3]);
+        prim.Vertex4(screen.v.v3);
         prim.Color(255, 255, 255, 64);
         prim.Vertex4(anchor);
         prim.Color(255, 255, 255, 128);
-        prim.Vertex4(screen[0]);
+        prim.Vertex4(screen.v.v0);
         prim.End();
     }
     mgCCamera *camera = scene->GetCamera(scene->active_camera);
