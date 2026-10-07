@@ -1061,8 +1061,17 @@ void mgSetPkFrameBuffer(mgCTexture *texture) {
     mgSetPkFrameBuffer(texture->tex0.TBP0 / 32, texture->tex0.TBW << 6, texture->height,
                        texture->tex0.PSM);
 }
-#ifdef NONMATCHING
-// 99.9% match, 3 words off
+struct mgFrameRegister {
+    struct {
+        u_long tbp0 : 9;
+        u_long pad09 : 7;
+        u_long tbw : 6;
+        u_long pad22 : 2;
+        u_long psm : 6;
+        u_long pad30 : 2;
+        u_long fbmsk : 32;
+    } bits;
+};
 void mgSetPkFrameBuffer(int fbp, int width, int height, int psm) {
     sceGsFrame     frame;
     sceGsFrame    *default_frame;
@@ -1104,7 +1113,7 @@ void mgSetPkFrameBuffer(int fbp, int width, int height, int psm) {
     if (aligned_width % 64 != 0) {
         aligned_width += 64 - aligned_width % 64;
     }
-    *(u_long *)&frame = *(u_long *)default_frame;
+    *(mgFrameRegister *)&frame = *(mgFrameRegister *)default_frame;
     frame.FBP = fbp;
     frame.FBW = aligned_width / 64;
     frame.PSM = psm;
@@ -1197,9 +1206,6 @@ void mgSetPkFrameBuffer(int fbp, int width, int height, int psm) {
     frame_tex.tex0_fields.tfx = 0;
     *(u_long *)&frame_tex.tex1 = 0x261;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mglib", mgSetPkFrameBuffer__Fiiii);
-#endif
 void mgGetFrameBuffer(mgCTexture *texture) {
     *(mgFrameTextureCopy *) texture = frame_tex;
 }
