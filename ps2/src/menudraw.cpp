@@ -909,8 +909,10 @@ void ResetMenuScissor() {
     prim->End();
 }
 #ifdef NONMATCHING
-// 99.5% match, 21 words off
+// 99.9% match, 6 words off
 int SetModeMenuDrawItemBoard(int mode) {
+    int k;
+    CGameDataUsed *item;
     int party;
     int i;
     CGameDataUsed *used;
@@ -949,10 +951,10 @@ int SetModeMenuDrawItemBoard(int mode) {
             MenuDrawItemInfo[MenuDrawItemInfoNum] = &MenuUserParam.robo->parts[0];
             MenuDrawItemInfoNum++;
         }
-        used = MenuUserParam.used_data;
-        for (i = 0; i < 150; i++, used++) {
-            if (used->item_type == ITEM_DATA_ROBO_PART_D) {
-                MenuDrawItemInfo[MenuDrawItemInfoNum] = used;
+        item = MenuUserParam.used_data;
+        for (k = 0; k < 150; k++, item++) {
+            if (item->item_type == ITEM_DATA_ROBO_PART_D) {
+                MenuDrawItemInfo[MenuDrawItemInfoNum] = item;
                 MenuDrawItemInfoNum++;
             }
         }
@@ -962,10 +964,10 @@ int SetModeMenuDrawItemBoard(int mode) {
             MenuDrawItemInfo[MenuDrawItemInfoNum] = &MenuUserParam.robo->parts[2];
             MenuDrawItemInfoNum++;
         }
-        used = MenuUserParam.used_data;
-        for (i = 0; i < 150; i++, used++) {
-            if (used->item_type == ITEM_DATA_ROBO_WEAPON) {
-                MenuDrawItemInfo[MenuDrawItemInfoNum] = used;
+        item = MenuUserParam.used_data;
+        for (k = 0; k < 150; k++, item++) {
+            if (item->item_type == ITEM_DATA_ROBO_WEAPON) {
+                MenuDrawItemInfo[MenuDrawItemInfoNum] = item;
                 MenuDrawItemInfoNum++;
             }
         }
@@ -983,10 +985,10 @@ int SetModeMenuDrawItemBoard(int mode) {
                 }
             }
         }
-        used = MenuUserParam.used_data;
-        for (i = 0; i < 150; i++, used++) {
-            if (used->used_type == USED_ITEM_TYPE_FISH) {
-                MenuDrawItemInfo[MenuDrawItemInfoNum] = used;
+        item = MenuUserParam.used_data;
+        for (k = 0; k < 150; k++, item++) {
+            if (item->used_type == USED_ITEM_TYPE_FISH) {
+                MenuDrawItemInfo[MenuDrawItemInfoNum] = item;
                 MenuDrawItemInfoNum++;
             }
         }
@@ -1714,7 +1716,7 @@ void CalcCommonBrdDrawInfo(float *pos, MENUFORM_MAKEBRD_INFO *info, ClsMes *mes)
 }
 #ifdef NONMATCHING
 static inline MENUFORM_MAKEBRD_LINE *BoardLine(int i) { return &CommonBoardDrawInfo.line[i]; }
-// 99.7% match, 42 words off
+// 99.8% match, 33 words off
 void CommonBoardDraw(float *pos, int &tex_block) {
     mgCTexture *board_tex = Tex_CommonBoard;
     if (board_tex == NULL) {
@@ -1746,31 +1748,33 @@ void CommonBoardDraw(float *pos, int &tex_block) {
     prim->Begin(6);
     prim->Texture(Tex_CommonBoard);
     prim->Color(0x80, 0x80, 0x80, 0x80);
-    int pass;
+    int row_bottom;
     int row;
+    int pass;
+    int row_top;
     for (row = 0; row < 5; row++) {
         int left = (int)(6.0f + pos[0]);
-        int top = (int)(6.0f + board_y);
+        row_top = (int)(6.0f + board_y);
         board_pass_color pass_color = at_1796;
         for (pass = 0; pass < 2; pass++) {
             int *rgba = pass_color.rgba[pass];
             prim->Color(rgba[0], rgba[1], rgba[2], rgba[3]);
             prim->TextureCrd(row_uv.uv[row][0][0], row_uv.uv[row][0][1]);
-            prim->Vertex(left, top, 0);
+            prim->Vertex(left, row_top, 0);
             prim->TextureCrd(row_uv.uv[row][0][0] + row_uv.uv[row][0][2], row_uv.uv[row][0][1] + row_uv.uv[row][0][3]);
-            int bottom = top + heights[row];
-            prim->Vertex(((int)left) + row_uv.uv[row][0][2], bottom, 0);
+            row_bottom = row_top + heights[row];
+            prim->Vertex(((int)left) + row_uv.uv[row][0][2], row_bottom, 0);
             left += row_uv.uv[row][0][2];
             prim->TextureCrd(row_uv.uv[row][1][0], row_uv.uv[row][1][1]);
-            prim->Vertex(left, top, 0);
+            prim->Vertex(left, row_top, 0);
             prim->TextureCrd(row_uv.uv[row][1][0] + row_uv.uv[row][1][2], row_uv.uv[row][1][1] + row_uv.uv[row][1][3]);
-            prim->Vertex(left + board_w, bottom, 0);
+            prim->Vertex(left + board_w, row_bottom, 0);
             left += board_w;
             prim->TextureCrd(row_uv.uv[row][2][0], row_uv.uv[row][2][1]);
-            prim->Vertex(((int)left), top, 0);
+            prim->Vertex(((int)left), row_top, 0);
             prim->TextureCrd(row_uv.uv[row][2][0] + row_uv.uv[row][2][2], row_uv.uv[row][2][1] + row_uv.uv[row][2][3]);
-            prim->Vertex(((int)left) + row_uv.uv[row][2][2], bottom, 0);
-            top -= 6;
+            prim->Vertex(((int)left) + row_uv.uv[row][2][2], row_bottom, 0);
+            row_top -= 6;
             left = (int)pos[0];
         }
         board_y += heights[row];
@@ -1793,11 +1797,12 @@ void CommonBoardDraw(float *pos, int &tex_block) {
     prim->Begin(6);
     prim->Texture(Tex_CommonBoard);
     prim->Color(0x80, 0x80, 0x80, 0x80);
-    for (int i = 0, line_y = 0; i < 4; i++, line_y += 34) {
-        MENUFORM_MAKEBRD_LINE *line = BoardLine(i);
+    
+    for (pass = 0, row_top = 0; pass < 4; pass++, row_top += 34) {
+        MENUFORM_MAKEBRD_LINE *line = BoardLine(pass);
         float line_x;
         float x = line_x = 20.0f + pos[0];
-        float line_top = 88.0f + pos[1] + line_y;
+        float line_top = 88.0f + pos[1] + row_top;
         s16 (*brd)[4] = get_onoffbrdtbl_1789[line->kind];
         int top;
         PrimQuad(prim, mgRect<int>((int)x, top = (int)line_top, brd[0][2], brd[0][3]),
@@ -2959,13 +2964,13 @@ void MenuItemBrdSetInfo(int unused, int pos, int max_line, int view_line) {
     MenuItemBrdCalcManner = 1;
     Func_MenuItemBrdPosStep(pos);
 }
-#ifdef NONMATCHING
-// 99.8% match, 17 words off
 void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int b) {
     int edge;
     int clip_left;
-    int clip_top;
     int shadow_alpha;
+    int j;
+    int clip_top;
+    int row_top;
     mgCDrawPrim *prim = GetMenuPrim();
     mgRect<int> put(0, 0, 0, 0);
     mgRect<int> top_left(0, 0, 32, 32);
@@ -3004,18 +3009,18 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
         prim->Begin(6);
         prim->Texture(tex);
         prim->Color(r, g, b, a);
-        int part = 8;
+        int part;
+        part = 8;
         prim->Color(0, 0, 0, shadow_alpha = (int)(2.0f * a / 3.0f));
         PrimQuad(prim, mgRect<float>(put_x, put_y, 40.0f, 32.0f), *parts[frmtbl0_2922[part++]]);
         put_x += 40.0f;
-        int j;
         int put_top;
-        for (int i = 0; i < 5; i++) {
+        for (j = 0; j < 5; j++) {
             edge = (int)put_x;
-            PrimQuad(prim, mgRect<int>((int)edge, put_top = (int)put_y, 40, 32), *parts[frmtbl0_2922[part++]]);
+            PrimQuad(prim, mgRect<int>((int)edge, clip_left = (int)put_y, 40, 32), *parts[frmtbl0_2922[part++]]);
             put_x += 40.0f;
         }
-        PrimQuad(prim, mgRect<int>((int)put_x, (int)put_top, 32, 32), *parts[11]);
+        PrimQuad(prim, mgRect<int>((int)put_x, (int)clip_left, 32, 32), *parts[11]);
         prim->End();
         ResetMenuScissor();
         SetSpriteEnv(prim, 0);
@@ -3027,15 +3032,15 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
         for (i = 0; i < 2; i++) {
             put_x = x;
             edge = (int)put_x;
-            PrimQuad(prim, mgRect<int>(edge, put_top = (int)put_y, 32, 40), *parts[frmtbl0_2922[part++]]);
-            PrimQuad(prim, mgRect<int>((int)(put_x + 32.0f), put_top, 8, 40), *parts[frmtbl0_2922[part++]]);
+            PrimQuad(prim, mgRect<int>(edge, row_top = (int)put_y, 32, 40), *parts[frmtbl0_2922[part++]]);
+            PrimQuad(prim, mgRect<int>((int)(put_x + 32.0f), row_top, 8, 40), *parts[frmtbl0_2922[part++]]);
             put_x += 40.0f;
             for (j = 0; j < 5; j++) {
-                PrimQuad(prim, mgRect<int>((int)put_x, put_top, 40, 40), *parts[frmtbl0_2922[part++]]);
+                PrimQuad(prim, mgRect<int>((int)put_x, row_top, 40, 40), *parts[frmtbl0_2922[part++]]);
                 put_x += 40.0f;
             }
-            PrimQuad(prim, mgRect<int>((int)(put_x - 8.0f), (int)put_top, 6, 40), *parts[frmtbl0_2922[part - 1]]);
-            PrimQuad(prim, mgRect<int>((int)(put_x - 2.0f), (int)put_top, 32, 40), *parts[frmtbl0_2922[part++]]);
+            PrimQuad(prim, mgRect<int>((int)(put_x - 8.0f), (int)row_top, 6, 40), *parts[frmtbl0_2922[part - 1]]);
+            PrimQuad(prim, mgRect<int>((int)(put_x - 2.0f), (int)row_top, 32, 40), *parts[frmtbl0_2922[part++]]);
             put_y += 250.0f;
         }
         put.right = 32;
@@ -3083,9 +3088,6 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
         prim->End();
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", MenuItemBrdFrameDraw__FiiRiiiii);
-#endif
 void MenuItemBrdDraw(float *pos, mgRect<int> clip_rect, int &tex_block, int a, int r, int g, int b) {
     mgCDrawPrim *prim;
     mgCTexture  *tex;
@@ -5008,8 +5010,6 @@ void MenuItemBrdItemIconEffectMalloc(mgCMemory *memory, MENUFORMPARTS_TYPE *part
     parts->w = 32.0f;
     parts->h = 40.0f;
 }
-#ifdef NONMATCHING
-// 99.5% match, 19 words off
 void CMenuPosDataManage::MallocPallet(mgCMemory *stack) {
     int i;
     int k;
@@ -5039,12 +5039,16 @@ void CMenuPosDataManage::MallocPallet(mgCMemory *stack) {
         memcpy(item_icon_tex[1][i], icon_tex.tex[i], sizeof(mgCTexture));
         memcpy(item_icon_tex[2][i], icon_tex.tex[i], sizeof(mgCTexture));
         memcpy(item_icon_tex[3][i], icon_tex.tex[i], sizeof(mgCTexture));
-        color = (u8 *)pallet[0][i];
-        for (j = 0; j < 256; j++, color += 4) {
-            grey = color[0] + color[1] + color[2];
-            grey /= 3;
-            if (grey > 8 && color[2] != 0) {
-                color[2] = 0xFF;
+        {
+            int entry;
+            int sum;
+            u8 *pixel = (u8 *)pallet[0][i];
+            for (entry = 0; entry < 256; entry++, pixel += 4) {
+                sum = pixel[0] + pixel[1] + pixel[2];
+                sum /= 3;
+                if (sum > 8 && pixel[2] != 0) {
+                    pixel[2] = 0xFF;
+                }
             }
         }
         item_icon_tex[1][i]->clut = pallet[0][i];
@@ -5077,9 +5081,6 @@ void CMenuPosDataManage::MallocPallet(mgCMemory *stack) {
         item_icon_tex[3][i]->clut = pallet[2][i];
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", MallocPallet__18CMenuPosDataManageFP9mgCMemory);
-#endif
 void CMenuPosDataManage::SearchTransPalletNo() {
     u8 *colors;
     int i;
@@ -5122,28 +5123,28 @@ void CMenuPosDataManage::InitializeCMenuPosDataManage() {
     memset(fish_jump_count, 2, sizeof(fish_jump_count));
 }
 #ifdef NONMATCHING
-// 97.9% match, 40 words off
+// 98.3% match, 30 words off
 int MenuCapture(int block, mgCMemory *stack, int draw) {
-    int pixel_num;
-    int b;
-    u8 *below;
     int pad_w;
     int pad_h;
+    int r;
+    int b;
+    mgCTextureManager *tex_manager;
+    mgCDrawPrim *prim;
+    int x;
     int y;
+    int pixel_num;
     int screen_w;
-    int line_num;
     u8 *line;
     int half_w;
-    mgCDrawPrim *prim;
-    int half_h;
+    int line_num;
     int g;
-    u8 *src;
+    int half_h;
     int tex_w;
-    int x;
-    int tex_h;
+    u8 *src;
     u8 *dst;
-    int r;
-    mgCTextureManager *tex_manager;
+    int tex_h;
+    u8 *below;
 
     stack->Align64();
     tex_manager = &mgTexManager;
@@ -5177,14 +5178,14 @@ int MenuCapture(int block, mgCMemory *stack, int draw) {
     mgStoreImage(&frame, (u_long128 *)src);
     screen_w = mgScreenWidth;
     line_num = mgScreenHeight >> 1;
-    pixel_num = screen_w >> 1;
+    pixel_num = mgScreenWidth >> 1;
     for (y = 0; y < line_num; y++) {
         line = src;
         for (x = 0; x < pixel_num; x++) {
-            below = line + screen_w * 4;
+            below = &line[screen_w * 4];
             r = 0;
-            g = 0;
             b = 0;
+            g = 0;
             r += line[0];
             g += line[1];
             b += line[2];
