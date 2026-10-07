@@ -197,7 +197,7 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/outline", Draw__12COutLineDrawFff);
 #endif
 
 #ifdef NONMATCHING
-// 93.9% match, 43 words off
+// 98.0% match, 18 words off
 static void DrawDivSprite(mgCDrawPrim *prim, mgRect<int> rect, mgCTexture *texture,
                           int *color, int dx, int dy, int z, int unused) {
     mgRect<int> area = rect;
@@ -205,8 +205,11 @@ static void DrawDivSprite(mgCDrawPrim *prim, mgRect<int> rect, mgCTexture *textu
     sceVu0IVECTOR vertex_end;
     sceVu0IVECTOR texcrd_start;
     sceVu0IVECTOR texcrd_end;
+    int x;
     int offset_x = dx + mgScreenOffx * 16;
+    int y_end;
     int offset_y = dy + mgScreenOffy * 16;
+    int y;
     int block_height = mgScreenHeight * 16;
 
     prim->Begin2();
@@ -219,15 +222,15 @@ static void DrawDivSprite(mgCDrawPrim *prim, mgRect<int> rect, mgCTexture *textu
     *(u_long128 *)vertex_end = 0;
     *(u_long128 *)texcrd_start = 0;
     *(u_long128 *)texcrd_end = 0;
-    vertex_start[2] = z;
     vertex_end[2] = z;
-    for (int x = area.left; x < area.right;) {
+    vertex_start[2] = z;
+    for (x = area.left; x < area.right;) {
         int x_end = x + 0x200;
         if (area.right < x_end) {
             x_end = area.right;
         }
-        for (int y = area.top; y < area.bottom;) {
-            int y_end = y + block_height;
+        for (y = area.top; y < area.bottom;) {
+            y_end = y + block_height;
             if (area.bottom < y_end) {
                 y_end = area.bottom;
             }
@@ -243,12 +246,13 @@ static void DrawDivSprite(mgCDrawPrim *prim, mgRect<int> rect, mgCTexture *textu
             texcrd_end[1] = y_end;
             vertex_end[0] += offset_x;
             vertex_end[1] += offset_y;
-            u_long128 *packet = (u_long128 *)prim->DirectData(4);
+                    u_long128 *packet = (u_long128 *)prim->DirectData(4);
             y = y_end;
             packet[0] = *(u_long128 *)texcrd_start;
             packet[1] = *(u_long128 *)vertex_start;
             packet[2] = *(u_long128 *)texcrd_end;
             packet[3] = *(u_long128 *)vertex_end;
+            y = y_end;
         }
         x = x_end;
     }
