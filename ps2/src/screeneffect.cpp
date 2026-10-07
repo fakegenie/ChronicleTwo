@@ -129,14 +129,14 @@ void DepthOfField(int levels, float *depths, mgCTexture *work_texture, float str
 }
 
 #ifdef NONMATCHING
-// 76.6% match, 394 words off
+// 79.7% match, 334 words off
 void LensFlare(int *screen, float *color, int bank, char *texture_a, char *texture_b) {
     int width = mgScreenWidth;
     int height = mgScreenHeight;
     float dx = (float)screen[0] / 16.0f - (float)(width / 2);
     float dy = (float)screen[1] / 16.0f - (float)(height / 2);
     float distance = sqrtf(dx * dx + dy * dy);
-    if (distance > (float)width) {
+    if (!(distance <= (float)width)) {
         return;
     }
 
@@ -162,7 +162,7 @@ void LensFlare(int *screen, float *color, int bank, char *texture_a, char *textu
     prim.Begin(MG_PRIM_SPRITE);
     prim.Color(0, 0, 0, 0x80);
     prim.Vertex(0, 0, 0);
-    prim.Vertex(width, height, 0);
+    prim.Vertex(mgScreenWidth, mgScreenHeight, 0);
     prim.End();
 
     prim.DepthTestEnable(1);
@@ -171,12 +171,10 @@ void LensFlare(int *screen, float *color, int bank, char *texture_a, char *textu
     prim.Vertex(0, 0, screen[2]);
     prim.Vertex(width, height, screen[2]);
     prim.End();
+
+    mgCTexture *textures[2] = {first, second};
     prim.DepthTestEnable(0);
     prim.TextureMapEnable(1);
-
-    mgCTexture *textures[2] = {NULL, NULL};
-    textures[0] = first;
-    textures[1] = second;
     mgSetPkFrameBuffer(second);
     prim.Begin(MG_PRIM_SPRITE);
     prim.Direct(0x3B, 0x8000000080ULL);
@@ -189,16 +187,17 @@ void LensFlare(int *screen, float *color, int bank, char *texture_a, char *textu
     prim.End();
 
     float fade = 1.0f - distance / (float)width;
-    if (fade > 1.0f) {
+    if (!(fade <= 1.0f)) {
         fade = 1.0f;
     }
-    mgSetPkFrameBuffer(first);
+    float alpha_scale = 0.7f * (fade * fade);
+    mgSetPkFrameBuffer(textures[0]);
     prim.DAlphaTest(0, 0);
     prim.TextureMapEnable(1);
     prim.AlphaBlendEnable(0);
     prim.Begin(MG_PRIM_SPRITE);
     prim.Color(0x80, 0x80, 0x80, 0x80);
-    prim.Texture(second);
+    prim.Texture(textures[1]);
     prim.TextureCrd(0, 0);
     prim.Vertex(0, 0, 0);
     int small_width = width / 3;
@@ -222,20 +221,20 @@ void LensFlare(int *screen, float *color, int bank, char *texture_a, char *textu
         prim.Color(brightness, brightness, brightness, 0x80);
         prim.TextureCrd(0, 0);
         prim.Vertex4(near_edge, near_edge, 0);
-        prim.TextureCrd(small_width, small_height);
-        prim.Vertex4(small_width * 16 + near_edge, small_height * 16 + near_edge, 0);
+        prim.TextureCrd(width / 3, height / 3);
+        prim.Vertex4(width / 3 * 16 + near_edge, height / 3 * 16 + near_edge, 0);
         prim.TextureCrd(0, 0);
         prim.Vertex4(far_edge, far_edge, 0);
-        prim.TextureCrd(small_width, small_height);
-        prim.Vertex4(small_width * 16 + far_edge, small_height * 16 + far_edge, 0);
+        prim.TextureCrd(width / 3, height / 3);
+        prim.Vertex4(width / 3 * 16 + far_edge, height / 3 * 16 + far_edge, 0);
         prim.TextureCrd(0, 0);
         prim.Vertex4(near_edge, far_edge, 0);
-        prim.TextureCrd(small_width, small_height);
-        prim.Vertex4(small_width * 16 + near_edge, small_height * 16 + far_edge, 0);
+        prim.TextureCrd(width / 3, height / 3);
+        prim.Vertex4(width / 3 * 16 + near_edge, height / 3 * 16 + far_edge, 0);
         prim.TextureCrd(0, 0);
         prim.Vertex4(far_edge, near_edge, 0);
-        prim.TextureCrd(small_width, small_height);
-        prim.Vertex4(small_width * 16 + far_edge, small_height * 16 + near_edge, 0);
+        prim.TextureCrd(width / 3, height / 3);
+        prim.Vertex4(width / 3 * 16 + far_edge, height / 3 * 16 + near_edge, 0);
         prim.End();
         current = next;
     }
@@ -258,10 +257,10 @@ void LensFlare(int *screen, float *color, int bank, char *texture_a, char *textu
     prim.Vertex4(centre_x, centre_y, 0);
     prim.Color(0xFF, 0xFF, 0xFF, 0x80);
     float angle = 0.0f;
-    int radius_index = 0;
+    unsigned char radius_index = 0;
     while (angle < 6.2831855f) {
-        prim.Vertex4(centre_x + (int)((float)radii[radius_index] * sinf(angle)),
-                     centre_y + (int)((float)radii[radius_index] * cosf(angle)), 0);
+        prim.Vertex4((int)((float)radii[radius_index] * sinf(angle)) + centre_x,
+                     (int)((float)radii[radius_index] * cosf(angle)) + centre_y, 0);
         radius_index = !radius_index;
         angle += 0.2617994f;
     }
@@ -281,13 +280,15 @@ void LensFlare(int *screen, float *color, int bank, char *texture_a, char *textu
     prim.AlphaBlend(MG_ALPHA_BLEND_ADD);
     prim.Begin(MG_PRIM_SPRITE);
     prim.Texture(textures[current]);
-    prim.Color((int)color[0], (int)color[1], (int)color[2], (int)(color[3] * (0.7f * fade * fade)));
-    for (int copy = 0; copy < 2; copy++) {
-        prim.TextureCrd(0, 0);
-        prim.Vertex(0, 0, 0);
-        prim.TextureCrd(small_width, small_height);
-        prim.Vertex(width, height, 0);
-    }
+    prim.Color((int)color[0], (int)color[1], (int)color[2], (int)(color[3] * alpha_scale));
+    prim.TextureCrd(0, 0);
+    prim.Vertex(0, 0, 0);
+    prim.TextureCrd(small_width, small_height);
+    prim.Vertex(width, height, 0);
+    prim.TextureCrd(0, 0);
+    prim.Vertex(0, 0, 0);
+    prim.TextureCrd(small_width, small_height);
+    prim.Vertex(width, height, 0);
     prim.End();
 }
 #else
