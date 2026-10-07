@@ -908,20 +908,17 @@ void ResetMenuScissor() {
     prim->Direct(0x40, ((s64) (mgScreenWidth - 1) << 16) | ((s64) (mgScreenHeight - 1) << 48));
     prim->End();
 }
-#ifdef NONMATCHING
-// 99.9% match, 6 words off
 int SetModeMenuDrawItemBoard(int mode) {
     int k;
-    CGameDataUsed *item;
+    CGameDataUsed *item = NULL;
     int party;
-    int i;
     CGameDataUsed *used;
 
     MenuDrawItemInfoNum = 0;
     party = GetUserDataMan()->GetNowPartyMember();
     if (mode == 0) {
-        for (i = 0; i < 150; i++) {
-            MenuDrawItemInfo[i] = &MenuUserParam.used_data[i];
+        for (k = 0; k < 150; k++) {
+            MenuDrawItemInfo[k] = &MenuUserParam.used_data[k];
         }
         MenuDrawItemInfoNum = GetNowBagMax(1);
     }
@@ -938,10 +935,10 @@ int SetModeMenuDrawItemBoard(int mode) {
             MenuDrawItemInfo[MenuDrawItemInfoNum] = &MenuUserParam.chara[1]->equip[1];
             MenuDrawItemInfoNum++;
         }
-        used = MenuUserParam.used_data;
-        for (i = 0; i < 150; i++, used++) {
-            if (used->used_type == USED_ITEM_TYPE_WEAPON) {
-                MenuDrawItemInfo[MenuDrawItemInfoNum] = used;
+        item = MenuUserParam.used_data;
+        for (k = 0; k < 150; k++, item++) {
+            if (item->used_type == USED_ITEM_TYPE_WEAPON) {
+                MenuDrawItemInfo[MenuDrawItemInfoNum] = item;
                 MenuDrawItemInfoNum++;
             }
         }
@@ -977,7 +974,7 @@ int SetModeMenuDrawItemBoard(int mode) {
             CFishAquarium *aquarium = GetAquariumData();
             if (aquarium != NULL) {
                 used = aquarium->GetAquariumFishTop(0);
-                for (i = 0; i < 6; i++, used++) {
+                for (k = 0; k < 6; k++, used++) {
                     if (0 < used->item_no) {
                         MenuDrawItemInfo[MenuDrawItemInfoNum] = used;
                         MenuDrawItemInfoNum++;
@@ -993,14 +990,11 @@ int SetModeMenuDrawItemBoard(int mode) {
             }
         }
     }
-    for (i = MenuDrawItemInfoNum; i < 150; i++) {
-        MenuDrawItemInfo[i] = NULL;
+    for (k = MenuDrawItemInfoNum; k < 150; k++) {
+        MenuDrawItemInfo[k] = NULL;
     }
     return MenuDrawItemInfoNum;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", SetModeMenuDrawItemBoard__Fi);
-#endif
 void EnableUseItemAlphaStep() {
     use_item_enable_alpha_angle += 0.052359879f;
 
