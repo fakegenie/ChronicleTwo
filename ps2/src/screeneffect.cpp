@@ -128,8 +128,6 @@ void DepthOfField(int levels, float *depths, mgCTexture *work_texture, float str
     }
 }
 
-#ifdef NONMATCHING
-// 99.9% match, 4 words off
 void LensFlare(sceVu0IVECTOR screen, sceVu0FVECTOR color, int bank, char *texture_a, char *texture_b) {
     int width = mgScreenWidth;
     int height = mgScreenHeight;
@@ -222,19 +220,21 @@ void LensFlare(sceVu0IVECTOR screen, sceVu0FVECTOR color, int bank, char *textur
         prim.TextureCrd(0, 0);
         prim.Vertex4(near_edge, near_edge, 0);
         prim.TextureCrd((int)width / 3, (int)height / 3);
-        prim.Vertex4((int)width / 3 * 16 + near_edge, (int)height / 3 * 16 + near_edge, 0);
+        int high = (int)height / 3 * 16;
+        int wide = (int)width / 3 * 16;
+        prim.Vertex4(wide + near_edge, high + near_edge, 0);
         prim.TextureCrd(0, 0);
         prim.Vertex4(far_edge, far_edge, 0);
         prim.TextureCrd((int)width / 3, (int)height / 3);
-        prim.Vertex4((int)width / 3 * 16 + far_edge, (int)height / 3 * 16 + far_edge, 0);
+        prim.Vertex4(wide + far_edge, high + far_edge, 0);
         prim.TextureCrd(0, 0);
         prim.Vertex4(near_edge, far_edge, 0);
         prim.TextureCrd((int)width / 3, (int)height / 3);
-        prim.Vertex4((int)width / 3 * 16 + near_edge, (int)height / 3 * 16 + far_edge, 0);
+        prim.Vertex4(wide + near_edge, high + far_edge, 0);
         prim.TextureCrd(0, 0);
         prim.Vertex4(far_edge, near_edge, 0);
         prim.TextureCrd((int)width / 3, (int)height / 3);
-        prim.Vertex4((int)width / 3 * 16 + far_edge, (int)height / 3 * 16 + near_edge, 0);
+        prim.Vertex4(wide + far_edge, high + near_edge, 0);
         prim.End();
         current = (unsigned char)!current;
     }
@@ -292,9 +292,6 @@ void LensFlare(sceVu0IVECTOR screen, sceVu0FVECTOR color, int bank, char *textur
     prim.Vertex(width, height, 0);
     prim.End();
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/screeneffect", LensFlare__FPiPfiPcPc);
-#endif
 
 // Small uninitialised data (.sbss)
 INCLUDE_BSS(at_205, 0x8);
