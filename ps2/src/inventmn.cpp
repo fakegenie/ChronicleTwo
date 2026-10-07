@@ -4499,7 +4499,7 @@ CStarDust::CStarDust() {
     this->active = 0;
 }
 #ifdef NONMATCHING
-// 78.5% match, 274 words off
+// 274 words off in an aligned diff
 void CMenuInvent::IsAccessAlbum() {
     CDC2Mes *message = MenuDCMsg[4];
     if (message == NULL) {
