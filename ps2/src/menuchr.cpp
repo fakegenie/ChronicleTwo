@@ -2797,68 +2797,90 @@ void CMenuChrCngMenu::UpdataLife() {
         ExeScript(at_2365);
     }
 }
+/**
+ *
+ * Short rectangle used for screen positions and bounds.
+ *
+ */
+class mgRect_s_ {
+public:
+    short left;   /**< Left edge. */
+    short top;    /**< Top edge. */
+    short right;  /**< Right edge. */
+    short bottom; /**< Bottom edge. */
+
+    /** Sets the four sides of the rectangle. */
+    void Set(short x, short y, short w, short h);
+} __attribute__((aligned(16)));
+
 #ifdef NONMATCHING
-extern "C" void Set__9mgRect_s_Fssss(mgRect<short> *rect, short x, short y, short w, short h);
-// 154 words off in an aligned diff
+// 13 words off in an aligned diff
 void MenuCharaChangeStarDraw() {
     mgCTextureManager *texManager = &mgTexManager;
+    mgCDrawPrim *prim;
+    float pulse;
+    float angle;
+    float circle;
+    float alpha;
+    float wave;
+    float halfAlpha;
+    float pulseAlpha;
+    float y;
+    float size;
+    int i;
+    int j;
 
     if (MenuCharaChangeBase_Tex == NULL) {
         return;
     }
     texManager->ReloadTexture(MenuCharaChangeBase_Tex->block, (sceVif1Packet *)NULL);
     CMenuChrCngMenu *menu = ChrChangMenuPt;
-    float size = menu->star_size;
+    size = menu->star_size;
     float offset = size / 2.0f - 2.0f;
-    RingCenter center = at_2371__4;
-    center.x = menu->star_x + offset;
-    center.y = menu->star_y + 1.1538461f * offset;
-    float angle = menu->star_angle;
-    mgCDrawPrim *prim = GetMenuPrim();
+    float center[2] = {menu->star_x + offset, menu->star_y + 1.1538461f * offset};
+    angle = menu->star_angle;
+    prim = GetMenuPrim();
     mgRect<int> baseRect(0x13F, 0xC0, 0x40, 0x40);
-    float u0 = baseRect.left;
     float u1 = baseRect.left + baseRect.right;
     float v1 = baseRect.top + baseRect.bottom;
+    float u0 = baseRect.left;
     float v0 = baseRect.top;
-    QuadTexCoords crd = {{{u0, v0}, {u1, v0}, {u1, v1}, {u0, v1}}};
+    float crd[4][2] = {{u0, v0}, {u1, v0}, {u1, v1}, {u0, v1}};
     SetSpriteEnv(prim, 4);
     prim->Bilinear(1);
     prim->Begin(5);
     prim->Texture(MenuCharaChangeBase_Tex);
     prim->Color(0x80, 0x80, 0x80, (int)ChrChangMenuPt->star_alpha);
     for (int i = 0; i < 4; i++) {
-        prim->TextureCrd((int)crd.uv[i][0], (int)crd.uv[(int)i][1]);
-        float x = 1.0f + (center.x + size * cosf(angle));
-        prim->Vertex(x, center.y + 1.1538461f * (size * sinf(angle)), 0.0f);
+        prim->TextureCrd((int)crd[i][0], (int)crd[i][1]);
+        prim->Vertex(1.0f + (center[0] + size * cosf(angle)), center[1] + 1.1538461f * (size * sinf(angle)), 0.0f);
         angle += 1.5707964f;
     }
     prim->End();
 
     mgRect<int> wakuRect(0x121, 0xE1, 0x1E, 0x1E);
-    float wave = ChrChangMenuPt->star_wave;
+    wave = ChrChangMenuPt->star_wave;
+    offset = 0.546875f * ChrChangMenuPt->star_size;
     angle -= 0.15707964f;
-    float ringSize = 0.546875f * ChrChangMenuPt->star_size;
-    float pulse = sinf(ChrChangMenuPt->star_pulse);
-    float halfAlpha = 0.5f * ChrChangMenuPt->star_alpha;
+    pulse = sinf(ChrChangMenuPt->star_pulse);
+    halfAlpha = 0.5f * ChrChangMenuPt->star_alpha;
     if (pulse < 0.0f) {
         pulse = -pulse;
     }
-    float pulseAlpha = halfAlpha * pulse;
-    for (int j = 0; j < 2; j++) {
-        float alpha = ChrChangMenuPt->star_alpha;
-        float circle = 60.0f + 3.0f * sinf(wave);
-        float x = ringSize * cosf(angle);
-        float y = ringSize * sinf(angle);
-        x = center.x + x;
-        mgRect<float> inner(x - 0.5f * circle, 6.0f + (center.y + 1.1538461f * (y - 0.5f * circle)), circle,
-                            circle);
-        DrawWakuCircle(prim, MenuCharaChangeBase_Tex, inner, wakuRect, wave, ringSize, (int)alpha, 0x80, 0x80,
-                       0x80);
+    pulseAlpha = halfAlpha * pulse;
+    for (j = 0; j < 2; j++) {
+        alpha = ChrChangMenuPt->star_alpha;
+        circle = 60.0f + 3.0f * sinf(wave);
+        size = offset * cosf(angle);
+        y = offset * sinf(angle);
+        size = center[0] + size;
+        DrawWakuCircle(prim, MenuCharaChangeBase_Tex,
+                       mgRect<float>(size - 0.5f * circle, 6.0f + (center[1] + 1.1538461f * (y - 0.5f * circle)), circle, circle),
+                       wakuRect, wave, offset, (int)alpha, 0x80, 0x80, 0x80);
         circle *= 1.4f;
-        mgRect<float> outer(x - 0.5f * circle, 6.0f + (center.y + 1.1538461f * (y - 0.5f * circle)), circle,
-                            circle);
-        DrawWakuCircle(prim, MenuCharaChangeBase_Tex, outer, wakuRect, wave, ringSize, (int)pulseAlpha, 0x80, 0x80,
-                       0x80);
+        DrawWakuCircle(prim, MenuCharaChangeBase_Tex,
+                       mgRect<float>(size - 0.5f * circle, 6.0f + (center[1] + 1.1538461f * (y - 0.5f * circle)), circle, circle),
+                       wakuRect, wave, offset, (int)pulseAlpha, 0x80, 0x80, 0x80);
         angle += 3.1415927f;
         wave += 3.1415927f;
     }
@@ -2867,19 +2889,19 @@ void MenuCharaChangeStarDraw() {
         return;
     }
     texManager->ReloadTexture(MenuCharaChangeStar_Tex->block, (sceVif1Packet *)NULL);
-    short starRect[4];
-    Set__9mgRect_s_Fssss((mgRect<short> *)starRect, 0, 0x20, 8, 8);
+    mgRect_s_ starRect;
+    starRect.Set(0, 0x20, 8, 8);
     prim->Begin(6);
     prim->Texture(MenuCharaChangeStar_Tex);
-    for (int k = 0; k < CHR_CNG_STAR_NUM; k++) {
-        if (0.0f < ChrChangMenuPt->star[k].alpha) {
-            float starX = ChrChangMenuPt->star[k].x + ChrChangMenuPt->star_x;
-            float starY = ChrChangMenuPt->star[k].y + ChrChangMenuPt->star_y;
-            prim->Color(0x80, 0x80, 0x80, (int)ChrChangMenuPt->star[k].alpha);
-            prim->TextureCrd(starRect[0], starRect[1]);
+    for (j = 0; j < CHR_CNG_STAR_NUM; j++) {
+        if (0.0f < ChrChangMenuPt->star[j].alpha) {
+            float starX = ChrChangMenuPt->star[j].x + ChrChangMenuPt->star_x;
+            float starY = ChrChangMenuPt->star[j].y + ChrChangMenuPt->star_y;
+            prim->Color(0x80, 0x80, 0x80, (int)ChrChangMenuPt->star[j].alpha);
+            prim->TextureCrd(starRect.left, starRect.top);
             prim->Vertex(starX, starY, 0.0f);
-            prim->TextureCrd(starRect[0] + starRect[2], starRect[1] + starRect[3]);
-            prim->Vertex(starX + starRect[2], starY + starRect[3], 0.0f);
+            prim->TextureCrd(starRect.left + starRect.right, starRect.top + starRect.bottom);
+            prim->Vertex(starX + starRect.right, starY + starRect.bottom, 0.0f);
         }
     }
     prim->End();
@@ -4033,7 +4055,10 @@ void MenuMonsterBoxInit(mgCMemory *stack, int *tex_block, int mode) {
 
 #pragma inline_depth reset
 #ifdef NONMATCHING
-// 161 words off in an aligned diff
+static inline s16 MosNowMonster() {
+    return GetUserDataMan()->monster_id;
+}
+// 109 words off in an aligned diff
 int CMenuMosSelect::KeyStep() {
     int size;
     int i;
@@ -4366,7 +4391,7 @@ int CMenuMosSelect::KeyStep() {
                             switch (buttons) {
                                 case 1:
                                     if (GetUserDataMan()->active_chr_no == USER_CHARA_MONSTER &&
-                                        view_monster == GetUserDataMan()->monster_id) {
+                                        view_monster == MosNowMonster()) {
                                         MenuSePlay(5);
                                     } else {
                                         action = 10;
@@ -4384,7 +4409,7 @@ int CMenuMosSelect::KeyStep() {
                     s16 *row = &monster_progress_tbl[select_badge->progress * (1 + MONSTER_PROGRESS_LEVEL_NUM)];
                     int level = -1;
                     for (int i = 0; i < select_badge->class_level + 1; i++) {
-                        if ((monster_progress_tbl + select_badge->progress * 5)[1 + i] == view_monster) {
+                        if (view_monster == row[1 + i]) {
                             level = i;
                             break;
                         }
@@ -4406,7 +4431,7 @@ int CMenuMosSelect::KeyStep() {
                     }
                     if (level != oldLevel) {
                         showInfo = 1;
-                        view_monster = row[1 + level];
+                        view_monster = (monster_progress_tbl + 1 + select_badge->progress * 5)[level];
                         pick_monster = view_monster;
                         load_wait = 0;
                         load_phase = 0;
@@ -4483,7 +4508,7 @@ int CMenuMosSelect::KeyStep() {
                     for (int i = 0; i < select_badge->class_level + 1; i++) {
                         names.name[i] = GetMonsterName((monster_progress_tbl + select_badge->progress * 5)[1 + i] );
                         if (GetUserDataMan()->active_chr_no == USER_CHARA_MONSTER &&
-                            (monster_progress_tbl + select_badge->progress * 5)[1 + i]  == GetUserDataMan()->monster_id &&
+                            MosNowMonster() == (monster_progress_tbl + select_badge->progress * 5)[1 + i] &&
                             i >= 0 && i < 20) {
                             info->line_color[i] = 0x80202020;
                         }
@@ -4541,8 +4566,8 @@ int CMenuMosSelect::KeyStep() {
                     ExeScript(at_3703);
                     names.name[0] = at_3704;
                     names.name[1] = GetMonsterName(monsterNo);
-                    for (i = 0; i < level_num; i++) {
-                        names.name[2 + i] = GetMonsterName(level_monster[(int)i]);
+                    for (int k = 0; k < level_num; k++) {
+                        names.name[2 + k] = GetMonsterName(level_monster[k]);
                     }
                     info->MakeMsg(level_num + 0x33);
                     info->SetMsgItemNo(names.name, level_num + 2);
@@ -4581,10 +4606,10 @@ int CMenuMosSelect::KeyStep() {
         BadgeInfoValues values = at_3554;
         int base = view_monster * 10 + 10000;
         int degree = select_badge->GetDegreeLevel();
+        values.value[1] = select * 20 + (degree + 1);
         values.value[2] = base + 10;
         values.value[3] = base + 11;
         values.value[4] = -1;
-        values.value[1] = select * 20 + degree + 1;
         CDC2Mes *desc = MenuDCMsg[7];
         desc->ClsMes::mes_no = -1;
         desc->value_zero = 1;
@@ -7418,22 +7443,6 @@ void MonsterBookDraw() {
         font.DrawDirect(font.str, font.pos_x, font.pos_y);
     }
 }
-/**
- *
- * Short rectangle used for screen positions and bounds.
- *
- */
-class mgRect_s_ {
-public:
-    short left;   /**< Left edge. */
-    short top;    /**< Top edge. */
-    short right;  /**< Right edge. */
-    short bottom; /**< Bottom edge. */
-
-    /** Sets the four sides of the rectangle. */
-    void Set(short x, short y, short w, short h);
-};
-
 void mgRect_s_::Set(short x, short y, short w, short h) {
     left = x;
     top = y;

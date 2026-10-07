@@ -3662,24 +3662,19 @@ extern char at_3630[];
 extern char at_3631[];
 extern char at_3632[];
 
-#ifdef NONMATCHING
-// 83.9% match, 442 words off
-#pragma opt_common_subs off
 void CMenuInvent::CalcTex() {
     if (bg_form != NULL) {
         float *left_top = GetMenuMainFrameLeftTopPos(0);
-        int bg_pos[2] = {0, 0};
-        bg_pos[0] = (int)left_top[0];
-        bg_pos[1] = (int)(left_top[1] - 480.0f);
-        bg_form->x = bg_pos[0];
-        bg_form->y = bg_pos[1];
+        int bg_pos[2] = {(int)left_top[0], (int)(left_top[1] - 480.0f)};
+        bg_form->SetPos(bg_pos[0], bg_pos[1]);
     }
     blink_count++;
     blink_count %= 50;
     if (blink_count >= 180000) {
         blink_count = 0;
     }
-    float shade = 128.0f + 64.0f * sinf(mgAngleLimit(3.1415927f * blink_count / 50.0f));
+    float wave = sinf(mgAngleLimit(3.1415927f * blink_count / 50.0f));
+    float shade = 128.0f + 64.0f * wave;
     neta_color[0] = shade;
     neta_color[1] = shade;
     neta_color[2] = 128.0f;
@@ -3704,9 +3699,7 @@ void CMenuInvent::CalcTex() {
         if (neta_circle_angle >= 3.1415927f) {
             neta_circle_angle -= 6.2831855f;
         }
-        NetaClipRange clip = at_3379;
-        clip.top = neta_board_form->y;
-        clip.bottom = neta_board_form->y + 6.0f + 270.0f;
+        float clip[2] = {neta_board_form->y, 270.0f + (6.0f + neta_board_form->y)};
         for (int i = 0; i < 3; i++) {
             CMenuPosDataForm *form = neta_form[i];
             if (form == NULL || form->draw_flag == 0) {
@@ -3717,7 +3710,7 @@ void CMenuInvent::CalcTex() {
             form->rgba_bit = 8;
             int target[2];
             if (neta_select_state[i] == 1) {
-                clip.top = neta_board_form->y;
+                clip[0] = neta_board_form->y;
                 float angle = neta_circle_angle + slot_angle * i;
                 target[0] = (int)(center[0] + neta_circle_radius * cosf(angle));
                 target[1] = (int)(center[1] + neta_circle_radius * sinf(angle));
@@ -3743,12 +3736,12 @@ void CMenuInvent::CalcTex() {
                     }
                 }
             } else if (neta_select_state[i] == 0) {
-                clip.top = neta_board_form->y + 6.0f + 54.0f;
+                clip[0] = neta_board_form->y + 6.0f + 54.0f;
                 if (neta_select_type[i] == 0) {
                     GetNetaBoardCursorPosition(neta_select_index[i], target);
                     form->SetNextMovePos(target, 2);
-                    if ((target[1] < clip.top && form->y < clip.top) ||
-                        (target[1] > clip.bottom && form->y > clip.top) || target[0] < 0) {
+                    if ((target[1] < clip[0] && form->y < clip[0]) ||
+                        (target[1] > clip[1] && form->y > clip[0]) || target[0] < 0) {
                         form->SetRGBACalcParam(3, -0x1C, 0);
                     }
                 } else if (neta_select_type[i] == 1) {
@@ -3756,8 +3749,8 @@ void CMenuInvent::CalcTex() {
                     target[0] += 200;
                     form->SetNextMovePos(target, 2);
                     form->SetRGBACalcParam(3, -0x10, 0);
-                    if ((target[1] < clip.top && form->y < clip.top) ||
-                        (target[1] > clip.bottom && form->y > clip.top)) {
+                    if ((target[1] < clip[0] && form->y < clip[0]) ||
+                        (target[1] > clip[1] && form->y > clip[0])) {
                         form->SetRGBACalcParam(3, -0x1C, 0);
                     }
                 }
@@ -3776,7 +3769,7 @@ void CMenuInvent::CalcTex() {
         CalcMenu1(neta_memo_form->y + 76.0f + 2.0f - memo_top * 26, &memo_scroll, 4.0f, 0.0f, memo_scroll_reset);
         float bar_step = 0.0f;
         if (pic_name_info_num > 9) {
-            bar_step = 108.0f / (pic_name_info_num - 9.0f);
+            bar_step = 216.0f / (pic_name_info_num - 9.0f);
         }
         CalcMenu1(neta_memo_form->y + 76.0f + 1.0f + bar_step * memo_top, &memo_bar, 4.0f, 0.0f, memo_scroll_reset);
         memo_scroll_reset = 0;
@@ -3813,9 +3806,10 @@ void CMenuInvent::CalcTex() {
         if (frame != NULL && bar != NULL) {
             bar[0].x = bar[1].x = bar[2].x = frame[0].x + 2.0f;
             float length = bar[0].h + bar[1].h + bar[2].h;
+            float step = (frame[1].h + 4.0f - length) / 20.0f;
+            float target = frame[0].y + 4.0f + step * album_top;
             float bar_y = bar[0].y;
-            CalcMenu1(frame[0].y + 4.0f + (frame[1].h + 4.0f - length) / 20.0f * album_top, &bar_y, 4.0f, 0.0f,
-                      album_scroll_reset);
+            CalcMenu1(target, &bar_y, 4.0f, 0.0f, album_scroll_reset);
             length = bar[0].h + bar[1].h + bar[2].h;
             float mid_scale = (6.0f + (length - bar[0].h - bar[2].h)) / 40.0f;
             bar[0].y = bar_y;
@@ -3846,9 +3840,9 @@ void CMenuInvent::CalcTex() {
         MENUFORMPARTS_TYPE *bar_mid = title->GetPartInfo(at_2129__2);
         MENUFORMPARTS_TYPE *bar_end = title->GetPartInfo(at_2130__2);
         int card_max = EnableSelectMaxCardList();
-        float bar_step = 0.0f;
         float knob = bar_size[1] * (5.0f / card_max);
         float hidden = card_max - 5;
+        float bar_step = 0.0f;
         if (1.0f <= hidden) {
             bar_step = (bar_size[1] - knob) / hidden;
         }
@@ -3915,7 +3909,7 @@ void CMenuInvent::CalcTex() {
                             effect_sway_angle -= 6.2831855f;
                             effect_sway = 1.0f + 2.0f * mgRnd();
                         }
-                        if (CalcMenuAdd(&effect_bob_angle, 3.1415927f / 22.0f, 3.1415927f)) {
+                        if (CalcMenuAdd(&effect_bob_angle, 3.1415927f / float(22), 3.1415927f)) {
                             effect_bob_angle = 0.0f;
                             effect_bob_count++;
                             effect_bob -= 0.6f + 2.0f * mgRnd() / 10.0f;
@@ -3986,10 +3980,6 @@ void CMenuInvent::CalcTex() {
     MenuEffect[0]->Step();
     MenuEffect[1]->Step();
 }
-#pragma opt_common_subs reset
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/inventmn", CalcTex__11CMenuInventFv);
-#endif
 void CMenuInvent::BootExtendCommand() {
     menu_invent_command_info_ptr = &modecmdtbl_3636[key_arg_no];
 
@@ -4499,17 +4489,34 @@ CStarDust::CStarDust() {
     this->active = 0;
 }
 #ifdef NONMATCHING
-// 274 words off in an aligned diff
+// 173 words off in an aligned diff
 void CMenuInvent::IsAccessAlbum() {
-    CDC2Mes *message = MenuDCMsg[4];
+    MC_CARD_INFO *card;
+    CDC2Mes *message;
+    int keys;
+    int button;
+    int done;
+    int back_to_photo;
+    int finish;
+    int access;
+    int cancel;
+    int loaded;
+    int check_space;
+    int card_removed;
+    int no_card;
+    int card_full;
+    int card_error;
+    int read_error;
+    MC_ERROR_INFO *error;
+    message = MenuDCMsg[4];
     if (message == NULL) {
         return;
     }
-    int keys = MenuCommonInfo->CheckSelectKey();
-    int button = MenuCommonInfo->CheckPushButton();
-    MC_ERROR_INFO *error = NULL;
-    MC_CARD_INFO *card = NULL;
-    int done = 0;
+    keys = MenuCommonInfo->CheckSelectKey();
+    button = MenuCommonInfo->CheckPushButton();
+    error = NULL;
+    card = NULL;
+    done = 0;
     if (MCManagerPtr != NULL) {
         MCManagerPtr->GetFuncNo();
         done = MCManagerPtr->Step();
@@ -4520,17 +4527,17 @@ void CMenuInvent::IsAccessAlbum() {
         }
         error = &manager->error;
     }
-    int back_to_photo = 0;
-    int finish = 0;
-    int access = -2;
-    int cancel = 0;
-    int loaded = 0;
-    int check_space = 0;
-    int card_removed = 0;
-    int no_card = 0;
-    int card_full = 0;
-    int card_error = 0;
-    int read_error = 0;
+    back_to_photo = 0;
+    finish = 0;
+    access = -2;
+    cancel = 0;
+    loaded = 0;
+    check_space = 0;
+    card_removed = 0;
+    no_card = 0;
+    card_full = 0;
+    card_error = 0;
+    read_error = 0;
     if (init_3950 == 0) {
         ActiveSlot_3949 = 0;
         init_3950 = 1;
@@ -4539,7 +4546,7 @@ void CMenuInvent::IsAccessAlbum() {
     case 0: {
         int move = 0;
         if (keys & MENU_SELECT_KEY_UP) {
-            move = -1;
+            move--;
         }
         if (keys & MENU_SELECT_KEY_DOWN) {
             move++;
@@ -4575,7 +4582,11 @@ void CMenuInvent::IsAccessAlbum() {
         MenuInventMCStack.stack_used = 0;
         MenuInventMCStack.lock = 0;
         MenuInventMCStack.Align64();
-        InventAlbumPtr = new ((u_long128 *)MenuInventMCStack.Alloc(0x64CD)) CDC2AlbumData;
+        CDC2AlbumData *album;
+        if ((album = (CDC2AlbumData *)operator new(sizeof(CDC2AlbumData), (u_long128 *)MenuInventMCStack.Alloc(0x64CD))) != NULL) {
+            album->Initialize();
+        }
+        InventAlbumPtr = album;
         MCManagerPtr = new ((u_long128 *)MenuInventMCStack.Alloc(0x112)) CMemoryCardManager;
         MCManagerPtr->Initialize(NULL);
         MCManagerPtr->InitForMC();
@@ -4628,7 +4639,7 @@ void CMenuInvent::IsAccessAlbum() {
         }
         break;
     case 5:
-        StepMenuDl2(download_base + MCManagerPtr->total_transferred);
+        StepMenuDl2(download_base + (int)MCManagerPtr->total_transferred);
         if (done != 0) {
             InitMenuDl(NULL, 0);
             if (McCheckMCPs2(card) == 0) {
@@ -4682,7 +4693,7 @@ void CMenuInvent::IsAccessAlbum() {
     case 201: {
         int move = 0;
         if (keys & MENU_SELECT_KEY_UP) {
-            move = -1;
+            move--;
         }
         if (keys & MENU_SELECT_KEY_DOWN) {
             move++;
@@ -4696,7 +4707,7 @@ void CMenuInvent::IsAccessAlbum() {
             if (ActiveSlot_3949 < 0) {
                 ActiveSlot_3949 = 0;
             }
-            if (ActiveSlot_3949 >= 2) {
+            if (ActiveSlot_3949 > 1) {
                 ActiveSlot_3949 = 1;
             }
             step = 2;
@@ -4761,7 +4772,7 @@ void CMenuInvent::IsAccessAlbum() {
         }
         break;
     case 205:
-        StepMenuDl2(download_base + MCManagerPtr->total_transferred);
+        StepMenuDl2(download_base + (int)MCManagerPtr->total_transferred);
         if (done != 0) {
             if (McCheckMCPs2(card) == 0) {
                 card_removed = 1;
@@ -4782,7 +4793,7 @@ void CMenuInvent::IsAccessAlbum() {
         int answer = message->YesNoCursor2(0);
         if (answer == 1) {
             MenuSePlay(SYSTEM_SE_DECIDE);
-            if (CheckRecoverPhotoNum() > 0) {
+            if (0 < CheckRecoverPhotoNum()) {
                 ExeScript(at_4362);
                 step = 240;
             } else {
@@ -4816,26 +4827,27 @@ void CMenuInvent::IsAccessAlbum() {
     case 240: {
         int answer = message->YesNoCursor2(0);
         if (answer == 1) {
-            keys = 0;
+            int empty = 0;
             for (int i = 0; i < 50; i++) {
                 USER_PICTURE_INFO *photo = InventUserDataPtr->GetPhotoInfo(i);
                 if (photo != NULL && *(s8 *)&photo->used == 0) {
-                    keys++;
+                    empty++;
                 }
             }
             int recover = 0;
             for (int i = 0; i < 50; i++) {
-                if (album_flag[i] > 0) {
+                if (0 < album_flag[i]) {
                     recover++;
                 }
             }
-            if (keys < recover) {
+            if (empty < recover) {
                 step = 241;
                 ExeScript(at_4363);
                 MenuSePlay(5);
+                break;
             } else {
                 for (int i = 0; i < 50; i++) {
-                    if (album_flag[i] > 0) {
+                    if (0 < album_flag[i]) {
                         album_flag[i] = -1;
                         USER_PICTURE_INFO *photo = InventUserDataPtr->IsPhotoSpace(NULL);
                         USER_PICTURE_INFO *album = InventAlbumPtr->GetAlbumPhotoInfo(i);
@@ -4878,7 +4890,7 @@ void CMenuInvent::IsAccessAlbum() {
         int answer = message->YesNoCursor2(0);
         if (answer == 1) {
             MenuSePlay(SYSTEM_SE_DECIDE);
-            if (CheckRecoverPhotoNum() > 0) {
+            if (0 < CheckRecoverPhotoNum()) {
                 ExeScript(at_4362);
                 step = 240;
             } else {
@@ -5116,11 +5128,11 @@ void CMenuInvent::IsAccessAlbum() {
         ExeScript(at_4380);
     }
     if (dload_form != NULL) {
-        int y;
-        dload_form->GetPutPosXY(NULL, finish, y);
-        y += 26;
+        int pos[2];
+        dload_form->GetPutPosXY(NULL, pos[0], pos[1]);
+        pos[1] += 26;
         MenuDCMsg[6]->StepMsg();
-        MenuDCMsg[6]->SetMovePosCenteringGyou(0, mgScreenWidth >> 1, y);
+        MenuDCMsg[6]->SetMovePosCenteringGyou(0, mgScreenWidth >> 1, pos[1]);
     }
 }
 #else
