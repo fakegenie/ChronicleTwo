@@ -330,7 +330,7 @@ void EndLightingEdit() {
 int IsLightingEditMode() { return LEditFlag; }
 #ifdef NONMATCHING
 int mgTransWorldScreen(int *out, float *position);
-// 148 aligned words off (objdiff splits this jump-table function)
+// 135 aligned words off (objdiff splits this jump-table function)
 void LightingEdit(CScene *scene) {
     int row;
     float *selected;
@@ -493,12 +493,13 @@ void LightingEdit(CScene *scene) {
         }
     }
     if (selected != NULL) {
+        int value;
         float *target = selected + selected_index;
-        int value = (int)*target;
+        value = (int)*target;
         if (GamePad__2.Down2(PAD_RIGHT)) value += 1;
         if (GamePad__2.Down2(PAD_LEFT)) value -= 1;
         if (value < 0) value = 0;
-        if (value >= 256) value = 255;
+        if (value > 255) value = 255;
         *target = value;
     }
     if (GamePad__2.Down2(PAD_UP)) row -= 1;
