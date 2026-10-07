@@ -2776,24 +2776,22 @@ int CMenuGeorama::GetNowModeLoadPartsID() {
 
     return id;
 }
-#ifdef NONMATCHING
-// 98.6% match, 2 words off
 CEditPartsInfo *CMenuGeorama::GetNowSelectEditPartsInfo(int mode, int line) {
+    CEditPartsInfo *info;
     if (MenuMainMapInfo == NULL) {
         return NULL;
     }
     if (mode == GEORAMA_VIEW_STOCK) {
-        return MenuMainMapInfo->GetePartsInfo(stock_list[line].name);
+        info = MenuMainMapInfo->GetePartsInfo(stock_list[line].name);
     } else if (mode == GEORAMA_VIEW_MAKE) {
-        return MenuMainMapInfo->GetePartsInfo(make_list[line].name);
+        info = MenuMainMapInfo->GetePartsInfo(make_list[line].name);
     } else if (mode == GEORAMA_VIEW_CHECK_POINT) {
-        return MenuMainMapInfo->GetePartsInfo(house_list[line].name);
+        info = MenuMainMapInfo->GetePartsInfo(house_list[line].name);
+    } else {
+        info = NULL;
     }
-    return NULL;
+    return info;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editmenu", GetNowSelectEditPartsInfo__12CMenuGeoramaFii);
-#endif
 void CMenuGeorama::LoadGeoramaPart(int no, int kind) {
     int       id;
     mgVu0FBOX box;
