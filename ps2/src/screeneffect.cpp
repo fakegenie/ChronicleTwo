@@ -129,7 +129,7 @@ void DepthOfField(int levels, float *depths, mgCTexture *work_texture, float str
 }
 
 #ifdef NONMATCHING
-// 95.7% match, 52 words off
+// 99.9% match, 4 words off
 void LensFlare(sceVu0IVECTOR screen, sceVu0FVECTOR color, int bank, char *texture_a, char *texture_b) {
     int width = mgScreenWidth;
     int height = mgScreenHeight;
@@ -242,9 +242,9 @@ void LensFlare(sceVu0IVECTOR screen, sceVu0FVECTOR color, int bank, char *textur
     prim.AlphaBlendEnable(1);
     prim.TextureMapEnable(0);
     prim.AlphaBlend(MG_ALPHA_BLEND_SUB);
-    int radii[2] = {0, 0};
     int centre_x = screen[0] / 3;
     int centre_y = screen[1] / 3;
+    int radii[2] = {0, 0};
     radii[0] = (small_width + (height / 3)) * 6;
     radii[1] = radii[0] - small_width;
     prim.Begin(MG_PRIM_SPRITE);
@@ -259,8 +259,9 @@ void LensFlare(sceVu0IVECTOR screen, sceVu0FVECTOR color, int bank, char *textur
     float angle = 0.0f;
     int radius_index = 0;
     while (angle < 6.2831855f) {
-        prim.Vertex4((int)((float)radii[radius_index] * sinf(angle)) + centre_x,
-                     (int)(cosf(angle) * (float)radii[radius_index] ) + centre_y, 0);
+        int x = (int)((float)radii[radius_index] * sinf(angle));
+        int y = (int)((float)radii[radius_index] * cosf(angle));
+        prim.Vertex4(x + centre_x, y + centre_y, 0);
         radius_index = !radius_index;
         angle += 0.2617994f;
     }
