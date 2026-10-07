@@ -3916,16 +3916,15 @@ void CAquarium::SelFishSetCursor() {
         mes.cursor_target[1] = y;
     }
 }
-#ifdef NONMATCHING
 template <typename T> static inline T Ident(T v) { return v; }
-// 19 words off in an aligned diff
 int CAquarium::Step() {
-    int key = 0;
-    int next;
     int lang;
-    int result;
+    int next;
+    int k;
     int i;
     CAquaMes *menu;
+    int result;
+    int key = 0;
     float saved_pos[6][4];
     float saved_rot[6][4];
 
@@ -4696,25 +4695,25 @@ int CAquarium::Step() {
         }
     }
     result = 0;
-    for (int i = 0; i < 6; i++) {
-        if (fish[i] != NULL) {
-            Thinking(i);
-            result |= ColCheck(i);
-            fish[i]->Step();
-            result |= fish[i]->ParamStep();
+    for (k = 0; k < 6; k++) {
+        if (fish[k] != NULL) {
+            Thinking(k);
+            result |= ColCheck(k);
+            fish[k]->Step();
+            result |= fish[k]->ParamStep();
             if (result & 8) {
-                mes.EatMessage(0x136, fish[i]);
+                mes.EatMessage(0x136, fish[k]);
                 result &= ~8;
             }
             if (result & 0x30) {
-                mes.ChangeManMessage(fish[i]);
+                mes.ChangeManMessage(fish[k]);
                 result &= ~0x30;
             }
             if (result & 2) {
                 MenuSePlay(Aqua_SpSndID, 4);
-                mes.DeadMessage(fish[i]);
-                fish[i]->Initialize();
-                fish[i] = NULL;
+                mes.DeadMessage(fish[k]);
+                fish[k]->Initialize();
+                fish[k] = NULL;
                 AquaDeadCheck = 1;
                 SelectFish(1);
                 if (sel_fish < 0) {
@@ -4744,7 +4743,7 @@ int CAquarium::Step() {
             CBubble *emitter = &AquaBattleBubble[AquaBattleBubble_Generate_Counter];
             float pos[4];
 
-            for (int i = 0; i < 0x30; i++) {
+            for (i = 0; i < 0x30; i++) {
                 pos[0] = AquaBattleBubble_Pos[0] + GetRandF(5.0f) - 2.5f;
                 pos[1] = AquaBattleBubble_Pos[1] + GetRandF(3.0f) - 1.5f;
                 pos[2] = AquaBattleBubble_Pos[2] + GetRandF(5.0f) - 2.5f;
@@ -4763,9 +4762,6 @@ int CAquarium::Step() {
     }
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuaqua", Step__9CAquariumFv);
-#endif
 void CAquarium::Draw() {
     mgCTextureManager *textures = &mgTexManager;
     int i;
@@ -4849,7 +4845,7 @@ void CAquarium::Draw() {
 
         Camera__2->GetPos(camera_pos);
         if (camera_pos[1] < 47.0f) {
-            water->SetPosition(-34.0f, float(46.8), -21.5f);
+            water->SetPosition(float(-34.0), 46.8f, float(-21.5));
         } else {
             water->SetPosition(-34.0f, 47.0f, -21.5f);
         }
@@ -4886,7 +4882,7 @@ void CAquarium::Draw() {
         int row = fptosi(24.0f * GetRandF(1.0f));
         water->Shake(row, fptosi(16.0f * GetRandF(1.0f)), ripple);
         float speed = 0.0045f;
-        water->SetParam(float(0.15), speed, 0.0f, 10.0f);
+        water->SetParam(0.15f, speed, 0.0f, 10.0f);
         water->Step();
         water->SetColor(0x80, 0x80, 0x80, 0x80);
         mgDrawDirect(water);
@@ -5023,8 +5019,8 @@ void CAquarium::Draw() {
         if (selected != NULL) {
             BREEDFISH_USED *breed = selected->data == NULL ? NULL : &selected->data->data.fish;
             int x = mgScreenWidth - 0x78;
-            float top = 80.0f;
             float h = 242.0f;
+            float top = 80.0f;
             float w = 120.0f;
             int y = 0x50;
             DrawMenuFillBox(x, top, w, h, 0x40, 0, 0, 0);
@@ -5072,7 +5068,7 @@ void MenuAquaInit(mgCMemory *memory, int *tex_block, int) {
     }
 
     m_next_aqua_no = -1;
-    Camera__2 = new ((u_long128 *) memory->Alloc(sizeof(mgCCameraFollow) / 16 + 2)) mgCCameraFollow(40.0f, 30.0f, 0.0f, 8.0f);
+    Camera__2 = new ((u_long128 *) memory->Alloc(sizeof(mgCCameraFollow) / 16 + 2)) mgCCameraFollow(40.0f, 30.0f, float(0.0), 8.0f);
     aqua_old_env = (aqua_light_env *) memory->Alloc(sizeof(aqua_light_env) / 16);
     mgCMemory aqua_memory;
     int       rest = memory->stGetRest();
