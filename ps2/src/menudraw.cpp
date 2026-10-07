@@ -1714,7 +1714,7 @@ void CalcCommonBrdDrawInfo(float *pos, MENUFORM_MAKEBRD_INFO *info, ClsMes *mes)
 }
 #ifdef NONMATCHING
 static inline MENUFORM_MAKEBRD_LINE *BoardLine(int i) { return &CommonBoardDrawInfo.line[i]; }
-// 99.7% match, 47 words off
+// 99.7% match, 42 words off
 void CommonBoardDraw(float *pos, int &tex_block) {
     mgCTexture *board_tex = Tex_CommonBoard;
     if (board_tex == NULL) {
@@ -1759,7 +1759,7 @@ void CommonBoardDraw(float *pos, int &tex_block) {
             prim->Vertex(left, top, 0);
             prim->TextureCrd(row_uv.uv[row][0][0] + row_uv.uv[row][0][2], row_uv.uv[row][0][1] + row_uv.uv[row][0][3]);
             int bottom = top + heights[row];
-            prim->Vertex(left + row_uv.uv[row][0][2], bottom, 0);
+            prim->Vertex(((int)left) + row_uv.uv[row][0][2], bottom, 0);
             left += row_uv.uv[row][0][2];
             prim->TextureCrd(row_uv.uv[row][1][0], row_uv.uv[row][1][1]);
             prim->Vertex(left, top, 0);
@@ -1767,9 +1767,9 @@ void CommonBoardDraw(float *pos, int &tex_block) {
             prim->Vertex(left + board_w, bottom, 0);
             left += board_w;
             prim->TextureCrd(row_uv.uv[row][2][0], row_uv.uv[row][2][1]);
-            prim->Vertex(left, top, 0);
+            prim->Vertex(((int)left), top, 0);
             prim->TextureCrd(row_uv.uv[row][2][0] + row_uv.uv[row][2][2], row_uv.uv[row][2][1] + row_uv.uv[row][2][3]);
-            prim->Vertex(left + row_uv.uv[row][2][2], bottom, 0);
+            prim->Vertex(((int)left) + row_uv.uv[row][2][2], bottom, 0);
             top -= 6;
             left = (int)pos[0];
         }
@@ -1803,11 +1803,11 @@ void CommonBoardDraw(float *pos, int &tex_block) {
         PrimQuad(prim, mgRect<int>((int)x, top = (int)line_top, brd[0][2], brd[0][3]),
                  mgRect<int>(brd[0][0], brd[0][1], brd[0][2], brd[0][3]));
         x += brd[0][2];
-        PrimQuad(prim, mgRect<int>((int)x, top, line_w, brd[1][3]),
+        PrimQuad(prim, mgRect<int>((int)x, top, ((int)line_w), brd[1][3]),
                  mgRect<int>(brd[1][0], brd[1][1], brd[1][2], brd[1][3]));
         int number_x;
         x += line_w;
-        PrimQuad(prim, mgRect<int>(number_x = (int)x, top, brd[2][2], brd[2][3]),
+        PrimQuad(prim, mgRect<int>(number_x = (int)x, ((int)top), brd[2][2], brd[2][3]),
                  mgRect<int>(brd[2][0], brd[2][1], brd[2][2], brd[2][3]));
         int number_y;
         PrimDrawNumber2(prim, line->num, 0, number_x, number_y = (int)(10.0f + line_top),
