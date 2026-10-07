@@ -4055,7 +4055,10 @@ void MenuMonsterBoxInit(mgCMemory *stack, int *tex_block, int mode) {
 
 #pragma inline_depth reset
 #ifdef NONMATCHING
-// 161 words off in an aligned diff
+static inline s16 MosNowMonster() {
+    return GetUserDataMan()->monster_id;
+}
+// 136 words off in an aligned diff
 int CMenuMosSelect::KeyStep() {
     int size;
     int i;
@@ -4388,7 +4391,7 @@ int CMenuMosSelect::KeyStep() {
                             switch (buttons) {
                                 case 1:
                                     if (GetUserDataMan()->active_chr_no == USER_CHARA_MONSTER &&
-                                        view_monster == GetUserDataMan()->monster_id) {
+                                        view_monster == MosNowMonster()) {
                                         MenuSePlay(5);
                                     } else {
                                         action = 10;
@@ -4406,7 +4409,7 @@ int CMenuMosSelect::KeyStep() {
                     s16 *row = &monster_progress_tbl[select_badge->progress * (1 + MONSTER_PROGRESS_LEVEL_NUM)];
                     int level = -1;
                     for (int i = 0; i < select_badge->class_level + 1; i++) {
-                        if ((monster_progress_tbl + select_badge->progress * 5)[1 + i] == view_monster) {
+                        if (view_monster == row[1 + i]) {
                             level = i;
                             break;
                         }
@@ -4428,7 +4431,7 @@ int CMenuMosSelect::KeyStep() {
                     }
                     if (level != oldLevel) {
                         showInfo = 1;
-                        view_monster = row[1 + level];
+                        view_monster = (monster_progress_tbl + 1 + select_badge->progress * 5)[level];
                         pick_monster = view_monster;
                         load_wait = 0;
                         load_phase = 0;
@@ -4505,7 +4508,7 @@ int CMenuMosSelect::KeyStep() {
                     for (int i = 0; i < select_badge->class_level + 1; i++) {
                         names.name[i] = GetMonsterName((monster_progress_tbl + select_badge->progress * 5)[1 + i] );
                         if (GetUserDataMan()->active_chr_no == USER_CHARA_MONSTER &&
-                            (monster_progress_tbl + select_badge->progress * 5)[1 + i]  == GetUserDataMan()->monster_id &&
+                            MosNowMonster() == (monster_progress_tbl + select_badge->progress * 5)[1 + i] &&
                             i >= 0 && i < 20) {
                             info->line_color[i] = 0x80202020;
                         }
