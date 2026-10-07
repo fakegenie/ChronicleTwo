@@ -782,8 +782,6 @@ static void BindFishObj() {
         mgZeroVector(top->velo);
     }
 }
-#ifdef NONMATCHING
-// 96.1% match, 89 words off
 void RodStep(CScene *scene, u_long128 *poly_buffer) {
     float remaining;
     int i;
@@ -849,12 +847,11 @@ void RodStep(CScene *scene, u_long128 *poly_buffer) {
     mgVu0FBOX line_box;
     *(u_long128 *)(line_box.max) = *(u_long128 *)(LinePoint[LineTop].pos);
     *(u_long128 *)(line_box.min) = *(u_long128 *)(LinePoint[LineTop].pos);
-    for (i = LineTop; i < 64; i++) {
-        FISH_POINT &point = LinePoint[i];
-        *(u_long128 *)(point.old_pos) = *(u_long128 *)(point.pos);
-        mgAddVector(point.pos, point.velo);
-        point.pos[1] -= 0.36f;
-        mgVectorMaxMin(line_box.max, line_box.min, line_box.max, line_box.min, point.pos);
+    for (int i = LineTop; i < 64; i++) {
+        *(u_long128 *)(LinePoint[i].old_pos) = *(u_long128 *)(LinePoint[i].pos);
+        mgAddVector(LinePoint[i].pos, LinePoint[i].velo);
+        LinePoint[i].pos[1] -= 0.36f;
+        mgVectorMaxMin(line_box.max, line_box.max + 4, line_box.max, line_box.min, LinePoint[i].pos);
     }
     hari->MovePoint();
     if (uki != 0) {
@@ -899,7 +896,7 @@ void RodStep(CScene *scene, u_long128 *poly_buffer) {
         }
     }
     if (BattleFlag != 0) {
-        for (pass = 0; pass < 4; pass++) {
+        for (int pass = 0; pass < 4; pass++) {
             *(u_long128 *)(hari->point[0].pos) = *(u_long128 *)(FishPoint.pos);
             *(u_long128 *)(hari->point[0].old_pos) = *(u_long128 *)(FishPoint.pos);
             mgZeroVector(hari->point[0].velo);
@@ -942,17 +939,16 @@ void RodStep(CScene *scene, u_long128 *poly_buffer) {
     *(u_long128 *)curve[3] = *(u_long128 *)(RodPoint + 36);
     *(u_long128 *)curve[4] = *(u_long128 *)(RodPoint + 48);
     for (int i = 1; i < 8; i++) {
-        mgCFrame **joint = &SaoFrame[i];
         sceVu0FMATRIX joint_matrix;
         sceVu0FMATRIX parent_world;
         sceVu0FMATRIX parent_inverse;
         sceVu0FVECTOR forward;
         sceVu0FVECTOR before;
         sceVu0FVECTOR after;
-        sceVu0CopyMatrix(joint_matrix, (*joint)->trans_matrix);
-        (*joint)->parent->GetLWMatrix(parent_world);
+        sceVu0CopyMatrix(joint_matrix, SaoFrame[i]->trans_matrix);
+        SaoFrame[i]->parent->GetLWMatrix(parent_world);
         mgInversMatrix(parent_inverse, parent_world);
-        sceVu0CopyMatrix(parent_world, (*joint)->parent->trans_matrix);
+        sceVu0CopyMatrix(parent_world, SaoFrame[i]->parent->trans_matrix);
         float fraction = 0.99f * (SaoDist[i] / SaoDist[7]);
         ParaBlend(before, 0.99f * (SaoDist[i - 1] / SaoDist[7]), curve, 5);
         before[3] = 1.0f;
@@ -968,32 +964,35 @@ void RodStep(CScene *scene, u_long128 *poly_buffer) {
         sceVu0Normalize(joint_matrix[0], joint_matrix[0]);
         sceVu0Normalize(joint_matrix[1], joint_matrix[1]);
         sceVu0Normalize(joint_matrix[2], joint_matrix[2]);
-        (*joint)->SetTransMatrix(joint_matrix);
+        SaoFrame[i]->SetTransMatrix(joint_matrix);
     }
-    for (int axis = 0; axis < 3; axis++) line_box.max[axis] += 20.0f;
+    for (axis = 0; axis < 3; axis++) line_box.max[axis] += 20.0f;
     line_box.max[3] = 1.0f;
-    for (int axis = 0; axis < 3; axis++) line_box.min[axis] -= 20.0f;
+    *line_box.min -= 20.0f;
+    line_box.min[1] -= 20.0f;
+    line_box.min[2] -= 20.0f;
     line_box.min[3] = 1.0f;
     polys = (CCPoly *)poly_buffer;
     int poly_count = scene->GetColPoly(polys, line_box, 1024);
-    for (i = 0; i < poly_count; i++) {
-        if (polys[i].area_kind == 7) {
-            polys[i].ignore_mask |= 8;
+    for (int i = 0; i < poly_count; i++) {
+        CCPoly *poly = &polys[i];
+        if (poly->area_kind == 7) {
+            poly->ignore_mask |= 8;
         }
     }
-    for (i = LineTop; i < 64; i++) {
+    for (int i = LineTop; i < 64; i++) {
         float damping = 0.95f;
         int previous = i - 1;
-        if (previous < LineTop) previous = LineTop;
         int following = i + 1;
+        if (previous < LineTop) {
+            previous = LineTop;
+        }
         if (following >= 64) following = 63;
         sceVu0FVECTOR from;
         sceVu0FVECTOR to;
         sceVu0FVECTOR hit;
         float heights[3];
-        u_long128 position = *(u_long128 *)LinePoint[i].pos;
-        *(u_long128 *)from = position;
-        *(u_long128 *)to = position;
+        *(u_long128 *)to = *(u_long128 *)from = *(u_long128 *)LinePoint[i].pos;
         heights[0] = LinePoint[i].pos[1];
         heights[1] = LinePoint[previous].pos[1];
         heights[2] = LinePoint[following].pos[1];
@@ -1063,9 +1062,6 @@ void RodStep(CScene *scene, u_long128 *poly_buffer) {
         uki->FloatPoint(water);
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/fishingobj", RodStep__FP6CSceneP1);
-#endif
 /**
  *
  * Moves two points toward their required separation at a chosen share.
