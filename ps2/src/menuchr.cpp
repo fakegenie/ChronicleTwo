@@ -923,7 +923,7 @@ static int MenuMemoryDivide(mgCMemory *memory, mgCMemory **list, int chara) {
                 char name[0x20];
                 int  size = table[(int)i];
                 if (size % 64 != 0) {
-                    size += 64 - size % 64;
+                    size = 64 - size % 64 + size;
                 }
                 sprintf(name, at_1078__2, i);
                 SetMemoryName(list[i], name);
