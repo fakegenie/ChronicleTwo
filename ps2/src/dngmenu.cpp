@@ -590,8 +590,6 @@ unsigned int CDngFreeMap::DrawGlidCheck(GLID_INFO *glid) {
     }
     return mask;
 }
-#ifdef NONMATCHING
-// 38 words off in an aligned diff
 void CDngFreeMap::DrawRoomOne(mgRect<float> rect, DNGMAP_ROOM_INFO *room, unsigned int glid_check, int alpha, float bright) {
     if (room == NULL || !(rect.left <= (float)(mgScreenWidth + 20)) || !(rect.top <= (float)(mgScreenHeight + 30))) {
         return;
@@ -670,10 +668,10 @@ void CDngFreeMap::DrawRoomOne(mgRect<float> rect, DNGMAP_ROOM_INFO *room, unsign
             phase += 6.2831855f;
         }
         if (!(phase <= 0.0f)) {
-            red = green = blue = (int)(7.0f * (float)level / 8.0f);
+            blue = green = red = (int)(7.0f * (float)level / 8.0f);
         }
     } else {
-        red = green = blue = level;
+        blue = green = red = level;
     }
     prim->Bilinear(0);
     prim->Begin(6);
@@ -707,17 +705,17 @@ void CDngFreeMap::DrawRoomOne(mgRect<float> rect, DNGMAP_ROOM_INFO *room, unsign
     shade = 128.0f * shade;
     if (name_tex != NULL && room->visited == 1) {
         for (int i = 0; i < 3; i++) {
+            int k = i * 4;
             if (room->flag & (1 << (i + 1))) {
-                s16 *letter = get_moji_tbl_1524[i];
-                if (letter[0] >= 0) {
-                    mgRect<float> letter_put(put.left + (float)put_moji_tbl_1525[i][0], put.top + (float)put_moji_tbl_1525[(int)i][1],
-                                             (float)letter[2], (float)letter[3]);
+                if (get_moji_tbl_1524[0][k] >= 0) {
+                    mgRect<float> letter_put(put.left + (float)put_moji_tbl_1525[i][0], put.top + (float)put_moji_tbl_1525[i][1],
+                                             (float)get_moji_tbl_1524[0][k + 2], (float)get_moji_tbl_1524[0][k + 3]);
                     prim->TextureMapEnable(1);
                     prim->Begin(6);
                     prim->Texture(name_tex);
                     int letter_level = fptosi(shade);
                     prim->Color(letter_level, letter_level, letter_level, alpha);
-                    mgRect<int> letter_uv(letter[0], letter[1], letter[2], letter[3]);
+                    mgRect<int> letter_uv(get_moji_tbl_1524[0][k], get_moji_tbl_1524[0][k + 1], get_moji_tbl_1524[0][k + 2], get_moji_tbl_1524[0][k + 3]);
                     PrimQuad(prim, letter_put.left, letter_put.top, letter_uv);
                     prim->End();
                 }
@@ -725,9 +723,6 @@ void CDngFreeMap::DrawRoomOne(mgRect<float> rect, DNGMAP_ROOM_INFO *room, unsign
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dngmenu", DrawRoomOne__11CDngFreeMapF9mgRect_f_P16DNGMAP_ROOM_INFOUiif);
-#endif
 void CDngFreeMap::DrawGlid(mgRect<float> rect) {
     mgCDrawPrim prim;
     SetSpriteEnv(&prim, 1);
