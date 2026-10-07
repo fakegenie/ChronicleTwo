@@ -13,6 +13,11 @@
 
 extern char at_356[];
 
+#pragma define_section dead ".dead" ".dead"
+__declspec(dead) static u_long PrimeLongDivision(u_long a, u_long b) {
+    return a / b;
+}
+
 #ifdef NONMATCHING
 #include <cstdio>
 
@@ -122,8 +127,6 @@ int CreatSmoothPassSW(float (*out)[4], float (*ring)[4], int point_num, int divi
     return written;
 }
 
-#ifdef NONMATCHING
-// 99.1% match, 4 words off
 void CSWordAfterEffect::Draw() {
     if (!active) return;
     if (point_num <= 0) return;
@@ -136,12 +139,7 @@ void CSWordAfterEffect::Draw() {
     alpha_step = opacity / (float)count;
     mgCDrawPrim prim;
     mgCTextureManager *textures = &mgTexManager;
-    switch ((int)texture) {
-    case 0:
-        break;
-    default:
-        textures->ReloadTexture(tex_block, (sceVif1Packet *)NULL);
-    }
+    if (texture != NULL) textures->ReloadTexture(tex_block, (sceVif1Packet *)NULL);
     prim.Initialize(NULL, NULL);
     prim.AlphaBlendEnable(1);
     prim.AlphaBlend(2);
@@ -194,9 +192,6 @@ void CSWordAfterEffect::Draw() {
     }
     prim.End();
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/swordeffect", Draw__17CSWordAfterEffectFv);
-#endif
 void CSWordAfterEffect::CreatPointList() {
     if (active != 0 && point_num > 0) {
         smooth_num =
