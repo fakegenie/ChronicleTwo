@@ -2118,8 +2118,6 @@ int CFishAquarium::CheckHaigouTankSex(CGameDataUsed *fish) {
 
     return 1;
 }
-#ifdef NONMATCHING
-// 99.5% match, 19 words off
 void CFishAquarium::RefreshParam() {
     int i;
     bool crowded;
@@ -2177,9 +2175,9 @@ void CFishAquarium::RefreshParam() {
                 tired = 1;
             }
             if (tired) {
-                int new_day = day;
+                int new_day = (int)day;
                 if ((float)fptosi(hour - (float)in_tank) < 0.0f) {
-                    new_day = day - 1;
+                    new_day = (int)day - 1;
                 }
                 sub_tank[i].data.fish.tank_day = new_day;
                 sub_tank[i].data.fish.tank_hour = hour;
@@ -2195,9 +2193,6 @@ void CFishAquarium::RefreshParam() {
     }
     unk_518 = unk_518 % 0x534;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/userdata", RefreshParam__13CFishAquariumFv);
-#endif
 
 int GetShiledKitLimmit(int item_no) {
     int index = item_no - 0xF6;
