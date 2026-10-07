@@ -514,22 +514,20 @@ void CFireAfterHit::Step() {
         }
     }
 }
-#ifdef NONMATCHING
 extern int gb_tbl_1052[3];
-// 99.8% match, 10 words off
 void CFireAfterHit::Draw(void) {
-    int middle;
-    int i;
-    int newest;
-    int tail_alpha;
-    int oldest;
-    FIRE_AFTER_HIT_FLAME *fire;
     float vec[4];
+    int i;
+    int middle;
+    int tail_alpha;
+    int k;
+    int newest;
     int puff0[4];
+    int oldest;
     int puff1[4];
     int main0[4];
     int main1[4];
-    int k;
+    FIRE_AFTER_HIT_FLAME *fire;
 
     if (active == 0) {
         return;
@@ -567,11 +565,11 @@ void CFireAfterHit::Draw(void) {
     prim.AlphaBlend(2);
     prim.Begin(6);
     prim.Texture(TEX_ExFx_FIRE);
-    for (k = 0; k < flame_num; k++, fire++) {
+    for (i = 0; i < flame_num; i++, fire++) {
         if (fire->alpha > 0 && !(0 < fire->delay)) {
             if (mgTransWorldPrim3DSprite(main0, main1, fire->pos, fire->size, fire->size, 0) != 0) {
                 if (fire->age >= 3) {
-                    FIRE_AFTER_HIT_TRAIL *row = trail[k];
+                    puff = trail[i];
                     oldest = fire->trail_head - 3;
                     middle = fire->trail_head - 2;
                     newest = fire->trail_head - 1;
@@ -584,11 +582,11 @@ void CFireAfterHit::Draw(void) {
                     if (newest < 0) {
                         newest += FIRE_AFTER_HIT_TRAIL_MAX;
                     }
-                    FIRE_AFTER_HIT_TRAIL *recent[3] = {&row[oldest], &row[middle], &row[newest]};
-                    for (tail_alpha = 0; tail_alpha < 3; tail_alpha++) {
-                        trans_float_to_sceVector(vec, recent[tail_alpha]->pos, 0);
-                        mgTransWorldPrim3DSprite(puff0, puff1, vec, recent[tail_alpha]->size, recent[tail_alpha]->size, 0);
-                        prim.Color(0x80, gb_tbl_1052[tail_alpha], gb_tbl_1052[tail_alpha], fire->alpha);
+                    FIRE_AFTER_HIT_TRAIL *recent[3] = {&puff[oldest], &puff[middle], &puff[newest]};
+                    for (k = 0; k < 3; k++) {
+                        trans_float_to_sceVector(vec, recent[k]->pos, 0);
+                        mgTransWorldPrim3DSprite(puff0, puff1, vec, recent[k]->size, recent[k]->size, 0);
+                        prim.Color(0x80, gb_tbl_1052[k], gb_tbl_1052[k], fire->alpha);
                         prim.TextureCrd(0x40, 0);
                         prim.Vertex4(puff0);
                         prim.TextureCrd(0x80, 0x40);
@@ -618,9 +616,6 @@ void CFireAfterHit::Draw(void) {
     }
     prim.End();
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dng_effect", Draw__13CFireAfterHitFv);
-#endif
 void CTornado::SetPos(float *pos, float size, float strength) {
     TORNADO_PIECE *p;
     int            i;

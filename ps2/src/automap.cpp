@@ -1662,51 +1662,60 @@ void CAutoMapGen::CreatFixedMap(int preset_no) {
     room[0].w = preset_width;
     room[0].h = preset_height;
 }
-#ifdef NONMATCHING
-// 98.6% match, 74 words off
 void CAutoMapGen::RandomMapMainProc() {
-    int placed;
-    int extra_links;
-    int from;
+    int link;
+    int i;
+    int rooms;
+    int goal;
+    int exits;
+    int seed;
+    int floor_id;
+    int round;
+    int dummy_roots;
+    int failures;
+    int to;
+    int result;
+    int n;
+    CDngFloorManager *manager;
     random_map = 1;
-    int seed = iRand(0xFFFF);
+    seed = iRand(0xFFFF);
     if (DebugFlag != 0) {
         printf(at_2561, seed);
     }
     srand(seed);
-    int floor_id = DngSaveDataDungeon->floor_id[DngSaveDataDungeon->stage_id];
-    CDngFloorManager *manager = &BattleAreaScene->floor_manager;
-    for (int i = 0; i < grid_w * grid_h; i++) {
+    floor_id = DngSaveDataDungeon->floor_id[DngSaveDataDungeon->stage_id];
+    manager = &BattleAreaScene->floor_manager;
+    for (i = 0; i < grid_w * grid_h; i++) {
         grid[i].Initialize();
     }
-    for (int i = 0; i < 8; i++) {
-        room[i].unk_0 = 0;
+    for (n = 0; n < 8; n++) {
+        room[n].unk_0 = 0;
     }
     do {
         if (gen_flag & AUTOMAP_GEN_FIXED_START) {
             CreatFixedMap(0);
-            placed = 1;
+            n = 1;
         } else {
-            placed = CreatRoom(iRand(grid_w - 2) + 1, iRand(grid_h - 2) + 1, 0, -1);
+            n = CreatRoom(iRand(grid_w - 2) + 1, iRand(grid_h - 2) + 1, 0, -1);
         }
-    } while (placed == 0);
+    } while (n == 0);
     while (CreatRoom(iRand(grid_w - 2) + 1, iRand(grid_h - 2) + 1, 1, -1) == 0) {
     }
     RoomLink(0, 1);
 
-    int rooms = 2;
-    int goal = iRand(3) + 4;
-    int round = 0;
+    rooms = 2;
+    goal = iRand(3) + 4;
+    round = 0;
     while (rooms < goal) {
-        int failures = 0;
+        failures = 0;
         do {
-            placed = CreatRoom(iRand(grid_w - 2) + 1, iRand(grid_h - 2) + 1, rooms, -1);
-            int link_to = iRand(rooms);
-            if ((gen_flag & AUTOMAP_GEN_FIXED_START) && link_to == 0) {
-                link_to++;
+            result = CreatRoom(iRand(grid_w - 2) + 1, iRand(grid_h - 2) + 1, rooms, -1);
+            link = iRand(rooms);
+            if ((gen_flag & AUTOMAP_GEN_FIXED_START) && link == 0) {
+                link++;
             }
-            if (placed != 0) {
-                RoomLink(rooms, link_to);
+            if (result != 0) {
+                RoomLink(rooms, link);
                 rooms++;
                 round = 0;
                 break;
@@ -1720,17 +1729,17 @@ void CAutoMapGen::RandomMapMainProc() {
     }
     room_num = rooms;
 
-    extra_links = iRand(3) + 1;
-    for (int linked = 0; linked < extra_links;) {
-        from = iRand(rooms);
-        int to = iRand(rooms);
-        if ((!(gen_flag & AUTOMAP_GEN_FIXED_START) || (from != 0 && to != 0)) && from != to) {
-            RoomLink(from, to);
-            linked++;
+    n = iRand(3) + 1;
+    for (link = 0; link < n;) {
+        result = iRand(rooms);
+        to = iRand(rooms);
+        if ((!(gen_flag & AUTOMAP_GEN_FIXED_START) || (result != 0 && to != 0)) && result != to) {
+            RoomLink(result, to);
+            link++;
         }
     }
-    int dummy_roots = iRand(3) + 1;
-    for (int i = 0; i < dummy_roots; i++) {
+    dummy_roots = iRand(3) + 1;
+    for (i = 0; i < dummy_roots; i++) {
         CreatDummyRoot(i + 50);
     }
     CreatTermParts();
@@ -1744,7 +1753,7 @@ void CAutoMapGen::RandomMapMainProc() {
     if (!(gen_flag & AUTOMAP_GEN_NO_HEALING)) {
         SetHealingPointIndex();
     }
-    int exits = manager->GetDngMapNextRoot(floor_id);
+    exits = manager->GetDngMapNextRoot(floor_id);
     if (exits & 1) {
         SetInOutPartsIndex(8);
     }
@@ -1759,9 +1768,6 @@ void CAutoMapGen::RandomMapMainProc() {
     }
     IndexToPartsPlace();
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/automap", RandomMapMainProc__11CAutoMapGenFv);
-#endif
 void CAutoMapGen::Build() {
     int        floor_no;
     int        room;
