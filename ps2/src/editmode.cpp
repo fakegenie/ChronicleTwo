@@ -1078,7 +1078,7 @@ static inline CMap *ActiveSceneMap(CScene *scene) {
 static inline mgCCameraFollow *ActiveSceneCamera(CScene *scene) {
     return (mgCCameraFollow *)scene->GetCamera(scene->active_camera);
 }
-// 52 aligned words off
+// 39 aligned words off
 void EditMode(CScene *scene) {
     CCPoly *next_poly;
     int i;
@@ -1380,7 +1380,7 @@ void EditMode(CScene *scene) {
             int ground_count = 0;
             next_poly = polys;
             *(u_long128 *)box_max = *(u_long128 *)eCurPos;
-            *(u_long128 *)box_min = *(u_long128 *)eCurPos;
+            *(u_long128 *)(box_low = box_min) = *(u_long128 *)eCurPos;
             *(u_long128 *)new_pos = *(u_long128 *)eCurPos;
             new_pos[1] = 1000.0f;
             box_max[0] += 10.0f;
