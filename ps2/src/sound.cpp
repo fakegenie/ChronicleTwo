@@ -154,7 +154,7 @@ int TransHdBd(int hd, int hd_size, int bd, int bd_size) {
 }
 
 #ifdef NONMATCHING
-// 92.5% match, 161 words off
+// 93.2% match, 101 words off
 int CSound::Init(int mode0, int mode1, int depth0, int depth1) {
     static int load_m_flg = 0;
     int        port;
@@ -184,11 +184,11 @@ int CSound::Init(int mode0, int mode1, int depth0, int depth1) {
         msinBfGrp[0].buffCtx = NULL;
         msinBfGrp[1].buffNum = MIDI_MSIN_PORT_COUNT;
         msinBfGrp[1].buffCtx = msinBfCtx;
-        for (int port = 0; port < MIDI_MSIN_PORT_COUNT; port++) {
-            msinBfCtx[port].sema = 0;
-            msinBfCtx[port].buff = &msinBf[port];
-            msinBf[port].size = sizeof(MSIN_BUFFER);
-            msinBf[port].length = 0;
+        for (slot = 0; slot < MIDI_MSIN_PORT_COUNT; slot++) {
+            msinBfCtx[slot].sema = 0;
+            msinBfCtx[slot].buff = &msinBf[slot];
+            msinBf[slot].size = sizeof(MSIN_BUFFER);
+            msinBf[slot].length = 0;
         }
         if (sceMSIn_Init(&msinCtx) != 0) {
             printf("sceMSIn_Init Error\n");
@@ -594,10 +594,7 @@ void CSound::LoadHdBd(int port, int hd, int hd_size, int bd, int bd_size) {
     LoadHdBd2(port, hd, hd_size, bd, bd_size);
 }
 
-#ifdef NONMATCHING
-// 98.5% match, 31 words off
 void CSound::LoadHdBd2(int port, int hd, int hd_size, int bd, int bd_size) {
-    int        dependent;
     int        dependent_port;
     MIDI_PORT *child;
     int        stream_port;
@@ -663,8 +660,8 @@ void CSound::LoadHdBd2(int port, int hd, int hd_size, int bd, int bd_size) {
         }
         midi_state.port[midi_state.port[port].linked_port].sequence_count = 0;
     }
-    for (dependent = 0; dependent < midi_state.port[port].dependent_port_count; dependent++) {
-        dependent_port = midi_state.port[port].dependent_port[dependent];
+    for (slot = 0; slot < midi_state.port[port].dependent_port_count; slot++) {
+        dependent_port = midi_state.port[port].dependent_port[slot];
         ezMidi(dependent_port + 0x20, 0);
         child = &midi_state.port[dependent_port];
         child->spu_next_address = child->spu_address = midi_state.port[port].spu_address;
@@ -674,8 +671,8 @@ void CSound::LoadHdBd2(int port, int hd, int hd_size, int bd, int bd_size) {
         ezMidi(midi_state.port[port].linked_port + 0xA0, midi_state.port[midi_state.port[port].linked_port].unk_98);
     }
     midi_state.port[port].bank[0] = gBank.hd_address;
-    for (dependent = 0; dependent < midi_state.port[port].dependent_port_count; dependent++) {
-        child = &midi_state.port[midi_state.port[port].dependent_port[dependent]];
+    for (slot = 0; slot < midi_state.port[port].dependent_port_count; slot++) {
+        child = &midi_state.port[midi_state.port[port].dependent_port[slot]];
         child->spu_next_address = child->spu_address = midi_state.port[port].spu_next_address;
     }
     if (midi_state.port[port].linked_port >= 0) {
@@ -685,9 +682,6 @@ void CSound::LoadHdBd2(int port, int hd, int hd_size, int bd, int bd_size) {
     }
     midi_state.port[port].bank_count++;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/sound", LoadHdBd2__6CSoundFiiiii);
-#endif
 
 int CSound::LoadHdBdAdd(int port, int hd, int hd_size, int bd, int bd_size) {
     int        dependent;

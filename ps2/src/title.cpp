@@ -1200,9 +1200,9 @@ void TitleModeInit() {
         TitleCamera2->Resume();
     }
 }
-#ifdef NONMATCHING
+
+static inline u8 Ident(u8 v) { return v; }
 int CalcMenuAdd(float *cursor, float step, float limit = 0.0f);
-// 99.9% match, 13 words off
 int TitleModeKey() {
     int start_pushed;
     int start;
@@ -1222,12 +1222,12 @@ int TitleModeKey() {
     if (TitlePhase <= TITLE_PHASE_MENU || TitlePhase == TITLE_PHASE_PUSH_START || TitlePhase == TITLE_PHASE_OMAKE_MENU ||
         TitlePhase == TITLE_PHASE_MC_MESSAGE) {
         CMemoryCardManager *card_manager = TitleMCCheck;
-        u8 inport1;
         MC_CARD_INFO *card0;
         u8 inport0;
         MC_CARD_INFO *card1;
-        inport1 = TitleMCCheckInport[1];
+        u8 inport1;
         inport0 = TitleMCCheckInport[0];
+        inport1 = Ident(TitleMCCheckInport[1]);
         card0 = &card_manager->card[0];
         card1 = &card_manager->card[1];
         if (TitleMCCheckNow != 0) {
@@ -1319,23 +1319,25 @@ int TitleModeKey() {
             TitlePushStart_AlphaPlus = 1;
         }
         break;
-    case TITLE_PHASE_PUSH_START:
-        CalcMenuAdd(&TitleInfo->menu_alpha, float(-12.0));
-        CalcMenuAdd(&TitleInfo->cursor_alpha, float(-12.0));
-        CalcMenuAdd(&TitleInfo->title_alpha, 8.0f, 128.0f);
-        CalcMenuAdd(&TitleInfo->omake_alpha, -8.0f);
+    case TITLE_PHASE_PUSH_START: {
+        float zero = 0.0f;
+        CalcMenuAdd(&TitleInfo->menu_alpha, -12, zero);
+        CalcMenuAdd(&TitleInfo->cursor_alpha, -12, zero);
+        CalcMenuAdd(&TitleInfo->title_alpha, 8, 128);
+        CalcMenuAdd(&TitleInfo->omake_alpha, float(-8.0), zero);
         if (start_pushed != 0) {
             sndSePlay(TitleEventSound, 0, 0);
             TitlePhase = TITLE_PHASE_MENU;
             TitleInfo->idle_count = 0;
         }
         break;
+    }
     case TITLE_PHASE_MENU: {
         TitlePushStart_AlphaPlus = 0;
         int old_select = TitleInfo->select;
-        CalcMenuAdd(&TitleInfo->title_alpha, -8.0f, 0.0f);
-        CalcMenuAdd(&TitleInfo->menu_alpha, float(12.0), float(128.0));
-        CalcMenuAdd(&TitleInfo->cursor_alpha, float(12.0), float(128.0));
+        CalcMenuAdd(&TitleInfo->title_alpha, float(-8.0), 0);
+        CalcMenuAdd(&TitleInfo->menu_alpha, float(12), 128);
+        CalcMenuAdd(&TitleInfo->cursor_alpha, 12.0f, float(128.0));
         if (GamePad__2.Down(PAD_UP) != 0) {
             TitleInfo->select--;
         }
@@ -1439,8 +1441,8 @@ int TitleModeKey() {
         break;
     case TITLE_PHASE_OMAKE_MENU: {
         TitlePushStart_AlphaPlus = 0;
-        CalcMenuAdd(&TitleInfo->menu_alpha, float(-8.0));
-        CalcMenuAdd(&TitleInfo->cursor_alpha, float(3.0), float(128.0));
+        CalcMenuAdd(&TitleInfo->menu_alpha, -8.0f);
+        CalcMenuAdd(&TitleInfo->cursor_alpha, 3, 128);
         int old_select = TitleInfo->omake_select;
         if (GamePad__2.Down(PAD_UP) != 0) {
             TitleInfo->omake_select--;
@@ -1483,9 +1485,6 @@ int TitleModeKey() {
     }
     return TITLE_KEY_NONE;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/title", TitleModeKey__Fv);
-#endif
 void TitleModeDraw() {
     int i;
     int x;
@@ -1497,10 +1496,11 @@ void TitleModeDraw() {
     mgTexManager.ReloadTexture(0x40, (sceVif1Packet *)NULL);
     mgCDrawPrim prim;
     SetSpriteEnv(&prim, 0);
-    float left = 0.0f;
+    float left;
+    left = 0.0f;
     float top = 24.0f;
     float title_alpha = TitleInfo->title_alpha;
-    PrimQuad(Tex_Chronicle, 0.0f, top, mgRect<int>(0, 0, 0x200, 0x1A0), fptosi(TitleInfo->title_alpha), 0x80, 0x80, 0x80);
+    PrimQuad(Tex_Chronicle, left, top, mgRect<int>(0, 0, 0x200, 0x1A0), fptosi(TitleInfo->title_alpha), 0x80, 0x80, 0x80);
     mgRect<int> start_rect(start_button_tbl_1826[LanguageCode].left, start_button_tbl_1826[LanguageCode].top,
                            start_button_tbl_1826[LanguageCode].right, start_button_tbl_1826[LanguageCode].bottom);
     if (LanguageCode == 0) {
@@ -1562,11 +1562,11 @@ void TitleModeDraw() {
         prim.Color(0x80, 0x80, 0x80, (int)TitleInfo->omake_alpha);
         if (OmakePlayEnableAttr & 2) {
             mgRect<int> dungeon_rect(0x5C, 0x100, 0xD2, 0x36);
-            PrimQuad(&prim, 151.0f, (float)row_y[row++], dungeon_rect);
+            PrimQuad(&prim, float(151.0), (float)row_y[row++], dungeon_rect);
         }
         if (OmakePlayEnableAttr & 1) {
             mgRect<int> gyorace_rect(0x5C, 0xCA, 0xD2, 0x36);
-            PrimQuad(&prim, 151.0f, (float)row_y[row], gyorace_rect);
+            PrimQuad(&prim, float(151.0), (float)row_y[row], gyorace_rect);
         }
         prim.End();
     }
