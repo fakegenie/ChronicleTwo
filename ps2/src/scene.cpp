@@ -458,8 +458,8 @@ void CRain::Stop() {
 
 void CRain::Start() {
     int   i;
-    float position[4];
     float view_angle = 0.7853982f;
+    float position[4];
 
     active = 1;
 
@@ -1041,7 +1041,7 @@ int CScene::CheckIMGName(int excluded_map, char *filename) {
             CMapInfo *map_info;
             CMap     *loaded_map = GetMap(map_index);
 
-            if ((map_info = loaded_map) != NULL && loaded_map != NULL) {
+            if ((map_info = (CMapInfo *)loaded_map) != NULL && loaded_map != NULL) {
                 name_index = 0;
 
                 for (;;) {
@@ -1071,7 +1071,7 @@ int CScene::CheckMDSName(int excluded_map, char *filename) {
             CMapInfo *map_info;
             CMap     *loaded_map = GetMap(map_index);
 
-            if ((map_info = loaded_map) != NULL && loaded_map != NULL) {
+            if ((map_info = (CMapInfo *)loaded_map) != NULL && loaded_map != NULL) {
                 name_index = 0;
 
                 for (;;) {
