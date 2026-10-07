@@ -23,8 +23,6 @@ extern char at_356[];
 #include "mglib.hpp"
 #endif
 
-#ifdef NONMATCHING
-// 93.7% match, 30 words off
 int CreatSmoothPassSW(float (*out)[4], float (*ring)[4], int point_num, int division, int start, int ring_size) {
     sceVu0FMATRIX coefficients;
     sceVu0FMATRIX points;
@@ -36,23 +34,24 @@ int CreatSmoothPassSW(float (*out)[4], float (*ring)[4], int point_num, int divi
         return 0;
     }
     float quarter = 0.25f;
-    float half = 0.5f;
+    float half;
+    half = 0.5f;
     basis[3][0] = 0.0f;
+    basis[1][0] = 1.0f;
     basis[2][1] = 0.0f;
     basis[0][0] = -quarter / half;
-    basis[1][0] = 1.0f;
-    basis[3][1] = 1.0f;
-    basis[0][2] = (-half - quarter) / half;
     basis[0][1] = 1.5f;
-    basis[3][2] = 0.0f;
-    basis[2][3] = 0.0f;
     basis[2][0] = basis[0][0];
     basis[1][1] = -(quarter + 1.0f) / half;
+    basis[3][1] = 1.0f;
+    basis[3][2] = 0.0f;
+    basis[0][2] = (-half - quarter) / half;
+    basis[2][2] = half;
     basis[1][2] = 2.0f;
     basis[0][3] = half;
-    basis[2][2] = basis[0][3];
+    basis[1][3] = -basis[0][3];
+    basis[2][3] = 0.0f;
     basis[3][3] = 0.0f;
-    basis[1][3] = -half;
     int written = 0;
     for (int segment = 0; segment < point_num - 1; segment++) {
         if (segment > 0 && segment < point_num - 2) {
@@ -107,25 +106,21 @@ int CreatSmoothPassSW(float (*out)[4], float (*ring)[4], int point_num, int divi
         float t = 0.0f;
         float step;
         while (t < 1.0f - (step = 1.0f / (division - 1.0f))) {
+            powers[0] = t * (t * t);
             powers[3] = 1.0f;
             powers[1] = t * t;
-            powers[0] = t * (t * t);
             powers[2] = t;
             sceVu0ApplyMatrix(result, coefficients, powers);
-            float *entry = out[written];
-            entry[0] = result[0];
-            entry[1] = result[1];
-            entry[2] = result[2];
-            entry[3] = 1.0f;
+            for (int j = 0; j < 3; j++) {
+                out[written][j] = result[j];
+            }
+            out[written][3] = 1.0f;
             t += step;
             written++;
         }
     }
     return written;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/swordeffect", CreatSmoothPassSW__FPA4_fPA4_fiiii);
-#endif
 
 #ifdef NONMATCHING
 // 99.1% match, 4 words off
