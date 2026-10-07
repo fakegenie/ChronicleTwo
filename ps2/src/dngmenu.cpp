@@ -1327,7 +1327,7 @@ void CDngFreeMap::SetKomaMove(int moving) {
     }
 }
 #ifdef NONMATCHING
-// 99.9% match, 16 words off
+// 99.9% match, 10 words off
 int CDngFreeMap::LoadDngInfo(mgCMemory *stack, int tex_block, int dng_no, int user_room_no, int next_room_no) {
     int i;
     if (stack == NULL || stack->stGetRest() <= 0) {
@@ -1631,18 +1631,18 @@ int CDngFreeMap::LoadDngInfo(mgCMemory *stack, int tex_block, int dng_no, int us
         s16(*room_points)[2] = RoomHokanTablePtrTable_2245[room_table];
         s8 room_reverse = is_reverse_tbl_room_2248[0][room_table];
         if (room_reverse == 0) {
-            for (j = 0; j < 10; j++) {
+            for (tex_block = 0; tex_block < 10; tex_block++) {
                 DNGMAP_KOMA_POS *pos = (DNGMAP_KOMA_POS *)work.Alloc(1);
-                pos->x = room_x + (float)room_points[j][0];
-                pos->y = room_y + (float)room_points[j][1];
+                pos->x = room_x + (float)room_points[tex_block][0];
+                pos->y = room_y + (float)room_points[tex_block][1];
                 tail->next = pos;
                 tail = pos;
             }
         } else if (room_reverse == 1) {
-            for (j = 9; j >= 0; j--) {
+            for (tex_block = 9; tex_block >= 0; tex_block--) {
                 DNGMAP_KOMA_POS *pos = (DNGMAP_KOMA_POS *)work.Alloc(1);
-                pos->x = room_x + (float)room_points[j][0];
-                pos->y = room_y + (float)room_points[j][1];
+                pos->x = room_x + (float)room_points[tex_block][0];
+                pos->y = room_y + (float)room_points[tex_block][1];
                 tail->next = pos;
                 tail = pos;
             }
