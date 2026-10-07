@@ -1378,7 +1378,6 @@ int CheckGiftPack(CActiveMonster *monster, CColPrim *prim) {
 
     return 1;
 }
-#ifdef NONMATCHING
 extern MONSTER_REACT react_tbl[];
 extern s16 vs_attk_index[];
 extern CFireAfterHit fireAfterHit[];
@@ -1389,7 +1388,10 @@ extern char at_2485[];
 extern char at_2486[];
 extern char at_2487[];
 extern char at_2488[];
-// 99.8% match, 39 words off
+static inline DNG_BATTLE_AREA *BattleArea(CScene *scene) {
+    return &scene->battle_area;
+}
+
 #pragma divbyzerocheck on
 void CMonsterMan::CheckDamage() {
     CActionChara *player;
@@ -1415,7 +1417,7 @@ void CMonsterMan::CheckDamage() {
     BASE_MONSTER_TBL *tbl;
     CBattleCharaInfo *chara_info;
     now_scene = scene;
-    DNG_BATTLE_AREA *area = &now_scene->battle_area;
+    DNG_BATTLE_AREA *area = BattleArea(now_scene);
     se_id = now_scene->se_battle_id;
     player = (CActionChara *)now_scene->GetCharacter(0);
     chara_info = GetBattleCharaInfo();
@@ -1841,9 +1843,6 @@ void CMonsterMan::CheckDamage() {
     }
 }
 #pragma divbyzerocheck reset
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/monster", CheckDamage__11CMonsterManFv);
-#endif
 void CMonsterMan::MoveUnit(CActiveMonster *monster, CCPoly *poly, int poly_num) {
     float position[4];
     float rotation[4];
