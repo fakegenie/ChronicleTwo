@@ -1713,7 +1713,7 @@ void CalcCommonBrdDrawInfo(float *pos, MENUFORM_MAKEBRD_INFO *info, ClsMes *mes)
 }
 #ifdef NONMATCHING
 static inline MENUFORM_MAKEBRD_LINE *BoardLine(int i) { return &CommonBoardDrawInfo.line[i]; }
-// 99.8% match, 33 words off
+// 99.8% match, 29 words off
 void CommonBoardDraw(float *pos, int &tex_block) {
     mgCTexture *board_tex = Tex_CommonBoard;
     if (board_tex == NULL) {
@@ -1795,11 +1795,12 @@ void CommonBoardDraw(float *pos, int &tex_block) {
     prim->Texture(Tex_CommonBoard);
     prim->Color(0x80, 0x80, 0x80, 0x80);
     
-    for (pass = 0, row_top = 0; pass < 4; pass++, row_top += 34) {
+    for (pass = 0; pass < 4; pass++) {
         MENUFORM_MAKEBRD_LINE *line = BoardLine(pass);
         float line_x;
-        float x = line_x = 20.0f + pos[0];
-        float line_top = 88.0f + pos[1] + row_top;
+        float x = 20.0f + pos[0];
+        line_x = x;
+        float line_top = 88.0f + pos[1] + pass * 34;
         s16 (*brd)[4] = get_onoffbrdtbl_1789[line->kind];
         int top;
         PrimQuad(prim, mgRect<int>((int)x, top = (int)line_top, brd[0][2], brd[0][3]),
