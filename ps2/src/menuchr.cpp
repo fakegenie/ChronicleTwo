@@ -6591,9 +6591,6 @@ int CMenuCostumeSel::KeyStep() {
 
     return 0;
 }
-#ifdef NONMATCHING
-// 100.0% match, 0 words off
-// Matches 100% in isolation; compiling it makes MenuCostumeInit's __vt__15CMenuCostumeSel reference resolve differently from retail
 void CMenuCostumeSel::Draw() {
     sceVu0FMATRIX view;
     sceVu0FVECTOR eye;
@@ -6743,9 +6740,6 @@ void CMenuCostumeSel::Draw() {
         help.DrawDirect(infomsg_5256[LanguageCode], 0x28, mgScreenHeight - 0x28);
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuchr", Draw__15CMenuCostumeSelFv);
-#endif
 extern void  *__vt__15CMenuCostumeSel[];
 extern u_long CostumeOptionEnv;
 extern "C" void *__ct__14CBaseMenuClassFv(void *self);
@@ -6760,13 +6754,13 @@ void MenuCostumeInit(mgCMemory *stack, int *tex_block, int mode) {
     if ((menu = (CMenuCostumeSel *)operator new(sizeof(CMenuCostumeSel),
                                                 (u_long128 *)MenuChangeMemory.Alloc(0x2F))) != NULL) {
         __ct__14CBaseMenuClassFv(menu);
-        float width = 8.0f;
+        void **vtable = (void **)((u8 *)menu + 0x10C);
         float height = 30.0f;
         float angle = 0.0f;
+        float width = 8.0f;
         float distance = 40.0f;
-        void **vtable = (void **)((u8 *)menu + 0x10C);
         *vtable = __vt__15CMenuCostumeSel;
-        __ct__15mgCCameraFollowFffff(&menu->camera, distance, height, angle, width);
+        __ct__15mgCCameraFollowFffff(&menu->camera, distance, 30.0f, angle, width);
         menu->stack.Init();
         menu->select = 0;
         MenuCosutumeLoadPhase = 0;
