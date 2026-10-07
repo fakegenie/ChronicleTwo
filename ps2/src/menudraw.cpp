@@ -3478,12 +3478,9 @@ void CMenuPosDataForm::SetNextMovePos(int *position, int move_type) {
     next_x = position[0];
     next_y = position[1];
 }
-#ifdef NONMATCHING
-// 99.5% match, 17 words off
 int CMenuPosDataForm::GetNextMovePos(int *pos) {
     int i;
     int move_type;
-    int target_pos;
     float rate_now;
     MENU_FORM_ACTION_MOVE *move;
     float diff;
@@ -3517,25 +3514,24 @@ int CMenuPosDataForm::GetNextMovePos(int *pos) {
         break;
     case MENUFORM_MTYPE_L:
         for (i = 0; i < 2; i++) {
-            target_pos = target[i];
             if (target[i] - now[i] < 0) {
                 rate[i] = -rate[i];
             }
             rate_now = rate[i];
             now[i] += rate_now;
-            if (abs(target_pos - now[i]) <= abs((int)rate_now)) {
-                now[i] = target_pos;
+            if (abs(target[i] - now[i]) <= abs((int)rate_now)) {
+                now[i] = target[i];
             }
         }
         break;
     case MENUFORM_MTYPE_I:
     case MENUFORM_MTYPE_IR:
         for (i = 0; i < 2; i++) {
-            target_pos = target[i];
             rate_now = rate[i];
-            diff = (float)(target_pos - now[i]);
-            now[i] = (int)(diff / rate_now + (float)now[i]);
-            if ((float)abs(target_pos - now[i]) <= rate_now) {
+            diff = (float)(target[i] - now[i]);
+            float step = diff / rate_now;
+            now[i] += step;
+            if ((float)abs(target[i] - now[i]) <= rate_now) {
                 if (mtype != MENUFORM_MTYPE_IR) {
                     if (diff > 0.0f) {
                         now[i]++;
@@ -3545,7 +3541,7 @@ int CMenuPosDataForm::GetNextMovePos(int *pos) {
                     }
                 }
                 if ((float)abs((int)diff) < 1.6f) {
-                    now[i] = target_pos;
+                    now[i] = target[i];
                 }
             }
         }
@@ -3555,9 +3551,6 @@ int CMenuPosDataForm::GetNextMovePos(int *pos) {
     pos[1] = now[1];
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", GetNextMovePos__16CMenuPosDataFormFPi);
-#endif
 void Menu3DivideTextureDraw(mgCDrawPrim *prim, mgRect<int> rect, short *tex_tbl, int vertical) {
     int middle;
 
