@@ -1548,35 +1548,35 @@ void DrawDownLoadAnaunce() {
     }
 }
 #ifdef NONMATCHING
-// 99.9% match, 37 words off
+// 99.9% match, 25 words off
 #pragma divbyzerocheck on
 int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_sub_num, int *out_height) {
-    CEditInfoMngr *info;
-    int valid;
-    int count;
-    int n;
-    CEditData *edit;
-    EditAnalyzeDataSrc *src;
-    CScene *scene;
-    char *dst_char;
-    int floor_num;
-    int no;
-    CSaveData *save;
-    char *hatena;
-    int total;
-    int request_num;
-    int limit;
-    char *word;
-    int condition_num;
-    int geo_floor;
-    int height;
-    int map_no;
     int *ok_table;
-    int condition;
+    int valid __attribute__((aligned(16)));
+    int map_no __attribute__((aligned(8)));
+    CSaveData *save;
+    int floor_num __attribute__((aligned(16)));
+    int count __attribute__((aligned(32)));
+    int n __attribute__((aligned(32)));
+    char *dst_char __attribute__((aligned(8)));
+    char *hatena;
+    int request_num __attribute__((aligned(8)));
+    int condition_num;
+    int no __attribute__((aligned(16)));
+    int height __attribute__((aligned(8)));
+    int limit __attribute__((aligned(8)));
+    EditAnalyzeDataSrc *src;
+    char *condition_name __attribute__((aligned(8)));
     int size;
-    int font_no;
-    char *condition_name;
-    CSaveDataDungeon *dungeon;
+    CScene *scene __attribute__((aligned(16)));
+    int condition __attribute__((aligned(16)));
+    CSaveDataDungeon *dungeon __attribute__((aligned(16)));
+    int total __attribute__((aligned(16)));
+    CEditInfoMngr *info;
+    char *word;
+    int geo_floor __attribute__((aligned(32)));
+    CEditData *edit __attribute__((aligned(8)));
+    int font_no __attribute__((aligned(32)));
     short floors[0x180][2];
     char *names[0x180];
     signed char extras[0x180];
