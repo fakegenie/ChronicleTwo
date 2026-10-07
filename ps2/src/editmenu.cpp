@@ -1548,13 +1548,25 @@ void DrawDownLoadAnaunce() {
     }
 }
 #ifdef NONMATCHING
-// 94.5% match, 182 words off
+// 181 aligned words off
 #pragma divbyzerocheck on
 int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_sub_num, int *out_height) {
     int geo_floor;
     char *dst_char;
     char *word;
     int valid;
+    int size;
+    int no;
+    CSaveDataDungeon *dungeon;
+    int floor_num;
+    int map_no;
+    CEditInfoMngr *info;
+    int request_num;
+    int font_no;
+    int condition_num;
+    int total;
+    int *ok_table;
+    int height;
     short floors[0x180][2];
     char *names[0x180];
     signed char extras[0x180];
@@ -1563,9 +1575,7 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
     char text[0x80];
     char conv_text[0x80];
     valid = 1;
-    int map_no = town_no;
-    int size;
-    int no;
+    map_no = town_no;
     if (town_no < 0 || town_no > 4) {
         map_no = 0;
         valid = 0;
@@ -1589,16 +1599,16 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
     analyze_percent = edit->GetAnalyzePercent(map_no);
     MenuAnalyzeData = &edit->analyze;
     MenuGeoStoneDownLoad_PartsNum = 0;
-    CSaveDataDungeon *dungeon = &save->save_dungeon;
-    int floor_num = 0;
+    dungeon = &save->save_dungeon;
+    floor_num = 0;
     MenuGeoStoneDownLoad_Request = 0;
     memset(floors, 0, sizeof(floors));
     PartsMakeOkTableNum = 0;
-    int *ok_table = PartsMakeOkTable;
+    ok_table = PartsMakeOkTable;
     char *hatena = GetHatena();
     CScene *scene = GetMainScene();
     CEditMap *map = (CEditMap *)scene->GetMap(scene->active_map);
-    CEditInfoMngr *info = &map->info_mngr;
+    info = &map->info_mngr;
     if (map == NULL) {
         return 0;
     }
@@ -1634,12 +1644,12 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
                     ok_table[PartsMakeOkTableNum] = parts->id;
                     PartsMakeOkTableNum++;
                 } else if (!(floor->flag & DNG_FLOOR_FLAG_GEOSTONE_READ)) {
-                    floor_num++;
                     extras[MenuGeoStoneDownLoad_PartsNum] = 0;
                     names[MenuGeoStoneDownLoad_PartsNum] = parts->edit_name;
                     MenuGeoStoneDownLoad_PartsNum++;
-                    floors[floor_num - 1][0] = dungeon_no;
-                    floors[floor_num - 1][1] = floor_no;
+                    floors[floor_num][0] = dungeon_no;
+                    floors[floor_num][1] = floor_no;
+                    floor_num++;
                 }
             }
         }
@@ -1650,10 +1660,10 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
         GeoramaReqMsgTexH[no] = 0;
         GeoramaReqMsgFontDrawFlag[no] = 1;
     }
-    int request_num = 0;
-    int font_no = 0;
-    int condition_num = 0;
-    int height = 0;
+    request_num = 0;
+    font_no = 0;
+    condition_num = 0;
+    height = 0;
     for (no = 0; no < 32; no++) {
         EditAnalyzeDataSrc *src = MenuEditAnalyzeDataSrc[no];
         if (src == NULL) {
@@ -1675,7 +1685,7 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
                 int dungeon_no = geo_floor / 100;
                 int floor_no = geo_floor % 100;
                 DNG_FLOOR_SAVE *floor = dungeon->GetFloorInfoPtr(dungeon_no, floor_no);
-                int was_open = MenuAnalyzeData->data_open[no];
+                int was_open = (signed char)MenuAnalyzeData->data_open[no];
                 if (floor != NULL && (floor->flag & DNG_FLOOR_FLAG_GEOSTONE_FOUND)) {
                     known = 1;
                     MenuAnalyzeData->data_open[no] = 1;
@@ -1684,8 +1694,9 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
                     floor_num++;
                 }
                 if (was_open != (signed char)MenuAnalyzeData->data_open[no]) {
+                    char *message = src->message;
                     extras[MenuGeoStoneDownLoad_PartsNum + MenuGeoStoneDownLoad_Request] = 0;
-                    names[MenuGeoStoneDownLoad_PartsNum + MenuGeoStoneDownLoad_Request] = src->message;
+                    names[MenuGeoStoneDownLoad_PartsNum + MenuGeoStoneDownLoad_Request] = message;
                     MenuGeoStoneDownLoad_Request++;
                 }
             }
@@ -1752,12 +1763,17 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
                     if (count >= 21 && *src_char == ' ') {
                         word = src_char + 1;
                         int word_len = 0;
-                        while (word != NULL && *word != ' ' && *word != '\0') {
-                            word_len++;
-                            word++;
+                        if (word != NULL) {
+                            while (*word != ' ' && *word != '\0') {
+                                word_len++;
+                                word++;
+                                if (word == NULL) {
+                                    break;
+                                }
+                            }
                         }
-                        *dst_char = '\n';
                         if (word_len >= limit) {
+                            *dst_char = '\n';
                             src_char++;
                             (*lines)++;
                             dst_char++;
@@ -1789,7 +1805,7 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
             floor->flag |= DNG_FLOOR_FLAG_GEOSTONE_READ;
         }
     }
-    int total = MenuGeoStoneDownLoad_Request + MenuGeoStoneDownLoad_PartsNum;
+    total = MenuGeoStoneDownLoad_Request + MenuGeoStoneDownLoad_PartsNum;
     DownLoadInfo = NULL;
     DownLoadInfoNext = NULL;
     MenuGeoStoneDmyCnt_Now = NULL;
