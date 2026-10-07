@@ -354,7 +354,7 @@ void LightingEdit(CScene *scene) {
     prim.Vertex(10, 10, 0);
     prim.Vertex(150, 300, 0);
     prim.End();
-    int light_no = map->active_light_no;
+    int light_no = map->map_info.active_light_no;
     CMapLightingInfo *light = ((CMapInfo *)map)->GetLightingInfo(light_no);
     selected = NULL;
     int selected_index = 0;
@@ -529,10 +529,10 @@ void LightingEdit(CScene *scene) {
         if (GamePad__2.Down2(PAD_RIGHT)) light_no += 1;
         if (GamePad__2.Down2(PAD_LEFT)) light_no -= 1;
         if (light_no < 0) light_no = 0;
-        if (light_no >= map->lighting_info_num) light_no = map->lighting_info_num - 1;
+        if (light_no >= map->map_info.lighting_info_num) light_no = map->map_info.lighting_info_num - 1;
         float time = map->GetLightNoTime(light_no);
         if (!(time < 0.0f)) scene->SetTime(time);
-        if (light_no >= 0 && light_no < map->lighting_info_num) map->active_light_no = light_no;
+        if (light_no >= 0 && light_no < map->map_info.lighting_info_num) map->map_info.active_light_no = light_no;
     }
     GetDebugFont()->DrawDirect(text, 10, 10);
     if (LightType == LIGHTING_EDIT_PAGE_BG_AMBIENT) {
