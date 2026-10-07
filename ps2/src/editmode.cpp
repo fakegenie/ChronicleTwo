@@ -575,8 +575,6 @@ void EndEditMode(CScene *scene, float *cursor_pos) {
     EditInitPlaceEffect();
     EditInitPlaceAnime();
 }
-#ifdef NONMATCHING
-// 97.2% match, 8 words off
 int StartEditModeFromMenu(CScene *scene, int mode, int *params) {
     scene->GetMap(scene->active_map);
     EditModeNo = mode;
@@ -599,9 +597,14 @@ int StartEditModeFromMenu(CScene *scene, int mode, int *params) {
         }
         if (EditModeNo == EDIT_MODE_PAINT || EditModeNo == EDIT_MODE_REPAINT) {
             if (PaintCursor2 != NULL && PaintCursor2->attr != NULL) {
+                float *c;
                 PaintCursor2->attr->color[0] = shade[0];
-                PaintCursor2->attr->color[1] = shade[1];
-                PaintCursor2->attr->color[2] = shade[2];
+                c = PaintCursor2->attr->color;
+                c += 1;
+                *c = shade[1];
+                c = PaintCursor2->attr->color;
+                c += 2;
+                *c = shade[2];
                 PaintColor[0] = ConvColor(color[0]);
                 PaintColor[1] = ConvColor(color[1]);
                 PaintColor[2] = ConvColor(color[2]);
@@ -626,9 +629,6 @@ int StartEditModeFromMenu(CScene *scene, int mode, int *params) {
     InitBalanceDraw(scene);
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editmode", StartEditModeFromMenu__FP6CSceneiPi);
-#endif
 /**
  *
  * Returns the current editor undo record.
