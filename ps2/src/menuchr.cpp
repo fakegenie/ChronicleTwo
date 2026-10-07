@@ -905,7 +905,7 @@ void SetMenuLoadItemNo(int who) {
  * Partitions character menu memory among its work buffers.
  *
  */
-// 99.0% match, 18 words off
+// 90.5% match, 11 words off
 static int MenuMemoryDivide(mgCMemory *memory, mgCMemory **list, int chara) {
     int total;
     memory->Align64();
@@ -916,19 +916,19 @@ static int MenuMemoryDivide(mgCMemory *memory, mgCMemory **list, int chara) {
         case 1:
         case 2: {
             u16 *table = menu_chr_memorytbl;
-            if (chara == 2) {
+            if ((int)chara == 2) {
                 table = menu_robo_memorytbl;
             }
             for (int i = 0; i < MENU_CHARA_LOAD_MAX; i++) {
                 char name[0x20];
-                int  size = table[i];
+                int  size = table[(int)i];
                 if (size % 64 != 0) {
                     size += 64 - size % 64;
                 }
                 sprintf(name, at_1078__2, i);
                 SetMemoryName(list[i], name);
-                list[i]->stSetBuffer(buffer, size);
-                total += size;
+                list[i]->stSetBuffer(buffer, (int)size);
+                total += (int)size;
                 buffer = list[i]->stGetTop() + size;
             }
             break;
