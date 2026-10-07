@@ -2594,7 +2594,7 @@ int MenuItemBrdKey(int keys, int *cursor, int *scroll, int board) {
 
 extern s8 ret_tbl1_2511[2];
 #ifdef NONMATCHING
-// 97.4% match, 13 words off
+// 97.0% match, 10 words off
 int MenuDataSwap(CGameDataUsed *destination, CGameDataUsed *source, int quantity) {
     int dst_type;
     int dst_no;
@@ -2651,16 +2651,19 @@ int MenuDataSwap(CGameDataUsed *destination, CGameDataUsed *source, int quantity
         }
         result = 5;
     } else {
-        int had_src = 0;
         int had_dst = 0;
+        int had_src = 0;
+        s8 *tbl;
         GameDataSwap(destination, source, 1);
         if (dst_no > 0) {
             had_dst = 1;
         }
+        tbl = ret_tbl1_2511;
         if (src_no > 0) {
             had_src = 1;
         }
-        s8 results[2] = {ret_tbl1_2511[had_src], 2};
+        tbl += had_src;
+        s8 results[2] = {*tbl, 2};
         result = results[had_dst];
     }
     CheckEnableHaveItemNum();
