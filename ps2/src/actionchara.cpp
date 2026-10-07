@@ -3086,7 +3086,7 @@ void CActionChara::RunScript(CScene *scene, RUN_SCRIPT_ENV *env) {
     if (move_check.landed != 0) {
         foot = move_check.ground_poly.foot_sound;
         if (foot == 0 && map != NULL) {
-            foot = map->def_foot;
+            foot = map->map_info.def_foot;
         }
         sound_info.foot_sound_id = foot;
         adjusted_velocity[1] = 0.0f;

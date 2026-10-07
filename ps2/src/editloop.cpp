@@ -723,7 +723,7 @@ void EditInit(INIT_LOOP_ARG arg) {
     player = MainScene__2->GetCharacter(MainScene__2->player_chara);
     map = MainScene__2->GetMap(0);
     if (player != NULL && map != NULL) {
-        player->SetPosition(map->chara_pos);
+        player->SetPosition(map->map_info.chara_pos);
         player->GetPosition(position);
     }
     Camera->SetPos(0.0f, 0.0f, float(100));
@@ -955,7 +955,7 @@ int EditLoop() {
                 MainScene__2->TimeStep(time_rate);
             }
             time_map->now_time = MainScene__2->time;
-            if (light_check != 0 && light_band != time_map->GetNowTimeLightBand() && time_map->time_cfade != 0) {
+            if (light_check != 0 && light_band != time_map->GetNowTimeLightBand() && time_map->map_info.time_cfade != 0) {
                 MainScene__2->fade.CaptureScreen();
                 MainScene__2->fade.CrossFade(10, 0.8f);
             }

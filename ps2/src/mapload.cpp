@@ -234,12 +234,12 @@ MAP_TIME_BAND GetTimeBand(float time) {
 }
 
 float CMap::GetNowTime() {
-    if (time_enable) {
+    if (map_info.time_enable) {
         return now_time;
     }
 
-    if (fixed_time_enable) {
-        return fixed_time;
+    if (map_info.fixed_time_enable) {
+        return map_info.fixed_time;
     }
 
     return 12.0f;
@@ -250,7 +250,7 @@ int CMap::GetNowTimeBand() {
 }
 
 int CMap::GetNowTimeLightBand() {
-    int band_count = time_light_num;
+    int band_count = map_info.time_light_num;
 
     if (band_count < 2) {
         return 0;
@@ -342,7 +342,7 @@ void CMap::GetLightingSunRatio(float *out_ratio) {
 }
 
 int CMap::GetTimeLightingRatio(float *ratio) {
-    int   band_count = time_light_num;
+    int   band_count = map_info.time_light_num;
     int   i;
     float hour;
     float blend;
@@ -394,12 +394,12 @@ void CMap::GetSunPoint(float *out_pos) {
 
     mgUnitMatrix(matrix);
     sceVu0RotMatrixZ(matrix, matrix, mgAngleLimit((GetNowTime() * 6.2831855f) / 24.0f));
-    sceVu0RotMatrixY(matrix, matrix, sun_angle);
+    sceVu0RotMatrixY(matrix, matrix, map_info.sun_angle);
     sceVu0ApplyMatrix(out_pos, matrix, sun);
 }
 
 float CMap::GetLightNoTime(int index) {
-    int   band_count = time_light_num;
+    int   band_count = map_info.time_light_num;
     float hour;
 
     if (index >= band_count || GetTimeEnable() == 0) {
@@ -432,7 +432,7 @@ float CMap::GetLightNoTime(int index) {
 }
 
 int CMap::GetTimeEnable() {
-    return time_enable;
+    return map_info.time_enable;
 }
 
 void CMap::GetLightInfo(CMapLightingInfo *out_info) {
@@ -440,9 +440,9 @@ void CMap::GetLightInfo(CMapLightingInfo *out_info) {
         return;
     }
 
-    int num = time_light_num;
+    int num = map_info.time_light_num;
 
-    if (GetActiveLightNo() >= num || (!GetTimeEnable() && !fixed_time_enable)) {
+    if (GetActiveLightNo() >= num || (!GetTimeEnable() && !map_info.fixed_time_enable)) {
         CMapLightingInfo *info = GetLightingInfo(GetActiveLightNo());
 
         if (info != NULL) {
@@ -458,7 +458,7 @@ void CMap::GetLightInfo(CMapLightingInfo *out_info) {
     int band = GetNowTimeLightBand();
 
     for (int i = 0; i < num; i++) {
-        list[i] = CMapInfo::GetLightingInfo(i);
+        list[i] = map_info.GetLightingInfo(i);
 
         if (list[i] == NULL) {
             return;
@@ -467,7 +467,7 @@ void CMap::GetLightInfo(CMapLightingInfo *out_info) {
 
     *out_info = *list[band];
 
-    if (time_light_blend) {
+    if (map_info.time_light_blend) {
         GetLightInfo(out_info, ratio, GetTimeLightingRatio(ratio));
 
         // The first directional light follows the sun, never lower than a fixed height.
@@ -508,13 +508,13 @@ mgMaterial *mgCFrame::GetMaterial(int index) {
 }
 
 CMapLightingInfo *CMap::GetLightingInfo(int no) {
-    return CMapInfo::GetLightingInfo(no);
+    return map_info.GetLightingInfo(no);
 }
 
 #pragma inline_depth(0)
 
 int CMap::GetActiveLightNo() {
-    return CMapInfo::GetActiveLightNo();
+    return map_info.GetActiveLightNo();
 }
 
 #pragma inline_depth reset
@@ -535,10 +535,10 @@ void CMap::GetLightInfo(CMapLightingInfo *out_info, float *ratio, int num) {
     int               fog_num = 0;
     int               i;
     int               j;
-    int               lighting_num = time_light_num;
+    int               lighting_num = map_info.time_light_num;
 
     for (i = 0; i < lighting_num; i++) {
-        list[i] = CMapInfo::GetLightingInfo(i);
+        list[i] = map_info.GetLightingInfo(i);
 
         if (list[i] == NULL) {
             return;
