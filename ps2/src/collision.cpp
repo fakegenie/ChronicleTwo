@@ -517,34 +517,29 @@ CColFrame::CColFrame() {
     Initialize();
 }
 
-#ifdef NONMATCHING
-// 97.9% match, 16 words off
 CCollisionMDT *CreateCollisionMDT(u_int *model, mgCMemory *memory) {
-    int           *words;
-    sceVu0FVECTOR *vertices;
-    int polygon_no;
-    MDT_MATERIAL_ *material;
+    MDT_HEADER    *header = (MDT_HEADER *)model;
     int            index_count;
-    CCPoly        *polys;
-    MDT_FACES     *faces;
-    int            prim_num;
-    int            i;
-    int            j;
-    FACES_ID      *prim;
-    CCollisionMDT *collision;
-    FACES_ID      *first_prim;
-    int            material_no;
-    int            poly_count;
-    MDT_HEADER    *header;
-    CCPoly        *poly;
+    sceVu0FVECTOR *vertices;
     MDT_MATERIAL_ *materials;
+    MDT_FACES     *faces;
+    int            j;
+    int            material_no;
+    FACES_ID      *first_prim;
+    CCPoly        *polys;
+    int            poly_count;
+    int            prim_num;
+    CCollisionMDT *collision;
+    CCPoly        *poly;
+    int           *words;
+    int            polygon_no;
+    int            i;
 
     collision = new ((u_long128 *)memory->Alloc(Align16Blocks(sizeof(CCollisionMDT)) + 2)) CCollisionMDT;
 
-    header = (MDT_HEADER *)model;
-    vertices = (sceVu0FVECTOR *)((char *)model + header->vertex_ofs);
-    materials = (MDT_MATERIAL_ *)((char *)model + header->material_ofs);
-    faces = (MDT_FACES *)((char *)model + header->faces_ofs);
+    vertices = (sceVu0FVECTOR *)((char *)header + header->vertex_ofs);
+    materials = (MDT_MATERIAL_ *)((char *)header + header->material_ofs);
+    faces = (MDT_FACES *)((char *)header + header->faces_ofs);
     prim_num = faces->prim_num;
     first_prim = (FACES_ID *)(faces + 1);
 
@@ -585,11 +580,10 @@ CCollisionMDT *CreateCollisionMDT(u_int *model, mgCMemory *memory) {
             words += 3;
 
             if (material_no >= 0 && materials != 0) {
-                material = &materials[material_no];
-                poly->ground_kind = material->diffuse[0] * 0.7f + 0.01f;
-                poly->foot_sound = material->diffuse[1] * 0.7f + 0.01f;
-                poly->area_kind = material->diffuse[2] * 0.7f + 0.01f;
-                poly->ignore_mask = 1.0f - material->diffuse[3];
+                poly->ground_kind = materials[material_no].diffuse[0] * 0.7f + 0.01f;
+                poly->foot_sound = materials[material_no].diffuse[1] * 0.7f + 0.01f;
+                poly->area_kind = materials[material_no].diffuse[2] * 0.7f + 0.01f;
+                poly->ignore_mask = 1.0f - materials[material_no].diffuse[3];
             } else {
                 memset(&poly->ground_kind, 0, 0x10);
             }
@@ -603,9 +597,6 @@ CCollisionMDT *CreateCollisionMDT(u_int *model, mgCMemory *memory) {
     collision->CreateBBox();
     return collision;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/collision", CreateCollisionMDT__FPUiP9mgCMemory);
-#endif
 
 // Defined in collision.hpp.
 // Defined in collision.hpp.
