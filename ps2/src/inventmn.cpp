@@ -3662,8 +3662,6 @@ extern char at_3630[];
 extern char at_3631[];
 extern char at_3632[];
 
-#ifdef NONMATCHING
-// 11 words off in an aligned diff
 void CMenuInvent::CalcTex() {
     if (bg_form != NULL) {
         float *left_top = GetMenuMainFrameLeftTopPos(0);
@@ -3675,7 +3673,8 @@ void CMenuInvent::CalcTex() {
     if (blink_count >= 180000) {
         blink_count = 0;
     }
-    float shade = 128.0f + 64.0f * sinf(mgAngleLimit(3.1415927f * blink_count / 50.0f));
+    float wave = sinf(mgAngleLimit(3.1415927f * blink_count / 50.0f));
+    float shade = 128.0f + 64.0f * wave;
     neta_color[0] = shade;
     neta_color[1] = shade;
     neta_color[2] = 128.0f;
@@ -3807,7 +3806,8 @@ void CMenuInvent::CalcTex() {
         if (frame != NULL && bar != NULL) {
             bar[0].x = bar[1].x = bar[2].x = frame[0].x + 2.0f;
             float length = bar[0].h + bar[1].h + bar[2].h;
-            float target = frame[0].y + 4.0f + (frame[1].h + 4.0f - length) / 20.0f * album_top;
+            float step = (frame[1].h + 4.0f - length) / 20.0f;
+            float target = frame[0].y + 4.0f + step * album_top;
             float bar_y = bar[0].y;
             CalcMenu1(target, &bar_y, 4.0f, 0.0f, album_scroll_reset);
             length = bar[0].h + bar[1].h + bar[2].h;
@@ -3840,9 +3840,9 @@ void CMenuInvent::CalcTex() {
         MENUFORMPARTS_TYPE *bar_mid = title->GetPartInfo(at_2129__2);
         MENUFORMPARTS_TYPE *bar_end = title->GetPartInfo(at_2130__2);
         int card_max = EnableSelectMaxCardList();
-        float bar_step = 0.0f;
         float knob = bar_size[1] * (5.0f / card_max);
         float hidden = card_max - 5;
+        float bar_step = 0.0f;
         if (1.0f <= hidden) {
             bar_step = (bar_size[1] - knob) / hidden;
         }
@@ -3909,7 +3909,7 @@ void CMenuInvent::CalcTex() {
                             effect_sway_angle -= 6.2831855f;
                             effect_sway = 1.0f + 2.0f * mgRnd();
                         }
-                        if (CalcMenuAdd(&effect_bob_angle, 3.1415927f / 22.0f, 3.1415927f)) {
+                        if (CalcMenuAdd(&effect_bob_angle, 3.1415927f / float(22), 3.1415927f)) {
                             effect_bob_angle = 0.0f;
                             effect_bob_count++;
                             effect_bob -= 0.6f + 2.0f * mgRnd() / 10.0f;
@@ -3980,9 +3980,6 @@ void CMenuInvent::CalcTex() {
     MenuEffect[0]->Step();
     MenuEffect[1]->Step();
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/inventmn", CalcTex__11CMenuInventFv);
-#endif
 void CMenuInvent::BootExtendCommand() {
     menu_invent_command_info_ptr = &modecmdtbl_3636[key_arg_no];
 
