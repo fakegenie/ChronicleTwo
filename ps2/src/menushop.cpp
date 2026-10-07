@@ -1090,7 +1090,6 @@ int CShopMenu::KeyStep() {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/menushop", KeyStep__9CShopMenuFv);
 #endif
-#ifdef NONMATCHING
 extern char at_1817[];
 extern char at_1818[];
 extern char at_1819[];
@@ -1101,11 +1100,8 @@ extern char at_1823__2[];
 extern char at_1824__2[];
 extern char at_1825__3[];
 extern char at_1826__4[];
-// 97.8% match, 61 words off
 void CShopMenu::CalcTex() {
-    int num_pos[2];
-    int down_pos[2];
-    int up_pos[2];
+    int pos[3][2];
     int name_pos[2];
     float bar_pos[2];
     if (shop_name_brd != NULL && MenuMesForm[1] != NULL) {
@@ -1154,17 +1150,16 @@ void CShopMenu::CalcTex() {
         message_form->draw_flag = 0;
         message->MakeMsg(0);
         if (NowSellMode == SHOP_SELL_MODE_MONEY && (key_arg_no == SHOP_MENU_MODE_BAG || key_arg_no == SHOP_MENU_MODE_SELL_NUM)) {
-            CGameDataUsed *item;
-            int win_y;
-            int px;
-            int koma[2];
             int py;
-            int gift_box;
+            s16 *mes_width;
+            int win_y;
+            int koma[2];
             int mes_no;
+            int sell;
+            CGameDataUsed *item;
+            int gift_box;
             int line;
             int win_x;
-            s16 *mes_width;
-            int sell;
             mes_width = &price_mes_width;
             item = SearchNowPosItemExist();
             message->point_y = 0;
@@ -1200,23 +1195,26 @@ void CShopMenu::CalcTex() {
             if (gift_box == 1) {
                 koma[0] += 0x2C;
                 win_x = koma[0] + 0xA;
-                if (mgScreenWidth - *mes_width - 0x1E < win_x) {
+                if (win_x > mgScreenWidth - *mes_width - 0x1E) {
                     win_x -= *mes_width + 0x6D;
                 }
                 koma[1] = koma[1] + 0xC;
                 win_y = koma[1] - 0x1A;
-                px = koma[0] - win_x;
+
                 py = koma[1] - win_y;
-                message->point_x = px;
+                message->point_x = koma[0] - win_x;
                 message->point_y = py;
             } else {
                 koma[0] += 0x14;
                 win_x = koma[0] - *mes_width / 2;
-                if (mgScreenWidth - 0x28 < win_x + *mes_width && win_x > mgScreenWidth - 0x28 - *mes_width) {
-                    do {
-                        win_x--;
-                    } while (mgScreenWidth - 0x28 - *mes_width < win_x);
+                if (mgScreenWidth - 0x28 < (int)win_x + *mes_width) {
+                    if (mgScreenWidth - 0x28 - *mes_width < (int)win_x) {
+                        do {
+                            win_x--;
+                        } while (mgScreenWidth - 0x28 - *mes_width < win_x);
+                    }
                 }
+
                 win_y = koma[1] + 0x32;
                 if (line >= 3) {
                     win_y = koma[1] - 0x50;
@@ -1224,9 +1222,9 @@ void CShopMenu::CalcTex() {
                         win_y = koma[1] - 0x32;
                     }
                 }
-                px = koma[0] - win_x;
+
                 py = koma[1] - win_y;
-                message->point_x = px;
+                message->point_x = koma[0] - win_x;
                 message->point_y = py;
             }
             message_form->x = win_x;
@@ -1234,22 +1232,23 @@ void CShopMenu::CalcTex() {
         }
     }
     if (trade_brd != NULL) {
-        trade_brd->GetPutPosXY(at_1821, num_pos[0], num_pos[1]);
-        trade_brd->GetPutPosXY(at_1822, up_pos[0], up_pos[1]);
-        trade_brd->GetPutPosXY(at_1823__2, down_pos[0], down_pos[1]);
+        trade_brd->GetPutPosXY(at_1821, pos[0][0], pos[0][1]);
+        int *up = pos[1];
+        trade_brd->GetPutPosXY(at_1822, up[0], up[1]);
+        int *down = pos[2];
+        trade_brd->GetPutPosXY(at_1823__2, down[0], down[1]);
         trade_brd->SetNumber(at_1824__2, num);
         if (NowSellMode != SHOP_SELL_MODE_DONY || (key_arg_no != SHOP_MENU_MODE_BUY_NUM && key_arg_no != SHOP_MENU_MODE_BUY_ASK && key_arg_no != SHOP_MENU_MODE_BUY_ERROR)) {
-            MenuDCMsg[3]->SetMovePosGyou(0, num_pos[0], num_pos[1]);
-            MenuDCMsg[3]->SetMovePosGyou(1, up_pos[0], up_pos[1]);
-            MenuDCMsg[3]->SetMovePosGyou(2, down_pos[0], down_pos[1]);
+            MenuDCMsg[3]->SetMovePosGyou(0, pos[0][0], pos[0][1]);
+            MenuDCMsg[3]->SetMovePosGyou(1, up[0], pos[1][1]);
+            MenuDCMsg[3]->SetMovePosGyou(2, down[0], pos[2][1]);
         }
         trade_brd->SetPartRGBA(at_1825__3, 0x80, 0x80, 0x80, 0x80);
         trade_brd->SetPartRGBA(at_1826__4, 0x80, 0x80, 0x80, 0x80);
         if (0 < arrow_flash[0]) {
             trade_brd->SetPartRGBA(at_1825__3, 0xA4, 0xA4, 0xA4, 0x80);
         }
-        int right_arrow_lit = arrow_flash[1] > 0;
-        if (right_arrow_lit) {
+        if (0 < arrow_flash[1]) {
             trade_brd->SetPartRGBA(at_1826__4, 0xA4, 0xA4, 0xA4, 0x80);
         }
     }
@@ -1260,9 +1259,6 @@ void CShopMenu::CalcTex() {
         arrow_flash[1]--;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menushop", CalcTex__9CShopMenuFv);
-#endif
 /**
  *
  * Position or offset of a shop menu cursor.
