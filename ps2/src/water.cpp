@@ -573,7 +573,7 @@ int CWater::Draw(u_int *tag, float (*matrix)[4], mgCDrawManager *draw_manager) {
     return 0;
 }
 #ifdef NONMATCHING
-// 96.4% match, 120 words off
+// 98.8% match, 80 words off
 struct WaterTextureName {
     char text[0x20];
 };
@@ -613,24 +613,24 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
     sceVu0FVECTOR      row_step;
     sceVu0FVECTOR      column_step;
     sceVu0FVECTOR      slope[64][64];
-    int                index;
     int                row;
+    int                index;
     u_long128         *start;
+    int                vertex_count;
     u_long128         *end;
-    int                started;
-    int                column;
     float              row_position;
-    float             *previous;
+    int                column;
     int                size;
     WaterDmaTag       *tag;
+    u_long128         *base;
     int                point_count;
-    int                vertex_count;
-    u_long128         *positions;
+    int                started;
+    mgCMemory         *memory;
     WaterFinishPacket *finish;
     u_int             *counts;
-    u_long128         *base;
+    float             *previous;
     WaterStripPacket  *strip;
-    mgCMemory         *memory;
+    u_long128         *positions;
     float             *current;
     sceVu0FVECTOR     *slope0;
     int                remaining;
@@ -659,21 +659,21 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
     }
     int row_end = rows - 1;
     int column_end = columns - 1;
-    for (row = 0; row < rows; row++) {
-        slope[row][column_end][3] = 0.0f;
-        slope[row][0][3] = 0.0f;
-        slope[row][column_end - 1][3] = 0.6f;
-        slope[row][1][3] = 0.6f;
-        slope[row][column_end - 2][3] = 0.3f;
-        slope[row][2][3] = 0.3f;
+    for (int r = 0; r < rows; r++) {
+        slope[r][column_end][3] = 0.0f;
+        slope[r][0][3] = 0.0f;
+        slope[r][column_end - 1][3] = 0.6f;
+        slope[r][1][3] = 0.6f;
+        slope[r][column_end - 2][3] = 0.3f;
+        slope[r][2][3] = 0.3f;
     }
-    for (column = 0; column < columns; column++) {
-        slope[row_end][column][3] = 0.0f;
-        slope[0][column][3] = 0.0f;
-        slope[row_end - 1][column][3] = 0.6f;
-        slope[1][column][3] = 0.6f;
-        slope[row_end - 2][column][3] = 0.3f;
-        slope[2][column][3] = 0.3f;
+    for (int c = 0; c < columns; c++) {
+        slope[row_end][c][3] = 0.0f;
+        slope[0][c][3] = 0.0f;
+        slope[row_end - 1][c][3] = 0.6f;
+        slope[1][c][3] = 0.6f;
+        slope[row_end - 2][c][3] = 0.3f;
+        slope[2][c][3] = 0.3f;
     }
     base = memory->stGetTop();
     start = (u_long128 *) ((u_int) base | MG_UNCACHED);
@@ -692,10 +692,10 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
         texture_copy.clut = source->clut;
         texture_copy.swizzled = source->swizzled;
         texture_copy.next = source->next;
-        texa.AEM = 0;
+        texture_copy.tex0.bits.psm = SCE_GS_PSMCT24;
         texa.TA0 = 0x80;
         texa.TA1 = 0x80;
-        texture_copy.tex0.bits.psm = SCE_GS_PSMCT24;
+        texa.AEM = 0;
         end += mgSetPkTEX0((u_int *) end, texture_copy.tex0.value,
                            *(u_long *) &texture_copy.tex1, *(u_long *) &texa);
     }
@@ -704,9 +704,9 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
         sceVu0FVECTOR position0;
         sceVu0FVECTOR position1;
         sceVu0FVECTOR row_offset;
-        slope0 = slope[row];
-        slope1 = slope[row + 1];
         current = height + row * columns;
+        slope1 = slope[row + 1];
+        slope0 = slope[row];
         sceVu0ScaleVector(row_offset, row_step, row_position);
         sceVu0AddVector(position0, min, row_offset);
         position0[3] = 1.0f;
