@@ -3022,8 +3022,10 @@ static inline MC_CARD_INFO *GetSubGameCard(CMemoryCardManager *manager) {
         return NULL;
     }
 }
-#ifdef NONMATCHING
-// 99.7% match, 17 words off
+template <typename T> static inline T Ident(T v) { return v; }
+static inline int &SubGameFileExists(CMemoryCardManager *manager) {
+    return manager->file_exists;
+}
 int SubGameSaveKey(void) {
     MC_CARD_INFO *card;
     u32 stepResult;
@@ -3086,7 +3088,7 @@ int SubGameSaveKey(void) {
         case SUB_SAVE_CARD_READY:
             card = GetSubGameCard(MemoryCardPtr);
             if (stepResult != 0) {
-                int &exists = MemoryCardPtr->file_exists;
+                int &exists = SubGameFileExists(MemoryCardPtr);
                 if (McCheckMCPs2(card) == 0) {
                     next = SUB_SAVE_CARD_ERROR;
                 } else if (card->formatted == 0) {
@@ -3227,13 +3229,15 @@ int SubGameSaveKey(void) {
         case SUB_SAVE_FORMATTING:
             card = GetSubGameCard(MemoryCardPtr);
             if (stepResult != 0) {
-                if (McCheckMCPs2(card) != 0) {
-                    next = SUB_SAVE_DIR_MAKING;
-                    if (card != NULL && card->formatted == 0) {
-                        next = SUB_SAVE_CARD_ERROR;
-                    }
-                } else {
+                if (McCheckMCPs2(card) == 0) {
+                    goto format_error;
+                }
+                next = SUB_SAVE_DIR_MAKING;
+                if (card != NULL && card->formatted == 0) {
+                format_error:
                     next = SUB_SAVE_CARD_ERROR;
+                } else {
+                    next = SUB_SAVE_DIR_MAKING;
                 }
             }
             break;
@@ -3417,7 +3421,7 @@ int SubGameSaveKey(void) {
                 break;
             case SUB_SAVE_CARD_ERROR:
                 window->MsgPreset(0x12, LanguageCode);
-                card = GetSubGameCard(MemoryCardPtr);
+                card = GetSubGameCard(Ident(MemoryCardPtr));
                 if (SubGameSaveOrLoadPhase == SUB_SAVE_FORMATTING) {
                     window->MakeMsg(0xBE5);
                     window->SetMsgVolumeNoOne(slotNo);
@@ -3451,9 +3455,6 @@ int SubGameSaveKey(void) {
     MenuDCMsg[0]->StepMsg();
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuop", SubGameSaveKey__Fv);
-#endif
 void SubGameSaveDraw() {
     mgCTextureManager *textures = &mgTexManager;
     textures->ReloadTexture(SubGameSaveBlock[0], (sceVif1Packet *) 0);
