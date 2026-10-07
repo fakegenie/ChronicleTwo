@@ -5119,30 +5119,28 @@ void CMenuPosDataManage::InitializeCMenuPosDataManage() {
     memset(fish_jump_height, 0, sizeof(fish_jump_height));
     memset(fish_jump_count, 2, sizeof(fish_jump_count));
 }
-#ifdef NONMATCHING
-// 99.9% match, 5 words off
 int MenuCapture(int block, mgCMemory *stack, int draw) {
-    int screen_w;
-    int pad_w;
+    u8 *src;
     int r;
+    int screen_w;
+    int tex_w;
+    int pad_w;
     int g;
     int b;
-    u8 *src;
-    int tex_w;
-    int pad_h;
-    int half_w;
-    mgCDrawPrim *prim;
-    int x;
     mgCTextureManager *tex_manager;
+    int half_w;
+    int pad_h;
+    int x;
+    mgCDrawPrim *prim;
+    int tex_h;
     u8 *below;
-    int row;
-    int half_h;
+    int y;
     int pixel_num;
     int stride;
+    int half_h;
     int line_num;
     u8 *dst;
-    int y;
-    int tex_h;
+    int row;
     u8 *line;
 
     stack->Align64();
@@ -5228,9 +5226,6 @@ int MenuCapture(int block, mgCMemory *stack, int draw) {
     }
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", MenuCapture__FiP9mgCMemoryi);
-#endif
 void SetBGFrameForMenu(int tex_block, char *name) {
     (&mgTexManager)->ReloadTexture(tex_block, (sceVif1Packet *) NULL);
     mgCTexture   frame;
