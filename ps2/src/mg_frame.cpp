@@ -1489,8 +1489,6 @@ int mgCFrame::Draw(unsigned int *packet) {
 }
 
 #pragma global_optimizer off
-#ifdef NONMATCHING
-// 99.4% match, 2 words off
 int mgCFrame::GetDrawRect(mgVu0FBOX *rect, mgCDrawManager *manager) {
     if (manager == NULL) {
         manager = &mgDrawManager;
@@ -1637,23 +1635,25 @@ int mgCFrame::GetDrawRect(mgVu0FBOX *rect, mgCDrawManager *manager) {
         sqc2 vf30, 0x0(max_ptr)
         sqc2 vf31, 0x0(min_ptr)
         }
-        int h;
-        int w = mgScreenWidth;
-        h = mgScreenHeight;
-        found = 0;
-        float left = 0.5f * (float)-w;
-        float top = 0.5f * (float)-h;
-        float right = left + (float)w;
-        float bottom = top + (float)h;
-        if (min[0] <= right && !(max[0] < left) &&
-            min[1] <= bottom && !(max[1] < top) &&
-            !(max[3] < render->clip_min[2])) {
-            found = 1;
-            min[0] += (float)(mgScreenWidth / 2);
-            max[0] += (float)(mgScreenWidth / 2);
-            min[1] += (float)(mgScreenHeight / 2);
-            max[1] += (float)(mgScreenHeight / 2);
-        }
+        do {
+            int h;
+            int w = mgScreenWidth;
+            h = mgScreenHeight;
+            found = 0;
+            float left = 0.5f * (float)-w;
+            float top = 0.5f * (float)-h;
+            float right = left + (float)w;
+            float bottom = top + (float)h;
+            if (min[0] <= right && !(max[0] < left) &&
+                min[1] <= bottom && !(max[1] < top) &&
+                !(max[3] < render->clip_min[2])) {
+                found = 1;
+                min[0] += (float)(mgScreenWidth / 2);
+                max[0] += (float)(mgScreenWidth / 2);
+                min[1] += (float)(mgScreenHeight / 2);
+                max[1] += (float)(mgScreenHeight / 2);
+            }
+        } while (0);
     }
     if (found) {
         sceVu0CopyVector(rect->max, max);
@@ -1683,9 +1683,6 @@ int mgCFrame::GetDrawRect(mgVu0FBOX *rect, mgCDrawManager *manager) {
     sceVu0CopyVector(rect->min, min);
     return found;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_frame", GetDrawRect__8mgCFrameFP9mgVu0FBOXP14mgCDrawManager);
-#endif
 #pragma global_optimizer reset
 
 mgCFrame &mgCFrame::operator=(mgCFrame &other) {

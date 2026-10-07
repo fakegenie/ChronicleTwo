@@ -908,20 +908,17 @@ void ResetMenuScissor() {
     prim->Direct(0x40, ((s64) (mgScreenWidth - 1) << 16) | ((s64) (mgScreenHeight - 1) << 48));
     prim->End();
 }
-#ifdef NONMATCHING
-// 99.9% match, 6 words off
 int SetModeMenuDrawItemBoard(int mode) {
     int k;
-    CGameDataUsed *item;
+    CGameDataUsed *item = NULL;
     int party;
-    int i;
     CGameDataUsed *used;
 
     MenuDrawItemInfoNum = 0;
     party = GetUserDataMan()->GetNowPartyMember();
     if (mode == 0) {
-        for (i = 0; i < 150; i++) {
-            MenuDrawItemInfo[i] = &MenuUserParam.used_data[i];
+        for (k = 0; k < 150; k++) {
+            MenuDrawItemInfo[k] = &MenuUserParam.used_data[k];
         }
         MenuDrawItemInfoNum = GetNowBagMax(1);
     }
@@ -938,10 +935,10 @@ int SetModeMenuDrawItemBoard(int mode) {
             MenuDrawItemInfo[MenuDrawItemInfoNum] = &MenuUserParam.chara[1]->equip[1];
             MenuDrawItemInfoNum++;
         }
-        used = MenuUserParam.used_data;
-        for (i = 0; i < 150; i++, used++) {
-            if (used->used_type == USED_ITEM_TYPE_WEAPON) {
-                MenuDrawItemInfo[MenuDrawItemInfoNum] = used;
+        item = MenuUserParam.used_data;
+        for (k = 0; k < 150; k++, item++) {
+            if (item->used_type == USED_ITEM_TYPE_WEAPON) {
+                MenuDrawItemInfo[MenuDrawItemInfoNum] = item;
                 MenuDrawItemInfoNum++;
             }
         }
@@ -977,7 +974,7 @@ int SetModeMenuDrawItemBoard(int mode) {
             CFishAquarium *aquarium = GetAquariumData();
             if (aquarium != NULL) {
                 used = aquarium->GetAquariumFishTop(0);
-                for (i = 0; i < 6; i++, used++) {
+                for (k = 0; k < 6; k++, used++) {
                     if (0 < used->item_no) {
                         MenuDrawItemInfo[MenuDrawItemInfoNum] = used;
                         MenuDrawItemInfoNum++;
@@ -993,14 +990,11 @@ int SetModeMenuDrawItemBoard(int mode) {
             }
         }
     }
-    for (i = MenuDrawItemInfoNum; i < 150; i++) {
-        MenuDrawItemInfo[i] = NULL;
+    for (k = MenuDrawItemInfoNum; k < 150; k++) {
+        MenuDrawItemInfo[k] = NULL;
     }
     return MenuDrawItemInfoNum;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", SetModeMenuDrawItemBoard__Fi);
-#endif
 void EnableUseItemAlphaStep() {
     use_item_enable_alpha_angle += 0.052359879f;
 
@@ -1332,14 +1326,12 @@ void MenuPresentBoxView(int x, int y, int &tex_block, mgCTexture *tex, mgCTextur
 static void SetMenuDrawNumberKeta(char value) {
     MenuDrawNumberKeta = value;
 }
-#ifdef NONMATCHING
 template <typename T> static inline T Ident(T v) { return v; }
 /**
  *
  * Draws a number with the selected alignment and optional digit padding.
  *
  */
-// 99.9% match, 2 words off
 int DrawMenuNumber(mgCDrawPrim *prim, int number, int align, mgRect<int> rect, mgRect<int> texture_rect, int step_x,
                    int step_y) {
     int digits = GetNumberKeta(number);
@@ -1377,16 +1369,15 @@ int DrawMenuNumber(mgCDrawPrim *prim, int number, int align, mgRect<int> rect, m
         int         put_y = y;
         x -= step_x;
         y -= step_y;
-        src.Set(texture_rect.left, Ident(texture_rect.top), digit_w, texture_rect.bottom);
+        int top = texture_rect.top;
+        int bottom = texture_rect.bottom;
+        src.Set(texture_rect.left, Ident(top), digit_w, Ident(bottom));
         dst.Set(x, put_y, rect.right, rect.bottom);
         PrimQuad(prim, dst, src);
         padding--;
     }
     return x;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", DrawMenuNumber__FP11mgCDrawPrimii9mgRect_i_9mgRect_i_ii);
-#endif
 void PrimDrawNumber(mgCDrawPrim *prim, int number, int digit_count, int x, int y,
                     mgRect<int> texture_rect, int spacing, int mode) {
     SetMenuDrawNumberKeta(-1);
@@ -1716,7 +1707,7 @@ void CalcCommonBrdDrawInfo(float *pos, MENUFORM_MAKEBRD_INFO *info, ClsMes *mes)
 }
 #ifdef NONMATCHING
 static inline MENUFORM_MAKEBRD_LINE *BoardLine(int i) { return &CommonBoardDrawInfo.line[i]; }
-// 99.8% match, 33 words off
+// 99.8% match, 29 words off
 void CommonBoardDraw(float *pos, int &tex_block) {
     mgCTexture *board_tex = Tex_CommonBoard;
     if (board_tex == NULL) {
@@ -1798,11 +1789,12 @@ void CommonBoardDraw(float *pos, int &tex_block) {
     prim->Texture(Tex_CommonBoard);
     prim->Color(0x80, 0x80, 0x80, 0x80);
     
-    for (pass = 0, row_top = 0; pass < 4; pass++, row_top += 34) {
+    for (pass = 0; pass < 4; pass++) {
         MENUFORM_MAKEBRD_LINE *line = BoardLine(pass);
         float line_x;
-        float x = line_x = 20.0f + pos[0];
-        float line_top = 88.0f + pos[1] + row_top;
+        float x = 20.0f + pos[0];
+        line_x = x;
+        float line_top = 88.0f + pos[1] + pass * 34;
         s16 (*brd)[4] = get_onoffbrdtbl_1789[line->kind];
         int top;
         PrimQuad(prim, mgRect<int>((int)x, top = (int)line_top, brd[0][2], brd[0][3]),
@@ -5122,29 +5114,29 @@ void CMenuPosDataManage::InitializeCMenuPosDataManage() {
     memset(fish_jump_height, 0, sizeof(fish_jump_height));
     memset(fish_jump_count, 2, sizeof(fish_jump_count));
 }
-#ifdef NONMATCHING
-// 98.3% match, 30 words off
 int MenuCapture(int block, mgCMemory *stack, int draw) {
-    int pad_w;
-    int pad_h;
+    u8 *src;
     int r;
+    int screen_w;
+    int tex_w;
+    int pad_w;
+    int g;
     int b;
     mgCTextureManager *tex_manager;
-    mgCDrawPrim *prim;
-    int x;
-    int y;
-    int pixel_num;
-    int screen_w;
-    u8 *line;
     int half_w;
-    int line_num;
-    int g;
-    int half_h;
-    int tex_w;
-    u8 *src;
-    u8 *dst;
+    int pad_h;
+    int x;
+    mgCDrawPrim *prim;
     int tex_h;
     u8 *below;
+    int y;
+    int pixel_num;
+    int stride;
+    int half_h;
+    int line_num;
+    u8 *dst;
+    int row;
+    u8 *line;
 
     stack->Align64();
     tex_manager = &mgTexManager;
@@ -5179,13 +5171,15 @@ int MenuCapture(int block, mgCMemory *stack, int draw) {
     screen_w = mgScreenWidth;
     line_num = mgScreenHeight >> 1;
     pixel_num = mgScreenWidth >> 1;
+    stride = screen_w * 4;
+    row = screen_w * 8;
     for (y = 0; y < line_num; y++) {
         line = src;
         for (x = 0; x < pixel_num; x++) {
-            below = &line[screen_w * 4];
+            below = &line[stride];
+            g = 0;
             r = 0;
             b = 0;
-            g = 0;
             r += line[0];
             g += line[1];
             b += line[2];
@@ -5205,7 +5199,7 @@ int MenuCapture(int block, mgCMemory *stack, int draw) {
             dst[3] = 0x80;
             dst += 4;
         }
-        src += screen_w * 8;
+        src += row;
     }
     if (draw != 0 && MenuFrameTex != NULL) {
         tex_manager->ReloadTexture(block, (sceVif1Packet *)NULL);
@@ -5227,9 +5221,6 @@ int MenuCapture(int block, mgCMemory *stack, int draw) {
     }
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menudraw", MenuCapture__FiP9mgCMemoryi);
-#endif
 void SetBGFrameForMenu(int tex_block, char *name) {
     (&mgTexManager)->ReloadTexture(tex_block, (sceVif1Packet *) NULL);
     mgCTexture   frame;
