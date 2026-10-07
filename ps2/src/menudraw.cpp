@@ -2960,7 +2960,7 @@ void MenuItemBrdSetInfo(int unused, int pos, int max_line, int view_line) {
     Func_MenuItemBrdPosStep(pos);
 }
 #ifdef NONMATCHING
-// 99.8% match, 23 words off
+// 99.8% match, 17 words off
 void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int b) {
     int edge;
     int clip_left;
@@ -3012,10 +3012,10 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
         int put_top;
         for (int i = 0; i < 5; i++) {
             edge = (int)put_x;
-            PrimQuad(prim, mgRect<int>(edge, put_top = (int)put_y, 40, 32), *parts[frmtbl0_2922[part++]]);
+            PrimQuad(prim, mgRect<int>((int)edge, put_top = (int)put_y, 40, 32), *parts[frmtbl0_2922[part++]]);
             put_x += 40.0f;
         }
-        PrimQuad(prim, mgRect<int>((int)put_x, put_top, 32, 32), *parts[11]);
+        PrimQuad(prim, mgRect<int>((int)put_x, (int)put_top, 32, 32), *parts[11]);
         prim->End();
         ResetMenuScissor();
         SetSpriteEnv(prim, 0);
@@ -3034,8 +3034,8 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
                 PrimQuad(prim, mgRect<int>((int)put_x, put_top, 40, 40), *parts[frmtbl0_2922[part++]]);
                 put_x += 40.0f;
             }
-            PrimQuad(prim, mgRect<int>((int)(put_x - 8.0f), put_top, 6, 40), *parts[frmtbl0_2922[part - 1]]);
-            PrimQuad(prim, mgRect<int>((int)(put_x - 2.0f), put_top, 32, 40), *parts[frmtbl0_2922[part++]]);
+            PrimQuad(prim, mgRect<int>((int)(put_x - 8.0f), (int)put_top, 6, 40), *parts[frmtbl0_2922[part - 1]]);
+            PrimQuad(prim, mgRect<int>((int)(put_x - 2.0f), (int)put_top, 32, 40), *parts[frmtbl0_2922[part++]]);
             put_y += 250.0f;
         }
         put.right = 32;
@@ -3046,10 +3046,10 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
             int put_left;
             for (j = 0; j < 5; ++j) {
                 put_left = (int)put_x;
-                PrimQuad(prim, mgRect<int>(put_left, (int)put_y, 32, 40), *parts[frmtbl1_2938[part++]]);
+                PrimQuad(prim, mgRect<int>((int)put_left, (int)put_y, 32, 40), *parts[frmtbl1_2938[part++]]);
                 put_y += 40.0f;
             }
-            PrimQuad(prim, mgRect<int>(put_left, (int)put_y, 32, 10), *parts[frmtbl1_2938[part - 1]]);
+            PrimQuad(prim, mgRect<int>((int)put_left, (int)put_y, 32, 10), *parts[frmtbl1_2938[part - 1]]);
             put_x += 238.0f;
         }
         prim->End();
