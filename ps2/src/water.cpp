@@ -573,7 +573,7 @@ int CWater::Draw(u_int *tag, float (*matrix)[4], mgCDrawManager *draw_manager) {
     return 0;
 }
 #ifdef NONMATCHING
-// 99.4% match, 66 words off
+// 99.9% match, 14 words off
 struct WaterTextureName {
     char text[0x20];
 };
@@ -635,6 +635,8 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
     sceVu0FVECTOR     *slope1;
     sceVu0FVECTOR     *slope2;
     WaterStripPacket  *strip;
+    u_long128         *out;
+    sceVu0FVECTOR     *slope3;
     memory = draw_manager->data_memory;
     mgZeroVector(row_step);
     mgZeroVector(column_step);
@@ -699,14 +701,15 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
         end += mgSetPkTEX0((u_int *) end, texture_copy.tex0.value,
                            *(u_long *) &texture_copy.tex1, *(u_long *) &texa);
     }
+    out = end;
     started = 0;
     for (row = 0, row_position = 0.0f; row < rows - 1; row++, row_position += 1.0f) {
         sceVu0FVECTOR position0;
         sceVu0FVECTOR position1;
         sceVu0FVECTOR row_offset;
         current = height + row * columns;
-        slope1 = slope[row + 1];
-        slope2 = slope[row];
+        slope2 = slope[row + 1];
+        slope1 = slope[row];
         sceVu0ScaleVector(row_offset, row_step, row_position);
         sceVu0AddVector(position0, min, row_offset);
         position0[3] = 1.0f;
@@ -717,7 +720,7 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
             if (remaining < 27) {
                 point_count = remaining;
             }
-            strip = (WaterStripPacket *) end;
+            strip = (WaterStripPacket *) out;
             counts = strip->counts;
             *(u_long128 *) &strip->giftag = 0;
             strip->giftag.EOP = 1;
@@ -729,23 +732,23 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
             strip->giftag.REGS2 = 4;
             positions = (u_long128 *) (strip + 1);
             column = point_count * 2;
-            end = (u_long128 *) strip + 3 + point_count * 2;
+            out = (u_long128 *) strip + 3 + point_count * 2;
             for (index = 0; index < point_count; index++) {
                 positions[0] = *(u_long128 *) position0;
                 positions[1] = *(u_long128 *) position1;
                 positions += 2;
-                end[0] = *(u_long128 *) slope2++;
-                end[1] = *(u_long128 *) slope1++;
-                end += 2;
+                out[0] = *(u_long128 *) slope1++;
+                out[1] = *(u_long128 *) slope2++;
+                out += 2;
                 mgAddVector(position0, column_step);
                 mgAddVector(position1, column_step);
             }
             current--;
-            slope2--;
             slope1--;
+            slope2--;
             mgSubVector(position0, column_step);
             mgSubVector(position1, column_step);
-            size = end - (u_long128 *) strip - 1;
+            size = out - (u_long128 *) strip - 1;
             strip->dma[0] = MG_DMA_CNT | size;
             strip->dma[1] = 0;
             strip->dma[2] = 0;
@@ -755,24 +758,24 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
             counts[2] = 0;
             counts[3] = 0;
             if (point_count > 0) {
-                tag = (WaterDmaTag *) end;
+                tag = (WaterDmaTag *) out;
                 tag->command = MG_DMA_CNT | 1;
                 tag->address = 0;
                 tag->vif[0] = 0;
                 tag->vif[1] = 0;
                 if (started == 0) {
-                    end[1] = *(u_long128 *) prog_vif;
+                    out[1] = *(u_long128 *) prog_vif;
                     started = 1;
-                    end += 2;
+                    out += 2;
                 } else {
-                    end[1] = *(u_long128 *) progf_vif;
-                    end += 2;
+                    out[1] = *(u_long128 *) progf_vif;
+                    out += 2;
                 }
             }
         }
     }
-    end += mgSetPkTexFlush_TagCnt((u_int *) end);
-    finish = (WaterFinishPacket *) end;
+    out += mgSetPkTexFlush_TagCnt((u_int *) out);
+    finish = (WaterFinishPacket *) out;
     finish->dma.command = MG_DMA_CNT | 1;
     finish->dma.address = 0;
     finish->dma.vif[0] = 0;
@@ -785,8 +788,8 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
     finish->ret.address = 0;
     finish->ret.vif[0] = 0;
     finish->ret.vif[1] = 0;
-    end += 3;
-    memory->Alloc(end - start);
+    out += 3;
+    memory->Alloc(out - start);
     packet = (u_int) base;
     return (u_int) base;
 }
