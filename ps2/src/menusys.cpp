@@ -6939,21 +6939,6 @@ extern u64           at_6220;
 extern u64           at_6234;
 extern u64           at_6256;
 extern u64           at_6265;
-__declspec(dead) static void PrimeDebugKey(void) {
-    MenuSePlay(0);
-    MenuSePlay(1);
-    MenuSePlay(2);
-    MenuSePlay(3);
-    MenuSePlay(4);
-    MenuSePlay(5);
-    MenuSePlay(6);
-    MenuSePlay(7);
-    MenuSePlay(8);
-    MenuSePlay(9);
-    MenuSePlay(10);
-    MenuSePlay(11);
-    MenuSePlay(12);
-}
 void MenuItemDebugKey(void) {
     float rotation[4];
     float health_input[2];
@@ -7064,7 +7049,7 @@ void MenuItemDebugKey(void) {
                 MenuDebugItemModel = NULL;
                 MenuDebugModelDrawFlag = 1;
 
-                MenuDebugCamera = new ((u_long128 *)MenuDebugStack.Alloc(sizeof(mgCCameraFollow) / 16 + 2))
+                MenuDebugCamera = camera = new ((u_long128 *)MenuDebugStack.Alloc(sizeof(mgCCameraFollow) / 16 + 2))
                     mgCCameraFollow(40.0f, 30.0f, 0.0f, 8.0f);
 
                 MenuDebugItemModel = model = NewMenuActionChara(&MenuDebugStack);
