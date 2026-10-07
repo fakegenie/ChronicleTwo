@@ -2156,12 +2156,10 @@ void MenuMapPartsDraw(int &draw_wait) {
         draw_wait = -1;
     }
 }
-#ifdef NONMATCHING
-// 99.9% match, 13 words off
 void MenuGeoramaMessageMake(int mode) {
     int first_line;
     int force_pos = GeoramaMesPosForceSetFlag;
-    char *name;
+    int k;
     GeoramaMesPosForceSetFlag = 0;
     for (int list_no = 0; list_no < GEORAMA_VIEW_MODE_NUM; list_no++) {
         int data_no = ConvGeoramaDataNo(list_no);
@@ -2232,27 +2230,26 @@ void MenuGeoramaMessageMake(int mode) {
             y += 24.0f;
         }
         CDC2Mes *mes = GeoramaMes[data_no];
-        for (i = 0; i < 10; i++) {
+        for (k = 0; k < 10; k++) {
             if (list_no == GEORAMA_VIEW_PAINT) {
-                line_pos[i][0] += 40;
-                if (mes->item_mes[i] != item_mes[i]) {
+                line_pos[k][0] += 40;
+                if (mes->item_mes[k] != item_mes[k]) {
                     mes->ClsMes::mes_no = - 1;
                 }
-                mes->SetItemMes(i, item_mes[i]);
+                mes->SetItemMes(k, item_mes[k]);
             }
             if (list_no != GEORAMA_VIEW_PAINT) {
-                name = names[i];
-                if (name != NULL && strcmp(mes->name[i], name) != 0) {
+                if (names[k] != NULL && strcmp(mes->name[k], names[k]) != 0) {
                     mes->ClsMes::mes_no = - 1;
                 }
-                if (name != NULL) {
-                    strcpy(mes->name[i], name);
+                if (names[k] != NULL) {
+                    strcpy(mes->name[k], names[k]);
                 }
-                if (name == NULL) {
-                    strcpy(mes->name[i], at_2370__2);
+                if (names[k] == NULL) {
+                    strcpy(mes->name[k], at_2370__2);
                 }
             }
-            mes->SetMovePosGyou(i, line_pos[i][0], line_pos[i][1]);
+            mes->SetMovePosGyou(k, line_pos[k][0], line_pos[k][1]);
         }
         if (GeoramaMesForceMakeFlag != 0) {
             mes->ClsMes::mes_no = - 1;
@@ -2277,9 +2274,6 @@ void MenuGeoramaMessageMake(int mode) {
         GeoramaMesForceMakeFlag = (signed char)GeoramaMesForceMakeFlag ^ 1;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editmenu", MenuGeoramaMessageMake__Fi);
-#endif
 int CheckGekkaViewMode(int view_mode) {
     if (view_mode == kTabHouse && CheckBitFlagMenu(kBitFlagGekkaView) != 0) {
         return 1;
