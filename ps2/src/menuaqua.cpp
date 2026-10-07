@@ -3917,7 +3917,8 @@ void CAquarium::SelFishSetCursor() {
     }
 }
 #ifdef NONMATCHING
-// ~20.0% match, 1383 words off
+template <typename T> static inline T Ident(T v) { return v; }
+// 19 words off in an aligned diff
 int CAquarium::Step() {
     int key = 0;
     int next;
@@ -4086,7 +4087,7 @@ int CAquarium::Step() {
                     MenuSePlay(5);
                     next = 0;
                 } else if (key & 1) {
-                    switch (menu_id_tbl_3721[aqua_no][menu->menu_cursor]) {
+                    switch (menu_id_tbl_3721[aqua_no][Ident(menu->menu_cursor)]) {
                         case 0:
                             if (InitSelFish() != 0) {
                                 MenuSePlay(5);
@@ -4468,7 +4469,7 @@ int CAquarium::Step() {
                     next = 0xA;
                     sel_sift_fish_select = -1;
                 } else if (key & 1) {
-                    int tank = another_aquarium_Notbl_3642[m_aquarium_para->unk_0][menu->question_cursor];
+                    int tank = another_aquarium_Notbl_3642[m_aquarium_para->unk_0][Ident(menu->question_cursor)];
                     int space = m_aquarium_para->SearchAqua1NotUsed(tank);
                     CGameDataUsed *data;
 
@@ -4527,7 +4528,7 @@ int CAquarium::Step() {
                     MenuSePlay(0x13);
                     next = 1;
                 } else if (key & 1) {
-                    m_next_aqua_no = another_aquarium_Notbl_3642[m_aquarium_para->unk_0][menu->question_cursor];
+                    m_next_aqua_no = another_aquarium_Notbl_3642[m_aquarium_para->unk_0][Ident(menu->question_cursor)];
                     AquaMode = 6;
                     mes.menu_cursor = 0;
                     mes.cursor_snap = 1;
