@@ -4163,7 +4163,10 @@ void CalcWindowInRectFromOutRect(int type, RECT outer, RECT *inner) {
     inner->height = outer.height - (waku_data[type][1] + waku_data[type][3]);
 }
 #ifdef NONMATCHING
-// ~10.1% match, 656 words off
+static inline int CentrePos(float max, int size) {
+    return (int)CalcAutoPosSet(0.0f, max, size, 0.5f);
+}
+// ~97.4% match, 19 words off
 void ClsMes::DrawMesWin() {
     RGBAQ_TYPE color;
     RGBAQ_TYPE shadow_color;
@@ -4266,8 +4269,9 @@ void ClsMes::DrawMesWin() {
             break;
         case MES_WIN_VERSATILE_3:
             CalcRectScale(shadow, fade, &versatile_3_scaled);
-            select_y = versatile_3_scaled.y + versatile_3_scaled.height / 2;
-            select_y += (int)((inner.y + font_h * select_top + 7 - select_y) * fade);
+            select_y = inner.y + font_h * select_top + 7;
+            select_y -= versatile_3_scaled.y + versatile_3_scaled.height / 2;
+            select_y = (int)(select_y * fade) + versatile_3_scaled.y + versatile_3_scaled.height / 2;
             versatile_3_scaled.x = (int)(versatile_3_scaled.x + draw_off_x);
             versatile_3_scaled.y = (int)(versatile_3_scaled.y + draw_off_y);
             DrawVersatileWin_3(&frame_prim, versatile_3_scaled, select_y, &shadow_color, alpha, bg_opaque);
@@ -4288,7 +4292,7 @@ void ClsMes::DrawMesWin() {
             break;
         case MES_WIN_DQ_FUKIDASHI:
         case MES_WIN_DQ_FUKIDASHI_2:
-            text_x = (int)CalcAutoPosSet(0.0f, float(512.0), text_w, 0.5f);
+            text_x = (int)CalcAutoPosSet(0, float(512.0), text_w, 0.5);
             text_y = (int)CalcAutoPosSet(0.0f, 480.0f, text_h, float(0.95));
             outer.x = text_x - (font_w + 8);
             outer.y = text_y - 13;
@@ -4307,36 +4311,36 @@ void ClsMes::DrawMesWin() {
         return;
     }
     page_time++;
-    if (abs_win.x >= 0) {
-        if (abs_text_off_x >= 0) {
+    if (0 <= abs_win.x) {
+        if (0 <= abs_text_off_x) {
             text_x = abs_win.x + abs_text_off_x;
         } else {
             text_x = abs_win.x + waku_data[window_mode][0];
         }
-    } else if (fukidashi_pos > 0) {
+    } else if (0 < fukidashi_pos) {
         text_x = outer.x + waku_data[window_mode][0];
     } else {
         text_x = inner.x;
     }
-    if (abs_win.y >= 0) {
-        if (abs_text_off_y >= 0) {
+    if (0 <= abs_win.y) {
+        if (0 <= abs_text_off_y) {
             text_y = abs_win.y + abs_text_off_y;
         } else {
             text_y = abs_win.y + waku_data[window_mode][1];
         }
-    } else if (fukidashi_pos > 0) {
+    } else if (0 < fukidashi_pos) {
         text_y = outer.y + waku_data[window_mode][1];
     } else {
         text_y = inner.y;
     }
     if (window_mode == MES_WIN_BOTTOM || window_mode == MES_WIN_DQ_FUKIDASHI ||
         window_mode == MES_WIN_DQ_FUKIDASHI_2) {
-        text_x = (int)CalcAutoPosSet(0.0f, float(512.0), text_w, float(0.5));
-        text_y = (int)CalcAutoPosSet(float(0.0), float(480.0), text_h, 0.95f);
+        text_x = (int)CalcAutoPosSet(float(0.0), 512.0f, text_w, float(0.5));
+        text_y = (int)CalcAutoPosSet(float(0.0), (float)480.0, text_h, float(0.95));
     }
     if (window_mode == MES_WIN_CENTRE) {
-        text_x = (int)CalcAutoPosSet(0.0f, 512.0f, text_w, 0.5f);
-        text_y = (int)CalcAutoPosSet(0.0f, 480.0f, text_h, 0.5f);
+        text_x = CentrePos(512.0f, text_w);
+        text_y = CentrePos(480.0f, text_h);
     }
     if (scissor_on == 1) {
         scissor.x = text_x;

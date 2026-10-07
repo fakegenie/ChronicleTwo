@@ -118,10 +118,10 @@ void CMonsterMan::RunScript(int index) {
  */
 static int GetStackInt(RS_STACKDATA *stack) {
     if (stack->type == 1) {
-        return (int) stack->f;
+        return (int) stack->val.f;
     }
 
-    return stack->i;
+    return stack->val.i;
 }
 
 /**
@@ -131,10 +131,10 @@ static int GetStackInt(RS_STACKDATA *stack) {
  */
 static float GetStackFloat(RS_STACKDATA *stack) {
     if (stack->type == 0) {
-        return (float) stack->i;
+        return (float) stack->val.i;
     }
 
-    return *(float *) &stack->i;
+    return *(float *) &stack->val.i;
 }
 
 /**
@@ -143,7 +143,7 @@ static float GetStackFloat(RS_STACKDATA *stack) {
  *
  */
 static char *GetStackString(RS_STACKDATA *stack) {
-    return (char *) stack->i;
+    return (char *) stack->val.i;
 }
 
 /**
@@ -153,7 +153,7 @@ static char *GetStackString(RS_STACKDATA *stack) {
  */
 static void SetStack(RS_STACKDATA *stack, int value) {
     if (stack->type == 3) {
-        ((RS_STACKDATA *) stack->i)->i = value;
+        ((RS_STACKDATA *) stack->val.i)->val.i = value;
     }
 }
 
@@ -164,7 +164,7 @@ static void SetStack(RS_STACKDATA *stack, int value) {
  */
 static void SetStack(RS_STACKDATA *stack, float value) {
     if (stack->type == 3) {
-        *(float *) &((RS_STACKDATA *) stack->i)->i = value;
+        *(float *) &((RS_STACKDATA *) stack->val.i)->val.i = value;
     }
 }
 
@@ -654,9 +654,9 @@ int _GET_POSREF_ANGLE(RS_STACKDATA *stack, int argc) {
  */
 int _NORMAL_VECTOR(RS_STACKDATA *stack, int argc) {
     float vec[4];
-    vec[0] = stack[0].p->f;
-    vec[1] = stack[1].p->f;
-    vec[2] = stack[2].p->f;
+    vec[0] = stack[0].val.p->val.f;
+    vec[1] = stack[1].val.p->val.f;
+    vec[2] = stack[2].val.p->val.f;
     vec[3] = 1.0f;
     sceVu0Normalize(vec, vec);
     SetStack(stack++, vec[0]);
@@ -693,9 +693,9 @@ int _ADD_VECTOR(RS_STACKDATA *stack, int argc) {
     float x = GetStackFloat(source++);
     float y = GetStackFloat(source++);
     float z = GetStackFloat(source);
-    SetStack(stack, stack[0].p->f + x);
-    SetStack(stack + 1, stack[1].p->f + y);
-    SetStack(stack + 2, stack[2].p->f + z);
+    SetStack(stack, stack[0].val.p->val.f + x);
+    SetStack(stack + 1, stack[1].val.p->val.f + y);
+    SetStack(stack + 2, stack[2].val.p->val.f + z);
     return 1;
 }
 
@@ -710,9 +710,9 @@ int _SUB_VECTOR(RS_STACKDATA *stack, int argc) {
     float x = GetStackFloat(source++);
     float y = GetStackFloat(source++);
     float z = GetStackFloat(source);
-    SetStack(stack, stack[0].p->f - x);
-    SetStack(stack + 1, stack[1].p->f - y);
-    SetStack(stack + 2, stack[2].p->f - z);
+    SetStack(stack, stack[0].val.p->val.f - x);
+    SetStack(stack + 1, stack[1].val.p->val.f - y);
+    SetStack(stack + 2, stack[2].val.p->val.f - z);
     return 1;
 }
 
@@ -723,9 +723,9 @@ int _SUB_VECTOR(RS_STACKDATA *stack, int argc) {
  */
 int _SCALE_VECTOR(RS_STACKDATA *stack, int argc) {
     float scale = GetStackFloat(stack + 3);
-    SetStack(stack, stack[0].p->f * scale);
-    SetStack(stack + 1, stack[1].p->f * scale);
-    SetStack(stack + 2, stack[2].p->f * scale);
+    SetStack(stack, stack[0].val.p->val.f * scale);
+    SetStack(stack + 1, stack[1].val.p->val.f * scale);
+    SetStack(stack + 2, stack[2].val.p->val.f * scale);
     return 1;
 }
 
@@ -741,9 +741,9 @@ int _DIV_VECTOR(RS_STACKDATA *stack, int argc) {
         return 0;
     }
 
-    SetStack(stack, stack[0].p->f / divisor);
-    SetStack(stack + 1, stack[1].p->f / divisor);
-    SetStack(stack + 2, stack[2].p->f / divisor);
+    SetStack(stack, stack[0].val.p->val.f / divisor);
+    SetStack(stack + 1, stack[1].val.p->val.f / divisor);
+    SetStack(stack + 2, stack[2].val.p->val.f / divisor);
     return 1;
 }
 
@@ -766,7 +766,7 @@ int _ANGLE_CMP(RS_STACKDATA *stack, int argc) {
  *
  */
 int _ANGLE_LIMIT(RS_STACKDATA *stack, int unused) {
-    SetStack(stack, mgAngleLimit(stack->p->f));
+    SetStack(stack, mgAngleLimit(stack->val.p->val.f));
     return 1;
 }
 
@@ -844,7 +844,7 @@ int _GET_MONSTER_LIFE(RS_STACKDATA *stack, int argc) {
         return 0;
     }
 
-    RS_STACKDATA *slot = (RS_STACKDATA *) stack->i;
+    RS_STACKDATA *slot = (RS_STACKDATA *) stack->val.i;
 
     if (slot->type == 0) {
         SetStack(stack, nowMonster->life);
@@ -1700,7 +1700,7 @@ int _V_POP(RS_STACKDATA *stack, int argc) {
         return 0;
     }
 
-    RS_STACKDATA *slot = (RS_STACKDATA *) stack->i;
+    RS_STACKDATA *slot = (RS_STACKDATA *) stack->val.i;
 
     if (slot->type == 0) {
         if (index < MONSTER_VAR_MAX) {
@@ -1792,7 +1792,7 @@ int _V_POP2(RS_STACKDATA *stack, int argc) {
         return 0;
     }
 
-    RS_STACKDATA *slot = (RS_STACKDATA *) stack->i;
+    RS_STACKDATA *slot = (RS_STACKDATA *) stack->val.i;
 
     if (slot->type == 0) {
         if (index < MONSTER_VAR2_MAX) {
