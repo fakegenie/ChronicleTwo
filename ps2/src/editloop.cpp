@@ -850,11 +850,10 @@ int SubMapLoadStep() {
 
     return 1;
 }
-#ifdef NONMATCHING
+extern "C" int CheckEventSkip__Fv();
 static inline bool IsCrossFading(CScene *scene) {
     return scene->fade.NowFade() && scene->fade.cross;
 }
-// ~41% match, 238 aligned words off
 int EditLoop() {
     static int          time_step;
     static int          show_time_step;
@@ -877,31 +876,31 @@ int EditLoop() {
     float               projection;
     float               distance;
     float               camera_angle;
-    int                 game_progress;
-    int                 light_band;
-    int                 next_sub_map;
-    int                 finish;
-    int                 light_check;
-    int                 wait_for_map;
-    int                 menu_mode;
-    int                 open_menu;
-    int                 change_mode;
-    int                 return_to_player;
-    int                 start_event;
-    int                 pause_enabled;
-    int                 event_result;
-    int                 reset_event;
-    int                 menu_requested;
-    int                 menu_button;
-    int                 quick_change;
-    int                 next_chara;
-    int                 menu_enabled;
-    int                 debug_closed;
     int                 debug_move;
-    int                 edit_enabled;
-    int                 main_map_no;
+    int                 menu_requested;
+    int                 return_to_player;
     int                 change_event;
+    int                 reset_event;
+    int                 menu_enabled;
+    int                 main_map_no;
+    int                 edit_enabled;
+    int                 finish;
+    int                 quick_change;
+    int                 open_menu;
+    int                 event_result;
+    int                 menu_mode;
+    int                 debug_closed;
+    int                 change_mode;
+    int                 start_event;
+    int                 wait_for_map;
+    int                 next_chara;
+    int                 pause_enabled;
+    int                 menu_button;
+    int                 next_sub_map;
+    int                 light_check;
+    int                 light_band;
     int                 pause_result;
+    int                 game_progress;
     finish = 0;
     mgSetAllScissorFlag(0);
     LoopCounter++;
@@ -938,8 +937,8 @@ int EditLoop() {
                 MainScene__2->SetTime(((int)MainScene__2->time / 2) * 2 + 2);
             }
             if (GamePad__2.Down2(PAD_DOWN) != 0) {
-                show_time_step = 30;
                 time_step = !time_step;
+                show_time_step = 30;
             }
             if (LoopMode == EDIT_LOOP_WAIT_READ) {
                 if (ReadBGSync() == 0) {
@@ -966,14 +965,14 @@ int EditLoop() {
         wait_for_map = 1;
     }
     map_name = MainScene__2->GetMapName(MainScene__2->active_map);
-    while (LoopCounter >= 3 && LoopMode == EDIT_LOOP_WALK && map_name != NULL && strcmp(map_name, "m01") == 0) {
+    while (LoopCounter > 2 && LoopMode == EDIT_LOOP_WALK && map_name != NULL && strcmp(map_name, "m01") == 0) {
         chara = MainScene__2->GetCharacter(MainScene__2->player_chara);
         if (chara != NULL) {
             chara->GetPosition(position);
             *(u_long128 *)ground_position = *(u_long128 *)position;
             ground_position[1] = 0.0f;
-            line_start[3] = 1.0f;
             line_end[3] = 1.0f;
+            line_start[3] = 1.0f;
             sceVu0FVECTOR load_position = {1400.0f, -6.0f, -218.0f, 1.0f};
             next_sub_map = -1;
             if (MainScene__2->LoadMapBGStep(NULL) == 0) {
@@ -1111,6 +1110,7 @@ int EditLoop() {
         }
     }
     if (LoopMode == EDIT_LOOP_WALK_MENU || LoopMode == EDIT_LOOP_EDIT_MENU) {
+        menu_pause.scene = NULL;
         menu_pause.scene = MainScene__2;
         menu_pause.event_skip = 0;
         if (PadCtrl.Btn(PAD_BTN_PAUSE) != 0) {
@@ -1123,9 +1123,7 @@ int EditLoop() {
                 if (MenuInfo->end_code != 11 && SubGameRunning() != 0 && GetSubGameNo() == SUBGAME_FISHING) {
                     sgExitSubGame();
                 }
-                switch (MenuInfo->end_code) {
-                    case 1:
-                    case 21:
+                if (MenuInfo->end_code == 21 || MenuInfo->end_code == 1) {
                         if (MenuInfo->end_code == 21) {
                             MainScene__2->fade.CaptureScreen();
                             MainScene__2->fade.CrossFade(20, 1.0f);
@@ -1138,14 +1136,13 @@ int EditLoop() {
                             chara->ResetDAPosition();
                         }
                         EditControlStatusInit(MainScene__2);
-                        break;
-                    case 11: {
+                } else if (MenuInfo->end_code == 11) {
                         SubGameInfo fishing;
                         fishing.scene = MainScene__2;
                         fishing.rod_no = MenuInfo->result[0];
                         fishing.esa_no = MenuInfo->result[1];
-                        FishingBuff.stSetBuffer(CharaBufs[0].stack + CharaBufs[0].stack_used,
-                                                CharaBufs[0].stack_size - CharaBufs[0].stack_used);
+                        int rest = CharaBufs[0].stGetRest();
+                        FishingBuff.stSetBuffer(CharaBufs[0].stGetTop(), rest);
                         fishing.menu_buff = &MenuBuffer__2;
                         fishing.load_buff = &FishingBuff;
                         MenuInfo->end_code = 0;
@@ -1159,9 +1156,7 @@ int EditLoop() {
                         } else {
                             sgRestartSubGame(&fishing);
                         }
-                        break;
-                    }
-                    case 6:
+                } else if (MenuInfo->end_code == 6) {
                         SetEventScript(NULL, NULL, NULL);
                         if (ControlMode == EDIT_CONTROL_EVENT) {
                             MainScene__2->active_camera = MainScene__2->before_camera;
@@ -1170,8 +1165,8 @@ int EditLoop() {
                         if (MenuInfo->result[0] != LOOP_EDIT) {
                             finish = 1;
                             INIT_LOOP_ARG next_loop;
-                            next_loop.map_no = MenuInfo->result[1];
                             next_loop.floor_no = MenuInfo->result[2];
+                            next_loop.map_no = MenuInfo->result[1];
                             next_loop.event_no = 1010;
                             NextLoop(MenuInfo->result[0], next_loop);
                         } else {
@@ -1179,7 +1174,6 @@ int EditLoop() {
                             EditMapJump(MenuInfo->result[1]);
                             MainScene__2->RunEvent(100, NULL);
                         }
-                        break;
                 }
             } else if (LoopMode == EDIT_LOOP_EDIT_MENU) {
                 MainScene__2->GetMap(MainScene__2->active_map);
@@ -1208,6 +1202,7 @@ int EditLoop() {
     }
     mgPlightEnable(0);
     MainScene__2->UpDateMapInfo();
+    float near_clip;
     projection = mgGetProjection() + PhotoAddProjection();
     if (strcmp(MainScene__2->GetMapName(MainScene__2->active_map), "s32") == 0 ||
         strcmp(MainScene__2->GetMapName(MainScene__2->active_map), "s55") == 0) {
@@ -1219,6 +1214,7 @@ int EditLoop() {
     if (projection > 1000.0f) {
         projection = 1000.0f;
     }
+    float far_clip;
     mgSetRenderInfo(projection, 3.0f, 30000.0f);
     S51Thunder(MainScene__2);
     menu_mode = LoopMode;
@@ -1226,8 +1222,9 @@ int EditLoop() {
     change_mode = 0;
     return_to_player = 0;
     start_event = -1;
-    pause.scene = MainScene__2;
+    pause.scene = NULL;
     pause.event_skip = 0;
+    pause.scene = MainScene__2;
     pause_enabled = 0;
     if (PauseFlag == 0) {
         switch (ControlMode) {
@@ -1300,7 +1297,7 @@ int EditLoop() {
                 break;
             case EDIT_CONTROL_EVENT:
                 pause.event_skip = 1;
-                if (CheckEventSkip() == 0) {
+                if (CheckEventSkip__Fv() == 0) {
                     pause.event_skip = 0;
                 }
                 pause_enabled = 1;
@@ -1378,9 +1375,8 @@ int EditLoop() {
         if (pause_enabled != 0 && (PadCtrl.Btn(PAD_BTN_PAUSE) != 0 || GamePad__2.Connect() == 0)) {
             PauseStart(&pause);
         }
-        WalkChara = MainScene__2->GetCharacter(MainScene__2->player_chara);
-        if (WalkChara != NULL) {
-            WalkChara->sound_info.foot_se_bank = MainScene__2->se_base_id;
+        if ((chara = WalkChara = MainScene__2->GetCharacter(MainScene__2->player_chara)) != NULL) {
+            chara->sound_info.foot_se_bank = MainScene__2->se_base_id;
         }
         EditStep();
         int stay[32];
@@ -1399,7 +1395,7 @@ int EditLoop() {
             menu_requested = PadCtrl.Btn(PAD_BTN_MENU) != 0 || sgGetItemOver() != 0;
             menu_button = PadCtrl.Btn(PAD_BTN_MENU);
             quick_change = EditOnGround() != 0 && PadCtrl.Btn(PAD_BTN_QUICK_CHANGE) != 0 && !SubGameRunning();
-            if (IsCrossFading(MainScene__2)) {
+            if (IsCrossFading(MainScene__2) != 0) {
                 quick_change = 0;
             }
             next_chara = !GetUserData()->active_chr_no;
@@ -1413,7 +1409,7 @@ int EditLoop() {
             if (LoopMode != EDIT_LOOP_EDIT && SubGameRunning() == 0 && EditOnGround() == 0) {
                 menu_enabled = 0;
             }
-            if (menu_enabled != 0 && LoopCounter >= 3 && ControlMode == EDIT_CONTROL_PLAYER &&
+            if (menu_enabled != 0 && LoopCounter > 2 && ControlMode == EDIT_CONTROL_PLAYER &&
                 (menu_requested != 0 || quick_change != 0 || menu_button != 0)) {
                 ShowOffOnceHelpMes();
                 if (LoopMode == EDIT_LOOP_WALK) {
@@ -1462,10 +1458,10 @@ int EditLoop() {
     if (DebugFlag != 0) {
         if (EditDebugMode() != 0 && EditDebugLoop(MainScene__2, &EdDebugInfo) != 0) {
             ControlMode = old_cm;
-            debug_closed = 1;
             if (ControlMode == EDIT_CONTROL_DEBUG) {
                 ControlMode = EDIT_CONTROL_PLAYER;
             }
+            debug_closed = 1;
         }
         if (ControlMode != EDIT_CONTROL_DEBUG && GamePad__2.Down(PAD_R3) != 0 && debug_closed == 0) {
             EditDebugStart(215, &MenuBuffer__2);
@@ -1557,7 +1553,7 @@ int EditLoop() {
         }
         if (LoopMode == EDIT_LOOP_EDIT_PRE_MENU) {
             PreEditMenuCnt++;
-            if (MenuInfo->param[0] < 0 || PreEditMenuCnt >= 25) {
+            if (MenuInfo->param[0] < 0 || PreEditMenuCnt > 24) {
                 menu_mode = EDIT_LOOP_EDIT_MENU;
                 MenuInfo->open_type = MENU_OPEN_GEORAMA;
                 open_menu = 1;
@@ -1567,7 +1563,7 @@ int EditLoop() {
         if (open_menu != 0) {
             EditDrawFlag &= ~0x1;
             if (!(0 < MainScene__2->bg_load_step)) {
-                if (IsCrossFading(MainScene__2)) {
+                if (IsCrossFading(MainScene__2) != 0) {
                     MainScene__2->fade.FadeIn(0);
                 }
                 MenuInfo->scene = MainScene__2;
@@ -1694,9 +1690,6 @@ int EditLoop() {
     }
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editloop", EditLoop__Fv);
-#endif
 /**
  *
  * Resets edit event state and character control locks.
