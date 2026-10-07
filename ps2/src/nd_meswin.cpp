@@ -4162,11 +4162,15 @@ void CalcWindowInRectFromOutRect(int type, RECT outer, RECT *inner) {
     inner->width = outer.width - (waku_data[type][0] + waku_data[type][2]);
     inner->height = outer.height - (waku_data[type][1] + waku_data[type][3]);
 }
-#ifdef NONMATCHING
+static inline int BottomPos(float max, int size) {
+    return (int)CalcAutoPosSet(0.0f, max, size, 0.95f);
+}
 static inline int CentrePos(float max, int size) {
     return (int)CalcAutoPosSet(0.0f, max, size, 0.5f);
 }
-// ~97.4% match, 19 words off
+static inline int CentrePosX(float max, int size) {
+    return (int)CalcAutoPosSet(float(0.0), max, size, 0.5f);
+}
 void ClsMes::DrawMesWin() {
     RGBAQ_TYPE color;
     RGBAQ_TYPE shadow_color;
@@ -4231,7 +4235,7 @@ void ClsMes::DrawMesWin() {
         case MES_WIN_HELP:
             CalcRectScale(outer, fade, &help_scaled);
             help_scaled.x = (int)(help_scaled.x + draw_off_x);
-            help_scaled.y = (int)(help_scaled.y + draw_off_y);
+            help_scaled.y += draw_off_y;
             MyMenuHelpWinDraw(&sprite_prim, help_scaled, alpha);
             break;
         case MES_WIN_FLOATING:
@@ -4270,8 +4274,10 @@ void ClsMes::DrawMesWin() {
         case MES_WIN_VERSATILE_3:
             CalcRectScale(shadow, fade, &versatile_3_scaled);
             select_y = inner.y + font_h * select_top + 7;
-            select_y -= versatile_3_scaled.y + versatile_3_scaled.height / 2;
-            select_y = (int)(select_y * fade) + versatile_3_scaled.y + versatile_3_scaled.height / 2;
+            int half = versatile_3_scaled.height / 2;
+            int diff = select_y - ((int)versatile_3_scaled.y + (int)half);
+            select_y = (int)(diff * fade);
+            select_y = select_y + versatile_3_scaled.y + (int)half;
             versatile_3_scaled.x = (int)(versatile_3_scaled.x + draw_off_x);
             versatile_3_scaled.y = (int)(versatile_3_scaled.y + draw_off_y);
             DrawVersatileWin_3(&frame_prim, versatile_3_scaled, select_y, &shadow_color, alpha, bg_opaque);
@@ -4292,7 +4298,7 @@ void ClsMes::DrawMesWin() {
             break;
         case MES_WIN_DQ_FUKIDASHI:
         case MES_WIN_DQ_FUKIDASHI_2:
-            text_x = (int)CalcAutoPosSet(0, float(512.0), text_w, 0.5);
+            text_x = CentrePos(512.0f, text_w);
             text_y = (int)CalcAutoPosSet(0.0f, 480.0f, text_h, float(0.95));
             outer.x = text_x - (font_w + 8);
             outer.y = text_y - 13;
@@ -4336,10 +4342,10 @@ void ClsMes::DrawMesWin() {
     if (window_mode == MES_WIN_BOTTOM || window_mode == MES_WIN_DQ_FUKIDASHI ||
         window_mode == MES_WIN_DQ_FUKIDASHI_2) {
         text_x = (int)CalcAutoPosSet(float(0.0), 512.0f, text_w, float(0.5));
-        text_y = (int)CalcAutoPosSet(float(0.0), (float)480.0, text_h, float(0.95));
+        text_y = BottomPos(float(480.0), text_h);
     }
     if (window_mode == MES_WIN_CENTRE) {
-        text_x = CentrePos(512.0f, text_w);
+        text_x = CentrePosX(512.0f, text_w);
         text_y = CentrePos(480.0f, text_h);
     }
     if (scissor_on == 1) {
@@ -4367,9 +4373,6 @@ void ClsMes::DrawMesWin() {
     DrawCross(&sprite_prim);
     DrawRightDelta(&sprite_prim);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/nd_meswin", DrawMesWin__6ClsMesFv);
-#endif
 void Parametric(float *a, float *b, float *out) {
     sceVu0SubVector(out, b, a);
     out[3] = 1.0f;
