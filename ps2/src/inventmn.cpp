@@ -4499,17 +4499,34 @@ CStarDust::CStarDust() {
     this->active = 0;
 }
 #ifdef NONMATCHING
-// 274 words off in an aligned diff
+// 173 words off in an aligned diff
 void CMenuInvent::IsAccessAlbum() {
-    CDC2Mes *message = MenuDCMsg[4];
+    MC_CARD_INFO *card;
+    CDC2Mes *message;
+    int keys;
+    int button;
+    int done;
+    int back_to_photo;
+    int finish;
+    int access;
+    int cancel;
+    int loaded;
+    int check_space;
+    int card_removed;
+    int no_card;
+    int card_full;
+    int card_error;
+    int read_error;
+    MC_ERROR_INFO *error;
+    message = MenuDCMsg[4];
     if (message == NULL) {
         return;
     }
-    int keys = MenuCommonInfo->CheckSelectKey();
-    int button = MenuCommonInfo->CheckPushButton();
-    MC_ERROR_INFO *error = NULL;
-    MC_CARD_INFO *card = NULL;
-    int done = 0;
+    keys = MenuCommonInfo->CheckSelectKey();
+    button = MenuCommonInfo->CheckPushButton();
+    error = NULL;
+    card = NULL;
+    done = 0;
     if (MCManagerPtr != NULL) {
         MCManagerPtr->GetFuncNo();
         done = MCManagerPtr->Step();
@@ -4520,17 +4537,17 @@ void CMenuInvent::IsAccessAlbum() {
         }
         error = &manager->error;
     }
-    int back_to_photo = 0;
-    int finish = 0;
-    int access = -2;
-    int cancel = 0;
-    int loaded = 0;
-    int check_space = 0;
-    int card_removed = 0;
-    int no_card = 0;
-    int card_full = 0;
-    int card_error = 0;
-    int read_error = 0;
+    back_to_photo = 0;
+    finish = 0;
+    access = -2;
+    cancel = 0;
+    loaded = 0;
+    check_space = 0;
+    card_removed = 0;
+    no_card = 0;
+    card_full = 0;
+    card_error = 0;
+    read_error = 0;
     if (init_3950 == 0) {
         ActiveSlot_3949 = 0;
         init_3950 = 1;
@@ -4539,7 +4556,7 @@ void CMenuInvent::IsAccessAlbum() {
     case 0: {
         int move = 0;
         if (keys & MENU_SELECT_KEY_UP) {
-            move = -1;
+            move--;
         }
         if (keys & MENU_SELECT_KEY_DOWN) {
             move++;
@@ -4575,7 +4592,11 @@ void CMenuInvent::IsAccessAlbum() {
         MenuInventMCStack.stack_used = 0;
         MenuInventMCStack.lock = 0;
         MenuInventMCStack.Align64();
-        InventAlbumPtr = new ((u_long128 *)MenuInventMCStack.Alloc(0x64CD)) CDC2AlbumData;
+        CDC2AlbumData *album;
+        if ((album = (CDC2AlbumData *)operator new(sizeof(CDC2AlbumData), (u_long128 *)MenuInventMCStack.Alloc(0x64CD))) != NULL) {
+            album->Initialize();
+        }
+        InventAlbumPtr = album;
         MCManagerPtr = new ((u_long128 *)MenuInventMCStack.Alloc(0x112)) CMemoryCardManager;
         MCManagerPtr->Initialize(NULL);
         MCManagerPtr->InitForMC();
@@ -4628,7 +4649,7 @@ void CMenuInvent::IsAccessAlbum() {
         }
         break;
     case 5:
-        StepMenuDl2(download_base + MCManagerPtr->total_transferred);
+        StepMenuDl2(download_base + (int)MCManagerPtr->total_transferred);
         if (done != 0) {
             InitMenuDl(NULL, 0);
             if (McCheckMCPs2(card) == 0) {
@@ -4682,7 +4703,7 @@ void CMenuInvent::IsAccessAlbum() {
     case 201: {
         int move = 0;
         if (keys & MENU_SELECT_KEY_UP) {
-            move = -1;
+            move--;
         }
         if (keys & MENU_SELECT_KEY_DOWN) {
             move++;
@@ -4696,7 +4717,7 @@ void CMenuInvent::IsAccessAlbum() {
             if (ActiveSlot_3949 < 0) {
                 ActiveSlot_3949 = 0;
             }
-            if (ActiveSlot_3949 >= 2) {
+            if (ActiveSlot_3949 > 1) {
                 ActiveSlot_3949 = 1;
             }
             step = 2;
@@ -4761,7 +4782,7 @@ void CMenuInvent::IsAccessAlbum() {
         }
         break;
     case 205:
-        StepMenuDl2(download_base + MCManagerPtr->total_transferred);
+        StepMenuDl2(download_base + (int)MCManagerPtr->total_transferred);
         if (done != 0) {
             if (McCheckMCPs2(card) == 0) {
                 card_removed = 1;
@@ -4782,7 +4803,7 @@ void CMenuInvent::IsAccessAlbum() {
         int answer = message->YesNoCursor2(0);
         if (answer == 1) {
             MenuSePlay(SYSTEM_SE_DECIDE);
-            if (CheckRecoverPhotoNum() > 0) {
+            if (0 < CheckRecoverPhotoNum()) {
                 ExeScript(at_4362);
                 step = 240;
             } else {
@@ -4816,26 +4837,27 @@ void CMenuInvent::IsAccessAlbum() {
     case 240: {
         int answer = message->YesNoCursor2(0);
         if (answer == 1) {
-            keys = 0;
+            int empty = 0;
             for (int i = 0; i < 50; i++) {
                 USER_PICTURE_INFO *photo = InventUserDataPtr->GetPhotoInfo(i);
                 if (photo != NULL && *(s8 *)&photo->used == 0) {
-                    keys++;
+                    empty++;
                 }
             }
             int recover = 0;
             for (int i = 0; i < 50; i++) {
-                if (album_flag[i] > 0) {
+                if (0 < album_flag[i]) {
                     recover++;
                 }
             }
-            if (keys < recover) {
+            if (empty < recover) {
                 step = 241;
                 ExeScript(at_4363);
                 MenuSePlay(5);
+                break;
             } else {
                 for (int i = 0; i < 50; i++) {
-                    if (album_flag[i] > 0) {
+                    if (0 < album_flag[i]) {
                         album_flag[i] = -1;
                         USER_PICTURE_INFO *photo = InventUserDataPtr->IsPhotoSpace(NULL);
                         USER_PICTURE_INFO *album = InventAlbumPtr->GetAlbumPhotoInfo(i);
@@ -4878,7 +4900,7 @@ void CMenuInvent::IsAccessAlbum() {
         int answer = message->YesNoCursor2(0);
         if (answer == 1) {
             MenuSePlay(SYSTEM_SE_DECIDE);
-            if (CheckRecoverPhotoNum() > 0) {
+            if (0 < CheckRecoverPhotoNum()) {
                 ExeScript(at_4362);
                 step = 240;
             } else {
@@ -5116,11 +5138,11 @@ void CMenuInvent::IsAccessAlbum() {
         ExeScript(at_4380);
     }
     if (dload_form != NULL) {
-        int y;
-        dload_form->GetPutPosXY(NULL, finish, y);
-        y += 26;
+        int pos[2];
+        dload_form->GetPutPosXY(NULL, pos[0], pos[1]);
+        pos[1] += 26;
         MenuDCMsg[6]->StepMsg();
-        MenuDCMsg[6]->SetMovePosCenteringGyou(0, mgScreenWidth >> 1, y);
+        MenuDCMsg[6]->SetMovePosCenteringGyou(0, mgScreenWidth >> 1, pos[1]);
     }
 }
 #else
