@@ -2589,8 +2589,6 @@ int MenuItemBrdKey(int keys, int *cursor, int *scroll, int board) {
 }
 
 extern s8 ret_tbl1_2511[2];
-#ifdef NONMATCHING
-// 97.0% match, 10 words off
 int MenuDataSwap(CGameDataUsed *destination, CGameDataUsed *source, int quantity) {
     int dst_type;
     int dst_no;
@@ -2650,6 +2648,7 @@ int MenuDataSwap(CGameDataUsed *destination, CGameDataUsed *source, int quantity
         int had_dst = 0;
         int had_src = 0;
         s8 *tbl;
+        s8 value;
         GameDataSwap(destination, source, 1);
         if (dst_no > 0) {
             had_dst = 1;
@@ -2658,16 +2657,14 @@ int MenuDataSwap(CGameDataUsed *destination, CGameDataUsed *source, int quantity
         if (src_no > 0) {
             had_src = 1;
         }
-        tbl += had_src;
-        s8 results[2] = {*tbl, 2};
+        tbl = ret_tbl1_2511 + had_src;
+        value = *tbl;
+        s8 results[2] = {Ident(value), 2};
         result = results[had_dst];
     }
     CheckEnableHaveItemNum();
     return result;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menusys", MenuDataSwap__FP13CGameDataUsedP13CGameDataUsedi);
-#endif
 void CMenuKeyFunc::Initialize() {
     int i;
 
@@ -5601,8 +5598,6 @@ extern char at_4953[];
 extern char at_4955[];
 extern char at_4956[];
 extern char at_4957[];
-#ifdef NONMATCHING
-// ~18.2% match, 549 words off
 int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
     mgCMemory *load_stack = &MenuCharaLoadStack;
     mgCMemory work;
@@ -5654,15 +5649,19 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
             }
             break;
         case 2: {
+            BUILDUP_WEAPON_INFO *info = &BuildUpWeaponInfo;
             if (!init_4704) {
                 BuildEndFlag_4703 = 0;
                 init_4704 = 1;
             }
-            BUILDUP_WEAPON_INFO *info = &BuildUpWeaponInfo;
-            CActionChara *chara = MenuActionChara[0];
-            CDC2Mes *name_message = MenuDCMsg[6];
-            CDC2Mes *message = MenuDCMsg[7];
-            int close = 0;
+            int close;
+            CDC2Mes *name_message;
+            CActionChara *chara;
+            CDC2Mes *message;
+            chara = MenuActionChara[0];
+            name_message = MenuDCMsg[6];
+            message = MenuDCMsg[7];
+            close = 0;
             switch (step) {
                 case 0: {
                     int old_select = info->select_no;
@@ -5675,7 +5674,7 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
                     if (info->select_no < 0) {
                         info->select_no = 0;
                     }
-                    if (info->select_no >= info->select_num) {
+                    if (info->select_num <= info->select_no) {
                         info->select_no = info->select_num - 1;
                     }
                     int select = info->select_no;
@@ -5706,8 +5705,8 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
                         break;
                     case MENU_PUSH_BUTTON_CANCEL:
                         info->mode = 0;
-                        MenuSePlay(5);
                         close = 1;
+                        MenuSePlay(5);
                         break;
                     }
                     break;
@@ -5739,8 +5738,8 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
                         if (MenuCommonInfo->cursor_form != NULL) {
                             MenuCommonInfo->cursor_form->draw_flag = 1;
                         }
-                        MenuSePlay(5);
                         step = 0;
+                        MenuSePlay(5);
                         break;
                     }
                     if (push_button != 0) {
@@ -5771,9 +5770,10 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
                         build_up_chara->SetMotion(at_4955, 0, 1);
                         build_up_chara->Step();
                         mgCFrame *frame = build_up_chara->CObjectFrame::frame;
-                        if (frame != NULL && frame->attr != NULL) {
-                            frame->attr->z_test = -1;
-                            frame->SetAttrParam(*frame->attr, 1, MG_FRAME_ATTR_Z_TEST);
+                        mgCFrameAttr *attr;
+                        if (frame != NULL && (attr = frame->attr) != NULL) {
+                            attr->z_test = -1;
+                            frame->SetAttrParam(*attr, 1, MG_FRAME_ATTR_Z_TEST);
                         }
                         work.Alloc(0x100);
                         BuildEndFlag_4703 = 0;
@@ -5801,8 +5801,8 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
                             int new_item_no = name_message->item_mes[info->select_no + 1];
                             BuildUpWeaponTrans(info->weapon, new_item_no);
                             int weapon_tex_block = tex_block[1];
-                            mgCTextureManager *textures = tex_manager;
-                            textures->DeleteBlock(weapon_tex_block);
+                            mgCTextureManager *textures;
+                            (textures = &mgTexManager)->DeleteBlock(weapon_tex_block);
                             strcpy(textures->name_suffix, at_4956);
                             MenuActionCharaBuffer[0].stReset();
                             chara->Initialize(NULL);
@@ -5828,8 +5828,8 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
                     if (push_button != 0) {
                         close = 1;
                         mes_form->draw_flag = 0;
-                        MenuSePlay(SYSTEM_SE_DECIDE);
                         itemmenu_chr_rotflag = 1;
+                        MenuSePlay(SYSTEM_SE_DECIDE);
                     }
                     break;
                 case 5:
@@ -5838,8 +5838,8 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
                         if (MenuCommonInfo->cursor_form != NULL) {
                             MenuCommonInfo->cursor_form->draw_flag = 1;
                         }
-                        MenuSePlay(5);
                         step = 0;
+                        MenuSePlay(5);
                     }
                     break;
             }
@@ -5854,9 +5854,6 @@ int CMenuItemInfo::IsAskExtend(int select_key, int push_button) {
     }
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menusys", IsAskExtend__13CMenuItemInfoFii);
-#endif
 void MenuMoveItemPos(int *item, int *pos, int phase) {
     char part_name[0x20];
 
@@ -6265,10 +6262,10 @@ extern s8   checkmoveFlag_5411;
 extern u8   itemmenu_calcmode_tbl_5410[6];
 extern char at_5758[];
 extern char at_5759[];
-#ifdef NONMATCHING
-// ~31.3% match, 570 words off
 void CMenuItemInfo::CalcTex() {
-    int held_type;
+    int k;
+    int spare_a;
+    int spare_b;
     Func_MenuItemBrdPosStep(MenuItem_ItemBoardTopLine);
     int cursor = MenuCommonInfo->cursor;
     if (init_5412 == 0) {
@@ -6353,10 +6350,10 @@ void CMenuItemInfo::CalcTex() {
             reference_no = cursor;
         }
     } else {
-        held_type = GetItemDataType(held_item_no);
-        for (i = 0; i < 4; i++) {
-            if (held_type == SearchEquipType(reference_id, i)) {
-                reference_no = i;
+        int held_type = GetItemDataType(held_item_no);
+        for (k = 0; k < 4; k++) {
+            if (held_type == SearchEquipType(reference_id, k)) {
+                reference_no = k;
             }
         }
     }
@@ -6589,9 +6586,6 @@ void CMenuItemInfo::CalcTex() {
     checkmoveFlag_5411 = check_move;
     EffectDrawCheck(item_board_form);
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menusys", CalcTex__13CMenuItemInfoFv);
-#endif
 extern char at_5879[];
 extern char at_5880[];
 extern char at_5881[];
@@ -9022,14 +9016,12 @@ extern char  at_7538[];
 extern char  at_7541[];
 extern float counter_7509;
 extern s8    init_7510;
-#ifdef NONMATCHING
-// 99.7% match, 19 words off
 void MenuPosFormValueSetCharaRobo(ROBO_DATA *robo, int flag) {
     float sway;
     MENUFORMPARTS_TYPE *hp_part;
     float rate;
     MENUFORMPARTS_TYPE *batu;
-    int red;
+    int green;
     CGameDataUsed *parts;
     MENUFORMPARTS_TYPE *whp_bar;
     int capacity;
@@ -9040,8 +9032,8 @@ void MenuPosFormValueSetCharaRobo(ROBO_DATA *robo, int flag) {
     if (form == NULL) {
         return;
     }
-    int green = 0x80;
-    red = green;
+    int red = 0x80;
+    green = red;
     int blink = (int)(64.0f * sinf(WeaponWarningCounter));
     parts = robo->parts;
     COMMON_GAGE *hp = &robo->hp;
@@ -9068,7 +9060,7 @@ void MenuPosFormValueSetCharaRobo(ROBO_DATA *robo, int flag) {
     int whp[2];
     rate = parts->GetWHp(whp);
     if (rate < 0.2f) {
-        red = green = 0x80 - blink;
+        green = red = 0x80 - blink;
         if (rate == 0.0f) {
             red = blink + 0x80;
         }
@@ -9113,9 +9105,6 @@ void MenuPosFormValueSetCharaRobo(ROBO_DATA *robo, int flag) {
     }
     form->SetNumber(at_7541, GetDispVolumeForFloat(robo->abs.now));
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menusys", MenuPosFormValueSetCharaRobo__FP9ROBO_DATAi);
-#endif
 extern char at_7560[];
 extern char at_7561[];
 extern char at_7562[];
