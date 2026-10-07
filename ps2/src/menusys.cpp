@@ -6991,8 +6991,21 @@ extern u64           at_6220;
 extern u64           at_6234;
 extern u64           at_6256;
 extern u64           at_6265;
-#ifdef NONMATCHING
-// ~99.6% match, 6 words off
+__declspec(dead) static void PrimeDebugKey(void) {
+    MenuSePlay(0);
+    MenuSePlay(1);
+    MenuSePlay(2);
+    MenuSePlay(3);
+    MenuSePlay(4);
+    MenuSePlay(5);
+    MenuSePlay(6);
+    MenuSePlay(7);
+    MenuSePlay(8);
+    MenuSePlay(9);
+    MenuSePlay(10);
+    MenuSePlay(11);
+    MenuSePlay(12);
+}
 void MenuItemDebugKey(void) {
     float rotation[4];
     float health_input[2];
@@ -7562,9 +7575,6 @@ void MenuItemDebugKey(void) {
         break;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menusys", MenuItemDebugKey__Fv);
-#endif
 extern char *attrtable_6472[7];
 extern char *stchar_6508[13];
 extern char  at_6760[];
