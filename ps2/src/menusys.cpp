@@ -6992,7 +6992,7 @@ extern u64           at_6234;
 extern u64           at_6256;
 extern u64           at_6265;
 #ifdef NONMATCHING
-// ~99.2% match, 11 words off
+// ~99.6% match, 6 words off
 void MenuItemDebugKey(void) {
     float rotation[4];
     float health_input[2];
@@ -7386,25 +7386,23 @@ void MenuItemDebugKey(void) {
             *(u64 *)weapon_status_input = at_6220;
             common->CheckAnalogKey(0, weapon_status_input);
             if (status_index < 2) {
-                s16 *field = &item->data.weapon.status[status_index];
 
-                *field += (s16)(s32)weapon_status_input[0];
-                if (*field < 0) {
-                    *field = 0;
+                item->data.weapon.status[status_index] += (s16)(s32)weapon_status_input[0];
+                if (item->data.weapon.status[status_index] < 0) {
+                    item->data.weapon.status[status_index] = 0;
                 }
-                if (info->status_max[status_index] < *field) {
-                    *field = info->status_max[status_index];
+                if (info->status_max[status_index] < item->data.weapon.status[status_index]) {
+                    item->data.weapon.status[status_index] = info->status_max[status_index];
                 }
             } else {
                 int attr = status_index - 2;
-                s16 *field = &item->data.weapon.attribute[attr];
 
-                *field += (s16)(s32)weapon_status_input[0];
-                if (*field < 0) {
-                    *field = 0;
+                item->data.weapon.attribute[attr] += (s16)(s32)weapon_status_input[0];
+                if (item->data.weapon.attribute[attr] < 0) {
+                    item->data.weapon.attribute[attr] = 0;
                 }
-                if (info->attribute_max[attr] < *field) {
-                    *field = info->attribute_max[attr];
+                if (info->attribute_max[attr] < item->data.weapon.attribute[attr]) {
+                    item->data.weapon.attribute[attr] = info->attribute_max[attr];
                 }
             }
 
@@ -7419,23 +7417,22 @@ void MenuItemDebugKey(void) {
             *(u64 *)ridepod_status_input = at_6234;
             common->CheckAnalogKey(0, ridepod_status_input);
             if (status_index < 2) {
-                field = &item->data.robopart.status[status_index];
-                *field += (s16)(s32)ridepod_status_input[0];
-                if (*field < 0) {
-                    *field = 0;
+                item->data.robopart.status[status_index] += (s16)(s32)ridepod_status_input[0];
+                if (item->data.robopart.status[status_index] < 0) {
+                    item->data.robopart.status[status_index] = 0;
                 }
                 if (item->data.robopart.status[status_index + 1] > 255) {
                     item->data.robopart.status[status_index + 1] = 255;
                 }
             } else {
-                field = &(item->data.robopart.status + 2)[status_index - 2];
+                int part = status_index - 2;
 
-                *field += (s16)(s32)ridepod_status_input[0];
-                if (*field < 0) {
-                    *field = 0;
+                (item->data.robopart.status + 2)[part] += (s16)(s32)ridepod_status_input[0];
+                if ((item->data.robopart.status + 2)[part] < 0) {
+                    (item->data.robopart.status + 2)[part] = 0;
                 }
-                if (*field > 0xFF) {
-                    *field = 0xFF;
+                if ((item->data.robopart.status + 2)[part] > 0xFF) {
+                    (item->data.robopart.status + 2)[part] = 0xFF;
                 }
             }
         }
@@ -7490,13 +7487,12 @@ void MenuItemDebugKey(void) {
             status_index = common->cursor;
             *(u64 *)rod_status_input = at_6265;
             common->CheckAnalogKey(0, rod_status_input);
-            field = &item->data.weapon.attribute[status_index];
-            *field += (s16)(s32)rod_status_input[0];
-            if (*field < 0) {
-                *field = 0;
+            item->data.weapon.attribute[status_index] += (s16)(s32)rod_status_input[0];
+            if (item->data.weapon.attribute[status_index] < 0) {
+                item->data.weapon.attribute[status_index] = 0;
             }
-            if (info->attribute_max[status_index] < *field) {
-                *field = info->attribute_max[status_index];
+            if (info->attribute_max[status_index] < item->data.weapon.attribute[status_index]) {
+                item->data.weapon.attribute[status_index] = info->attribute_max[status_index];
             }
             if (GamePad__2.On(PAD_CIRCLE)) {
                 item->AddFusionPoint(1);
