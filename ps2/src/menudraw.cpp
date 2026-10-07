@@ -1713,7 +1713,7 @@ void CalcCommonBrdDrawInfo(float *pos, MENUFORM_MAKEBRD_INFO *info, ClsMes *mes)
     memcpy(&CommonBoardDrawInfo, info, sizeof(MENUFORM_MAKEBRD_INFO));
 }
 #ifdef NONMATCHING
-// 97.5% match, 110 words off
+// 99.6% match, 62 words off
 void CommonBoardDraw(float *pos, int &tex_block) {
     mgCTexture *board_tex = Tex_CommonBoard;
     if (board_tex == NULL) {
@@ -1801,10 +1801,12 @@ void CommonBoardDraw(float *pos, int &tex_block) {
         int top;
         PrimQuad(prim, mgRect<int>((int)x, top = (int)line_top, brd[0][2], brd[0][3]),
                  mgRect<int>(brd[0][0], brd[0][1], brd[0][2], brd[0][3]));
-        PrimQuad(prim, mgRect<int>((int)(x += brd[0][2]), top, line_w, brd[1][3]),
+        x += brd[0][2];
+        PrimQuad(prim, mgRect<int>((int)x, top, line_w, brd[1][3]),
                  mgRect<int>(brd[1][0], brd[1][1], brd[1][2], brd[1][3]));
         int number_x;
-        PrimQuad(prim, mgRect<int>(number_x = (int)(x += line_w), top, brd[2][2], brd[2][3]),
+        x += line_w;
+        PrimQuad(prim, mgRect<int>(number_x = (int)x, top, brd[2][2], brd[2][3]),
                  mgRect<int>(brd[2][0], brd[2][1], brd[2][2], brd[2][3]));
         int number_y;
         PrimDrawNumber2(prim, line->num, 0, number_x, number_y = (int)(10.0f + line_top),
@@ -1824,9 +1826,10 @@ void CommonBoardDraw(float *pos, int &tex_block) {
             PrimQuad(prim, mgRect<int>((int)(line_x - 3.0f), top, 16, 16), mgRect<int>(button[0], button[1], 16, 16));
         }
     }
-    MakeBoardDrawInfo[1] = 246.0f + pos[1];
-    MakeBoardDrawInfo[3] = 28.0f + MakeBoardDrawInfo[1];
+    float yes_y = 246.0f + pos[1];
+    MakeBoardDrawInfo[1] = yes_y;
     MakeBoardDrawInfo[0] = MakeBoardDrawInfo[2] = (mgScreenWidth >> 1) - MakeBoardDrawInfo[4] / 3.0f;
+    MakeBoardDrawInfo[3] = 28.0f + yes_y;
     board_button_color button_color = at_1814;
     mgRect<int> yes_uv(0x44, 0x14, 0x3C, 0x1A);
     mgRect<int> no_uv(0x44, 0x2E, 0x3C, 0x1A);
