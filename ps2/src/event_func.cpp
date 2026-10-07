@@ -1975,18 +1975,18 @@ void FileNameConvLanguage(char *name) {
 
 static int GetStackInt(RS_STACKDATA *stack) {
     if (stack->type == RS_FLOAT) {
-        return fptosi(stack->f);
+        return fptosi(stack->val.f);
     }
 
-    return stack->i;
+    return stack->val.i;
 }
 
 static float GetStackFloat(RS_STACKDATA *stack) {
     if (stack->type == RS_INT) {
-        return (float) stack->i;
+        return (float) stack->val.i;
     }
 
-    return stack->f;
+    return stack->val.f;
 }
 #ifdef NONMATCHING
 static void GetStackVector(float *vector, RS_STACKDATA *stack) {
@@ -2004,18 +2004,18 @@ static void GetStackVector(float *vector, RS_STACKDATA *stack) {
 }
 #endif
 static char *GetStackString(RS_STACKDATA *stack) {
-    return stack->s;
+    return stack->val.s;
 }
 
 static void SetStack(RS_STACKDATA *stack, int value) {
     if (stack->type == RS_PTR) {
-        stack->p->i = value;
+        stack->val.p->val.i = value;
     }
 }
 
 static void SetStack(RS_STACKDATA *stack, float value) {
     if (stack->type == RS_PTR) {
-        stack->p->f = value;
+        stack->val.p->val.f = value;
     }
 }
 
@@ -3283,7 +3283,7 @@ void CancelDramaScene() {
 
 void EdEventMenuExit() {
     if (p_use_item != 0) {
-        p_use_item->i = MenuArg.result[0];
+        p_use_item->val.i = MenuArg.result[0];
     }
 
     p_use_item = 0;
@@ -4158,7 +4158,7 @@ int _GOTO_USE_ITEM(RS_STACKDATA *stack, int argc) {
         return 0;
     }
 
-    RS_STACKDATA *item_slot = stack->p;
+    RS_STACKDATA *item_slot = stack->val.p;
     arg_no = 1;
     MenuArg.open_type = menu_use_item;
     stack++;
@@ -13457,9 +13457,9 @@ int _ZERO_VECTOR(RS_STACKDATA *stack, int arg_count) {
 
 static int _NORMAL_VECTOR(RS_STACKDATA *stack, int argc) {
     float vec[4];
-    vec[0] = ((RS_STACKDATA *) stack[0].i)->f;
-    vec[1] = ((RS_STACKDATA *) stack[1].i)->f;
-    vec[2] = ((RS_STACKDATA *) stack[2].i)->f;
+    vec[0] = ((RS_STACKDATA *) stack[0].val.i)->val.f;
+    vec[1] = ((RS_STACKDATA *) stack[1].val.i)->val.f;
+    vec[2] = ((RS_STACKDATA *) stack[2].val.i)->val.f;
     vec[3] = 1.0f;
     sceVu0Normalize(vec, vec);
     SetStack(stack++, vec[0]);
@@ -13480,26 +13480,26 @@ static int _COPY_VECTOR(RS_STACKDATA *stack, int argc) {
 static int _ADD_VECTOR(RS_STACKDATA *stack, int argc) {
     float operand[4];
     GetStackVector(operand, stack + 3);
-    SetStack(stack, stack[0].p->f + operand[0]);
-    SetStack(stack + 1, stack[1].p->f + operand[1]);
-    SetStack(stack + 2, stack[2].p->f + operand[2]);
+    SetStack(stack, stack[0].val.p->val.f + operand[0]);
+    SetStack(stack + 1, stack[1].val.p->val.f + operand[1]);
+    SetStack(stack + 2, stack[2].val.p->val.f + operand[2]);
     return 1;
 }
 
 static int _SUB_VECTOR(RS_STACKDATA *stack, int argc) {
     float operand[4];
     GetStackVector(operand, stack + 3);
-    SetStack(stack, stack[0].p->f - operand[0]);
-    SetStack(stack + 1, stack[1].p->f - operand[1]);
-    SetStack(stack + 2, stack[2].p->f - operand[2]);
+    SetStack(stack, stack[0].val.p->val.f - operand[0]);
+    SetStack(stack + 1, stack[1].val.p->val.f - operand[1]);
+    SetStack(stack + 2, stack[2].val.p->val.f - operand[2]);
     return 1;
 }
 
 static int _SCALE_VECTOR(RS_STACKDATA *stack, int argc) {
     float scale = GetStackFloat(stack + 3);
-    SetStack(stack, stack[0].p->f * scale);
-    SetStack(stack + 1, stack[1].p->f * scale);
-    SetStack(stack + 2, stack[2].p->f * scale);
+    SetStack(stack, stack[0].val.p->val.f * scale);
+    SetStack(stack + 1, stack[1].val.p->val.f * scale);
+    SetStack(stack + 2, stack[2].val.p->val.f * scale);
     return 1;
 }
 
@@ -13510,9 +13510,9 @@ static int _DIV_VECTOR(RS_STACKDATA *stack, int argc) {
         return 0;
     }
 
-    SetStack(stack, stack[0].p->f / divisor);
-    SetStack(stack + 1, stack[1].p->f / divisor);
-    SetStack(stack + 2, stack[2].p->f / divisor);
+    SetStack(stack, stack[0].val.p->val.f / divisor);
+    SetStack(stack + 1, stack[1].val.p->val.f / divisor);
+    SetStack(stack + 2, stack[2].val.p->val.f / divisor);
     return 1;
 }
 
@@ -13558,8 +13558,8 @@ static int _ANGLE_CMP(RS_STACKDATA *stack, int argc) {
 }
 
 static int _ANGLE_LIMIT(RS_STACKDATA *stack, int argc) {
-    RS_STACKDATA *angle = (RS_STACKDATA *) stack->i;
-    SetStack(stack, mgAngleLimit(angle->f));
+    RS_STACKDATA *angle = (RS_STACKDATA *) stack->val.i;
+    SetStack(stack, mgAngleLimit(angle->val.f));
     return 1;
 }
 
@@ -16693,7 +16693,7 @@ int _GOTO_USE_ITEM2(RS_STACKDATA *stack, int argc) {
         return 0;
     }
 
-    p_use_item = (RS_STACKDATA *) stack->i;
+    p_use_item = (RS_STACKDATA *) stack->val.i;
     stack++;
     MenuArg.open_type = 9;
     MenuArg.param[0] = GetStackInt(stack++);

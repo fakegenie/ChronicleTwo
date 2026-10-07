@@ -1803,10 +1803,10 @@ static _ES_SPRITE *GetSpritePtr(_EFF_SCRIPT *script, int index) {
  */
 static int GetStackInt(RS_STACKDATA *slot) {
     if (slot->type == 1) {
-        return fptosi(*(float *) &slot->i);
+        return fptosi(*(float *) &slot->val.i);
     }
 
-    return slot->i;
+    return slot->val.i;
 }
 
 /**
@@ -1816,10 +1816,10 @@ static int GetStackInt(RS_STACKDATA *slot) {
  */
 static float GetStackFloat(RS_STACKDATA *slot) {
     if (slot->type == 0) {
-        return (float) slot->i;
+        return (float) slot->val.i;
     }
 
-    return *(float *) &slot->i;
+    return *(float *) &slot->val.i;
 }
 
 /**
@@ -1840,7 +1840,7 @@ static void GetStackVector(float *vector, RS_STACKDATA *slot) {
  *
  */
 static char *GetStackString(RS_STACKDATA *slot) {
-    return reinterpret_cast<char *>(slot->i);
+    return reinterpret_cast<char *>(slot->val.i);
 }
 
 /**
@@ -1850,7 +1850,7 @@ static char *GetStackString(RS_STACKDATA *slot) {
  */
 static void SetStack(RS_STACKDATA *slot, int value) {
     if (slot->type == 3) {
-        slot->p->i = value;
+        slot->val.p->val.i = value;
     }
 }
 
@@ -1861,7 +1861,7 @@ static void SetStack(RS_STACKDATA *slot, int value) {
  */
 static void SetStack(RS_STACKDATA *slot, float value) {
     if (slot->type == 3) {
-        slot->p->f = value;
+        slot->val.p->val.f = value;
     }
 }
 
@@ -1893,9 +1893,9 @@ static int _NORMAL_VECTOR(RS_STACKDATA *stack, int argument_count) {
         return 0;
     }
 
-    vector[0] = stack->p->f;
-    vector[1] = (stack + 1)->p->f;
-    vector[2] = (stack + 2)->p->f;
+    vector[0] = stack->val.p->val.f;
+    vector[1] = (stack + 1)->val.p->val.f;
+    vector[2] = (stack + 2)->val.p->val.f;
     vector[3] = 1.0f;
     sceVu0Normalize(vector, vector);
     SetStack(stack++, vector[0]);
@@ -1936,9 +1936,9 @@ static int _ADD_VECTOR(RS_STACKDATA *stack, int argument_count) {
     }
 
     GetStackVector(vector, stack + 3);
-    SetStack(stack, stack->p->f + vector[0]);
-    SetStack(stack + 1, (stack + 1)->p->f + vector[1]);
-    SetStack(stack + 2, (stack + 2)->p->f + vector[2]);
+    SetStack(stack, stack->val.p->val.f + vector[0]);
+    SetStack(stack + 1, (stack + 1)->val.p->val.f + vector[1]);
+    SetStack(stack + 2, (stack + 2)->val.p->val.f + vector[2]);
     return 1;
 }
 
@@ -1955,9 +1955,9 @@ static int _SUB_VECTOR(RS_STACKDATA *stack, int argument_count) {
     }
 
     GetStackVector(vector, stack + 3);
-    SetStack(stack, stack->p->f - vector[0]);
-    SetStack(stack + 1, (stack + 1)->p->f - vector[1]);
-    SetStack(stack + 2, (stack + 2)->p->f - vector[2]);
+    SetStack(stack, stack->val.p->val.f - vector[0]);
+    SetStack(stack + 1, (stack + 1)->val.p->val.f - vector[1]);
+    SetStack(stack + 2, (stack + 2)->val.p->val.f - vector[2]);
     return 1;
 }
 
@@ -1974,9 +1974,9 @@ static int _SCALE_VECTOR(RS_STACKDATA *stack, int argument_count) {
     }
 
     scale = GetStackFloat(stack + 3);
-    SetStack(stack, stack->p->f * scale);
-    SetStack(stack + 1, (stack + 1)->p->f * scale);
-    SetStack(stack + 2, (stack + 2)->p->f * scale);
+    SetStack(stack, stack->val.p->val.f * scale);
+    SetStack(stack + 1, (stack + 1)->val.p->val.f * scale);
+    SetStack(stack + 2, (stack + 2)->val.p->val.f * scale);
     return 1;
 }
 
@@ -1998,9 +1998,9 @@ static int _DIV_VECTOR(RS_STACKDATA *stack, int argument_count) {
         return 0;
     }
 
-    SetStack(stack, stack->p->f / divisor);
-    SetStack(stack + 1, (stack + 1)->p->f / divisor);
-    SetStack(stack + 2, (stack + 2)->p->f / divisor);
+    SetStack(stack, stack->val.p->val.f / divisor);
+    SetStack(stack + 1, (stack + 1)->val.p->val.f / divisor);
+    SetStack(stack + 2, (stack + 2)->val.p->val.f / divisor);
     return 1;
 }
 
@@ -2107,7 +2107,7 @@ static int _ANGLE_LIMIT(RS_STACKDATA *stack, int argument_count) {
         return 0;
     }
 
-    SetStack(stack, mgAngleLimit(stack->p->f));
+    SetStack(stack, mgAngleLimit(stack->val.p->val.f));
     return 1;
 }
 
@@ -2331,7 +2331,7 @@ int _GET_VALUE(RS_STACKDATA *stack, int argument_count) {
         return 0;
     }
 
-    switch (result_slot->p->type) {
+    switch (result_slot->val.p->type) {
         case 0: {
             _EFF_SCRIPT *script = now_script;
             SetStack(result_slot, script->value[index].i);
