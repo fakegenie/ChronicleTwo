@@ -1230,7 +1230,7 @@ static inline CMap *ActiveDngMap() {
     return DngMainScene->GetMap(DngMainScene->active_map);
 }
 template <typename T> static inline T Ident(T v) { return v; }
-// 99.9% match, 10 words off
+// 99.9% match, 7 words off
 int SearchMapFlatPosition(float *out_pos, CAutoMapGen *map_gen) {
     float center[4];
     float from[4];
@@ -1240,17 +1240,16 @@ int SearchMapFlatPosition(float *out_pos, CAutoMapGen *map_gen) {
     int hit_polys[32];
     float hit_points[32][4];
     float found[4];
-    CMapParts *place_parts;
-    int attr __attribute__((aligned(8)));
-    int poly_num __attribute__((aligned(16)));
-    int axis __attribute__((aligned(16)));
-    CMap *map __attribute__((aligned(16)));
-    CMapParts *parts __attribute__((aligned(16)));
-    int attempt;
-    int hit_num;
-    int tries_left;
+    CMapParts *parts;
     int place_num;
-
+    int poly_num __attribute__((aligned(16)));
+    CMapParts *place_parts;
+    int tries_left __attribute__((aligned(32)));
+    int attempt __attribute__((aligned(16)));
+    CMap *map __attribute__((aligned(32)));
+    int hit_num __attribute__((aligned(16)));
+    int attr __attribute__((aligned(32)));
+    int axis __attribute__((aligned(32)));
     map = ActiveDngMap();
     if (map == NULL) {
         return 0;
