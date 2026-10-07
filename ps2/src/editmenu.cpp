@@ -1548,28 +1548,35 @@ void DrawDownLoadAnaunce() {
     }
 }
 #ifdef NONMATCHING
-// 99.9% match, 49 words off
+// 99.9% match, 42 words off
 #pragma divbyzerocheck on
 int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_sub_num, int *out_height) {
     int count;
     char *dst_char;
-    int limit;
-    int geo_floor;
-    int n;
-    char *word;
     int valid;
-    int size;
+    int limit;
     int no;
+    int condition;
     CSaveDataDungeon *dungeon;
     int floor_num;
-    int map_no;
-    CEditInfoMngr *info;
-    int request_num;
-    int font_no;
-    int condition_num;
-    int total;
+    char *hatena;
     int *ok_table;
+    int request_num;
+    CScene *scene;
+    int condition_num;
+    int size;
+    char *word;
+    CEditInfoMngr *info;
+    int n;
     int height;
+    CEditData *edit;
+    int map_no;
+    int font_no;
+    CSaveData *save;
+    int geo_floor;
+    char *condition_name;
+    int total;
+    EditAnalyzeDataSrc *src;
     short floors[0x180][2];
     char *names[0x180];
     signed char extras[0x180];
@@ -1583,11 +1590,11 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
         map_no = 0;
         valid = 0;
     }
-    CSaveData *save = GetSaveData();
+    save = GetSaveData();
     if (save == NULL) {
         return 0;
     }
-    CEditData *edit = save->GetEditData(map_no);
+    edit = save->GetEditData(map_no);
     if (edit != NULL) {
         MenuEditAnalyzeSrc = edit->GetAnalyzeSrc(map_no);
         MenuEditAnalyzeDataSrcNum = 0;
@@ -1608,8 +1615,8 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
     memset(floors, 0, sizeof(floors));
     PartsMakeOkTableNum = 0;
     ok_table = PartsMakeOkTable;
-    char *hatena = GetHatena();
-    CScene *scene = GetMainScene();
+    hatena = GetHatena();
+    scene = GetMainScene();
     CEditMap *map = (CEditMap *)scene->GetMap(scene->active_map);
     info = &map->info_mngr;
     if (map == NULL) {
@@ -1668,7 +1675,7 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
     condition_num = 0;
     height = 0;
     for (no = 0; no < 32; no++) {
-        EditAnalyzeDataSrc *src = MenuEditAnalyzeDataSrc[no];
+        src = MenuEditAnalyzeDataSrc[no];
         if (src == NULL) {
             continue;
         }
@@ -1711,8 +1718,8 @@ int MakeDownLoadAnaunce(int town_no, mgCMemory *stack, int *out_num, int *out_su
             height += *tex_h;
         }
         for (int con = 0; src->con_no[con] >= 0; con++, condition_num++) {
-            int condition = src->con_no[con];
-            char *condition_name = MenuEditAnalyzeSrc->condition[condition];
+            condition = src->con_no[con];
+            condition_name = MenuEditAnalyzeSrc->condition[condition];
             if (condition_name == NULL) {
                 continue;
             }

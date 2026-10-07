@@ -340,7 +340,7 @@ static inline float LightAbs(float value) {
     return value;
 }
 int mgTransWorldScreen(int *out, float *position);
-// 65 aligned words off (objdiff splits this jump-table function)
+// 64 aligned words off (objdiff splits this jump-table function)
 void LightingEdit(CScene *scene) {
     int row;
     float *selected;
@@ -460,7 +460,7 @@ void LightingEdit(CScene *scene) {
             case 2:
             case 3:
             case 4: {
-                u_char *component = edit + (u_char *)fog + 6;
+                u_char *component = (u_char *)(edit + (u_int)fog + 6);
                 int value = *component + direction;
                 if (value < 0) value = 0;
                 if (value > 255) value = 255;
