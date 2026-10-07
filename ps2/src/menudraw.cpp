@@ -2959,8 +2959,11 @@ void MenuItemBrdSetInfo(int unused, int pos, int max_line, int view_line) {
     Func_MenuItemBrdPosStep(pos);
 }
 #ifdef NONMATCHING
-// 94.7% match, 111 words off
+// 99.8% match, 23 words off
 void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int b) {
+    int edge;
+    int clip_left;
+    int clip_top;
     int shadow_alpha;
     mgCDrawPrim *prim = GetMenuPrim();
     mgRect<int> put(0, 0, 0, 0);
@@ -2989,8 +2992,8 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
         put_y = y;
         put_x += 4.0f;
         put_y += 262.0f;
-        int clip_left = put_x;
-        int clip_top = (int)(put_y + 20.0f);
+        clip_left = put_x;
+        clip_top = (int)(put_y + 20.0f);
         int clip_right = (int)(put_x + 300.0f);
         mgRect<int> clip(clip_left, clip_top, clip_right, (int)(put_y + 50.0f));
         MenuClipRectCheck(clip);
@@ -3004,13 +3007,11 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
         prim->Color(0, 0, 0, shadow_alpha = (int)(2.0f * a / 3.0f));
         PrimQuad(prim, mgRect<float>(put_x, put_y, 40.0f, 32.0f), *parts[frmtbl0_2922[part++]]);
         put_x += 40.0f;
-        int i;
         int j;
         int put_top;
         for (int i = 0; i < 5; i++) {
-            int edge_left = (int)put_x;
-            put_top = (int)put_y;
-            PrimQuad(prim, mgRect<int>(edge_left, put_top, 40, 32), *parts[frmtbl0_2922[part++]]);
+            edge = (int)put_x;
+            PrimQuad(prim, mgRect<int>(edge, put_top = (int)put_y, 40, 32), *parts[frmtbl0_2922[part++]]);
             put_x += 40.0f;
         }
         PrimQuad(prim, mgRect<int>((int)put_x, put_top, 32, 32), *parts[11]);
@@ -3024,7 +3025,8 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
         part = 0;
         for (i = 0; i < 2; i++) {
             put_x = x;
-            PrimQuad(prim, mgRect<int>((int)put_x, put_top = (int)put_y, 32, 40), *parts[frmtbl0_2922[part++]]);
+            edge = (int)put_x;
+            PrimQuad(prim, mgRect<int>(edge, put_top = (int)put_y, 32, 40), *parts[frmtbl0_2922[part++]]);
             PrimQuad(prim, mgRect<int>((int)(put_x + 32.0f), put_top, 8, 40), *parts[frmtbl0_2922[part++]]);
             put_x += 40.0f;
             for (j = 0; j < 5; j++) {
@@ -3042,7 +3044,8 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
             put_y = y + 40;
             int put_left;
             for (j = 0; j < 5; ++j) {
-                PrimQuad(prim, mgRect<int>(put_left = (int)put_x, (int)put_y, 32, 40), *parts[frmtbl1_2938[part++]]);
+                put_left = (int)put_x;
+                PrimQuad(prim, mgRect<int>(put_left, (int)put_y, 32, 40), *parts[frmtbl1_2938[part++]]);
                 put_y += 40.0f;
             }
             PrimQuad(prim, mgRect<int>(put_left, (int)put_y, 32, 10), *parts[frmtbl1_2938[part - 1]]);
@@ -3051,25 +3054,25 @@ void MenuItemBrdFrameDraw(int x, int y, int &tex_block, int a, int r, int g, int
         prim->End();
         float bar_x = x + 260;
         int heights[3] = {ItemBoardScrlBar1.bottom, 0x102, ItemBoardScrlBar3.bottom};
-        int layers[2][5] = {{4, 0, 0, 0, shadow_alpha}, {0, r, g, b, a}};
+        int layers[10] = {4, 0, 0, 0, shadow_alpha, 0, r, g, b, a};
         scroll_bar_parts bars = at_2951__2;
         prim->Begin(6);
         prim->Texture(tex);
         for (int i = 0; i < 2; i++) {
-            int *layer = layers[i];
-            prim->Color(layer[1], layer[2], layer[3], layer[4]);
+            int pos = i * 5;
+            prim->Color(layers[pos + 1], layers[pos + 2], layers[pos + 3], layers[pos + 4]);
             float bar_y = y + 9;
             for (j = 0; j < 3; j++) {
                 mgRect<int> *bar = bars.rect[j];
                 prim->TextureCrd(bar->left, bar->top);
-                prim->Vertex(bar_x + layer[0], bar_y + layer[0], 0.0f);
+                prim->Vertex(bar_x + layers[pos], bar_y + layers[pos], 0.0f);
                 prim->TextureCrd(bar->left + bar->right, bar->top + bar->bottom);
-                prim->Vertex(bar_x + (bar->right + layer[0]), bar_y + (heights[j] + layer[0]), 0.0f);
+                prim->Vertex(bar_x + bar->right + layers[pos], bar_y + heights[j] + layers[pos], 0.0f);
                 bar_y += heights[j];
             }
         }
         prim->End();
-        float bar_top = y + 9 + layers[0][0];
+        float bar_top = y + 9 + layers[0];
         if (MenuItemBrdScrlBarY < bar_top) {
             MenuItemBrdScrlBarY = bar_top;
         }
