@@ -377,6 +377,59 @@ __declspec(dead) static u_long PrimeLongDivision(u_long a, u_long b) {
     return a / b;
 }
 
+__declspec(dead) static void PrimeBuildUpDraw(void) {
+    MenuSePlay(0);
+    MenuSePlay(1);
+    MenuSePlay(2);
+    MenuSePlay(3);
+    MenuSePlay(4);
+    MenuSePlay(5);
+    MenuSePlay(6);
+    MenuSePlay(7);
+    MenuSePlay(8);
+    MenuSePlay(9);
+    MenuSePlay(10);
+    MenuSePlay(11);
+    MenuSePlay(12);
+    MenuSePlay(13);
+    MenuSePlay(14);
+    MenuSePlay(15);
+    MenuSePlay(16);
+    MenuSePlay(17);
+    MenuSePlay(18);
+    MenuSePlay(19);
+    MenuSePlay(20);
+    MenuSePlay(21);
+    MenuSePlay(22);
+    MenuSePlay(23);
+    MenuSePlay(24);
+    MenuSePlay(25);
+    MenuSePlay(26);
+    MenuSePlay(27);
+    MenuSePlay(28);
+    MenuSePlay(29);
+    MenuSePlay(30);
+    MenuSePlay(31);
+    MenuSePlay(32);
+    MenuSePlay(33);
+    MenuSePlay(34);
+    MenuSePlay(35);
+    MenuSePlay(36);
+    MenuSePlay(37);
+    MenuSePlay(38);
+    MenuSePlay(39);
+    MenuSePlay(40);
+    MenuSePlay(41);
+    MenuSePlay(42);
+    MenuSePlay(43);
+    MenuSePlay(44);
+    MenuSePlay(45);
+    MenuSePlay(46);
+    MenuSePlay(47);
+    MenuSePlay(48);
+    MenuSePlay(49);
+}
+
 // Code (.text)
 /**
  *
@@ -512,8 +565,6 @@ int CBaseMenuClass::MenuItemMoveItemCommand(CGameDataUsed *item, int arg_pos, in
 extern s8 init_1049;
 extern s8 cmd_counter_1048;
 template <typename T> static inline T Ident(T v) { return v; }
-#ifdef NONMATCHING
-// 100.0% match, 0 words off
 int CBaseMenuClass::MenuItemCommandSelect(int select_key, int push_button) {
     CGameDataUsed *used_data = MenuUserParam.used_data;
     u_long target;
@@ -892,9 +943,6 @@ int CBaseMenuClass::MenuItemCommandSelect(int select_key, int push_button) {
     }
     return ret;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menusys", MenuItemCommandSelect__14CBaseMenuClassFii);
-#endif
 extern s8 wakutbl_1411[2];
 extern s8 tartbl_1412[2];
 void CBaseMenuClass::SetItemCmdMsgPos(int *item_pos) {
