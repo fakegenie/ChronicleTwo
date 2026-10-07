@@ -57,7 +57,6 @@ struct mgMaterialVector {
     float values[4]; /**< Material channel values. */
 };
 
-#ifdef NONMATCHING
 /**
  *
  * Initial transform and lighting upload of an MDT visual's setup packet.
@@ -77,6 +76,7 @@ struct mgVISUAL_SETUP_PACKET {
 
 STATIC_ASSERT(sizeof(mgVISUAL_SETUP_PACKET) == 0x140);
 
+#ifdef NONMATCHING
 static u_long128 *(*set_data_func[8])(int, int, int **, u_long128 *, u_long128 *, u_long128 *, u_long128 *, u_long128 *) = {
     SetData0, SetData1, SetData2, SetData3, SetData4, SetData5, SetData6, SetData7}; /**< Vertex upload writers selected by the face attributes. */
 
@@ -1133,8 +1133,6 @@ int mgCVisualMDT::CreateFacePacket(u_int *packet, mgCFace *face) {
     packet += 4;
     return (packet - start) / 4;
 }
-#ifdef NONMATCHING
-// 99.0% match, 76 words off
 int mgCVisualMDT::CreateRenderInfoPacket(u_int *packet, float (*matrix)[4], mgRENDER_INFO *info) {
     mgVISUAL_SETUP_PACKET *setup;
     mgLIGHT_INFO          *lighting;
@@ -1161,7 +1159,9 @@ int mgCVisualMDT::CreateRenderInfoPacket(u_int *packet, float (*matrix)[4], mgRE
         packet[3] = 0;
         return 1;
     }
-    setup = (mgVISUAL_SETUP_PACKET *)(start = GetScrPad());
+    write = GetScrPad();
+    start = write;
+    setup = (mgVISUAL_SETUP_PACKET *)write;
     lighting = info->GetpLightInfo();
     *(u_long128 *)setup->model_world[0] = *(u_long128 *)matrix[0];
     *(u_long128 *)setup->model_world[1] = *(u_long128 *)matrix[1];
@@ -1334,9 +1334,6 @@ int mgCVisualMDT::CreateRenderInfoPacket(u_int *packet, float (*matrix)[4], mgRE
     SendDMA(packet, size);
     return size;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/mg_visual", CreateRenderInfoPacket__12mgCVisualMDTFPUiPA4_fP13mgRENDER_INFO);
-#endif
 int mgCVisualMDT::CreateExtRenderInfoPacket(u_int         *packet, float (*matrix)[4],
                                             mgRENDER_INFO *info) {
     return 0;
