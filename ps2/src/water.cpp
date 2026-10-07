@@ -573,7 +573,7 @@ int CWater::Draw(u_int *tag, float (*matrix)[4], mgCDrawManager *draw_manager) {
     return 0;
 }
 #ifdef NONMATCHING
-// 92.5% match, 217 words off
+// 96.4% match, 120 words off
 struct WaterTextureName {
     char text[0x20];
 };
@@ -624,6 +624,7 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
     int                size;
     WaterDmaTag       *tag;
     int                point_count;
+    int                vertex_count;
     u_long128         *positions;
     WaterFinishPacket *finish;
     u_int             *counts;
@@ -638,11 +639,8 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
     mgZeroVector(row_step);
     mgZeroVector(column_step);
     row_step[0] = (max[0] - min[0]) / (rows - 1);
-    row_step[1] = 0.0f;
-    row_step[3] = 0.0f;
     column_step[2] = (max[2] - min[2]) / (columns - 1);
-    column_step[1] = 0.0f;
-    column_step[3] = 0.0f;
+    row_step[1] = column_step[1] = row_step[3] = column_step[3] = 0.0f;
     for (row = 0, row_position = 0.0f; row < rows; row++, row_position += 1.0f) {
         current = height + row * columns;
         previous = current - columns;
@@ -730,6 +728,7 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
             strip->giftag.REGS1 = 3;
             strip->giftag.REGS2 = 4;
             positions = (u_long128 *) (strip + 1);
+            vertex_count = point_count * 2;
             end = positions + point_count * 2;
             for (index = 0; index < point_count; index++) {
                 positions[0] = *(u_long128 *) position0;
@@ -748,32 +747,44 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
             mgSubVector(position1, column_step);
             size = end - (u_long128 *) strip - 1;
             strip->dma[0] = MG_DMA_CNT | size;
-            strip->dma[1] = strip->dma[2] = 0;
+            strip->dma[1] = 0;
+            strip->dma[2] = 0;
             strip->dma[3] = MG_VIF_UNPACK_V4_32 | MG_VIF_UNPACK_FLG | (size << MG_VIF_NUM_SHIFT);
-            counts[0] = counts[1] = point_count * 2;
-            counts[2] = counts[3] = 0;
+            counts[0] = vertex_count;
+            counts[1] = vertex_count;
+            counts[2] = 0;
+            counts[3] = 0;
             if (point_count > 0) {
                 tag = (WaterDmaTag *) end;
                 tag->command = MG_DMA_CNT | 1;
-                tag->address = tag->vif[0] = tag->vif[1] = 0;
+                tag->address = 0;
+                tag->vif[0] = 0;
+                tag->vif[1] = 0;
                 if (started == 0) {
-                    started = 1;
                     end[1] = *(u_long128 *) prog_vif;
+                    started = 1;
+                    end += 2;
                 } else {
                     end[1] = *(u_long128 *) progf_vif;
+                    end += 2;
                 }
-                end += 2;
             }
         }
     }
     end += mgSetPkTexFlush_TagCnt((u_int *) end);
     finish = (WaterFinishPacket *) end;
     finish->dma.command = MG_DMA_CNT | 1;
-    finish->dma.address = finish->dma.vif[0] = finish->dma.vif[1] = 0;
+    finish->dma.address = 0;
+    finish->dma.vif[0] = 0;
+    finish->dma.vif[1] = 0;
     finish->flush[0] = MG_VIF_FLUSHA;
-    finish->flush[1] = finish->flush[2] = finish->flush[3] = 0;
+    finish->flush[1] = 0;
+    finish->flush[2] = 0;
+    finish->flush[3] = 0;
     finish->ret.command = MG_DMA_RET;
-    finish->ret.address = finish->ret.vif[0] = finish->ret.vif[1] = 0;
+    finish->ret.address = 0;
+    finish->ret.vif[0] = 0;
+    finish->ret.vif[1] = 0;
     end += 3;
     memory->Alloc(end - start);
     packet = (u_int) base;
