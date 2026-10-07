@@ -4163,7 +4163,10 @@ void CalcWindowInRectFromOutRect(int type, RECT outer, RECT *inner) {
     inner->height = outer.height - (waku_data[type][1] + waku_data[type][3]);
 }
 #ifdef NONMATCHING
-// ~96.9% match, 23 words off
+static inline int CentrePos(float max, int size) {
+    return (int)CalcAutoPosSet(0.0f, max, size, 0.5f);
+}
+// ~97.4% match, 19 words off
 void ClsMes::DrawMesWin() {
     RGBAQ_TYPE color;
     RGBAQ_TYPE shadow_color;
@@ -4336,8 +4339,8 @@ void ClsMes::DrawMesWin() {
         text_y = (int)CalcAutoPosSet(float(0.0), (float)480.0, text_h, float(0.95));
     }
     if (window_mode == MES_WIN_CENTRE) {
-        text_x = (int)CalcAutoPosSet((float)0.0, (float)512.0, text_w, (float)0.5);
-        text_y = (int)CalcAutoPosSet(0.0f, 480.0f, text_h, float(0.5));
+        text_x = CentrePos(512.0f, text_w);
+        text_y = CentrePos(480.0f, text_h);
     }
     if (scissor_on == 1) {
         scissor.x = text_x;
