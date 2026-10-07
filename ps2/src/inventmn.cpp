@@ -4499,7 +4499,7 @@ CStarDust::CStarDust() {
     this->active = 0;
 }
 #ifdef NONMATCHING
-// 97.6% match, 314 words off
+// 78.5% match, 274 words off
 void CMenuInvent::IsAccessAlbum() {
     CDC2Mes *message = MenuDCMsg[4];
     if (message == NULL) {
@@ -4816,11 +4816,11 @@ void CMenuInvent::IsAccessAlbum() {
     case 240: {
         int answer = message->YesNoCursor2(0);
         if (answer == 1) {
-            int space = 0;
+            keys = 0;
             for (int i = 0; i < 50; i++) {
                 USER_PICTURE_INFO *photo = InventUserDataPtr->GetPhotoInfo(i);
                 if (photo != NULL && *(s8 *)&photo->used == 0) {
-                    space++;
+                    keys++;
                 }
             }
             int recover = 0;
@@ -4829,7 +4829,7 @@ void CMenuInvent::IsAccessAlbum() {
                     recover++;
                 }
             }
-            if (space < recover) {
+            if (keys < recover) {
                 step = 241;
                 ExeScript(at_4363);
                 MenuSePlay(5);
@@ -5116,9 +5116,8 @@ void CMenuInvent::IsAccessAlbum() {
         ExeScript(at_4380);
     }
     if (dload_form != NULL) {
-        int x;
         int y;
-        dload_form->GetPutPosXY(NULL, x, y);
+        dload_form->GetPutPosXY(NULL, finish, y);
         y += 26;
         MenuDCMsg[6]->StepMsg();
         MenuDCMsg[6]->SetMovePosCenteringGyou(0, mgScreenWidth >> 1, y);
