@@ -330,7 +330,7 @@ void EndLightingEdit() {
 int IsLightingEditMode() { return LEditFlag; }
 #ifdef NONMATCHING
 int mgTransWorldScreen(int *out, float *position);
-// 177 aligned words off (objdiff splits this jump-table function)
+// 148 aligned words off (objdiff splits this jump-table function)
 void LightingEdit(CScene *scene) {
     int row;
     float *selected;
@@ -378,10 +378,10 @@ void LightingEdit(CScene *scene) {
     if (LightType == LIGHTING_EDIT_PAGE_BG_AMBIENT) {
         int edit = row - 2;
         float *colors[3] __attribute__((aligned(16))) = {light->bg_color, light->bg_color2, light->ambient};
-        const char *groups[3] = {"BG_COL  ", "BG_COL2 ", "AMBIENT "};
         if (row > 10) row = 10;
         selected = colors[edit / 3];
         selected_index = edit % 3;
+        const char *groups[3] = {"BG_COL  ", "BG_COL2 ", "AMBIENT "};
         for (int group = 0; group < 3; group++) {
             for (int component = 0; component < 3; component++) {
                 int hit = edit == group * 3 + component;
@@ -515,7 +515,7 @@ void LightingEdit(CScene *scene) {
                 DirLightNo = 0;
                 LightType -= 1;
             }
-            if (DirLightNo >= 4) {
+            if (DirLightNo > 3) {
                 DirLightNo = 3;
                 LightType += 1;
             }
@@ -524,7 +524,7 @@ void LightingEdit(CScene *scene) {
             if (GamePad__2.Down2(PAD_LEFT)) LightType -= 1;
         }
         if (LightType < 0) LightType = 0;
-        if (LightType >= 4) LightType = 3;
+        if (LightType > 3) LightType = 3;
         if (LightType == 0) DirLightNo = 0;
         if (LightType == 2) DirLightNo = 3;
         if (previous != LightType) LightSel[LightType] = 1;
@@ -649,8 +649,7 @@ void LightingEdit(CScene *scene) {
     mgCCamera *camera = scene->GetCamera(scene->active_camera);
     if (camera != NULL) {
         angle = 0.05f * -GamePad__2.GetRXf2();
-        float magnitude = angle;
-        if (angle < 0.0f) magnitude = -angle;
+        float magnitude = (angle < 0.0f) ? -angle : angle;
         if (!(magnitude <= 0.001f)) ((CCameraControl *)camera)->Rotate(angle);
     }
     if (GamePad__2.Down2(PAD_R3)) {
