@@ -591,7 +591,7 @@ unsigned int CDngFreeMap::DrawGlidCheck(GLID_INFO *glid) {
     return mask;
 }
 #ifdef NONMATCHING
-// 93.9% match, 90 words off
+// 93.5% match, 38 words off
 void CDngFreeMap::DrawRoomOne(mgRect<float> rect, DNGMAP_ROOM_INFO *room, unsigned int glid_check, int alpha, float bright) {
     if (room == NULL || !(rect.left <= (float)(mgScreenWidth + 20)) || !(rect.top <= (float)(mgScreenHeight + 30))) {
         return;
@@ -638,10 +638,10 @@ void CDngFreeMap::DrawRoomOne(mgRect<float> rect, DNGMAP_ROOM_INFO *room, unsign
         put.left += (float)room->offset_x;
         put.top += (float)room->offset_y;
     }
-    s16 draw_mode = mode;
     int level = (int)(128.0f * bright);
     float shadow_alpha = 0.25f * (float)alpha;
     float shade = 1.0f;
+    int draw_mode = mode;
     if (draw_mode == DNGMAP_MODE_EVENT && user_glid != NULL && &user_glid->room != room) {
         level = (int)(64.0f * bright);
         shade = 0.5f;
@@ -678,7 +678,7 @@ void CDngFreeMap::DrawRoomOne(mgRect<float> rect, DNGMAP_ROOM_INFO *room, unsign
     prim->Bilinear(0);
     prim->Begin(6);
     prim->Texture(map_tex);
-    prim->Color(red, green, blue, alpha);
+    prim->Color(red, green, (int)blue, (int)alpha);
     PrimQuad(prim, put, uv);
     prim->End();
     if (room->visited == 0 && user_glid != NULL && &user_glid->room != room) {
@@ -710,7 +710,7 @@ void CDngFreeMap::DrawRoomOne(mgRect<float> rect, DNGMAP_ROOM_INFO *room, unsign
             if (room->flag & (1 << (i + 1))) {
                 s16 *letter = get_moji_tbl_1524[i];
                 if (letter[0] >= 0) {
-                    mgRect<float> letter_put(put.left + (float)put_moji_tbl_1525[i][0], put.top + (float)put_moji_tbl_1525[i][1],
+                    mgRect<float> letter_put(put.left + (float)put_moji_tbl_1525[i][0], put.top + (float)put_moji_tbl_1525[(int)i][1],
                                              (float)letter[2], (float)letter[3]);
                     prim->TextureMapEnable(1);
                     prim->Begin(6);
