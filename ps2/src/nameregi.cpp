@@ -216,8 +216,6 @@ void CNameRegiMenu::CopyAsciiToJis(char *src, char *dst) {
         *dst = 0;
     }
 }
-#ifdef NONMATCHING
-// 99.4% match, 8 words off
 void CNameRegiMenu::CopyJisToAscii(char *src, char *dst) {
     if (src == NULL || dst == NULL) {
         return;
@@ -225,30 +223,27 @@ void CNameRegiMenu::CopyJisToAscii(char *src, char *dst) {
     if (CheckNowEurope() != 0) {
         strcpy(dst, src);
     } else {
-        char *ascii_codes = ascii_code_table;
-        while ((s8) *src != 0) {
-            long high = *src;
+        char *text = src;
+        while ((s8) *text != 0) {
+            long high = *text;
             int  matched_index = -1;
             int  table_index = 0;
             while ((s8) jis_table[table_index] != 0) {
-                if (high == jis_table[table_index] && src[1] == jis_table[table_index + 1]) {
+                if (high == jis_table[table_index] && text[1] == jis_table[table_index + 1]) {
                     matched_index = table_index;
                     break;
                 }
                 table_index += 2;
             }
             if (0 <= matched_index) {
-                *dst = ascii_codes[matched_index / 2];
+                *dst = ascii_code_table[matched_index / 2];
                 dst++;
             }
-            src += 2;
+            text += 2;
         }
         *dst = 0;
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/nameregi", CopyJisToAscii__13CNameRegiMenuFPcPc);
-#endif
 int CheckChronicleKanjiFont(mgCMemory *memory) {
     char name[3];
     int  total;
