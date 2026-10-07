@@ -3571,18 +3571,22 @@ void Menu3DivideTextureDraw(mgCDrawPrim *prim, mgRect<int> rect, short *tex_tbl,
     }
 }
 #ifdef NONMATCHING
-// 93.6% match, 292 words off
+static inline float PlusF(int v) { return v; }
+static inline MENUFORMPARTS_TYPE *FormPart(CMenuPosDataForm *f, int i) { return &f->parts[i]; }
+static inline mgCTexture *PartTex(MENUFORMPARTS_TYPE *p) { return p->tex; }
+// 99.9% match, 13 words off
 void CMenuPosDataForm::MenuFormDrawNormal(int x, int y, float sway_x, float sway_y, int &tex_block) {
     mgCTextureManager *textures = &mgTexManager;
     mgCDrawPrim       *prim = GetMenuPrim();
     prim->Initialize(NULL, NULL);
     mgRect<float>              put(0.0f, 0.0f, 0.0f, 0.0f);
     mgRect<int>                uv(0, 0, 0, 0);
+    mgCTexture                *effect_tex = MenuPosData->icon_effect_tex;
+    float                     *top_left;
     int                        block = -1;
     MENU_PARTS_EFFECT_STRUCT1 *item_effect = NULL;
-    mgCTexture                *effect_tex = MenuPosData->icon_effect_tex;
     for (int i = 0; i < parts_num; i++) {
-        MENUFORMPARTS_TYPE *part = &parts[i];
+        MENUFORMPARTS_TYPE *part = FormPart(this, i);
         if (part->active == 0 || part->draw_flag == 0 || part->dtype == MENUFORMPARTS_DTYPE_FUNCINFO) {
             continue;
         }
@@ -3600,19 +3604,20 @@ void CMenuPosDataForm::MenuFormDrawNormal(int x, int y, float sway_x, float sway
             cursor.pos[0] = put.left;
             cursor.pos[1] = put.top;
             mgCTexture *cursor_tex = textures->GetTexture(at_2238, -1);
-            if (cursor_tex != NULL) {
-                MenuReloadTexture(tex_block, cursor_tex->block);
-                MenuCursorDraw(cursor_tex, cursor.pos, menu_cursor_rotation_angle, MenuCursorReverseFlag, rgba[3], 1.0f);
+            if (cursor_tex == NULL) {
+                return;
             }
+            MenuReloadTexture(tex_block, cursor_tex->block);
+            MenuCursorDraw(cursor_tex, cursor.pos, menu_cursor_rotation_angle, (u8)MenuCursorReverseFlag, rgba[3], 1.0f);
             continue;
         }
         if (part->dtype == MENUFORMPARTS_DTYPE_CLUT_RELOAD) {
             MenuReloadCLUT(part->etc_info[0]);
             continue;
         }
-        mgCTexture       *tex = part->tex;
-        u8                dtype = part->dtype;
+        mgCTexture       *tex = PartTex(part);
         MENU_BASETEXINFO *info = MenuPosData->GetTexGetInfo(part->tex_info_no);
+        u8                dtype = part->dtype;
         if (dtype != MENUFORMPARTS_DTYPE_SQ_BETA && dtype != MENUFORMPARTS_DTYPE_FONT && tex == NULL) {
             continue;
         }
@@ -3646,17 +3651,16 @@ void CMenuPosDataForm::MenuFormDrawNormal(int x, int y, float sway_x, float sway
         }
         uv = info->rect;
         ConvMGIRECTtoINTtbl(uv, getpostbl_3411);
+        s8 repeat = part->effect != NULL ? 1 : 0;
         switch (part->dtype) {
             case MENUFORMPARTS_DTYPE_NORMAL: {
-                s8  repeat = part->effect != NULL;
-                u8 *prim_type = menu_prim_tbl[repeat];
-                prim->Begin(prim_type[0]);
+                prim->Begin(menu_prim_tbl[repeat][0]);
                 prim->Texture(tex);
                 if (part->shadow != 0) {
                     prim->Color(0, 0, 0, color[3] / 3);
                     if (repeat == 0) {
                         s8          offset = part->shadow_offset;
-                        mgRect<int> shadow((int) (put.left + offset), (int) (put.top + offset), (int) put.right, (int) put.bottom);
+                        mgRect<int> shadow((int) (put.left + PlusF(offset)), (int) (put.top + offset), (int) put.right, (int) put.bottom);
                         PrimQuad(prim, shadow, uv);
                     }
                 }
@@ -3664,7 +3668,7 @@ void CMenuPosDataForm::MenuFormDrawNormal(int x, int y, float sway_x, float sway
                 if (repeat == 0) {
                     PrimQuad(prim, put, uv);
                 } else if (repeat == 1) {
-                    PushPrimRepeat(prim, putpostbl_3410, getpostbl_3411, prim_type[1]);
+                    PushPrimRepeat(prim, putpostbl_3410, getpostbl_3411, menu_prim_tbl[repeat][1]);
                 }
                 prim->End();
                 break;
@@ -3686,34 +3690,39 @@ void CMenuPosDataForm::MenuFormDrawNormal(int x, int y, float sway_x, float sway
                 break;
             case MENUFORMPARTS_DTYPE_NUMBER1:
             case MENUFORMPARTS_DTYPE_NUMBER2:
-                if (part->etc_info[2] == 1 ? part->etc_info[1] >= 2 : part->etc_info[1] >= 0) {
-                    uv = info->rect;
-                    prim->Bilinear(0);
-                    prim->Begin(6);
-                    prim->Texture(tex);
-                    if (part->shadow != 0) {
-                        s8  offset = part->shadow_offset;
-                        int shadow_x = (int) (put.left + offset);
-                        int shadow_y = (int) (put.top + offset);
-                        prim->Color(0, 0, 0, color[3] / 3);
-                        if (part->dtype == MENUFORMPARTS_DTYPE_NUMBER1) {
-                            PrimDrawNumber(prim, part->etc_info[1], part->etc_info[0], shadow_x, shadow_y, uv, (int) part->w,
-                                           (int) part->h);
-                        } else if (part->dtype == MENUFORMPARTS_DTYPE_NUMBER2) {
-                            PrimDrawNumber2(prim, part->etc_info[1], part->etc_info[0], shadow_x, shadow_y, uv, (int) part->w,
-                                            (int) part->h);
-                        }
+                if (part->etc_info[2] == 1) {
+                    if (part->etc_info[1] <= 1) {
+                        break;
                     }
-                    prim->Color(color[0], color[1], color[2], color[3]);
-                    if (part->dtype == MENUFORMPARTS_DTYPE_NUMBER1) {
-                        PrimDrawNumber(prim, part->etc_info[1], part->etc_info[0], (int) put.left, (int) put.top, uv,
-                                       (int) part->w, (int) part->h);
-                    } else if (part->dtype == MENUFORMPARTS_DTYPE_NUMBER2) {
-                        PrimDrawNumber2(prim, part->etc_info[1], part->etc_info[0], (int) put.left, (int) put.top, uv,
-                                        (int) part->w, (int) part->h);
-                    }
-                    prim->End();
+                } else if (part->etc_info[1] < 0) {
+                    break;
                 }
+                uv = info->rect;
+                prim->Bilinear(0);
+                prim->Begin(6);
+                prim->Texture(tex);
+                if (part->shadow != 0) {
+                    s8  offset = part->shadow_offset;
+                    int shadow_x = (int) (put.left + PlusF(offset));
+                    int shadow_y = (int) (put.top + offset);
+                    prim->Color(0, 0, 0, color[3] / 3);
+                    if (part->dtype == MENUFORMPARTS_DTYPE_NUMBER1) {
+                        PrimDrawNumber(prim, part->etc_info[1], part->etc_info[0], shadow_x, shadow_y, uv, (int) part->w,
+                                       (int) part->h);
+                    } else if (part->dtype == MENUFORMPARTS_DTYPE_NUMBER2) {
+                        PrimDrawNumber2(prim, part->etc_info[1], part->etc_info[0], shadow_x, shadow_y, uv, (int) part->w,
+                                        (int) part->h);
+                    }
+                }
+                prim->Color(color[0], color[1], color[2], color[3]);
+                if (part->dtype == MENUFORMPARTS_DTYPE_NUMBER1) {
+                    PrimDrawNumber(prim, part->etc_info[1], part->etc_info[0], (int) put.left, (int) put.top, uv,
+                                   (int) part->w, (int) part->h);
+                } else if (part->dtype == MENUFORMPARTS_DTYPE_NUMBER2) {
+                    PrimDrawNumber2(prim, part->etc_info[1], part->etc_info[0], (int) put.left, (int) put.top, uv,
+                                    (int) part->w, (int) part->h);
+                }
+                prim->End();
                 break;
             case MENUFORMPARTS_DTYPE_WAKU_RECT:
                 put.right = part->w;
@@ -3770,7 +3779,6 @@ void CMenuPosDataForm::MenuFormDrawNormal(int x, int y, float sway_x, float sway
                     prim->DepthTestEnable(0);
                     alpha_rate = (u_int) color[3] / 128.0f;
                 }
-                float *top_left;
                 float *top_right;
                 float *bottom_left;
                 float *bottom_right;
@@ -3778,8 +3786,7 @@ void CMenuPosDataForm::MenuFormDrawNormal(int x, int y, float sway_x, float sway
                     case 0: {
                         top_left = top_right = bottom_left = bottom_right = part->effect->param;
                         prim->Begin(6);
-                        float *fill = part->effect->param;
-                        prim->Color((int) fill[0], (int) fill[1], (int) fill[2], (int) (fill[3] * alpha_rate));
+                        prim->Color((int) part->effect->param[0], (int) part->effect->param[1], (int) part->effect->param[2], (int) (part->effect->param[3] * alpha_rate));
                         prim->Vertex(put.left, put.top, 0.0f);
                         prim->Vertex(put.left + put.right, put.top + put.bottom, 0.0f);
                         break;
@@ -3807,10 +3814,10 @@ void CMenuPosDataForm::MenuFormDrawNormal(int x, int y, float sway_x, float sway
                 }
                 prim->End();
                 if (rgba_bit & 8) {
-                    top_left[3] = color[3];
-                    bottom_left[3] = color[3];
-                    top_right[3] = color[3];
-                    bottom_right[3] = color[3];
+                    top_left[3] = (int)color[3];
+                    bottom_left[3] = (int)color[3];
+                    top_right[3] = (int)color[3];
+                    bottom_right[3] = (int)color[3];
                 }
                 break;
             }
