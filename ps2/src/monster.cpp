@@ -1389,38 +1389,39 @@ extern char at_2485[];
 extern char at_2486[];
 extern char at_2487[];
 extern char at_2488[];
-// 99.8% match, 75 words off
+// 99.8% match, 39 words off
 #pragma divbyzerocheck on
 void CMonsterMan::CheckDamage() {
-    int hit_damage;
-    CBattleCharaInfo *chara_info;
+    CActionChara *player;
+    int gift_pack_num;
+    int i;
+    int greyed;
+    int roll;
+    u_int se_id;
     CActiveMonster *monster;
-    s16 status_rate;
-    float dist;
     float power;
-    int guard;
+    CScene *now_scene;
+    s16 status_rate;
     CColPrim *prim;
     float resist;
-    BASE_MONSTER_TBL *tbl;
-    float element_damage;
-    int reaction;
+    float dist;
     int se_no;
-    CScene *now_scene;
-    int final_damage;
-    CActionChara *player;
     int steal_rate;
+    int reaction;
+    float element_damage;
     int element_power;
-    int gift_pack_num;
     int drain_rate;
-    int roll;
+    int guard;
+    BASE_MONSTER_TBL *tbl;
+    CBattleCharaInfo *chara_info;
     now_scene = scene;
     DNG_BATTLE_AREA *area = &now_scene->battle_area;
-    u_int se_id = now_scene->se_battle_id;
+    se_id = now_scene->se_battle_id;
     player = (CActionChara *)now_scene->GetCharacter(0);
     chara_info = GetBattleCharaInfo();
     gift_pack_num = GetUserItemHaveNum(0x134);
 
-    for (int i = 0; i < MONSTER_ACTIVE_MAX; i++) {
+    for (i = 0; i < MONSTER_ACTIVE_MAX; i++) {
         monster = active[i];
         if (monster == NULL || monster->state != ACTIVE_MONSTER_LIVE) {
             continue;
@@ -1535,11 +1536,10 @@ void CMonsterMan::CheckDamage() {
                     monster->status.attr &= ~(MONSTER_STATUS_UNK_8 | MONSTER_STATUS_UNK_20);
                 }
             }
-            int greyed = 0;
-            BASE_MONSTER_TBL *status_tbl = monster->tbl;
-            status_rate = status_tbl->status_chance / prim->param->hit_count;
-            if ((hit_damage = (int)damage) > 0) {
-                if ((prim->status & 0x4) && !(status_tbl->resist_attr & 0x4) && status_rate >= iRand(100)) {
+            greyed = 0;
+            status_rate = monster->tbl->status_chance / prim->param->hit_count;
+            if ((int)damage > 0) {
+                if ((prim->status & 0x4) && !(monster->tbl->resist_attr & 0x4) && status_rate >= iRand(100)) {
                     monster->status.attr |= MONSTER_STATUS_POISON;
                     monster->status.poison_count = 0x78;
                 }
@@ -1560,7 +1560,7 @@ void CMonsterMan::CheckDamage() {
                     monster->status.slow_time = 1800;
                 }
             }
-            if (hit_damage > 0 && (prim->status & 0x200) && (prim->attacker == 0 || prim->attacker == 1)) {
+            if ((int)damage > 0 && (prim->status & 0x200) && (prim->attacker == 0 || prim->attacker == 1)) {
                 damage *= 1.5f;
                 if (chara_info->GetNowHp_i() > 1) {
                     chara_info->AddHp_Point(-(0.01f * (float)chara_info->GetMaxHp_i()), 0.0f);
@@ -1569,7 +1569,7 @@ void CMonsterMan::CheckDamage() {
             if ((int)damage > 0 && (prim->status & 0x400) && iRand(10) == 0) {
                 damage *= 1.8f;
             }
-            if ((final_damage = (int)damage) > 0 && (prim->status & 0x80) && prim->attacker == chara_info->chr_no) {
+            if ((int)damage > 0 && (prim->status & 0x80) && prim->attacker == chara_info->chr_no) {
                 drain_rate = 25 / prim->param->hit_count;
                 if (drain_rate <= 1) {
                     drain_rate = 1;
@@ -1578,7 +1578,7 @@ void CMonsterMan::CheckDamage() {
                     chara_info->AddHp_Point(0.02f * damage, 0.0f);
                 }
             }
-            if (final_damage > 0 && (prim->status & 0x10)) {
+            if ((int)damage > 0 && (prim->status & 0x10)) {
                 steal_rate = 12 / prim->param->hit_count;
                 if (steal_rate <= 1) {
                     steal_rate = 1;
@@ -1628,12 +1628,12 @@ void CMonsterMan::CheckDamage() {
                 damage *= 0.01f * (float)prim->param->critical_rate;
             }
             calcWeaponParamWhp(monster, prim);
-            int dealt;
-            monster->life -= (dealt = (int)damage);
+            
+            monster->life -= (int)damage;
             if (monster->life <= 0) {
                 monster->life = 0;
             }
-            if (dealt <= 0) {
+            if ((int)damage <= 0) {
                 monster->no_damage_cnt++;
                 GuardEffectSet(scene, prim->hit_pos, 0);
                 sndSePlay(se_id, 0x26, 0);
@@ -1751,7 +1751,7 @@ void CMonsterMan::CheckDamage() {
                     }
                 }
             }
-            HitScoreSet(prim->hit_pos, 0, dealt);
+            HitScoreSet(prim->hit_pos, 0, (int)damage);
             reaction = 2;
             if ((s16)prim->param->hit_flags & 2) {
                 reaction = 4;
@@ -1780,7 +1780,7 @@ void CMonsterMan::CheckDamage() {
                     }
                 }
             }
-            if (dealt > 0 && !(monster->gekirin <= 0.0f)) {
+            if ((int)damage > 0 && !(monster->gekirin <= 0.0f)) {
                 monster->gekirin -= 1.0f / (float)prim->param->hit_count;
                 if (monster->gekirin <= 0.0f) {
                     monster->gekirin = 0.0f;
