@@ -330,7 +330,7 @@ void EndLightingEdit() {
 int IsLightingEditMode() { return LEditFlag; }
 #ifdef NONMATCHING
 int mgTransWorldScreen(int *out, float *position);
-// 90 aligned words off (objdiff splits this jump-table function)
+// 87 aligned words off (objdiff splits this jump-table function)
 void LightingEdit(CScene *scene) {
     int row;
     float *selected;
@@ -598,14 +598,8 @@ void LightingEdit(CScene *scene) {
         mgTransWorldScreen(screen[1], tip_x);
         mgTransWorldScreen(screen[2], tip_y);
         mgTransWorldScreen(screen[3], tip_z);
-        screen[0][0] -= origin[0];
-        screen[1][0] -= origin[0];
-        screen[2][0] -= origin[0];
-        screen[3][0] -= origin[0];
-        screen[0][1] -= origin[1];
-        screen[1][1] -= origin[1];
-        screen[2][1] -= origin[1];
-        screen[3][1] -= origin[1];
+        for (int i = 0; i < 4; i++) screen[i][0] = screen[i][0] - origin[0];
+        for (int i = 0; i < 4; i++) screen[i][1] -= origin[1];
         sceVu0ITOF4Vector(tip_light, screen[0]);
         sceVu0ITOF4Vector(tip_x, screen[1]);
         sceVu0ITOF4Vector(tip_y, screen[2]);
@@ -621,14 +615,8 @@ void LightingEdit(CScene *scene) {
         sceVu0FTOI4Vector(screen[1], tip_x);
         sceVu0FTOI4Vector(screen[2], tip_y);
         sceVu0FTOI4Vector(screen[3], tip_z);
-        screen[0][0] += anchor[0];
-        screen[1][0] += anchor[0];
-        screen[2][0] += anchor[0];
-        screen[3][0] += anchor[0];
-        screen[0][1] += anchor[1];
-        screen[1][1] += anchor[1];
-        screen[2][1] += anchor[1];
-        screen[3][1] += anchor[1];
+        for (int i = 0; i < 4; i++) screen[i][0] += anchor[0];
+        for (int i = 0; i < 4; i++) screen[i][1] += anchor[1];
         prim.AlphaBlendEnable(1);
         prim.AlphaTestEnable(0);
         prim.DepthTestEnable(0);
