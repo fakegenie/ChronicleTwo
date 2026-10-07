@@ -573,7 +573,7 @@ int CWater::Draw(u_int *tag, float (*matrix)[4], mgCDrawManager *draw_manager) {
     return 0;
 }
 #ifdef NONMATCHING
-// 99.9% match, 12 words off
+// 99.9% match, 11 words off
 struct WaterTextureName {
     char text[0x20];
 };
@@ -637,6 +637,7 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
     u_long128         *out;
     sceVu0FVECTOR     *slope3;
     int                vertex_count;
+    int                strip_row;
     memory = draw_manager->data_memory;
     mgZeroVector(row_step);
     mgZeroVector(column_step);
@@ -703,13 +704,13 @@ u_int CWater::CreatePacket(mgCDrawManager *draw_manager) {
     }
     out = end;
     started = 0;
-    for (row = 0, row_position = 0.0f; row < rows - 1; row++, row_position += 1.0f) {
+    for (strip_row = 0, row_position = 0.0f; strip_row < rows - 1; strip_row++, row_position += 1.0f) {
         sceVu0FVECTOR position0;
         sceVu0FVECTOR position1;
         sceVu0FVECTOR row_offset;
-        current = height + row * columns;
-        slope2 = slope[row + 1];
-        slope1 = slope[row];
+        current = height + strip_row * columns;
+        slope2 = slope[strip_row + 1];
+        slope1 = slope[strip_row];
         sceVu0ScaleVector(row_offset, row_step, row_position);
         sceVu0AddVector(position0, min, row_offset);
         position0[3] = 1.0f;
