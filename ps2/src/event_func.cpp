@@ -2064,7 +2064,6 @@ void CEventScriptArg::BuildArgData(u32 *program) {
     script.run(script_run_id);
     nowScriptArg = NULL;
 }
-#ifdef NONMATCHING
 static inline ARG_LIST *ScriptArgAddList(CEventScriptArg *script) {
     if (script->memory == NULL) {
         return NULL;
@@ -2108,13 +2107,9 @@ static inline char *ScriptArgNewString(CEventScriptArg *script, char *source) {
     }
     return copy;
 }
-static inline ARG_DATA *ArgAt(ARG_DATA *args, int i) {
-    return &args[i];
-}
-// 99.7% match, 8 words off
 int _DATA(RS_STACKDATA *stack, int argc) {
     char *source;
-        CEventScriptArg *script = nowScriptArg;
+    CEventScriptArg *script = nowScriptArg;
     if (script == NULL) {
         return 0;
     }
@@ -2130,29 +2125,25 @@ int _DATA(RS_STACKDATA *stack, int argc) {
     node->args = args;
     node->arg_num = argc;
     for (int i = 0; i < argc; i++) {
-        ARG_DATA *arg = ArgAt(args, i);
-        arg->type = stack->type;
+        args[i].type = stack->type;
         switch (stack->type) {
             case RS_INT:
-                arg->i = GetStackInt(stack++);
+                args[i].i = GetStackInt(stack++);
                 break;
             case RS_FLOAT:
-                arg->f = GetStackFloat(stack++);
+                args[i].f = GetStackFloat(stack++);
                 break;
             case RS_STR:
                 source = GetStackString(stack++);
-                arg->s = ScriptArgNewString(nowScriptArg, source);
+                args[i].s = ScriptArgNewString(nowScriptArg, source);
                 break;
             default:
-                arg->s = NULL;
+                args[i].s = NULL;
                 break;
         }
     }
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/event_func", _DATA__FP12RS_STACKDATAi);
-#endif
 int _ID_OFFSET(RS_STACKDATA *stack, int arg_count) {
     if (nowScriptArg == 0) {
         return 0;
@@ -4566,7 +4557,7 @@ int LoadMovie(char *name, mgCMemory *memory, bool skip) {
                         frame <= EdEventInfo.caption_start[i] + EdEventInfo.caption_frames[i]) {
                         char *line = EdEventInfo.caption_text[i];
                         font.CalcDrawWH(line, &captionWidth, &captionHeight);
-                        x = (int)CalcAutoPosSet(0.0f, 512.0f, (float)captionWidth, 0.5f);
+                        x = (int)CalcAutoPosSet(0.0f, float(512), (float)captionWidth, 0.5f);
                         y = fptosi(CalcAutoPosSet(0.0f, 480.0f, (float)captionHeight, 0.95f));
                         memset(caption, 0, 0xE1);
                         My_strncpy(caption, EdEventInfo.caption_text[i], (frame - EdEventInfo.caption_start[i]) / 2 * 2);
@@ -13586,8 +13577,6 @@ static int _GET_RAND(RS_STACKDATA *stack, int argc) {
 
     return 1;
 }
-#ifdef NONMATCHING
-// 96.7% match, 4 words off
 int _LINE_POINT_DIST(RS_STACKDATA *stack, int argc) {
     float segmentStart[4];
     float segmentEnd[4];
@@ -13599,8 +13588,8 @@ int _LINE_POINT_DIST(RS_STACKDATA *stack, int argc) {
     GetStackVector(segmentStart, stack);
     GetStackVector(segmentEnd, stack + 3);
     GetStackVector(point, stack + 6);
+    RS_STACKDATA *result = stack += 9;
     segmentLength = mgDistVector(segmentStart, segmentEnd);
-    RS_STACKDATA *result = stack + 9;
     sceVu0SubVector(toPoint, point, segmentStart);
     sceVu0SubVector(direction, segmentEnd, segmentStart);
     sceVu0Normalize(direction, direction);
@@ -13614,9 +13603,6 @@ int _LINE_POINT_DIST(RS_STACKDATA *stack, int argc) {
     SetStack(result, mgDistVector(point, direction));
     return 1;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/event_func", _LINE_POINT_DIST__FP12RS_STACKDATAi);
-#endif
 int _CREATE_SWORD_EFFECT(RS_STACKDATA *stack, int argc) {
     int               stack_no = GetStackInt(stack++);
     int               init_param1 = GetStackInt(stack++);
