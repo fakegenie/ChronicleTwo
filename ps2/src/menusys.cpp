@@ -9419,7 +9419,7 @@ extern s8    backboard_x_repeat_drawnum_7628[5];
 extern s8    backboard_y_repeat_drawnum_7629[3];
 extern s16   mos_repeat_table_x_7694[5];
 extern char *strtbl_7727[7];
-#ifdef NONMATCHING
+
 void MenuWeaponBuildUpDraw(int &tex_block) {
     if (BuildUpWeaponInfo.mode == 0) {
         return;
@@ -9638,9 +9638,6 @@ void MenuWeaponBuildUpDraw(int &tex_block) {
         mes->DrawMsg();
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menusys", MenuWeaponBuildUpDraw__FRi);
-#endif
 extern s8 count_7867;
 extern s8 init_7868;
 

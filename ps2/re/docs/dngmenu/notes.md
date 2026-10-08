@@ -524,3 +524,11 @@ constructor avoids an unnecessary default initialization. Together with the
 jump helper, the complete unit passes:0x8BD4 bytes,1129 relocations.
 No new floating selectors are required; initial 4/30 selector trials were
 ineffective and discarded.
+
+## Native message-window initialization
+
+`ClsMes::Init` is emitted from its shared C++ definition in `nd_meswin.hpp`.
+This unit selects `MES_WINDOW_OUT_OF_LINE_INIT`; other callers retain the
+inline body. Moving the initializer entirely out of the header changes caller
+code and fails retail verification. The shared definition with scoped emission
+preserves those callers and passes the full linked retail comparison.

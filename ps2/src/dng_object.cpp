@@ -640,41 +640,38 @@ void CMachineGun::Set(float *position, float *direction) {
     }
 }
 
-#ifdef NONMATCHING
 void CMachineGun::Step() {
-    int i;
+    int bullet;
 
-    for (i = 0; i < 16; i++) {
-        s16 state = active[i];
+    for (bullet = 0; bullet < 16; bullet++) {
+        s16 state = active[bullet];
 
         if (state != 0 && state == 1) {
-            CColPrim *col_prim = ColPrimMan.GetID2Prim(col_prim_id[i]);
+            CColPrim *col_prim = ColPrimMan.GetID2Prim(col_prim_id[bullet]);
             float     previous_pos[4];
             CCPoly    polys[128];
             mgVu0FBOX box;
             float     hit[4];
 
-            float *slot = (float *) ((u8 *) this + i * 16);
-            float *shot_pos = (slot + 0x80);
-            sceVu0CopyVector(previous_pos, shot_pos);
-            sceVu0AddVector(shot_pos, shot_pos, (slot + 0x40));
+            sceVu0CopyVector(previous_pos, pos[bullet]);
+            sceVu0AddVector(pos[bullet], pos[bullet], velocity[bullet]);
 
             if (col_prim != NULL) {
-                col_prim->SetCoord(previous_pos, shot_pos, 5.0f);
+                col_prim->SetCoord(previous_pos, pos[bullet], 5.0f);
             }
 
             box.max[3] = 1.0f;
             box.min[3] = 1.0f;
-            box.max[0] = 20.0f + (40.0f + (slot + 0x80)[0]);
-            box.min[0] = ((slot + 0x80)[0] - 40.0f) - 20.0f;
-            box.max[1] = 20.0f + (40.0f + (slot + 0x80)[1]);
-            box.min[1] = ((slot + 0x80)[1] - 40.0f) - 20.0f;
-            box.max[2] = 20.0f + (40.0f + (slot + 0x80)[2]);
-            box.min[2] = ((slot + 0x80)[2] - 40.0f) - 20.0f;
+            box.max[0] = 20.0f + (40.0f + pos[bullet][0]);
+            box.min[0] = (pos[bullet][0] - 40.0f) - 20.0f;
+            box.max[1] = 20.0f + (40.0f + pos[bullet][1]);
+            box.min[1] = (pos[bullet][1] - 40.0f) - 20.0f;
+            box.max[2] = 20.0f + (40.0f + pos[bullet][2]);
+            box.min[2] = (pos[bullet][2] - 40.0f) - 20.0f;
             int count = ((CMap *) DngMainMap)->GetColPoly(polys, box, 128);
 
-            if (CheckHit(polys, count, shot_pos, previous_pos, hit, 1, 4) >= 0) {
-                active[i] = 0;
+            if (CheckHit(polys, count, pos[bullet], previous_pos, hit, 1, 4) >= 0) {
+                active[bullet] = 0;
 
                 if (col_prim != NULL) {
                     col_prim->Delete(-1);
@@ -706,13 +703,13 @@ void CMachineGun::Step() {
                     image->kind = 1;
                 }
             } else if (col_prim != NULL && col_prim->hit_num > 0) {
-                active[i] = 0;
+                active[bullet] = 0;
                 col_prim->Delete(-1);
             } else {
-                life[i]--;
+                life[bullet]--;
 
-                if (life[i] <= 0) {
-                    active[i] = 0;
+                if (life[bullet] <= 0) {
+                    active[bullet] = 0;
 
                     if (col_prim != NULL) {
                         col_prim->Delete(-1);
@@ -722,9 +719,6 @@ void CMachineGun::Step() {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dng_object", Step__11CMachineGunFv);
-#endif
 
 void CLaserGun::SetPos(float *start, float *target, float *direction_vec) {
     int i;

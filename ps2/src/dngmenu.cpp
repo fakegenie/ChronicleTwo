@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <cstring>
 
+#define MES_WINDOW_OUT_OF_LINE_INIT
 #include "dataread.hpp"
 #include "dngfloor.hpp"
 #include "dngmenu.hpp"
@@ -27,6 +28,7 @@
 #include "scenesnd.hpp"
 #include "sysmes.hpp"
 #include "userdata.hpp"
+#undef MES_WINDOW_OUT_OF_LINE_INIT
 
 /** Brightness of the active dungeon tree selection. */
 extern float DngTreeMapActiveLightRate;
@@ -2469,7 +2471,6 @@ void DngTreeMapInit(mgCMemory *stack, int *tex_block, int menu_mode, int dng_no)
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/dngmenu", DngTreeMapInit__FP9mgCMemoryPiii);
 #endif
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/dngmenu", Init__6ClsMesFv);
 extern mgCMemory    MenuTreeMapStack;
 extern CDngFreeMap *MenuDngMap;
 

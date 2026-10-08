@@ -335,9 +335,7 @@ public:
      * @address 0x1ACF40
      * @size 0xC0
      */
-    CActionChara() {
-        memset(&move_check, 0, sizeof(move_check));
-    }
+    CActionChara();
 
     /**
      *
@@ -992,3 +990,10 @@ public:
 };
 
 STATIC_ASSERT(sizeof(CActionChara) == 0x1030);
+
+#ifndef ACTION_CHARA_OUT_OF_LINE_CONSTRUCTOR
+inline
+#endif
+    CActionChara::CActionChara() {
+    memset(&move_check, 0, sizeof(move_check));
+}

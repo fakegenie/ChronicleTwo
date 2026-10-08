@@ -215,18 +215,15 @@ the retail assembly until its C++ form matches. `MenuItemInfoCursorSet` now
 matches exactly as C++, including its linked image.
 `CMenuItemInfo::PushKey` also retains a guarded draft: its object section exceeds
 the retail function by 0x20 bytes and shifts later linked text.
-`MenuWeaponBuildUpDraw` retains a guarded draft because MWCC assigns opposite
-integer registers to the bottom bar Y coordinate and its X literal before
-`PrimQuad`; the four resulting instructions differ from retail when the draft
-is compiled alone. Compiling all `NONMATCHING` drafts changes MWCC's register
-selection and yields an exact function, but that object contains other
-nonmatching functions.
+`MenuWeaponBuildUpDraw` is active C++ with the current compiler profile.
+Its complete object bytes, resolved relocations, and linked retail image pass
+without an additional floating-point override.
 
 ## October 2026 menu draft promotions
 
 - `CBaseMenuClass::MenuItemCommandSelect` is an exact C++ match when compiled alone through mwccgap. Its dispatch selects an item command from a key and button pair, including ask mode handling.
 - `MenuItemSelectDiffer` is an exact C++ match when compiled alone through mwccgap. It tests whether an item selection differs from the currently selected item.
-- Both functions passed the isolated linked-image verification. `MenuWeaponBuildUpDraw` differs by one instruction in the linked image despite the whole-unit draft comparison reporting a match. `CMenuItemInfo::LRCheck` differs in two branch-delay-slot words at offsets 0x264 and 0x268; the compiler places the zero return value in the delay slot and skips the shared return-value assignment.
+- Both functions passed the isolated linked-image verification. The earlier one-instruction `MenuWeaponBuildUpDraw` finding is resolved by the current source and compiler profile. `CMenuItemInfo::LRCheck` differs in two branch-delay-slot words at offsets 0x264 and 0x268; the compiler places the zero return value in the delay slot and skips the shared return-value assignment.
 
 ## Constructor-backed allocations
 

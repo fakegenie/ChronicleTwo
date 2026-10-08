@@ -136,3 +136,10 @@ Name not retail. Only written: +0 = MenuArg.mes_tex_block, +4 = GetTexture("mnma
 ## Topic rectangle argument order
 
 The unscoped binary32 selector for `DrawMenuTopic__Fv`, `36.0f` (`0x42100000`), sets `evaluate_first: true`. It preserves the vertical-origin assignment through all four rectangle constructor calls. Canonical verification passes the complete unit: `0x4F98` allocated bytes and 1,389 relocations. The unused long-division primer is replaced by GPR helper mask `0x30`, FPR mask `0`, preserving all allocated bytes and relocation identities.
+
+## Native internal-selection drawing
+
+`MenuInternSelectDraw` is active C++ and passes the complete object comparison.
+Its debug rectangles need binary32 evaluate-first settings for 80.0f
+(`0x42a00000`) and 350.0f (`0x43af0000`). Both selectors apply throughout
+this function; no occurrence or instruction-address selectors are used.

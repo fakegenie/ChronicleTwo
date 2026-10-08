@@ -1941,7 +1941,7 @@ extern s8    randam_checktbl[];
 extern short tbl_2469[7][12];
 extern short at_2470[12];
 extern char  at_2629__2[];
-#ifdef NONMATCHING
+
 void MenuNPCQuestViewDraw() {
     int mark_u;
     if (Tex_QuestMemo == NULL) {
@@ -2218,9 +2218,6 @@ void MenuNPCQuestViewDraw() {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menushop", MenuNPCQuestViewDraw__Fv);
-#endif
 
 // Initialised data (.data)
 INCLUDE_RODATA("ps2/asm/pal/nonmatchings/menushop", dony_shoplist__DATA);

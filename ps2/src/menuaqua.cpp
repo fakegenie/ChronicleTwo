@@ -4920,7 +4920,6 @@ int CAquarium::Step() {
 #else
 INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuaqua", Step__9CAquariumFv);
 #endif
-#ifdef NONMATCHING
 void CAquarium::Draw() {
     mgCTextureManager *textures = &mgTexManager;
     int                i;
@@ -5242,9 +5241,6 @@ void CAquarium::Draw() {
         }
     }
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuaqua", Draw__9CAquariumFv);
-#endif
 void MenuAquaInit(mgCMemory *memory, int *tex_block, int) {
     AquaScene = GetMainScene();
     Auqa_Bgm_Volf = AquaScene->GetTimeBgmVolf();
@@ -6299,7 +6295,7 @@ static inline void SetHaveName(CDC2Mes *mes, int k, char *name) {
         strcpy(mes->name[k], name);
     }
 }
-#ifdef NONMATCHING
+
 int GyoraceMenuKey() {
     static CGameDataUsed *local_gdata = NULL;
     CDC2Mes              *ask = MenuDCMsg[0];
@@ -6870,10 +6866,7 @@ int GyoraceMenuKey() {
               &GyoraceHaveFishCursor, 3.6f, 3.0f, scroll_init);
     return 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuaqua", GyoraceMenuKey__Fv);
-#endif
-#ifdef NONMATCHING
+
 void GyoraceMenuDraw() {
     mgCTextureManager *textures;
     mgCDrawPrim       *prim;
@@ -7105,9 +7098,6 @@ void GyoraceMenuDraw() {
 
     GyoraceHaveFishListScrlInit = 0;
 }
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/menuaqua", GyoraceMenuDraw__Fv);
-#endif
 
 void DrawSubGameTitle(mgCTexture *texture, int large, int x, int y, int width) {
     mgRect<int> shadow;

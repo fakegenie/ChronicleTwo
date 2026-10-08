@@ -3,8 +3,12 @@
 #include <cstdio>
 #include <cstring>
 
+#define ACTION_CHARA_OUT_OF_LINE_CONSTRUCTOR
 #include "actionchara.hpp"
+#undef ACTION_CHARA_OUT_OF_LINE_CONSTRUCTOR
+#define CAMERA_CONTROL_USE_RETAIL_ASSIGNMENT
 #include "cameracontrol.hpp"
+#undef CAMERA_CONTROL_USE_RETAIL_ASSIGNMENT
 #include "character.hpp"
 #include "dataread.hpp"
 #include "dbg_font.hpp"
@@ -774,10 +778,20 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/editloop", EditInit__F13INIT_LOOP_ARG);
  * @address 0x1ACEE0
  * @size 0x60
  */
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editloop", __as__15CameraCtrlParamFRC15CameraCtrlParam);
-#ifndef NONMATCHING
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/editloop", __ct__12CActionCharaFv);
-#endif
+CameraCtrlParam &CameraCtrlParam::operator=(const CameraCtrlParam &source) {
+    min_dist = source.min_dist;
+    max_dist = source.max_dist;
+    near_height = source.near_height;
+    far_height = source.far_height;
+    height = source.height;
+    max_height = source.max_height;
+    min_height = source.min_height;
+    rest_max_height = source.rest_max_height;
+    rest_min_height = source.rest_min_height;
+    ground_space = source.ground_space;
+    no_check = source.no_check;
+    return *this;
+}
 void EditExit() {
     sndSeAllStop(1);
     MainScene__2->InitSeSrc();

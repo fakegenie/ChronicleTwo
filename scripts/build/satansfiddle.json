@@ -577,6 +577,41 @@
         "value_type": "binary32",
         "value_bits": "0x3f800000",
         "evaluate_first": true
+      },
+      {
+        "translation_unit": "menuaqua.cpp",
+        "function": "Draw__9CAquariumFv",
+        "value_type": "binary32",
+        "value_bits": "0x42f00000",
+        "evaluate_first": true
+      },
+      {
+        "translation_unit": "menuaqua.cpp",
+        "function": "Draw__9CAquariumFv",
+        "value_type": "binary32",
+        "value_bits": "0x43720000",
+        "evaluate_first": true
+      },
+      {
+        "translation_unit": "menumain.cpp",
+        "function": "MenuInternSelectDraw__Fv",
+        "value_type": "binary32",
+        "value_bits": "0x42a00000",
+        "evaluate_first": true
+      },
+      {
+        "translation_unit": "menumain.cpp",
+        "function": "MenuInternSelectDraw__Fv",
+        "value_type": "binary32",
+        "value_bits": "0x43af0000",
+        "evaluate_first": true
+      },
+      {
+        "translation_unit": "dng_object.cpp",
+        "function": "Step__11CMachineGunFv",
+        "value_type": "binary32",
+        "value_bits": "0x00000000",
+        "evaluate_first": true
       }
     ]
   }

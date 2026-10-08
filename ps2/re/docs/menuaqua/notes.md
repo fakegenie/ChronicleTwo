@@ -1,15 +1,13 @@
 # menuaqua: reverse-engineering notes
 
-`CAquarium::Draw` draws the fish, aquarium frames, bubbles, water reflection,
-and menu overlays in retail order. An earlier C++ version passed an isolated
-comparison, but the current matching build selects its `INCLUDE_ASM` gap.
-`CAquarium::SettingAqua` and `GyoraceMenuDraw` also use retail assembly gaps.
-Their C++ bodies remain guarded drafts and are not active decompilations.
-The `SettingAqua` draft constructs its `love_chara` member as a `CCharacter2`.
+`CAquarium::Draw`, `GyoraceMenuKey`, and `GyoraceMenuDraw` are active C++
+implementations. Their complete object bytes and resolved relocations match PAL.
+The aquarium draw uses function-scoped binary32 evaluate-first settings for
+120.0f (`0x42f00000`) and 242.0f (`0x43720000`); the race menus need no new settings.
 
-`DrawFishParam`, `CAquarium::ColCheck`,
-`CAquarium::Step`, and `GyoraceMenuKey` likewise retain `NONMATCHING` drafts
-with retail `INCLUDE_ASM` fallbacks.
+`CAquarium::SettingAqua`, `DrawFishParam`, `CAquarium::ColCheck`, and
+`CAquarium::Step` retain `NONMATCHING` drafts and retail assembly fallbacks.
+The `SettingAqua` draft constructs its `love_chara` member as a `CCharacter2`.
 
 `CAquaFish::SetAdjustScale` (0x20F0E0, size 0x8C) is native and exact. It
 computes a size-dependent scale, applies it to all three axes, and derives the

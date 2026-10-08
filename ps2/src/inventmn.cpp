@@ -5253,7 +5253,6 @@ static int neta_sort(int mode, int first, int last, int *keys) {
     return swapped;
 }
 
-#ifdef NONMATCHING
 void CMenuInvent::UpdataNetaMemoStr() {
     int              sort_keys[(0x184)];
     CInventUserData *user_data;
@@ -5299,10 +5298,6 @@ void CMenuInvent::UpdataNetaMemoStr() {
         NetaMemoStr[i] = 0;
     }
 }
-
-#else
-INCLUDE_ASM("ps2/asm/pal/nonmatchings/inventmn", UpdataNetaMemoStr__11CMenuInventFv);
-#endif
 
 void MakeMsgNetaName(CDC2Mes *message, CMenuPosDataForm *form, USER_PICTURE_INFO *photo, int *pos, int show_mark) {
     NetaNameBlank blank = at_4470;

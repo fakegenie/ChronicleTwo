@@ -5,9 +5,9 @@
 `EditInit`, `EditLoop`, and `EditDraw` retain typed C++ drafts under
 `NONMATCHING`; the matching build selects their `INCLUDE_ASM` gaps. Earlier
 active versions changed the unit's code and data layout and failed the object
-check. `CameraCtrlParam::operator=` also has an assembly gap at its retail
-address, with no hand-written assignment definition. The other game functions
-remain native C++ where the base source already matched.
+check. `CameraCtrlParam::operator=` now copies the eleven named scalar fields
+in C++, and the compiler emits `CActionChara::CActionChara()` from its header
+definition. Both replacements pass the complete object comparison.
 
 The town main-loop mode (walking and Georama editing). `LoopInit/LoopMain/LoopExit` in mainloop
 hold `EditInit`, `EditLoop`, `EditExit`. No class is owned by this unit (`class_units.tsv`).
@@ -16,8 +16,9 @@ hold `EditInit`, `EditLoop`, `EditExit`. No class is owned by this unit (`class_
 ## Classes emitted here but owned elsewhere
 - `CameraCtrlParam::operator=` (0x1ACEE0): owned by cameracontrol; caller `CCameraControl::CCameraControl`.
 - `CActionChara::CActionChara()` (0x1ACF40): owned by actionchara; caller `InitDungeonMain` (dng_main).
-  `CameraCtrlParam` uses its implicit copy assignment; the `CActionChara` constructor is defined in
-  `actionchara.hpp`.
+  `CameraCtrlParam` has an explicit assignment definition here. Other users retain
+  implicit assignment unless they select its existing declaration. The action-character
+  constructor has one definition in `actionchara.hpp`.
 
 ## INIT_LOOP_ARG (declared in mainloop.hpp)
 - Used by mainloop (`NextLoop(int, INIT_LOOP_ARG)`), title, dng_main, the viewers. The complete
@@ -77,6 +78,9 @@ All other named data is local (static in .cpp): .sbss ints/pointers 0x37D2C0..0x
 `EditEvent` (CEditEvent, 0x150; +0x4 state, 1 = running; +0x148 door SE id), `EdDebugInfo`
 (EditDebugInfo, 0x3C), `TestVisual` (0x50), `TestFrame` (0x110), `beforeAnalyze` (int[16]).
 
-`CameraCtrlParam::operator=` copies the 11 scalar limits and `no_check`
-field in retail. The current editloop source keeps this body as an assembly
-gap; `cameracontrol.hpp` leaves assignment implicit for other C++ users.
+`CameraCtrlParam::operator=` copies ten float limits and `no_check`, producing
+the retail 96-byte function. `ACTION_CHARA_OUT_OF_LINE_CONSTRUCTOR` emits the
+192-byte constructor in this unit; other units retain its inline definition.
+The base constructors, virtual-table writes, interpreter construction, and
+movement-check clearing are generated from the C++ types. No constructor
+address aliases or manual virtual-table stores are needed.

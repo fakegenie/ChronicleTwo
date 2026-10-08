@@ -1061,118 +1061,124 @@ public:
      * @address 0x1F38E0
      * @size 0x2C0
      */
-    void Init() {
-        int name_count;
-        int i;
-
-        npc_name_mode = 0;
-        char_num = 0;
-        text_w = 0;
-        text_h = 0;
-        page = 0;
-        page_num = 0;
-
-        for (i = 0; i < MES_PAGE_MAX; i++) {
-            page_chars[i] = 0;
-        }
-
-        last_x = 0;
-        last_y = 0;
-        fade = 0.0f;
-        open = 1;
-        draw_speed = GetDrawSpeedDef();
-        page_wait = 0;
-        scroll_wait = 0;
-        reveal = 0.0f;
-        reveal_num = 0;
-        page_top = 0;
-        unk_1f4 = 0;
-        InitMesWinTbl();
-        color = def_color;
-        wait = 0;
-        page_time = 0;
-        page_auto_time = 30;
-        mes_no = -1;
-        text_ptr = 0;
-        alpha = 0x80;
-        name_count = 0;
-
-        do {
-            memset(name[name_count], 0, MES_NAME_LEN);
-            name_count++;
-        } while (name_count < MES_NAME_MAX);
-
-        for (int item_index = 0; item_index < MES_ITEM_MAX; item_index++) {
-            item_mes[item_index] = -1;
-        }
-
-        for (int value_index = 0; value_index < MES_VALUE_MAX; value_index++) {
-            values[value_index] = 0;
-            value_width[value_index] = 0;
-        }
-
-        value = 0;
-        value_sign = 0;
-        value_zero = 1;
-        value_half = 0;
-        value_space = 0;
-        digit_font = 0;
-        space_w = -1;
-        justify_w = -1;
-        select = -1;
-        goal_cursor_x = 0;
-        goal_cursor_y = 0;
-        cursor_x = 0;
-        cursor_y = 0;
-        select_shade = MES_SELECT_SHADE_DARK;
-        cursor_centering = 0;
-        cursor_time = 0;
-        choice_pos[0][0] = -1;
-        choice_pos[0][1] = -1;
-        choice_pos[1][0] = -1;
-        choice_pos[1][1] = -1;
-        select_top = 0;
-        cursor_off_y = 0;
-        voice_on = 0;
-        voice_type = 0;
-        voice_cnt = 0;
-        close_time = 0;
-        scissor_on = 0;
-        scissor.x = 0;
-        scissor.width = 0;
-        scissor.y = 0;
-        scissor.height = 0;
-        int line_index;
-        line_index = 0;
-
-        do {
-            line_indent[line_index] = 0;
-            line_pos[line_index][0] = 0;
-            line_pos[line_index][1] = 0;
-            line_pos_on[line_index] = 0;
-            line_shade[line_index] = MES_SHADE_AUTO;
-            line_color[line_index] = 0;
-            equip_on[line_index] = 0;
-            equip_x[line_index] = 0;
-            equip_y[line_index] = 0;
-            line_w[line_index] = 0;
-            line_alpha[line_index] = -1;
-            cross_on[line_index] = 0;
-            cross_x[line_index] = 0;
-            cross_y[line_index] = 0;
-            unk_271c[line_index] = -1;
-            unk_276c[line_index] = -1;
-            unk_27bc[line_index] = 0;
-            unk_280c[line_index] = 0;
-            delta_on[line_index] = 0;
-            delta_x[line_index] = 0;
-            delta_y[line_index] = 0;
-            line_index++;
-        } while (line_index < MES_LINE_MAX);
-    }
+    void Init();
 };
 
 STATIC_ASSERT(sizeof(ClsMes) == 0x2958);
+
+#ifndef MES_WINDOW_OUT_OF_LINE_INIT
+inline
+#endif
+    void
+    ClsMes::Init() {
+    int name_count;
+    int i;
+
+    npc_name_mode = 0;
+    char_num = 0;
+    text_w = 0;
+    text_h = 0;
+    page = 0;
+    page_num = 0;
+
+    for (i = 0; i < MES_PAGE_MAX; i++) {
+        page_chars[i] = 0;
+    }
+
+    last_x = 0;
+    last_y = 0;
+    fade = 0.0f;
+    open = 1;
+    draw_speed = GetDrawSpeedDef();
+    page_wait = 0;
+    scroll_wait = 0;
+    reveal = 0.0f;
+    reveal_num = 0;
+    page_top = 0;
+    unk_1f4 = 0;
+    InitMesWinTbl();
+    color = def_color;
+    wait = 0;
+    page_time = 0;
+    page_auto_time = 30;
+    mes_no = -1;
+    text_ptr = 0;
+    alpha = 0x80;
+    name_count = 0;
+
+    do {
+        memset(name[name_count], 0, MES_NAME_LEN);
+        name_count++;
+    } while (name_count < MES_NAME_MAX);
+
+    for (int item_index = 0; item_index < MES_ITEM_MAX; item_index++) {
+        item_mes[item_index] = -1;
+    }
+
+    for (int value_index = 0; value_index < MES_VALUE_MAX; value_index++) {
+        values[value_index] = 0;
+        value_width[value_index] = 0;
+    }
+
+    value = 0;
+    value_sign = 0;
+    value_zero = 1;
+    value_half = 0;
+    value_space = 0;
+    digit_font = 0;
+    space_w = -1;
+    justify_w = -1;
+    select = -1;
+    goal_cursor_x = 0;
+    goal_cursor_y = 0;
+    cursor_x = 0;
+    cursor_y = 0;
+    select_shade = MES_SELECT_SHADE_DARK;
+    cursor_centering = 0;
+    cursor_time = 0;
+    choice_pos[0][0] = -1;
+    choice_pos[0][1] = -1;
+    choice_pos[1][0] = -1;
+    choice_pos[1][1] = -1;
+    select_top = 0;
+    cursor_off_y = 0;
+    voice_on = 0;
+    voice_type = 0;
+    voice_cnt = 0;
+    close_time = 0;
+    scissor_on = 0;
+    scissor.x = 0;
+    scissor.width = 0;
+    scissor.y = 0;
+    scissor.height = 0;
+    int line_index;
+    line_index = 0;
+
+    do {
+        line_indent[line_index] = 0;
+        line_pos[line_index][0] = 0;
+        line_pos[line_index][1] = 0;
+        line_pos_on[line_index] = 0;
+        line_shade[line_index] = MES_SHADE_AUTO;
+        line_color[line_index] = 0;
+        equip_on[line_index] = 0;
+        equip_x[line_index] = 0;
+        equip_y[line_index] = 0;
+        line_w[line_index] = 0;
+        line_alpha[line_index] = -1;
+        cross_on[line_index] = 0;
+        cross_x[line_index] = 0;
+        cross_y[line_index] = 0;
+        unk_271c[line_index] = -1;
+        unk_276c[line_index] = -1;
+        unk_27bc[line_index] = 0;
+        unk_280c[line_index] = 0;
+        delta_on[line_index] = 0;
+        delta_x[line_index] = 0;
+        delta_y[line_index] = 0;
+        line_index++;
+    } while (line_index < MES_LINE_MAX);
+}
 
 /**
  *

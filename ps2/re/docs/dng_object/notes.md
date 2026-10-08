@@ -190,3 +190,15 @@ is retained as analysis evidence, but its active profile row is removed while
 the source stays guarded for raw field-offset aliases. Strict selector checking
 must not accept a calibration that no native function consumes. Restore a row
 only after the typed native body reaches zero byte and relocation differences.
+
+## Typed machine-gun update
+
+`CMachineGun::Step` now uses `pos[bullet]` and `velocity[bullet]` directly
+throughout movement, bounds generation, and hit testing. Removing the temporary
+position pointer also restores the retail allocation of the two retained
+address registers. The raw object-offset alias is removed.
+
+The binary32 zero evaluate-first selector for this function is restored.
+The typed 752-byte function and its resolved relocations match PAL, and the
+complete unit passes the canonical comparison: 0x4B90 allocated bytes and
+675 relocations. This supersedes the guarded-source status above.
