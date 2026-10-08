@@ -175,13 +175,13 @@ node and appends it to its name's chain. `DelHash` unlinks the matching texture
 and returns that node to the free stack. `SearchHash` compares names and applies
 an optional texture-block filter.
 
-The preserved typed native implementations differ from retail by one commutative
-`addu` operand order when forming the bucket address. Retail adds scaled index
-then manager base; typed member-array indexing emits base then index. All other
-instructions and relocations match. Casts on the index, base, or member array,
-unsigned indices, swapped subscript syntax, local manager pointers, and direct
-bucket-load expressions did not produce the retail instruction. These functions
-remain fuzzy; no zero-difference match is claimed.
+The bucket address uses the shifted index before the manager base, followed by
+`offsetof(mgCTextureManager, hash_table)`. Retail adds scaled index then manager;
+typed member-array indexing and multiplication by the pointer size emit the
+operands in the opposite order. Keeping the shift restores the three hash
+functions without hard-coding the member offset. The initializer uses the same
+layout expression. The canonical whole-unit check passes all `0x3674` allocated
+bytes and 160 relocations, including the native `Conv32To8` body below.
 
 ## Native full-image conversion
 

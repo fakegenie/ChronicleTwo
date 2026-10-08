@@ -45,7 +45,6 @@
 #include "sound.hpp"
 #include "water.hpp"
 
-
 /**
  *
  * Vector copied as four floats or one quadword.
@@ -517,7 +516,7 @@ void CRocketLauncher::Draw() {
         sprite.Begin(6);
         sprite.Texture(trail_texture);
         sprite.AlphaTestEnable(1);
-        sprite.SetAlphaBlend(1);
+        sprite.SetAlphaBlend(MG_ALPHA_BLEND_NORMAL);
         sprite.Color(0x80, 0x80, 0x80, 0x80);
         fade = 1.0f;
         size = 6.0f;
@@ -1059,7 +1058,7 @@ void CLaserGun::Draw() {
             sprite.Begin(MG_PRIM_SPRITE);
             sprite.Texture(trail_texture);
             sprite.AlphaTestEnable(1);
-            sprite.SetAlphaBlend(2);
+            sprite.SetAlphaBlend(MG_ALPHA_BLEND_ADD);
             sprite.Color(0x80, 0x80, 0x80, 0x80);
             fade = 1.0f;
             size = 6.0f * scale;
@@ -1141,7 +1140,7 @@ void CLaserGun::Draw() {
             attr.color[1] = color[1];
             attr.color[2] = color[2];
             attr.color[3] = 128.0f;
-            model->SetAttrParam(attr, 1, 0x10000);
+            model->SetAttrParam(attr, 1, MG_FRAME_ATTR_COLOR);
             float model_scale = scale;
             ((mgCObject *) model)->SetScale(model_scale, model_scale, model_scale);
             model->SetPosition(pos);
@@ -1275,7 +1274,7 @@ void CPullItem::Draw(mgCTexture *texture) {
         }
 
         if (mgTransWorldPrim3DSprite(quad_a, quad_b, center, width, height, 0) != 0) {
-            sprite.SetAlphaBlend(1);
+            sprite.SetAlphaBlend(MG_ALPHA_BLEND_NORMAL);
             sprite.TextureCrd(draw_u, tex_v);
             sprite.Vertex4(quad_a);
             sprite.TextureCrd(draw_u + tex_w, tex_v + tex_h);
@@ -1285,9 +1284,11 @@ void CPullItem::Draw(mgCTexture *texture) {
         sprite.End();
     }
 }
+
 static inline CMonsterBox *MonsterBox() {
     return &DngUserData->monster_box;
 }
+
 void CPullItem::Step() {
     CCharacter2  *player;
     sceVu0FVECTOR collect_pos;
@@ -1438,7 +1439,7 @@ void CPullItem::Step() {
         }
         if (type == PULL_ITEM_BADGE) {
             CMonsterBox *box = MonsterBox();
-            char **badge_ptr = mons_attr_list[LanguageCode];
+            char       **badge_ptr = mons_attr_list[LanguageCode];
             badge_ptr += item_no;
             char *&badge_name = *badge_ptr;
             if (box->IsChange(item_no) != 0) {
@@ -1565,6 +1566,7 @@ void CPullItem::Step() {
         afterWire[wire_index].SetPos(pos);
     }
 }
+
 void CPullItem::IsGet(float *player_pos) {
     if (state == PULL_ITEM_STATE_FREE || can_get == 0 || get_delay > 0) {
         return;

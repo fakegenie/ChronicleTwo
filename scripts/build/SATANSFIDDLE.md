@@ -2,11 +2,17 @@
 
 The PS2 game units use MWCC 3.0-011126 through Satan's Fiddle. The linker uses
 plain `wibo`; library and data-only assembly use GNU `as`. The Docker image
-builds a pinned Satan's Fiddle revision and includes LLDB and an unstripped
-`wibo`, so local container builds and CI use the same compiler wrapper. For
-builds outside the container, build Satan's Fiddle with its documented Linux,
-Rust, LLDB and unstripped `wibo` prerequisites. Reuse the existing checkout in
+builds a pinned Satan's Fiddle revision with the checked-in
+`scripts/build/patches/satansfiddle-native-floating-point.patch` and includes
+LLDB and an unstripped `wibo`, so local container builds and CI use the same
+compiler wrapper. Builds outside the container must apply that patch before
+building Satan's Fiddle with its documented Linux, Rust, LLDB and unstripped
+`wibo` prerequisites. Reuse the existing checkout in
 cloud tasks; no worktree is needed for setup.
+
+The pinned revision is `365415fa2fd7bf69e899044b704b571a64ed4e6c`.
+After updating the Dockerfile or compiler patch, rebuild an existing container
+image with `REBUILD_IMAGE=1 ./build.sh`.
 
 Objdiff's source-only base objects use the same adapter, profile, options and
 logical translation-unit name as the linked objects. They omit mwccgap so
@@ -35,6 +41,26 @@ and `0x10` for `nd_meswin.cpp`, with FPR mask zero. Calibration checks the compl
 allocated object and resolved relocation identities, so a pre-existing mismatch
 cannot conceal a new change. These rows describe compiler state, not additional
 game functions.
+
+The three translation-unit rows for `actionchara.cpp`, `actscript.cpp` and
+`nd_meswin.cpp` set `native_floating_point: true`. This compatibility mode
+keeps MWCC's floating expression handling intact while retaining the helper
+mask initialization and compiler hash/signature checks. It is opt-in; all
+other units keep the deterministic floating-point policies above. Expression
+or literal override rows for a native-mode unit are rejected as conflicting.
+
+A clean build of `216512e1` reproduces its retail match and 149 passing units.
+With current sources, the plain compiler matches `actionchara` and `actscript`;
+`nd_meswin` also needs its GPR helper mask `0x10`. Native mode reproduces all
+three complete objects without restoring discarded helpers or changing their
+game functions. The old `actionchara` expression overrides are removed because
+the native path already matches those functions. This mode retains the original
+compiler's sensitivity to source changes; edits require the same full object
+and linked retail checks as other units.
+
+The cleanup integration passes all 149 object checks and the linked retail
+comparison after clean builds with both 12 and 6 jobs. The compiler patch's
+15 configuration tests and the adapter's 4 tests also pass.
 
 `scripts/build/mwccgap.sh` supplies `satansfiddle-wibo.py` as mwccgap's
 `--wibo-path`. For each of mwccgap's two passes, the adapter preserves every

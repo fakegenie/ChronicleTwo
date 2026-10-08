@@ -204,3 +204,11 @@ and resolved relocations. With the division primer removed and helper masks
 GPR `0x30` / FPR `0`, validation checks `0x11C50` bytes and 2,970 relocations.
 The seven existing `DrawEsaDropRoot` issues remain; their complete masked
 instruction bytes and resolved relocation targets/addends are unchanged.
+
+## Food drop drawing calibration
+
+`DrawEsaDropRoot__FP9CFishFoodf` needs binary32 `0x3f800000` (1.0f)
+evaluated first. The 0.3f argument keeps the default policy. This restores
+the loop's argument setup and removes all seven previous findings. The
+canonical whole-unit check passes `0x11C54` allocated bytes and 2,970
+relocations with the existing constructor, food-step and fish-scale rows.

@@ -263,18 +263,18 @@ public:
     s32         reveal_num;  /**< Characters revealed so far. */
     s32         page_top;    /**< First character of the page being shown. */
     s32         unk_1f4;
-    MES_WIN_TBL tbl[MES_WIN_TBL_MAX]; /**< Laid-out characters of the message. */
-    s32         tbl_num;              /**< Entries of tbl in use. */
-    s32         scroll_y;             /**< Distance the text has scrolled by. */
-    s32         scroll_goal;          /**< Distance the text is scrolling to. */
-    s32         scroll_speed;         /**< Distance the text scrolls by each frame. */
-    u32         def_color;            /**< Packed RGBA colour the text starts in. */
-    u32         color;                /**< Packed RGBA colour of the next character laid out. */
-    s32         wait;                 /**< Frames left before the next character is revealed. */
-    s32         page_time;            /**< Frames the window has been drawn since the page began. */
-    s32         page_auto_time;       /**< Frames a page shows for before turning by itself. */
-    s32         mes_no;               /**< Message the window holds; -1 for none, -2 for a string. */
-    s32         text_ptr; /**< Address of the current message text. */
+    MES_WIN_TBL tbl[MES_WIN_TBL_MAX];             /**< Laid-out characters of the message. */
+    s32         tbl_num;                          /**< Entries of tbl in use. */
+    s32         scroll_y;                         /**< Distance the text has scrolled by. */
+    s32         scroll_goal;                      /**< Distance the text is scrolling to. */
+    s32         scroll_speed;                     /**< Distance the text scrolls by each frame. */
+    u32         def_color;                        /**< Packed RGBA colour the text starts in. */
+    u32         color;                            /**< Packed RGBA colour of the next character laid out. */
+    s32         wait;                             /**< Frames left before the next character is revealed. */
+    s32         page_time;                        /**< Frames the window has been drawn since the page began. */
+    s32         page_auto_time;                   /**< Frames a page shows for before turning by itself. */
+    s32         mes_no;                           /**< Message the window holds; -1 for none, -2 for a string. */
+    s32         text_ptr;                         /**< Address of the current message text. */
     char       *mes_data;                         /**< Message text loaded for the window. */
     s32         mes_data_size;                    /**< Bytes of mes_data. */
     s32         push_button;                      /**< Non-zero to draw the button prompt when the text is shown. */

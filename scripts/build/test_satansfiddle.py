@@ -47,7 +47,8 @@ class AdapterTests(unittest.TestCase):
             profile.write_text(json.dumps({
                 "compiler_path": "unused", "compiler_options": "unused",
                 "translation_units": [
-                    {"name": "unit.cpp", "gpr_helper_mask": 48, "fpr_helper_mask": 4096},
+                    {"name": "unit.cpp", "gpr_helper_mask": 48, "fpr_helper_mask": 4096,
+                     "native_floating_point": False},
                     {"name": "other.cpp", "gpr_helper_mask": 0, "fpr_helper_mask": 0},
                 ],
                 "floating_point": {
@@ -75,7 +76,10 @@ class AdapterTests(unittest.TestCase):
             selected = observed["configuration"]
             self.assertEqual(shlex.split(selected["compiler_options"]),
                              ["-c", "-pragma", "divbyzerocheck on"])
-            self.assertEqual([row["name"] for row in selected["translation_units"]], ["unit.cpp"])
+            self.assertEqual(selected["translation_units"], [{
+                "name": "unit.cpp", "gpr_helper_mask": 48, "fpr_helper_mask": 4096,
+                "native_floating_point": False,
+            }])
             self.assertEqual(selected["floating_point"]["expression_overrides"], [expression("unit.cpp")])
             self.assertFalse(Path(observed["arguments"][2]).exists())
 

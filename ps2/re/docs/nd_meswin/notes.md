@@ -191,4 +191,11 @@ These trial native promotions were restored. No profile rows were accepted.
 
 ## Compiler helper history
 
-The unused `PrimeDoubleToFloat` definition is removed. The translation-unit profile uses GPR helper mask `0x10` and FPR mask `0`; private baseline and candidate checks preserve all allocated bytes and resolved relocation identities. The existing `DrawMesWin` finding is unchanged. Its two `0.5f` calls require opposite retail schedules and share the current stable selector identity.
+The unused `PrimeDoubleToFloat` definition remains removed. The translation-unit
+profile uses GPR helper mask `0x10` and FPR mask `0`, plus
+`native_floating_point: true`. The plain compiler matches `DrawMesWin` but
+fails `StepNormal` without that helper state. Keeping the helper calibration
+and MWCC's original floating-point handling restores both functions. The
+canonical whole-unit check passes `0xBF28` allocated bytes and 1,364 relocations.
+The `DrawMesWin` body is unchanged from the verified `216512e1` source apart
+from formatting.

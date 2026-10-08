@@ -68,6 +68,7 @@ enum MenuModeID {
     MENU_MODE_SPHIDA_SCORE_VIEW = 29, /**< Spheda score view. */
     MENU_MODE_NUM               = 30, /**< Number of entries in the key and draw function tables. */
 };
+
 // clang-format on
 
 /**
@@ -110,6 +111,7 @@ enum MenuOpenType {
     MENU_OPEN_NUM                     = 30, /**< Number of open requests. */
     MENU_OPEN_ITEM_OVER               = 16, /**< Added to a top-menu request when items overflow. */
 };
+
 // clang-format on
 
 /**
@@ -122,6 +124,7 @@ enum MenuLoopType {
     MENU_LOOP_TOWN    = 0, /**< Opened in a town; the world map is offered. */
     MENU_LOOP_DUNGEON = 1, /**< Opened in a dungeon; the floor map is offered. */
 };
+
 // clang-format on
 
 /**
@@ -136,6 +139,7 @@ enum MenuInterStep {
     MENU_INTER_STEP_CLOSE   = 2,  /**< The menu frame closes before the menu ends. */
     MENU_INTER_STEP_MESSAGE = 13, /**< A message says that the chosen sub-menu cannot be used. */
 };
+
 // clang-format on
 
 /**
@@ -149,6 +153,7 @@ enum MenuInterBGReadStep {
     MENU_INTER_BG_READ_BUSY = 1, /**< The file is being read. */
     MENU_INTER_BG_READ_DONE = 2, /**< The file is in memory, or there is none. */
 };
+
 // clang-format on
 
 /**

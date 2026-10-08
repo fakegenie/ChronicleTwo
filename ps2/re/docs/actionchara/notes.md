@@ -200,7 +200,7 @@ order; MWCC folds the multiplication and the full actionchara object matches.
 
 `CActionChara::Step` can call the held `mgCFrame` and `CMapParts` members directly; their stored fields already have the needed types. Removing the three base/derived casts leaves its object code exact.
 
-## Stable floating-point compiler calibration
+## Earlier deterministic floating-point calibration
 
 GuardEffectSet__FP6CScenePf uses binary32 evaluate-first policies for
 `0x3DCCCCCD` (0.1) and `0x41F00000` (30), scoped to actionchara.cpp and
@@ -210,7 +210,7 @@ identity and initializes expression flags; no source value, argument
 order or pointer workaround was introduced for this calibration. The calibrated effect routines match; other movement and data-piece
 findings remain in the merged unit.
 
-## Gun movement rotation argument order
+## Earlier gun movement rotation calibration
 
 `HumanGunMoveIF__12CActionCharaFPcPc` needs binary32 zero
 (`0x00000000`) evaluated first, before the nested rotation calculation.
@@ -218,3 +218,19 @@ The stable function/type/value policy produces the complete retail
 736-byte body and resolves its five canonical findings. All other 135
 allocated sections retain identical bytes, geometry and resolved relocation
 targets; the unit's other existing findings remain unchanged.
+
+## Native motion-name data and walking compatibility
+
+The six strings `at_2420` through `at_2422` and `at_2504` through `at_2506`
+are emitted by the native movement functions. Removing their redundant
+`INCLUDE_RODATA` markers restores the 43 retail read-only data pieces without
+adding declarations or changing the movement code. The canonical checker
+validates the data bytes and their layout.
+
+`RoboWalkMoveIF` needs zero retained in `f21` across the neutral arm's
+`unitRotation` call. The deterministic default rematerialized it afterward;
+a zero override changed other rotation calls too. The current unit uses
+`native_floating_point: true`, reproducing the original compiler behavior
+from `216512e1` without changing any game function. The earlier GuardEffectSet
+and HumanGunMoveIF override rows are removed. The canonical whole-unit check
+passes `0x8F80` allocated bytes and 1,035 relocations.

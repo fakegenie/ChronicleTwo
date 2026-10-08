@@ -67,6 +67,7 @@ void CDngFreeMap::Initialize() {
     fade_time = -1;
     fade_step = 0.0f;
 }
+
 void CDngFreeMap::InitTexture() {
     map_tex = NULL;
     last_tex = NULL;
@@ -74,12 +75,14 @@ void CDngFreeMap::InitTexture() {
     name_tex = NULL;
     tex_block = -1;
 }
+
 void CDngFreeMap::SetUserGlid(int room_no) {
     user_glid = NULL;
     if (0 <= room_no) {
         user_glid = GetRoomGlid(room_no);
     }
 }
+
 void CDngFreeMap::CalcGlidPutPos(GLID_INFO *glid, float &x, float &y, int board) {
     if (glid != NULL) {
         x = static_cast<float>(glid->x * 52 + glid->y * -16);
@@ -121,6 +124,7 @@ void CDngFreeMap::SetNextRoomPos(GLID_INFO *glid) {
         next_pos_y = pos_y + move_y;
     }
 }
+
 GLID_INFO *CDngFreeMap::GetNextGlid(GLID_INFO *glid, int *direction) {
     if (glid == NULL || floor_manager == NULL) {
         return NULL;
@@ -148,20 +152,22 @@ GLID_INFO *CDngFreeMap::GetEntranceRoomGlid() {
 
     return NULL;
 }
+
 void CDngFreeMap::SetTextureInfo() {
     map_tex = mgTexManager.GetTexture("dt", -1);
     last_tex = mgTexManager.GetTexture("dtbg", -1);
     koma_tex = mgTexManager.GetTexture("dngop", -1);
     name_tex = mgTexManager.GetTexture("dtname", -1);
 }
+
 void CDngFreeMap::ResetDngMapPos(int room_no, int at_once) {
     GLID_INFO *glid = GetRoomGlid(room_no);
     if (glid != NULL) {
         float board_pos[2];
         float unused_x, unused_y;
         float left, top, right, bottom;
-        int width = floor_manager->glid_w;
-        int height = floor_manager->glid_h;
+        int   width = floor_manager->glid_w;
+        int   height = floor_manager->glid_h;
         for (int i = 0; i < floor_manager->glid_num; i++) {
             GLID_INFO *cell = &floor_manager->glid_info[i];
             if (cell->x == 0) {
@@ -217,6 +223,7 @@ void CDngFreeMap::DrawBackPattern(int opacity) {
         }
     }
 }
+
 void CDngFreeMap::DrawDngName(int opacity) {
     if (name_tex != NULL) {
         mgRect<int> tex_rect;
@@ -232,6 +239,7 @@ void CDngFreeMap::DrawDngName(int opacity) {
         prim->End();
     }
 }
+
 void CDngFreeMap::DrawLast() {
     if (last_tex == NULL || mode == DNGMAP_MODE_EVENT) {
         return;
@@ -1081,6 +1089,7 @@ void CDngFreeMap::DrawPlayer(int opacity) {
     PrimQuad(prim, board_x, board_y, tex_rect);
     prim->End();
 }
+
 void CDngFreeMap::Step() {
     if (active == 0) {
         return;
@@ -1239,6 +1248,7 @@ void CDngFreeMap::FadeIn(int frames) {
     }
     alpha = 0.0f;
 }
+
 void CDngFreeMap::FadeOut(int frames) {
     fade_mode = DNGMAP_FADE_OUT;
     fade_time = frames;
@@ -1247,13 +1257,15 @@ void CDngFreeMap::FadeOut(int frames) {
         fade_step = -128.0f / static_cast<float>(frames);
     }
 }
+
 void CDngFreeMap::DeleteTexBlock() {
     mgCTextureManager *manager = &mgTexManager;
-    int block = tex_block;
+    int                block = tex_block;
     if (block >= 0) {
         manager->DeleteBlock(block);
     }
 }
+
 void CDngFreeMap::SetKomaMove(int moving) {
     koma_move = moving;
     koma_now = koma_path;
@@ -1554,14 +1566,16 @@ INCLUDE_ASM("ps2/asm/pal/nonmatchings/dngmenu", LoadDngInfo__11CDngFreeMapFP9mgC
 extern short DngTreeMode;
 
 int CheckDngTreeMapFuncType() {
-    if (MenuCommonInfo->open_type == 3) {
+    if (MenuCommonInfo->open_type == (int) MENU_OPEN_DNG_TREE_MAP) {
         return 2;
     }
-    if (MenuCommonInfo->open_type == 1 || TreeMapCallDungeonSubMap == 1) {
+
+    if (MenuCommonInfo->open_type == (int) MENU_OPEN_MAIN_DUNGEON || TreeMapCallDungeonSubMap == 1) {
         return 1;
     }
     return 0;
 }
+
 extern char *name_tbl_2728[8];
 
 void MakeDngTreeMapJumpNo(int dng_no, int floor_id, int *loop_no, int *map_no) {
@@ -2060,7 +2074,7 @@ int CMenuTreeMap::Step() {
                     DngInfoFloorInfo = target_save;
                     GetSaveData()->GetBitCtrl();
                     DNG_BATTLE_AREA *area = (DNG_BATTLE_AREA *) menu_GetBattleAreaScene();
-                    jump_pay = (area->battle_clear == 0 && MenuCommonInfo->open_type == 1 && !TreeMapCallDungeonSubMap);
+                    jump_pay = (area->battle_clear == 0 && MenuCommonInfo->open_type == (int) MENU_OPEN_MAIN_DUNGEON && !TreeMapCallDungeonSubMap);
                     int mes_no = 0x3C;
                     if (flags & (DNGMAP_ROOM_FLAG_START | DNGMAP_ROOM_FLAG_SUB | DNGMAP_ROOM_FLAG_EXIT | DNGMAP_ROOM_FLAG_BOSS)) {
                         mes_no = 0x3D;
@@ -2351,7 +2365,7 @@ void CMenuTreeMap::Draw() {
         mgRect<int> money_rect(0, 144, 184, 36);
         PrimQuad(prim, 302.0f, (float) y_money, money_rect);
         mgRect<int> number_rect(0, 126, 12, 18);
-        PrimDrawNumber(prim, GetUserDataMan()->money, 0, 426, y_money + 7,
+        PrimDrawNumber(prim, GetUserDataMan()->money, (int) MENU_NUMBER_ALIGN_RIGHT, 426, y_money + 7,
                        number_rect, -1, 0);
         prim->End();
     }
@@ -2421,7 +2435,7 @@ void DngTreeMapInit(mgCMemory *stack, int *tex_block, int menu_mode, int dng_no)
         int size = LoadFileMenu(at_3539, MenuCursorDataBuff, 1);
         MenuTreeMapStack.Alloc((size + 15) / 16);
         CMenuTreePt->FadeOutMenu(1, 0.0f);
-        if (GetNowLoopNo() == 1 || menu_mode == 0) {
+        if (GetNowLoopNo() == (int) LOOP_EDIT || menu_mode == 0) {
             MenuDngMap->floor_manager->LoadDataTable(dng_no, &MenuTreeMapStack);
             MenuDngMap->floor_manager->CheckDrawGlidInfo();
             MenuTreeMapStack.Alloc(0x800);

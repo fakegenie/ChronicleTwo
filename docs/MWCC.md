@@ -40,6 +40,16 @@ ordinals, instruction addresses or compiler-arena addresses select expressions.
 Unmatched selectors are errors, so source changes cannot silently leave stale
 calibration behind. Signed zero and NaN payloads remain distinct identities.
 
+**Native floating-point compatibility.** The translation-unit flag
+`native_floating_point` leaves the original compiler's floating annotations
+and argument lowering intact. `actionchara.cpp`, `actscript.cpp` and
+`nd_meswin.cpp` use this mode to reproduce the schedules from the verified
+`216512e1` build. Compiler hash/signature checks and helper-mask initialization
+remain active; `nd_meswin` retains GPR mask `0x10`. Native mode rejects floating
+expression and literal overrides for the same unit. It preserves the original
+compiler's source sensitivity, so acceptance requires complete object and
+linked retail comparisons. Other units retain deterministic annotations.
+
 **Pooled literal aliasing.** The separate bug that treats a literal's value buffer
 as variable alias metadata is verified for MWCC 2.3.3. No affected alias path is
 validated for this 3.0 image. It can pool constants under other optimization

@@ -1,0 +1,114 @@
+diff --git a/src/config.rs b/src/config.rs
+index 9db2cf5..c247ed3 100644
+--- a/src/config.rs
++++ b/src/config.rs
+@@ -25,6 +25,8 @@ struct TUConfig {
+     name: String,
+     gpr_helper_mask: u32,
+     fpr_helper_mask: u32,
++    #[serde(default)]
++    native_floating_point: bool,
+ }
+ 
+ #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+@@ -175,9 +177,13 @@ impl Config {
+         shlex::split(config.compiler_options.as_deref().unwrap_or_default())
+             .context("Invalid shell quoting in compiler_options")?;
+         let mut tus = HashSet::new();
++        let mut native_units = HashSet::new();
+         for tu in &mut config.translation_units {
+             tu.name = translation_unit_name(&tu.name).to_owned();
+             validate_name(&tu.name, "translation unit name")?;
++            if tu.native_floating_point {
++                native_units.insert(tu.name.clone());
++            }
+             ensure!(
+                 tus.insert(tu.name.clone()),
+                 "Duplicate translation-unit override: {}",
+@@ -192,6 +198,11 @@ impl Config {
+             if let Some(callee) = &row.callee {
+                 validate_name(callee, "expression callee")?;
+             }
++            ensure!(
++                !native_units.contains(&row.translation_unit),
++                "floating-point override conflicts with native_floating_point for {}",
++                row.translation_unit
++            );
+             validate_bits(row.value_type, row.value_bits)?;
+             ensure!(
+                 expressions.insert((
+@@ -210,6 +221,11 @@ impl Config {
+         for row in &mut config.floating_point.literal_overrides {
+             row.translation_unit = translation_unit_name(&row.translation_unit).to_owned();
+             validate_name(&row.translation_unit, "literal translation_unit")?;
++            ensure!(
++                !native_units.contains(&row.translation_unit),
++                "floating-point override conflicts with native_floating_point for {}",
++                row.translation_unit
++            );
+             validate_bits(row.value_type, row.value_bits)?;
+             ensure!(
+                 literals.insert((row.translation_unit.clone(), row.value_type, row.value_bits)),
+@@ -263,6 +279,15 @@ pub fn compiler_options() -> Result<Vec<String>> {
+         .context("Invalid shell quoting in compiler_options")
+ }
+ 
++pub fn native_floating_point(unit: &str) -> bool {
++    for row in &get().translation_units {
++        if row.name == unit {
++            return row.native_floating_point;
++        }
++    }
++    false
++}
++
+ pub fn floating_point() -> &'static FloatingPointConfig {
+     &get().floating_point
+ }
+diff --git a/src/hooks.rs b/src/hooks.rs
+index 9bc73f1..2d91936 100644
+--- a/src/hooks.rs
++++ b/src/hooks.rs
+@@ -395,6 +395,9 @@ fn apply(process: &SBProcess, thread: &SBThread) -> Result<()> {
+     let s = state
+         .as_mut()
+         .ok_or_else(|| anyhow!("hook state not initialized"))?;
++    if pc != c.translation_unit && config::native_floating_point(&s.unit) {
++        return Ok(());
++    }
+     if pc == c.translation_unit {
+         let size = read(process, c.tu_name, 1)?[0] as usize;
+         let name = String::from_utf8(read(process, c.tu_name + 1, size)?)?;
+diff --git a/tests/config/mod.rs b/tests/config/mod.rs
+index 683c584..c576ce7 100644
+--- a/tests/config/mod.rs
++++ b/tests/config/mod.rs
+@@ -221,3 +221,28 @@ fn callee_scopes_coexist_with_global_identity_and_reject_duplicates() {
+     let encoded = serde_json::to_string(&parse(EXPRESSION).unwrap()).unwrap();
+     assert!(!encoded.contains("callee"));
+ }
++
++#[test]
++fn native_floating_point_is_opt_in_and_preserves_helper_masks() {
++    let old = Config::parse(include_str!("../compile_sample/config.toml")).unwrap();
++    assert!(!old.translation_units[0].native_floating_point);
++    let config = parse("[[translation_units]]\nname='src/test.cpp'\ngpr_helper_mask=16\nfpr_helper_mask=0\nnative_floating_point=true").unwrap();
++    let row = &config.translation_units[0];
++    assert_eq!(row.name, "test.cpp");
++    assert_eq!(row.gpr_helper_mask, 16);
++    assert!(row.native_floating_point);
++    let encoded = serde_json::to_string(&config).unwrap();
++    assert!(Config::parse(&encoded).unwrap().translation_units[0].native_floating_point);
++}
++
++#[test]
++fn native_floating_point_rejects_conflicting_overrides() {
++    let unit = "[[translation_units]]\nname='test.cpp'\ngpr_helper_mask=16\nfpr_helper_mask=0\nnative_floating_point=true\n";
++    let literal = "[[floating_point.literal_overrides]]\ntranslation_unit='test.cpp'\nvalue_type='binary32'\nvalue_bits='0x3f800000'\nreload=false\n";
++    for policy in [EXPRESSION, literal] {
++        let error = parse(&format!("{unit}{policy}")).unwrap_err();
++        assert!(error.to_string().contains("conflicts with native_floating_point"));
++        assert!(parse(&format!("{unit}{}", policy.replace("test.cpp", "other.cpp"))).is_ok());
++    }
++    assert!(parse(&unit.replace("native_floating_point=true", "native_floating_point=1")).is_err());
++}

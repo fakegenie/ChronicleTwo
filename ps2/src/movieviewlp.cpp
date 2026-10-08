@@ -234,23 +234,23 @@ int MovieViewLoop() {
     int               entry_offset;
 
     if (MovieMode == 0) {
-        if (GamePad__2.Down(0x800) != 0 || GamePad__2.Down(0x40) != 0) {
+        if (GamePad__2.Down(PAD_START) != 0 || GamePad__2.Down(PAD_CROSS) != 0) {
             return 1;
         }
 
-        if (GamePad__2.Down(0x1000) != 0) {
+        if (GamePad__2.Down(PAD_UP) != 0) {
             MovieSelect -= 1;
         }
 
-        if (GamePad__2.Down(0x4000) != 0) {
+        if (GamePad__2.Down(PAD_DOWN) != 0) {
             MovieSelect += 1;
         }
 
-        if (GamePad__2.Down(4) != 0) {
+        if (GamePad__2.Down(PAD_L1) != 0) {
             MovieSelect -= 7;
         }
 
-        if (GamePad__2.Down(8) != 0) {
+        if (GamePad__2.Down(PAD_R1) != 0) {
             MovieSelect += 7;
         }
 
@@ -274,7 +274,7 @@ int MovieViewLoop() {
             MovieLine += 1;
         }
 
-        if (GamePad__2.Down(0x20) != 0) {
+        if (GamePad__2.Down(PAD_CIRCLE) != 0) {
             Stack_ReadBuff__2.stack_used = 0;
             Stack_ReadBuff__2.lock = 0;
             entry = MovieList + MovieSelect;
@@ -374,12 +374,12 @@ int MovieViewLoop() {
         ((CPreSprite *) prim)->SetIRect(0, 0, 0x200, mgScreenHeight, 0, 0);
         ((CPreSprite *) prim)->End();
 
-        if (GamePad__2.Down(8) != 0 || GamePad__2.Down(2) != 0 ||
-            GamePad__2.Down(4) != 0 || GamePad__2.Down(1) != 0) {
+        if (GamePad__2.Down(PAD_R1) != 0 || GamePad__2.Down(PAD_R2) != 0 ||
+            GamePad__2.Down(PAD_L1) != 0 || GamePad__2.Down(PAD_L2) != 0) {
             mgPerformanceMeter(mgGetPerformanceMeterFlag() ^ 1);
         }
 
-        if (MovieView->EndCheck() != 0 || GamePad__2.Down(0x800) != 0) {
+        if (MovieView->EndCheck() != 0 || GamePad__2.Down(PAD_START) != 0) {
             MovieView->Term();
             MovieView->SwitchThread();
             MovieMode = 0;

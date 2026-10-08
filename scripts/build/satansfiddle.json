@@ -6,6 +6,18 @@
   "default_fpr_helper_mask": 0,
   "translation_units": [
     {
+      "name": "actionchara.cpp",
+      "gpr_helper_mask": 0,
+      "fpr_helper_mask": 0,
+      "native_floating_point": true
+    },
+    {
+      "name": "actscript.cpp",
+      "gpr_helper_mask": 0,
+      "fpr_helper_mask": 0,
+      "native_floating_point": true
+    },
+    {
       "name": "automap.cpp",
       "gpr_helper_mask": 48,
       "fpr_helper_mask": 0
@@ -143,7 +155,8 @@
     {
       "name": "nd_meswin.cpp",
       "gpr_helper_mask": 16,
-      "fpr_helper_mask": 0
+      "fpr_helper_mask": 0,
+      "native_floating_point": true
     },
     {
       "name": "outline.cpp",
@@ -199,27 +212,6 @@
   "floating_point": {
     "default_evaluate_first": false,
     "expression_overrides": [
-      {
-        "translation_unit": "actionchara.cpp",
-        "function": "GuardEffectSet__FP6CScenePf",
-        "value_type": "binary32",
-        "value_bits": "0x3dcccccd",
-        "evaluate_first": true
-      },
-      {
-        "translation_unit": "actionchara.cpp",
-        "function": "GuardEffectSet__FP6CScenePf",
-        "value_type": "binary32",
-        "value_bits": "0x41f00000",
-        "evaluate_first": true
-      },
-      {
-        "translation_unit": "actionchara.cpp",
-        "function": "HumanGunMoveIF__12CActionCharaFPcPc",
-        "value_type": "binary32",
-        "value_bits": "0x00000000",
-        "evaluate_first": true
-      },
       {
         "translation_unit": "cameracontrol.cpp",
         "function": "__ct__14CCameraControlFv",
@@ -577,6 +569,13 @@
         "function": "SetAdjustScale__9CAquaFishFv",
         "value_type": "binary32",
         "value_bits": "0x3f733333",
+        "evaluate_first": true
+      },
+      {
+        "translation_unit": "menuaqua.cpp",
+        "function": "DrawEsaDropRoot__FP9CFishFoodf",
+        "value_type": "binary32",
+        "value_bits": "0x3f800000",
         "evaluate_first": true
       }
     ]

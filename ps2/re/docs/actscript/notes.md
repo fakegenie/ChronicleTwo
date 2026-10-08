@@ -91,3 +91,16 @@ Global (in header): `SetActionScript`, `SetActionExtendTable`, both called only 
 ## Division-check pragma
 
 The unit-level `divbyzerocheck` pragma was redundant with the global MWCC flag; removing it left the full compiled object identical in objdiff.
+
+## Shot argument compatibility
+
+Under deterministic floating annotations, `_SHOT` had four differing
+instruction words around its late `SetValue(4, float(160.0), 0, -1)` call.
+Retail uses `v1` for the float bits and `v0` for the character pointer; the
+default swapped them. A 160.0f evaluate-first row fixed that call but changed
+the earlier call sharing its function, callee, type and value identity.
+
+`native_floating_point: true` restores the original compiler behavior from
+`216512e1` with the current sources and headers. The function body remains
+unchanged. The canonical whole-unit check passes `0x47FC` allocated bytes
+and 1,111 relocations without an expression override.
